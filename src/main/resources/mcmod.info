@@ -1,0 +1,17 @@
+[
+{
+  "modid": "integratedtunnels",
+  "name": "Integrated Tunnels",
+  "description": "Transfer other stuff over Integrated Dynamics networks",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "logoFile": "assets/integratedtunnels/textures/logo.png",
+  "url": "https://github.com/CyclopsMC/IntegratedTunnels",
+  "updateUrl": "todo",
+  "authorList": [ "rubensworks (aka kroeserr)" ],
+  "credits": "rubensworks (aka kroeserr)",
+  "parent": "",
+  "screenshots": [],
+  "dependencies": []
+}
+]
