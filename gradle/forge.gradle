@@ -5,6 +5,42 @@ repositories {
         name "Cyclops Repo"
         url "https://dl.bintray.com/cyclopsmc/dev/"
     }
+    maven {
+        name "Amadornes"
+        url "http://maven.amadornes.com/"
+    }
+    maven {
+        name "Mobius Repo"
+        url "http://mobiusstrip.eu/maven"
+    }
+    maven {
+        name 'DVS1 Maven FS'
+        url 'http://dvs1.progwml6.com/files/maven'
+    }
+    maven {
+        name = "bdew"
+        url = "http://jenkins.bdew.net/maven"
+    }
+    maven {
+        name = "Charset Maven"
+        url = "http://charset.asie.pl/maven"
+    }
+    maven {
+        name = "Dankhax"
+        url = "http://maven.epoxide.xyz"
+    }
+    maven {
+        name 'Player Maven FS'
+        url 'http://maven.ic2.player.to/'
+    }
+    maven {
+        name 'tterrag'
+        url 'http://maven.tterrag.com/'
+    }
+    maven {
+        name "Raoulvdberge Repo"
+        url "https://dl.bintray.com/raoulvdberge/dev/"
+    }
 }
 dependencies {
     // Add something like 'integrateddynamics_version_local=0.1.0-DEV' to your gradle.properties if you want to use a custom local Integrated Dynamics version.
