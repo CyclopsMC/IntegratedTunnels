@@ -36,9 +36,12 @@ public class Reference {
     public static final String MOD_CYCLOPSCORE = "cyclopscore";
     public static final String MOD_CYCLOPSCORE_VERSION = "@CYCLOPSCORE_VERSION@";
     public static final String MOD_CYCLOPSCORE_VERSION_MIN = "0.7.7";
+    public static final String MOD_INTEGRATEDDYNAMICS = "integrateddynamics";
+    public static final String MOD_INTEGRATEDDYNAMICS_VERSION_MIN = "0.5.1";
     
     // Dependencies
     public static final String MOD_DEPENDENCIES =
-            "required-after:" + MOD_FORGE       + "@[" + MOD_FORGE_VERSION_MIN       + ",);" +
-            "required-after:" + MOD_CYCLOPSCORE + "@[" + MOD_CYCLOPSCORE_VERSION_MIN + ",);";
+            "required-after:" + MOD_FORGE              + "@[" + MOD_FORGE_VERSION_MIN              + ",);" +
+            "required-after:" + MOD_CYCLOPSCORE        + "@[" + MOD_CYCLOPSCORE_VERSION_MIN        + ",);" +
+            "required-after:" + MOD_INTEGRATEDDYNAMICS + "@[" + MOD_INTEGRATEDDYNAMICS_VERSION_MIN + ",);";
 }

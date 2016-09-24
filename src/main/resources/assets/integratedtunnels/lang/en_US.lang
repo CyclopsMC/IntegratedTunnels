@@ -1,0 +1,10 @@
+# General
+itemGroup.integratedtunnels=Integrated Tunnels
+
+# Part types
+parttype.parttypes.integratedtunnels.interfaceEnergy.name=Energy Interface
+parttype.parttypes.integratedtunnels.interfaceEnergy.info=Attaches an energy holder to the network
+parttype.parttypes.integratedtunnels.importerEnergy.name=Energy Importer
+parttype.parttypes.integratedtunnels.importerEnergy.info=Imports energy into the network
+parttype.parttypes.integratedtunnels.exporterEnergy.name=Energy Exporter
+parttype.parttypes.integratedtunnels.exporterEnergy.info=Exports energy from the network
