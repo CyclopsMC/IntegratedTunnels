@@ -2,6 +2,7 @@ package org.cyclops.integratedtunnels.part;
 
 import net.minecraftforge.energy.IEnergyStorage;
 import org.cyclops.integrateddynamics.api.network.IEnergyNetwork;
+import org.cyclops.integratedtunnels.core.EnergyHelpers;
 import org.cyclops.integratedtunnels.core.part.PartTypeIOEnergy;
 
 /**
@@ -14,11 +15,8 @@ public class PartTypeImporterEnergy extends PartTypeIOEnergy<PartTypeImporterEne
 
     @Override
     protected void handleEnergyConnection(IEnergyNetwork energyNetwork, IEnergyStorage energyStorage) {
-        int ENERGY_RATE = 80; // TODO
-
-        int toSend = Math.min(ENERGY_RATE, energyNetwork.getMaxEnergyStored() - energyNetwork.getEnergyStored());
-        int extracted = energyStorage.extractEnergy(toSend, false);
-        energyNetwork.receiveEnergy(extracted, false);
+        int energyRate = Integer.MAX_VALUE;
+        EnergyHelpers.moveEnergy(energyStorage, energyNetwork, energyRate);
     }
 
     @Override
