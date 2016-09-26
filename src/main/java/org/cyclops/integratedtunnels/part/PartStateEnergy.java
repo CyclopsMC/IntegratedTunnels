@@ -22,11 +22,6 @@ public class PartStateEnergy<P extends IPartType> extends PartStateBase<P> imple
         this.canExtract = canExtract;
     }
 
-    @Override
-    public Class<? extends IPartState> getPartStateClass() {
-        return IPartState.class; // TODO
-    }
-
     public IEnergyNetwork getEnergyNetwork() {
         return energyNetwork;
     }
