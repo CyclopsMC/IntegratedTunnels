@@ -1,23 +1,23 @@
 package org.cyclops.integratedtunnels.part;
 
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
 import org.cyclops.integrateddynamics.api.network.IEnergyNetwork;
-import org.cyclops.integrateddynamics.api.part.IPartState;
-import org.cyclops.integrateddynamics.api.part.IPartType;
-import org.cyclops.integrateddynamics.core.part.PartStateBase;
+import org.cyclops.integrateddynamics.api.part.write.IPartTypeWriter;
+import org.cyclops.integrateddynamics.core.part.write.PartStateWriterBase;
 
 /**
+ * A part state for handling energy import and export.
+ * It also acts as an energy capability that can be added to itself.
  * @author rubensworks
  */
-public class PartStateEnergy<P extends IPartType> extends PartStateBase<P> implements IEnergyStorage {
+public class PartStateEnergy<P extends IPartTypeWriter> extends PartStateWriterBase<P> implements IEnergyStorage {
 
     private final boolean canReceive;
     private final boolean canExtract;
     private IEnergyNetwork energyNetwork;
 
-    public PartStateEnergy(boolean canReceive, boolean canExtract) {
+    public PartStateEnergy(int inventorySize, boolean canReceive, boolean canExtract) {
+        super(inventorySize);
         this.canReceive = canReceive;
         this.canExtract = canExtract;
     }
@@ -28,20 +28,6 @@ public class PartStateEnergy<P extends IPartType> extends PartStateBase<P> imple
 
     public void setEnergyNetwork(IEnergyNetwork energyNetwork) {
         this.energyNetwork = energyNetwork;
-    }
-
-    @Override
-    public boolean hasCapability(Capability<?> capability) {
-        return capability == CapabilityEnergy.ENERGY || super.hasCapability(capability);
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    public <T> T getCapability(Capability<T> capability) {
-        if (capability == CapabilityEnergy.ENERGY) {
-            return (T) this;
-        }
-        return super.getCapability(capability);
     }
 
     @Override

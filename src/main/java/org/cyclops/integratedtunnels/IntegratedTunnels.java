@@ -16,6 +16,7 @@ import org.cyclops.cyclopscore.init.ModBaseVersionable;
 import org.cyclops.cyclopscore.init.RecipeHandler;
 import org.cyclops.cyclopscore.proxy.ICommonProxy;
 import org.cyclops.integratedtunnels.part.PartTypes;
+import org.cyclops.integratedtunnels.part.aspect.TunnelAspects;
 
 /**
  * The main mod class of this mod.
@@ -61,6 +62,7 @@ public class IntegratedTunnels extends ModBaseVersionable {
     @EventHandler
     @Override
     public void preInit(FMLPreInitializationEvent event) {
+        TunnelAspects.load();
         PartTypes.load();
         super.preInit(event);
     }

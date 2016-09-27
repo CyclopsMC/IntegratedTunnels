@@ -5,7 +5,7 @@ import net.minecraftforge.energy.IEnergyStorage;
 /**
  * @author Ruben Taelman (ruben.taelman@ugent.be)
  */
-public class EnergyHelpers {
+public class TunnelEnergyHelpers {
 
     /**
      * Move energy from source to target.
