@@ -9,6 +9,8 @@ import org.cyclops.integrateddynamics.IntegratedDynamics;
 import org.cyclops.integrateddynamics.api.part.IPartState;
 import org.cyclops.integrateddynamics.api.part.IPartType;
 import org.cyclops.integrateddynamics.api.part.PartRenderPosition;
+import org.cyclops.integrateddynamics.core.client.gui.container.GuiPartSettings;
+import org.cyclops.integrateddynamics.core.inventory.container.ContainerPartSettings;
 import org.cyclops.integrateddynamics.core.part.PartTypeBase;
 import org.cyclops.integratedtunnels.IntegratedTunnels;
 
@@ -28,23 +30,27 @@ public abstract class PartTypeTunnel<P extends IPartType<P, S>, S extends IPartS
     }
 
     @Override
+    public ModBase getModGui() {
+        return IntegratedDynamics._instance;
+    }
+
+    @Override
     public Class<? super P> getPartTypeClass() {
         return IPartType.class;
     }
 
     @Override
     protected boolean hasGui() {
-        return false;
+        return true;
     }
 
     @Override
     public Class<? extends Container> getContainer() {
-        return null;
+        return ContainerPartSettings.class;
     }
 
     @Override
-    @SideOnly(Side.CLIENT)
     public Class<? extends GuiScreen> getGui() {
-        return null;
+        return GuiPartSettings.class;
     }
 }
