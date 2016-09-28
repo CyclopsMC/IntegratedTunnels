@@ -3,6 +3,7 @@ package org.cyclops.integratedtunnels.part;
 import net.minecraft.block.Block;
 import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.energy.CapabilityEnergy;
+import net.minecraftforge.energy.IEnergyStorage;
 import org.cyclops.cyclopscore.helper.TileHelpers;
 import org.cyclops.integrateddynamics.api.network.IEnergyNetwork;
 import org.cyclops.integrateddynamics.api.network.INetwork;
@@ -46,10 +47,12 @@ public class PartTypeInterfaceEnergy extends PartTypeTunnel<PartTypeInterfaceEne
     }
 
     protected void addToNetwork(INetwork network, PartPos pos) {
-        if (network.hasCapability(Capabilities.NETWORK_ENERGY)
-                && TileHelpers.getCapability(pos.getPos(), CapabilityEnergy.ENERGY) != null) {
-            IEnergyNetwork energyNetwork = network.getCapability(Capabilities.NETWORK_ENERGY);
-            energyNetwork.addEnergyBattery(pos);
+        if (network.hasCapability(Capabilities.NETWORK_ENERGY)) {
+            IEnergyStorage energyStorage = TileHelpers.getCapability(pos.getPos(), CapabilityEnergy.ENERGY);
+            if (energyStorage != null && energyStorage.canExtract() && energyStorage.canReceive()) {
+                IEnergyNetwork energyNetwork = network.getCapability(Capabilities.NETWORK_ENERGY);
+                energyNetwork.addEnergyBattery(pos);
+            }
         }
     }
 
