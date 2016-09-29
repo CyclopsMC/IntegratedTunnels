@@ -1,0 +1,7 @@
+{
+  "forge_marker": 1,
+  "parent": "integratedtunnels:block/connector",
+  "textures": {
+    "texture": "integratedtunnels:parts/exporter_item_active"
+  }
+}

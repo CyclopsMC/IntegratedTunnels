@@ -3,6 +3,7 @@ package org.cyclops.integratedtunnels;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.Mod.Instance;
@@ -15,6 +16,8 @@ import org.cyclops.cyclopscore.init.ItemCreativeTab;
 import org.cyclops.cyclopscore.init.ModBaseVersionable;
 import org.cyclops.cyclopscore.init.RecipeHandler;
 import org.cyclops.cyclopscore.proxy.ICommonProxy;
+import org.cyclops.integratedtunnels.capability.network.ItemNetworkConfig;
+import org.cyclops.integratedtunnels.capability.network.TunnelNetworkCapabilityConstructors;
 import org.cyclops.integratedtunnels.part.PartTypes;
 import org.cyclops.integratedtunnels.part.aspect.TunnelAspects;
 
@@ -65,6 +68,8 @@ public class IntegratedTunnels extends ModBaseVersionable {
         TunnelAspects.load();
         PartTypes.load();
         super.preInit(event);
+
+        MinecraftForge.EVENT_BUS.register(new TunnelNetworkCapabilityConstructors());
     }
     
     /**
@@ -130,6 +135,12 @@ public class IntegratedTunnels extends ModBaseVersionable {
     @Override
     public void onGeneralConfigsRegister(ConfigHandler configHandler) {
         configHandler.add(new GeneralConfig());
+    }
+
+    @Override
+    public void onMainConfigsRegister(ConfigHandler configHandler) {
+        super.onMainConfigsRegister(configHandler);
+        configHandler.add(new ItemNetworkConfig());
     }
 
     @Override

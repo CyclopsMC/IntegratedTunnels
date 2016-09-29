@@ -44,6 +44,36 @@ public class TunnelAspects {
 
         }
 
+        public static final class Item {
+
+            public static final IAspectWrite<ValueTypeBoolean.ValueBoolean, ValueTypeBoolean> BOOLEAN_EXPORT =
+                    TunnelAspectWriteBuilders.Item.BUILDER_BOOLEAN
+                            .withProperties(TunnelAspectWriteBuilders.Item.PROPERTIES)
+                            .handle(TunnelAspectWriteBuilders.Item.PROP_GETRATE)
+                            .handle(TunnelAspectWriteBuilders.Item.PROP_ITEMTARGET)
+                            .handle(TunnelAspectWriteBuilders.Item.PROP_EXPORT)
+                            .appendKind("export").buildWrite();
+            public static final IAspectWrite<ValueTypeInteger.ValueInteger, ValueTypeInteger> INTEGER_EXPORT =
+                    TunnelAspectWriteBuilders.Item.BUILDER_INTEGER
+                            .handle(TunnelAspectWriteBuilders.Item.PROP_ITEMTARGET)
+                            .handle(TunnelAspectWriteBuilders.Item.PROP_EXPORT)
+                            .appendKind("export").buildWrite();
+
+            public static final IAspectWrite<ValueTypeBoolean.ValueBoolean, ValueTypeBoolean> BOOLEAN_IMPORT =
+                    TunnelAspectWriteBuilders.Item.BUILDER_BOOLEAN
+                            .withProperties(TunnelAspectWriteBuilders.Item.PROPERTIES)
+                            .handle(TunnelAspectWriteBuilders.Item.PROP_GETRATE)
+                            .handle(TunnelAspectWriteBuilders.Item.PROP_ITEMTARGET)
+                            .handle(TunnelAspectWriteBuilders.Item.PROP_IMPORT)
+                            .appendKind("import").buildWrite();
+            public static final IAspectWrite<ValueTypeInteger.ValueInteger, ValueTypeInteger> INTEGER_IMPORT =
+                    TunnelAspectWriteBuilders.Item.BUILDER_INTEGER
+                            .handle(TunnelAspectWriteBuilders.Item.PROP_ITEMTARGET)
+                            .handle(TunnelAspectWriteBuilders.Item.PROP_IMPORT)
+                            .appendKind("import").buildWrite();
+
+        }
+
     }
 
 }
