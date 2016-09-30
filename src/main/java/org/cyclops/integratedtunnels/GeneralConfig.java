@@ -54,6 +54,12 @@ public class GeneralConfig extends DummyConfig {
     public static boolean versionChecker = true;
 
     /**
+     * How many ticks importers/exporters should sleep until checking targets again when they were previously unchanged.
+     */
+    @ConfigurableProperty(category = ConfigurableTypeCategory.CORE, comment = "How many ticks importers/exporters should sleep until checking targets again when they were previously unchanged.")
+    public static int inventoryUnchangedTickTimeout = 10;
+
+    /**
      * The type of this config.
      */
     public static ConfigurableType TYPE = ConfigurableType.DUMMY;

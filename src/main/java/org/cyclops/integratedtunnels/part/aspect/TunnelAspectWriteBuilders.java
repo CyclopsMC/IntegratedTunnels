@@ -7,6 +7,7 @@ import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import org.apache.commons.lang3.tuple.Triple;
+import org.cyclops.commoncapabilities.api.capability.inventorystate.IInventoryState;
 import org.cyclops.cyclopscore.datastructure.DimPos;
 import org.cyclops.cyclopscore.helper.TileHelpers;
 import org.cyclops.integrateddynamics.api.network.IEnergyNetwork;
@@ -176,7 +177,10 @@ public class TunnelAspectWriteBuilders {
                 INetwork network = NetworkHelpers.getNetwork(center.getPos().getWorld(), center.getPos().getBlockPos());
                 IItemHandler itemHandler = TileHelpers.getCapability(target.getPos(), target.getSide(), CapabilityItemHandler.ITEM_HANDLER_CAPABILITY);
                 int slot = input.getMiddle().getValue(PROP_SLOT).getRawValue();
-                return new ItemTarget(network.getCapability(ItemNetworkConfig.CAPABILITY), itemHandler, slot, input.getRight());
+                return new ItemTarget(
+                        network.getCapability(ItemNetworkConfig.CAPABILITY), itemHandler,
+                        network.hasCapability(Capabilities.INVENTORY_STATE) ? network.getCapability(Capabilities.INVENTORY_STATE) : null, TileHelpers.getCapability(target.getPos(), target.getSide(), Capabilities.INVENTORY_STATE),
+                        target.hashCode(), slot, input.getRight());
             }
         };
         public static final IAspectValuePropagator<ItemTarget, Void>
@@ -184,7 +188,10 @@ public class TunnelAspectWriteBuilders {
             @Override
             public Void getOutput(ItemTarget input) {
                 if (input.getItemNetwork() != null && input.getItemStorage() != null && input.getAmount() != 0) {
-                    TunnelItemHelpers.moveItems(input.getItemNetwork(), -1, input.getItemStorage(), input.getSlot(), input.getAmount());
+                    TunnelItemHelpers.moveItemsStateOptimized(
+                            input.getNetworkHash(), input.getItemNetwork(), input.getInventoryStateNetwork(), -1,
+                            input.getStoragePosHash(), input.getItemStorage(), input.getInventoryStateStorage(), input.getSlot(),
+                            input.getAmount());
                 }
                 return null;
             }
@@ -194,7 +201,10 @@ public class TunnelAspectWriteBuilders {
             @Override
             public Void getOutput(ItemTarget input) {
                 if (input.getItemNetwork() != null && input.getItemStorage() != null && input.getAmount() != 0) {
-                    TunnelItemHelpers.moveItems(input.getItemStorage(), input.getSlot(), input.getItemNetwork(), -1, input.getAmount());
+                    TunnelItemHelpers.moveItemsStateOptimized(
+                            input.getStoragePosHash(), input.getItemStorage(), input.getInventoryStateStorage(), input.getSlot(),
+                            input.getNetworkHash(), input.getItemNetwork(), input.getInventoryStateNetwork(), -1,
+                            input.getAmount());
                 }
                 return null;
             }
@@ -204,12 +214,22 @@ public class TunnelAspectWriteBuilders {
 
             private final IItemNetwork itemNetwork;
             private final IItemHandler itemStorage;
+            private final IInventoryState inventoryStateNetwork;
+            private final IInventoryState inventoryStateStorage;
+            private final int networkHash;
+            private final int storagePosHash;
             private final int slot;
             private final int amount;
 
-            public ItemTarget(IItemNetwork itemNetwork, IItemHandler itemStorage, int slot, int amount) {
+            public ItemTarget(IItemNetwork itemNetwork, IItemHandler itemStorage,
+                              IInventoryState inventoryStateNetwork, IInventoryState inventoryStateStorage,
+                              int storagePosHash, int slot, int amount) {
                 this.itemNetwork = itemNetwork;
                 this.itemStorage = itemStorage;
+                this.inventoryStateNetwork = inventoryStateNetwork;
+                this.inventoryStateStorage = inventoryStateStorage;
+                this.networkHash = itemNetwork.hashCode();
+                this.storagePosHash = storagePosHash;
                 this.slot = slot;
                 this.amount = amount;
             }
@@ -220,6 +240,22 @@ public class TunnelAspectWriteBuilders {
 
             public IItemHandler getItemStorage() {
                 return itemStorage;
+            }
+
+            public IInventoryState getInventoryStateNetwork() {
+                return inventoryStateNetwork;
+            }
+
+            public IInventoryState getInventoryStateStorage() {
+                return inventoryStateStorage;
+            }
+
+            public int getNetworkHash() {
+                return networkHash;
+            }
+
+            public int getStoragePosHash() {
+                return storagePosHash;
             }
 
             public int getSlot() {
