@@ -205,7 +205,7 @@ public class TunnelAspectWriteBuilders {
                 PROP_INTEGER_ITEMTARGET = new IAspectValuePropagator<Triple<PartTarget, IAspectProperties, Integer>, ItemTarget>() {
             @Override
             public ItemTarget getOutput(Triple<PartTarget, IAspectProperties, Integer> input) {
-                return ItemTarget.of(input.getLeft(), input.getMiddle(), input.getRight(), TunnelItemHelpers.MATCH_ALL);
+                return ItemTarget.of(input.getLeft(), input.getMiddle(), input.getRight(), TunnelItemHelpers.MATCH_ALL, input.getRight());
             }
         };
         public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, ItemStack>, ItemTarget>
@@ -218,7 +218,8 @@ public class TunnelAspectWriteBuilders {
                 boolean checkDamage = properties.getValue(PROP_CHECK_DAMAGE).getRawValue();
                 boolean checkNbt = properties.getValue(PROP_CHECK_NBT).getRawValue();
                 return ItemTarget.of(input.getLeft(), input.getMiddle(), rate,
-                        TunnelItemHelpers.matchItemStack(input.getRight(), checkStackSize, checkDamage, checkNbt));
+                        TunnelItemHelpers.matchItemStack(input.getRight(), checkStackSize, checkDamage, checkNbt),
+                        TunnelItemHelpers.getItemStackHashCode(input.getRight()));
             }
         };
         public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, ValueTypeList.ValueList>, ItemTarget>
@@ -235,7 +236,8 @@ public class TunnelAspectWriteBuilders {
                 boolean checkDamage = properties.getValue(PROP_CHECK_DAMAGE).getRawValue();
                 boolean checkNbt = properties.getValue(PROP_CHECK_NBT).getRawValue();
                 return ItemTarget.of(input.getLeft(), input.getMiddle(), rate,
-                        TunnelItemHelpers.matchItemStacks(list.getRawValue(), checkStackSize, checkDamage, checkNbt));
+                        TunnelItemHelpers.matchItemStacks(list.getRawValue(), checkStackSize, checkDamage, checkNbt),
+                        list.getRawValue().hashCode());
             }
         };
 
@@ -245,8 +247,8 @@ public class TunnelAspectWriteBuilders {
             public Void getOutput(ItemTarget input) {
                 if (input.getItemNetwork() != null && input.getItemStorage() != null && input.getAmount() != 0) {
                     TunnelItemHelpers.moveItemsStateOptimized(
-                            input.getNetworkHash(), input.getItemNetwork(), input.getInventoryStateNetwork(), -1,
-                            input.getStoragePosHash(), input.getItemStorage(), input.getInventoryStateStorage(), input.getSlot(),
+                            input.getConnectionHash(), input.getItemNetwork(), input.getInventoryStateNetwork(), -1,
+                            input.getItemStorage(), input.getInventoryStateStorage(), input.getSlot(),
                             input.getAmount(), input.getItemStackMatcher());
                 }
                 return null;
@@ -258,8 +260,8 @@ public class TunnelAspectWriteBuilders {
             public Void getOutput(ItemTarget input) {
                 if (input.getItemNetwork() != null && input.getItemStorage() != null && input.getAmount() != 0) {
                     TunnelItemHelpers.moveItemsStateOptimized(
-                            input.getStoragePosHash(), input.getItemStorage(), input.getInventoryStateStorage(), input.getSlot(),
-                            input.getNetworkHash(), input.getItemNetwork(), input.getInventoryStateNetwork(), -1,
+                            input.getConnectionHash(), input.getItemStorage(), input.getInventoryStateStorage(), input.getSlot(),
+                            input.getItemNetwork(), input.getInventoryStateNetwork(), -1,
                             input.getAmount(), input.getItemStackMatcher());
                 }
                 return null;
@@ -272,14 +274,13 @@ public class TunnelAspectWriteBuilders {
             private final IItemHandler itemStorage;
             private final IInventoryState inventoryStateNetwork;
             private final IInventoryState inventoryStateStorage;
-            private final int networkHash;
-            private final int storagePosHash;
+            private final int connectionHash;
             private final int slot;
             private final int amount;
             private final Predicate<ItemStack> itemStackMatcher;
 
             public static ItemTarget of(PartTarget partTarget, IAspectProperties properties, int amount,
-                                        Predicate<ItemStack> itemStackMatcher) {
+                                        Predicate<ItemStack> itemStackMatcher, int transferHash) {
                 PartPos center = partTarget.getCenter();
                 PartPos target = partTarget.getTarget();
                 INetwork network = NetworkHelpers.getNetwork(center.getPos().getWorld(), center.getPos().getBlockPos());
@@ -289,18 +290,18 @@ public class TunnelAspectWriteBuilders {
                         network.getCapability(ItemNetworkConfig.CAPABILITY), itemHandler,
                         network.hasCapability(Capabilities.INVENTORY_STATE) ? network.getCapability(Capabilities.INVENTORY_STATE) : null,
                         TileHelpers.getCapability(target.getPos(), target.getSide(), Capabilities.INVENTORY_STATE),
-                        target.hashCode(), slot, amount, itemStackMatcher);
+                        target.hashCode(), slot, amount, itemStackMatcher, transferHash);
             }
 
             public ItemTarget(IItemNetwork itemNetwork, IItemHandler itemStorage,
                               IInventoryState inventoryStateNetwork, IInventoryState inventoryStateStorage,
-                              int storagePosHash, int slot, int amount, Predicate<ItemStack> itemStackMatcher) {
+                              int storagePosHash, int slot,
+                              int amount, Predicate<ItemStack> itemStackMatcher, int transferHash) {
                 this.itemNetwork = itemNetwork;
                 this.itemStorage = itemStorage;
                 this.inventoryStateNetwork = inventoryStateNetwork;
                 this.inventoryStateStorage = inventoryStateStorage;
-                this.networkHash = itemNetwork.hashCode();
-                this.storagePosHash = storagePosHash;
+                this.connectionHash = transferHash << 4 + storagePosHash + itemNetwork.hashCode();
                 this.slot = slot;
                 this.amount = amount;
                 this.itemStackMatcher = itemStackMatcher;
@@ -322,12 +323,8 @@ public class TunnelAspectWriteBuilders {
                 return inventoryStateStorage;
             }
 
-            public int getNetworkHash() {
-                return networkHash;
-            }
-
-            public int getStoragePosHash() {
-                return storagePosHash;
+            public int getConnectionHash() {
+                return connectionHash;
             }
 
             public int getSlot() {

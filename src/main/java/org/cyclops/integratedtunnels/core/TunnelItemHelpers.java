@@ -122,7 +122,7 @@ public class TunnelItemHelpers {
         CACHE_INV_CHECKS.invalidate(posHash);
     }
 
-    protected static int getItemStackHashCode(ItemStack itemStack) {
+    public static int getItemStackHashCode(ItemStack itemStack) {
         if (itemStack == null) {
             return 0;
         }
@@ -166,18 +166,21 @@ public class TunnelItemHelpers {
 
     /**
      * Move items from source to target.
+     * @param connectionHash The connection hash.
      * @param sourceHandler The source item handler.
+     * @param sourceInvState Optional inventory state of the source.
      * @param sourceSlot The source slot.
      * @param targetHandler The target item handler.
+     * @param targetInvState Optional inventory state of the target.
      * @param targetSlot The target slot.
      * @param amount The maximum item amount to transfer.
      * @param itemStackMatcher Only itemstack matching this predicate will be moved.
      * @return The moved itemstack.
      */
-    public static ItemStack moveItemsStateOptimized(int sourcePosHash, IItemHandler sourceHandler, @Nullable IInventoryState sourceInvState, int sourceSlot,
-                                                    int targetPosHash, IItemHandler targetHandler, @Nullable IInventoryState targetInvState, int targetSlot,
+    public static ItemStack moveItemsStateOptimized(int connectionHash,
+                                                    IItemHandler sourceHandler, @Nullable IInventoryState sourceInvState, int sourceSlot,
+                                                    IItemHandler targetHandler, @Nullable IInventoryState targetInvState, int targetSlot,
                                                     int amount, Predicate<ItemStack> itemStackMatcher) {
-        int connectionHash = sourcePosHash + targetPosHash;
         Integer cachedState = getCachedState(connectionHash);
 
         boolean calculatedStates = false;
