@@ -4,6 +4,7 @@ import org.cyclops.integrateddynamics.api.part.aspect.IAspectWrite;
 import org.cyclops.integrateddynamics.core.evaluate.variable.ValueObjectTypeItemStack;
 import org.cyclops.integrateddynamics.core.evaluate.variable.ValueTypeBoolean;
 import org.cyclops.integrateddynamics.core.evaluate.variable.ValueTypeInteger;
+import org.cyclops.integrateddynamics.core.evaluate.variable.ValueTypeList;
 
 /**
  * Collection of all tunnel aspects.
@@ -66,6 +67,12 @@ public class TunnelAspects {
                             .handle(TunnelAspectWriteBuilders.Item.PROP_ITEMSTACK_ITEMTARGET)
                             .handle(TunnelAspectWriteBuilders.Item.PROP_EXPORT)
                             .appendKind("export").buildWrite();
+            public static final IAspectWrite<ValueTypeList.ValueList, ValueTypeList> LIST_EXPORT =
+                    TunnelAspectWriteBuilders.Item.BUILDER_LIST
+                            .withProperties(TunnelAspectWriteBuilders.Item.PROPERTIES_ITEMSTACK)
+                            .handle(TunnelAspectWriteBuilders.Item.PROP_ITEMSTACKLIST_ITEMTARGET)
+                            .handle(TunnelAspectWriteBuilders.Item.PROP_EXPORT)
+                            .appendKind("export").buildWrite();
 
             public static final IAspectWrite<ValueTypeBoolean.ValueBoolean, ValueTypeBoolean> BOOLEAN_IMPORT =
                     TunnelAspectWriteBuilders.Item.BUILDER_BOOLEAN
@@ -84,6 +91,12 @@ public class TunnelAspects {
                     TunnelAspectWriteBuilders.Item.BUILDER_ITEMSTACK
                             .withProperties(TunnelAspectWriteBuilders.Item.PROPERTIES_ITEMSTACK)
                             .handle(TunnelAspectWriteBuilders.Item.PROP_ITEMSTACK_ITEMTARGET)
+                            .handle(TunnelAspectWriteBuilders.Item.PROP_IMPORT)
+                            .appendKind("import").buildWrite();
+            public static final IAspectWrite<ValueTypeList.ValueList, ValueTypeList> LIST_IMPORT =
+                    TunnelAspectWriteBuilders.Item.BUILDER_LIST
+                            .withProperties(TunnelAspectWriteBuilders.Item.PROPERTIES_ITEMSTACK)
+                            .handle(TunnelAspectWriteBuilders.Item.PROP_ITEMSTACKLIST_ITEMTARGET)
                             .handle(TunnelAspectWriteBuilders.Item.PROP_IMPORT)
                             .appendKind("import").buildWrite();
 

@@ -9,6 +9,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraftforge.items.IItemHandler;
 import org.cyclops.commoncapabilities.api.capability.inventorystate.IInventoryState;
 import org.cyclops.cyclopscore.helper.MinecraftHelpers;
+import org.cyclops.integrateddynamics.api.evaluate.variable.IValueTypeListProxy;
+import org.cyclops.integrateddynamics.core.evaluate.variable.ValueObjectTypeItemStack;
 import org.cyclops.integratedtunnels.GeneralConfig;
 
 import javax.annotation.Nullable;
@@ -215,6 +217,22 @@ public class TunnelItemHelpers {
             @Override
             public boolean apply(@Nullable ItemStack input) {
                 return areItemStackEqual(input, itemStack, checkStackSize, true, checkDamage, checkNbt);
+            }
+        };
+    }
+
+    public static Predicate<ItemStack> matchItemStacks(final IValueTypeListProxy<ValueObjectTypeItemStack, ValueObjectTypeItemStack.ValueItemStack> itemStacks,
+                                                       final boolean checkStackSize, final boolean checkDamage, final boolean checkNbt) {
+        return new Predicate<ItemStack>() {
+            @Override
+            public boolean apply(@Nullable ItemStack input) {
+                for (ValueObjectTypeItemStack.ValueItemStack itemStack : itemStacks) {
+                    if (itemStack.getRawValue().isPresent()
+                            && areItemStackEqual(input, itemStack.getRawValue().get(), checkStackSize, true, checkDamage, checkNbt)) {
+                        return true;
+                    }
+                }
+                return false;
             }
         };
     }

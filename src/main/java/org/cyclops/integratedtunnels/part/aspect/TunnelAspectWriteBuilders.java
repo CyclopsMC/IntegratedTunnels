@@ -12,6 +12,7 @@ import org.apache.commons.lang3.tuple.Triple;
 import org.cyclops.commoncapabilities.api.capability.inventorystate.IInventoryState;
 import org.cyclops.cyclopscore.datastructure.DimPos;
 import org.cyclops.cyclopscore.helper.TileHelpers;
+import org.cyclops.integrateddynamics.api.evaluate.EvaluationException;
 import org.cyclops.integrateddynamics.api.network.IEnergyNetwork;
 import org.cyclops.integrateddynamics.api.network.INetwork;
 import org.cyclops.integrateddynamics.api.network.IPositionedAddonsNetwork;
@@ -21,10 +22,7 @@ import org.cyclops.integrateddynamics.api.part.aspect.property.IAspectProperties
 import org.cyclops.integrateddynamics.api.part.aspect.property.IAspectPropertyTypeInstance;
 import org.cyclops.integrateddynamics.api.part.write.IPartStateWriter;
 import org.cyclops.integrateddynamics.api.part.write.IPartTypeWriter;
-import org.cyclops.integrateddynamics.core.evaluate.variable.ValueObjectTypeItemStack;
-import org.cyclops.integrateddynamics.core.evaluate.variable.ValueTypeBoolean;
-import org.cyclops.integrateddynamics.core.evaluate.variable.ValueTypeInteger;
-import org.cyclops.integrateddynamics.core.evaluate.variable.ValueTypes;
+import org.cyclops.integrateddynamics.core.evaluate.variable.*;
 import org.cyclops.integrateddynamics.core.helper.EnergyHelpers;
 import org.cyclops.integrateddynamics.core.helper.NetworkHelpers;
 import org.cyclops.integrateddynamics.core.part.aspect.build.AspectBuilder;
@@ -154,6 +152,10 @@ public class TunnelAspectWriteBuilders {
                 BUILDER_ITEMSTACK = AspectWriteBuilders.BUILDER_ITEMSTACK.byMod(IntegratedTunnels._instance)
                 .appendActivator(ACTIVATOR).appendDeactivator(DEACTIVATOR)
                 .appendKind("item").handle(AspectWriteBuilders.PROP_GET_ITEMSTACK);
+        public static final AspectBuilder<ValueTypeList.ValueList, ValueTypeList, Triple<PartTarget, IAspectProperties, ValueTypeList.ValueList>>
+                BUILDER_LIST = AspectWriteBuilders.BUILDER_LIST.byMod(IntegratedTunnels._instance)
+                .appendActivator(ACTIVATOR).appendDeactivator(DEACTIVATOR)
+                .appendKind("item");
 
         public static final IAspectPropertyTypeInstance<ValueTypeInteger, ValueTypeInteger.ValueInteger> PROP_RATE =
                 new AspectPropertyTypeInstance<ValueTypeInteger, ValueTypeInteger.ValueInteger>(ValueTypes.INTEGER, "aspect.aspecttypes.integratedtunnels.integer.item.rate.name");
@@ -219,6 +221,24 @@ public class TunnelAspectWriteBuilders {
                         TunnelItemHelpers.matchItemStack(input.getRight(), checkStackSize, checkDamage, checkNbt));
             }
         };
+        public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, ValueTypeList.ValueList>, ItemTarget>
+                PROP_ITEMSTACKLIST_ITEMTARGET = new IAspectValuePropagator<Triple<PartTarget, IAspectProperties, ValueTypeList.ValueList>, ItemTarget>() {
+            @Override
+            public ItemTarget getOutput(Triple<PartTarget, IAspectProperties, ValueTypeList.ValueList> input) throws EvaluationException {
+                ValueTypeList.ValueList list = input.getRight();
+                if (list.getRawValue().getValueType() != ValueTypes.OBJECT_ITEMSTACK) {
+                    throw new EvaluationException("Expected item values in the list, but got " + list.getRawValue().getValueType());
+                }
+                IAspectProperties properties = input.getMiddle();
+                int rate = properties.getValue(PROP_RATE).getRawValue();
+                boolean checkStackSize = properties.getValue(PROP_CHECK_STACKSIZE).getRawValue();
+                boolean checkDamage = properties.getValue(PROP_CHECK_DAMAGE).getRawValue();
+                boolean checkNbt = properties.getValue(PROP_CHECK_NBT).getRawValue();
+                return ItemTarget.of(input.getLeft(), input.getMiddle(), rate,
+                        TunnelItemHelpers.matchItemStacks(list.getRawValue(), checkStackSize, checkDamage, checkNbt));
+            }
+        };
+
         public static final IAspectValuePropagator<ItemTarget, Void>
                 PROP_EXPORT = new IAspectValuePropagator<ItemTarget, Void>() {
             @Override
