@@ -1,10 +1,7 @@
 package org.cyclops.integratedtunnels.part.aspect;
 
 import org.cyclops.integrateddynamics.api.part.aspect.IAspectWrite;
-import org.cyclops.integrateddynamics.core.evaluate.variable.ValueObjectTypeItemStack;
-import org.cyclops.integrateddynamics.core.evaluate.variable.ValueTypeBoolean;
-import org.cyclops.integrateddynamics.core.evaluate.variable.ValueTypeInteger;
-import org.cyclops.integrateddynamics.core.evaluate.variable.ValueTypeList;
+import org.cyclops.integrateddynamics.core.evaluate.variable.*;
 
 /**
  * Collection of all tunnel aspects.
@@ -50,53 +47,65 @@ public class TunnelAspects {
 
             public static final IAspectWrite<ValueTypeBoolean.ValueBoolean, ValueTypeBoolean> BOOLEAN_EXPORT =
                     TunnelAspectWriteBuilders.Item.BUILDER_BOOLEAN
-                            .withProperties(TunnelAspectWriteBuilders.Item.PROPERTIES_BOOLEAN)
+                            .withProperties(TunnelAspectWriteBuilders.Item.PROPERTIES_RATESLOT)
                             .handle(TunnelAspectWriteBuilders.Item.PROP_BOOLEAN_GETRATE)
                             .handle(TunnelAspectWriteBuilders.Item.PROP_INTEGER_ITEMTARGET)
                             .handle(TunnelAspectWriteBuilders.Item.PROP_EXPORT)
                             .appendKind("export").buildWrite();
             public static final IAspectWrite<ValueTypeInteger.ValueInteger, ValueTypeInteger> INTEGER_EXPORT =
                     TunnelAspectWriteBuilders.Item.BUILDER_INTEGER
-                            .withProperties(TunnelAspectWriteBuilders.Item.PROPERTIES_INTEGER)
+                            .withProperties(TunnelAspectWriteBuilders.Item.PROPERTIES_SLOT)
                             .handle(TunnelAspectWriteBuilders.Item.PROP_INTEGER_ITEMTARGET)
                             .handle(TunnelAspectWriteBuilders.Item.PROP_EXPORT)
                             .appendKind("export").buildWrite();
             public static final IAspectWrite<ValueObjectTypeItemStack.ValueItemStack, ValueObjectTypeItemStack> ITEMSTACK_EXPORT =
                     TunnelAspectWriteBuilders.Item.BUILDER_ITEMSTACK
-                            .withProperties(TunnelAspectWriteBuilders.Item.PROPERTIES_ITEMSTACK)
+                            .withProperties(TunnelAspectWriteBuilders.Item.PROPERTIES_RATESLOTCHECKS)
                             .handle(TunnelAspectWriteBuilders.Item.PROP_ITEMSTACK_ITEMTARGET)
                             .handle(TunnelAspectWriteBuilders.Item.PROP_EXPORT)
                             .appendKind("export").buildWrite();
             public static final IAspectWrite<ValueTypeList.ValueList, ValueTypeList> LIST_EXPORT =
                     TunnelAspectWriteBuilders.Item.BUILDER_LIST
-                            .withProperties(TunnelAspectWriteBuilders.Item.PROPERTIES_ITEMSTACK)
+                            .withProperties(TunnelAspectWriteBuilders.Item.PROPERTIES_RATESLOTCHECKS)
                             .handle(TunnelAspectWriteBuilders.Item.PROP_ITEMSTACKLIST_ITEMTARGET)
+                            .handle(TunnelAspectWriteBuilders.Item.PROP_EXPORT)
+                            .appendKind("export").buildWrite();
+            public static final IAspectWrite<ValueTypeOperator.ValueOperator, ValueTypeOperator> PREDICATE_EXPORT =
+                    TunnelAspectWriteBuilders.Item.BUILDER_OPERATOR
+                            .withProperties(TunnelAspectWriteBuilders.Item.PROPERTIES_RATESLOT)
+                            .handle(TunnelAspectWriteBuilders.Item.PROP_ITEMSTACKPREDICATE_ITEMTARGET)
                             .handle(TunnelAspectWriteBuilders.Item.PROP_EXPORT)
                             .appendKind("export").buildWrite();
 
             public static final IAspectWrite<ValueTypeBoolean.ValueBoolean, ValueTypeBoolean> BOOLEAN_IMPORT =
                     TunnelAspectWriteBuilders.Item.BUILDER_BOOLEAN
-                            .withProperties(TunnelAspectWriteBuilders.Item.PROPERTIES_BOOLEAN)
+                            .withProperties(TunnelAspectWriteBuilders.Item.PROPERTIES_RATESLOT)
                             .handle(TunnelAspectWriteBuilders.Item.PROP_BOOLEAN_GETRATE)
                             .handle(TunnelAspectWriteBuilders.Item.PROP_INTEGER_ITEMTARGET)
                             .handle(TunnelAspectWriteBuilders.Item.PROP_IMPORT)
                             .appendKind("import").buildWrite();
             public static final IAspectWrite<ValueTypeInteger.ValueInteger, ValueTypeInteger> INTEGER_IMPORT =
                     TunnelAspectWriteBuilders.Item.BUILDER_INTEGER
-                            .withProperties(TunnelAspectWriteBuilders.Item.PROPERTIES_INTEGER)
+                            .withProperties(TunnelAspectWriteBuilders.Item.PROPERTIES_SLOT)
                             .handle(TunnelAspectWriteBuilders.Item.PROP_INTEGER_ITEMTARGET)
                             .handle(TunnelAspectWriteBuilders.Item.PROP_IMPORT)
                             .appendKind("import").buildWrite();
             public static final IAspectWrite<ValueObjectTypeItemStack.ValueItemStack, ValueObjectTypeItemStack> ITEMSTACK_IMPORT =
                     TunnelAspectWriteBuilders.Item.BUILDER_ITEMSTACK
-                            .withProperties(TunnelAspectWriteBuilders.Item.PROPERTIES_ITEMSTACK)
+                            .withProperties(TunnelAspectWriteBuilders.Item.PROPERTIES_RATESLOTCHECKS)
                             .handle(TunnelAspectWriteBuilders.Item.PROP_ITEMSTACK_ITEMTARGET)
                             .handle(TunnelAspectWriteBuilders.Item.PROP_IMPORT)
                             .appendKind("import").buildWrite();
             public static final IAspectWrite<ValueTypeList.ValueList, ValueTypeList> LIST_IMPORT =
                     TunnelAspectWriteBuilders.Item.BUILDER_LIST
-                            .withProperties(TunnelAspectWriteBuilders.Item.PROPERTIES_ITEMSTACK)
+                            .withProperties(TunnelAspectWriteBuilders.Item.PROPERTIES_RATESLOTCHECKS)
                             .handle(TunnelAspectWriteBuilders.Item.PROP_ITEMSTACKLIST_ITEMTARGET)
+                            .handle(TunnelAspectWriteBuilders.Item.PROP_IMPORT)
+                            .appendKind("import").buildWrite();
+            public static final IAspectWrite<ValueTypeOperator.ValueOperator, ValueTypeOperator> PREDICATE_IMPORT =
+                    TunnelAspectWriteBuilders.Item.BUILDER_OPERATOR
+                            .withProperties(TunnelAspectWriteBuilders.Item.PROPERTIES_RATESLOT)
+                            .handle(TunnelAspectWriteBuilders.Item.PROP_ITEMSTACKPREDICATE_ITEMTARGET)
                             .handle(TunnelAspectWriteBuilders.Item.PROP_IMPORT)
                             .appendKind("import").buildWrite();
 

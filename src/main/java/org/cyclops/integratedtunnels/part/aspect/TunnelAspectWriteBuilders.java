@@ -11,8 +11,11 @@ import net.minecraftforge.items.IItemHandler;
 import org.apache.commons.lang3.tuple.Triple;
 import org.cyclops.commoncapabilities.api.capability.inventorystate.IInventoryState;
 import org.cyclops.cyclopscore.datastructure.DimPos;
+import org.cyclops.cyclopscore.helper.L10NHelpers;
 import org.cyclops.cyclopscore.helper.TileHelpers;
 import org.cyclops.integrateddynamics.api.evaluate.EvaluationException;
+import org.cyclops.integrateddynamics.api.evaluate.operator.IOperator;
+import org.cyclops.integrateddynamics.api.evaluate.variable.IValueType;
 import org.cyclops.integrateddynamics.api.network.IEnergyNetwork;
 import org.cyclops.integrateddynamics.api.network.INetwork;
 import org.cyclops.integrateddynamics.api.network.IPositionedAddonsNetwork;
@@ -24,6 +27,7 @@ import org.cyclops.integrateddynamics.api.part.write.IPartStateWriter;
 import org.cyclops.integrateddynamics.api.part.write.IPartTypeWriter;
 import org.cyclops.integrateddynamics.core.evaluate.variable.*;
 import org.cyclops.integrateddynamics.core.helper.EnergyHelpers;
+import org.cyclops.integrateddynamics.core.helper.L10NValues;
 import org.cyclops.integrateddynamics.core.helper.NetworkHelpers;
 import org.cyclops.integrateddynamics.core.part.aspect.build.AspectBuilder;
 import org.cyclops.integrateddynamics.core.part.aspect.build.IAspectValuePropagator;
@@ -156,6 +160,10 @@ public class TunnelAspectWriteBuilders {
                 BUILDER_LIST = AspectWriteBuilders.BUILDER_LIST.byMod(IntegratedTunnels._instance)
                 .appendActivator(ACTIVATOR).appendDeactivator(DEACTIVATOR)
                 .appendKind("item");
+        public static final AspectBuilder<ValueTypeOperator.ValueOperator, ValueTypeOperator, Triple<PartTarget, IAspectProperties, ValueTypeOperator.ValueOperator>>
+                BUILDER_OPERATOR = AspectWriteBuilders.BUILDER_OPERATOR.byMod(IntegratedTunnels._instance)
+                .appendActivator(ACTIVATOR).appendDeactivator(DEACTIVATOR)
+                .appendKind("item");
 
         public static final IAspectPropertyTypeInstance<ValueTypeInteger, ValueTypeInteger.ValueInteger> PROP_RATE =
                 new AspectPropertyTypeInstance<ValueTypeInteger, ValueTypeInteger.ValueInteger>(ValueTypes.INTEGER, "aspect.aspecttypes.integratedtunnels.integer.item.rate.name");
@@ -167,14 +175,14 @@ public class TunnelAspectWriteBuilders {
                 new AspectPropertyTypeInstance<ValueTypeBoolean, ValueTypeBoolean.ValueBoolean>(ValueTypes.BOOLEAN, "aspect.aspecttypes.integratedtunnels.boolean.item.checkdamage.name");
         public static final IAspectPropertyTypeInstance<ValueTypeBoolean, ValueTypeBoolean.ValueBoolean> PROP_CHECK_NBT =
                 new AspectPropertyTypeInstance<ValueTypeBoolean, ValueTypeBoolean.ValueBoolean>(ValueTypes.BOOLEAN, "aspect.aspecttypes.integratedtunnels.boolean.item.checknbt.name");
-        public static final IAspectProperties PROPERTIES_BOOLEAN = new AspectProperties(ImmutableList.<IAspectPropertyTypeInstance>of(
+        public static final IAspectProperties PROPERTIES_RATESLOT = new AspectProperties(ImmutableList.<IAspectPropertyTypeInstance>of(
                 PROP_RATE,
                 PROP_SLOT
         ));
-        public static final IAspectProperties PROPERTIES_INTEGER = new AspectProperties(ImmutableList.<IAspectPropertyTypeInstance>of(
+        public static final IAspectProperties PROPERTIES_SLOT = new AspectProperties(ImmutableList.<IAspectPropertyTypeInstance>of(
                 PROP_SLOT
         ));
-        public static final IAspectProperties PROPERTIES_ITEMSTACK = new AspectProperties(ImmutableList.<IAspectPropertyTypeInstance>of(
+        public static final IAspectProperties PROPERTIES_RATESLOTCHECKS = new AspectProperties(ImmutableList.<IAspectPropertyTypeInstance>of(
                 PROP_RATE,
                 PROP_SLOT,
                 PROP_CHECK_STACKSIZE,
@@ -182,16 +190,16 @@ public class TunnelAspectWriteBuilders {
                 PROP_CHECK_NBT
         ));
         static {
-            PROPERTIES_BOOLEAN.setValue(PROP_RATE, ValueTypeInteger.ValueInteger.of(64));
-            PROPERTIES_BOOLEAN.setValue(PROP_SLOT, ValueTypeInteger.ValueInteger.of(-1));
+            PROPERTIES_RATESLOT.setValue(PROP_RATE, ValueTypeInteger.ValueInteger.of(64));
+            PROPERTIES_RATESLOT.setValue(PROP_SLOT, ValueTypeInteger.ValueInteger.of(-1));
 
-            PROPERTIES_INTEGER.setValue(PROP_SLOT, ValueTypeInteger.ValueInteger.of(-1));
+            PROPERTIES_SLOT.setValue(PROP_SLOT, ValueTypeInteger.ValueInteger.of(-1));
 
-            PROPERTIES_ITEMSTACK.setValue(PROP_RATE, ValueTypeInteger.ValueInteger.of(64));
-            PROPERTIES_ITEMSTACK.setValue(PROP_SLOT, ValueTypeInteger.ValueInteger.of(-1));
-            PROPERTIES_ITEMSTACK.setValue(PROP_CHECK_STACKSIZE, ValueTypeBoolean.ValueBoolean.of(false));
-            PROPERTIES_ITEMSTACK.setValue(PROP_CHECK_DAMAGE, ValueTypeBoolean.ValueBoolean.of(true));
-            PROPERTIES_ITEMSTACK.setValue(PROP_CHECK_NBT, ValueTypeBoolean.ValueBoolean.of(true));
+            PROPERTIES_RATESLOTCHECKS.setValue(PROP_RATE, ValueTypeInteger.ValueInteger.of(64));
+            PROPERTIES_RATESLOTCHECKS.setValue(PROP_SLOT, ValueTypeInteger.ValueInteger.of(-1));
+            PROPERTIES_RATESLOTCHECKS.setValue(PROP_CHECK_STACKSIZE, ValueTypeBoolean.ValueBoolean.of(false));
+            PROPERTIES_RATESLOTCHECKS.setValue(PROP_CHECK_DAMAGE, ValueTypeBoolean.ValueBoolean.of(true));
+            PROPERTIES_RATESLOTCHECKS.setValue(PROP_CHECK_NBT, ValueTypeBoolean.ValueBoolean.of(true));
         }
 
         public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, Boolean>, Triple<PartTarget, IAspectProperties, Integer>>
@@ -228,7 +236,8 @@ public class TunnelAspectWriteBuilders {
             public ItemTarget getOutput(Triple<PartTarget, IAspectProperties, ValueTypeList.ValueList> input) throws EvaluationException {
                 ValueTypeList.ValueList list = input.getRight();
                 if (list.getRawValue().getValueType() != ValueTypes.OBJECT_ITEMSTACK) {
-                    throw new EvaluationException("Expected item values in the list, but got " + list.getRawValue().getValueType());
+                    throw new EvaluationException(new L10NHelpers.UnlocalizedString(L10NValues.ASPECT_ERROR_INVALIDTYPE,
+                            ValueTypes.OBJECT_ITEMSTACK, list.getRawValue().getValueType()).localize());
                 }
                 IAspectProperties properties = input.getMiddle();
                 int rate = properties.getValue(PROP_RATE).getRawValue();
@@ -238,6 +247,25 @@ public class TunnelAspectWriteBuilders {
                 return ItemTarget.of(input.getLeft(), input.getMiddle(), rate,
                         TunnelItemHelpers.matchItemStacks(list.getRawValue(), checkStackSize, checkDamage, checkNbt),
                         list.getRawValue().hashCode());
+            }
+        };
+        public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, ValueTypeOperator.ValueOperator>, ItemTarget>
+                PROP_ITEMSTACKPREDICATE_ITEMTARGET = new IAspectValuePropagator<Triple<PartTarget, IAspectProperties, ValueTypeOperator.ValueOperator>, ItemTarget>() {
+            @Override
+            public ItemTarget getOutput(Triple<PartTarget, IAspectProperties, ValueTypeOperator.ValueOperator> input) throws EvaluationException {
+                IOperator predicate = input.getRight().getRawValue();
+                if (predicate.getInputTypes().length == 1 && ValueHelpers.correspondsTo(predicate.getInputTypes()[0], ValueTypes.OBJECT_ITEMSTACK)) {
+                    IAspectProperties properties = input.getMiddle();
+                    int rate = properties.getValue(PROP_RATE).getRawValue();
+                    return ItemTarget.of(input.getLeft(), input.getMiddle(), rate,
+                            TunnelItemHelpers.matchPredicate(input.getLeft(), predicate),
+                            predicate.hashCode());
+                } else {
+                    String current = ValueTypeOperator.getSignature(predicate);
+                    String expected = ValueTypeOperator.getSignature(new IValueType[]{ValueTypes.OBJECT_ITEMSTACK}, ValueTypes.BOOLEAN);
+                    throw new EvaluationException(new L10NHelpers.UnlocalizedString(L10NValues.ASPECT_ERROR_INVALIDTYPE,
+                            expected, current).localize());
+                }
             }
         };
 

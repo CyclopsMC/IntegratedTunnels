@@ -8,9 +8,18 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.items.IItemHandler;
 import org.cyclops.commoncapabilities.api.capability.inventorystate.IInventoryState;
+import org.cyclops.cyclopscore.helper.L10NHelpers;
 import org.cyclops.cyclopscore.helper.MinecraftHelpers;
+import org.cyclops.integrateddynamics.api.evaluate.EvaluationException;
+import org.cyclops.integrateddynamics.api.evaluate.operator.IOperator;
+import org.cyclops.integrateddynamics.api.evaluate.variable.IValue;
 import org.cyclops.integrateddynamics.api.evaluate.variable.IValueTypeListProxy;
+import org.cyclops.integrateddynamics.api.part.PartTarget;
+import org.cyclops.integrateddynamics.api.part.write.IPartStateWriter;
+import org.cyclops.integrateddynamics.core.evaluate.variable.ValueHelpers;
 import org.cyclops.integrateddynamics.core.evaluate.variable.ValueObjectTypeItemStack;
+import org.cyclops.integrateddynamics.core.evaluate.variable.ValueTypeBoolean;
+import org.cyclops.integrateddynamics.core.helper.PartHelpers;
 import org.cyclops.integratedtunnels.GeneralConfig;
 
 import javax.annotation.Nullable;
@@ -236,6 +245,26 @@ public class TunnelItemHelpers {
                     }
                 }
                 return false;
+            }
+        };
+    }
+
+    public static Predicate<ItemStack> matchPredicate(final PartTarget partTarget, final IOperator predicate) {
+        return new Predicate<ItemStack>() {
+            @Override
+            public boolean apply(@Nullable ItemStack input) {
+                ValueObjectTypeItemStack.ValueItemStack valueItemStack = ValueObjectTypeItemStack.ValueItemStack.of(input);
+                try {
+                    IValue result = ValueHelpers.evaluateOperator(predicate, valueItemStack);
+                    return ((ValueTypeBoolean.ValueBoolean) result).getRawValue();
+                } catch (EvaluationException e) {
+                    PartHelpers.PartStateHolder<?, ?> partData = PartHelpers.getPart(partTarget.getCenter());
+                    if (partData != null) {
+                        IPartStateWriter partState = (IPartStateWriter) partData.getState();
+                        partState.addError(partState.getActiveAspect(), new L10NHelpers.UnlocalizedString(e.getMessage()));
+                    }
+                    return false;
+                }
             }
         };
     }
