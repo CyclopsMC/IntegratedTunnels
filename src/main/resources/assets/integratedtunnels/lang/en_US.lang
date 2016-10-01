@@ -19,6 +19,9 @@ parttype.parttypes.integratedtunnels.exporterItem.info=Exports items from the ne
 aspect.aspecttypes.integratedtunnels.integer.energy.rate.name=Energy Transfer Rate
 aspect.aspecttypes.integratedtunnels.integer.item.rate.name=Item Transfer Rate
 aspect.aspecttypes.integratedtunnels.integer.item.slot.name=Item Slot
+aspect.aspecttypes.integratedtunnels.boolean.item.checkstacksize.name=Check Stack Size
+aspect.aspecttypes.integratedtunnels.boolean.item.checkdamage.name=Check Damage
+aspect.aspecttypes.integratedtunnels.boolean.item.checknbt.name=Check NBT
 
 # Aspects
 
@@ -33,11 +36,15 @@ aspect.aspects.integratedtunnels.write.integer.energy.import.name=Import Energy 
 aspect.aspects.integratedtunnels.write.integer.energy.import.info=Import the given amount of energy each tick.
 
 ## Item
-aspect.aspects.integratedtunnels.write.boolean.item.export.name=Export Items
+aspect.aspects.integratedtunnels.write.boolean.item.export.name=Export All Items
 aspect.aspects.integratedtunnels.write.boolean.item.export.info=Export items if the boolean is true
 aspect.aspects.integratedtunnels.write.integer.item.export.name=Export Item Amount
 aspect.aspects.integratedtunnels.write.integer.item.export.info=Export the given amount of items each tick.
-aspect.aspects.integratedtunnels.write.boolean.item.import.name=Import Items
+aspect.aspects.integratedtunnels.write.itemstack.item.export.name=Export Item
+aspect.aspects.integratedtunnels.write.itemstack.item.export.info=Export the given item.
+aspect.aspects.integratedtunnels.write.boolean.item.import.name=Import All Items
 aspect.aspects.integratedtunnels.write.boolean.item.import.info=Import items if the boolean is true
 aspect.aspects.integratedtunnels.write.integer.item.import.name=Import Item Amount
 aspect.aspects.integratedtunnels.write.integer.item.import.info=Import the given amount of items each tick.
+aspect.aspects.integratedtunnels.write.itemstack.item.import.name=Import Item
+aspect.aspects.integratedtunnels.write.itemstack.item.import.info=Import the given item.

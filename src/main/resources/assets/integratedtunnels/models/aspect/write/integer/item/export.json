@@ -1,6 +1,6 @@
 {
   "parent": "builtin/generated",
   "textures": {
-    "layer0": "integratedtunnels:aspects/write/integer/item/export"
+    "layer0": "integratedtunnels:aspects/write/item/export"
   }
 }

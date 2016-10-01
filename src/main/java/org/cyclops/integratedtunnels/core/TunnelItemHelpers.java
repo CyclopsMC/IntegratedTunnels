@@ -1,6 +1,7 @@
 package org.cyclops.integratedtunnels.core;
 
 import com.google.common.base.Objects;
+import com.google.common.base.Predicate;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import net.minecraft.item.Item;
@@ -18,6 +19,13 @@ import java.util.concurrent.TimeUnit;
  */
 public class TunnelItemHelpers {
 
+    public static final Predicate<ItemStack> MATCH_ALL = new Predicate<ItemStack>() {
+        @Override
+        public boolean apply(@Nullable ItemStack input) {
+            return true;
+        }
+    };
+
     private static final Cache<Integer, Integer> CACHE_INV_STATES = CacheBuilder.newBuilder()
             .expireAfterWrite(10, TimeUnit.SECONDS).build();
     private static final Cache<Integer, Boolean> CACHE_INV_CHECKS = CacheBuilder.newBuilder()
@@ -31,23 +39,25 @@ public class TunnelItemHelpers {
      * @param target The target item handler.
      * @param targetSlot The target slot.
      * @param amount The maximum item amount to transfer.
+     * @param itemStackMatcher Only itemstack matching this predicate will be moved.
      * @param simulate If the transfer should be simulated.
      * @return The moved itemstack.
      */
-    public static ItemStack moveItemsSingle(IItemHandler source, int sourceSlot, IItemHandler target, int targetSlot, int amount, boolean simulate) {
+    public static ItemStack moveItemsSingle(IItemHandler source, int sourceSlot, IItemHandler target, int targetSlot,
+                                            int amount, Predicate<ItemStack> itemStackMatcher, boolean simulate) {
         boolean loopSourceSlots = sourceSlot < 0;
         boolean loopTargetSlots = targetSlot < 0;
 
         if (!loopSourceSlots && !loopTargetSlots) {
             ItemStack extracted = source.extractItem(sourceSlot, amount, simulate);
-            if (extracted != null) {
+            if (extracted != null && (!simulate || itemStackMatcher.apply(extracted))) {
                 ItemStack remaining = target.insertItem(targetSlot, extracted, simulate);
                 if (remaining == null) {
                     return extracted;
                 } else {
                     extracted = extracted.copy();
                     extracted.stackSize -= remaining.stackSize;
-                    return extracted.stackSize > 0 ? extracted : null;
+                    return extracted.stackSize > 0 && (simulate || itemStackMatcher.apply(extracted)) ? extracted : null;
                 }
             }
         } else if (loopSourceSlots) {
@@ -56,10 +66,10 @@ public class TunnelItemHelpers {
                     if (source.getStackInSlot(sourceSlot) != null) {
                         for (targetSlot = 0; targetSlot < target.getSlots(); targetSlot++) {
                             if (!simulate) {
-                                ItemStack movedSimulated = moveItemsSingle(source, sourceSlot, target, targetSlot, amount, true);
+                                ItemStack movedSimulated = moveItemsSingle(source, sourceSlot, target, targetSlot, amount, itemStackMatcher, true);
                                 if (movedSimulated == null) continue;
                             }
-                            ItemStack moved = moveItemsSingle(source, sourceSlot, target, targetSlot, amount, simulate);
+                            ItemStack moved = moveItemsSingle(source, sourceSlot, target, targetSlot, amount, itemStackMatcher, simulate);
                             if (moved != null) {
                                 return moved;
                             }
@@ -67,10 +77,10 @@ public class TunnelItemHelpers {
                     }
                 } else {
                     if (!simulate) {
-                        ItemStack movedSimulated = moveItemsSingle(source, sourceSlot, target, targetSlot, amount, true);
+                        ItemStack movedSimulated = moveItemsSingle(source, sourceSlot, target, targetSlot, amount, itemStackMatcher, true);
                         if (movedSimulated == null) continue;
                     }
-                    ItemStack moved = moveItemsSingle(source, sourceSlot, target, targetSlot, amount, simulate);
+                    ItemStack moved = moveItemsSingle(source, sourceSlot, target, targetSlot, amount, itemStackMatcher, simulate);
                     if (moved != null) {
                         return moved;
                     }
@@ -79,10 +89,10 @@ public class TunnelItemHelpers {
         } else if (loopTargetSlots) {
             for (targetSlot = 0; targetSlot < target.getSlots(); targetSlot++) {
                 if (!simulate) {
-                    ItemStack movedSimulated = moveItemsSingle(source, sourceSlot, target, targetSlot, amount, true);
+                    ItemStack movedSimulated = moveItemsSingle(source, sourceSlot, target, targetSlot, amount, itemStackMatcher, true);
                     if (movedSimulated == null) continue;
                 }
-                ItemStack moved = moveItemsSingle(source, sourceSlot, target, targetSlot, amount, simulate);
+                ItemStack moved = moveItemsSingle(source, sourceSlot, target, targetSlot, amount, itemStackMatcher, simulate);
                 if (moved != null) {
                     return moved;
                 }
@@ -145,11 +155,11 @@ public class TunnelItemHelpers {
      * @return The moved itemstack.
      */
     public static ItemStack moveItems(IItemHandler source, int sourceSlot, IItemHandler target, int targetSlot, int amount) {
-        ItemStack simulatedTransfer = moveItemsSingle(source, sourceSlot, target, targetSlot, amount, true);
+        ItemStack simulatedTransfer = moveItemsSingle(source, sourceSlot, target, targetSlot, amount, MATCH_ALL, true);
         if (simulatedTransfer == null) {
             return null;
         }
-        return moveItemsSingle(source, sourceSlot, target, targetSlot, simulatedTransfer.stackSize, false);
+        return moveItemsSingle(source, sourceSlot, target, targetSlot, simulatedTransfer.stackSize, MATCH_ALL, false);
     }
 
     /**
@@ -159,10 +169,12 @@ public class TunnelItemHelpers {
      * @param targetHandler The target item handler.
      * @param targetSlot The target slot.
      * @param amount The maximum item amount to transfer.
+     * @param itemStackMatcher Only itemstack matching this predicate will be moved.
      * @return The moved itemstack.
      */
     public static ItemStack moveItemsStateOptimized(int sourcePosHash, IItemHandler sourceHandler, @Nullable IInventoryState sourceInvState, int sourceSlot,
-                                                    int targetPosHash, IItemHandler targetHandler, @Nullable IInventoryState targetInvState, int targetSlot, int amount) {
+                                                    int targetPosHash, IItemHandler targetHandler, @Nullable IInventoryState targetInvState, int targetSlot,
+                                                    int amount, Predicate<ItemStack> itemStackMatcher) {
         int connectionHash = sourcePosHash + targetPosHash;
         Integer cachedState = getCachedState(connectionHash);
 
@@ -180,7 +192,7 @@ public class TunnelItemHelpers {
 
         // If cache miss or a cache state is different
         if (shouldMoveItems) {
-            ItemStack simulatedTransfer = moveItemsSingle(sourceHandler, sourceSlot, targetHandler, targetSlot, amount, true);
+            ItemStack simulatedTransfer = moveItemsSingle(sourceHandler, sourceSlot, targetHandler, targetSlot, amount, itemStackMatcher, true);
 
             // If transfer failed, cache the current states and return
             if (simulatedTransfer == null) {
@@ -192,9 +204,32 @@ public class TunnelItemHelpers {
             }
 
             invalidateCachedState(connectionHash);
-            return moveItemsSingle(sourceHandler, sourceSlot, targetHandler, targetSlot, simulatedTransfer.stackSize, false);
+            return moveItemsSingle(sourceHandler, sourceSlot, targetHandler, targetSlot, simulatedTransfer.stackSize, itemStackMatcher, false);
         }
         return null;
+    }
+
+    public static Predicate<ItemStack> matchItemStack(final ItemStack itemStack, final boolean checkStackSize,
+                                                      final boolean checkDamage, final boolean checkNbt) {
+        return new Predicate<ItemStack>() {
+            @Override
+            public boolean apply(@Nullable ItemStack input) {
+                return areItemStackEqual(input, itemStack, checkStackSize, true, checkDamage, checkNbt);
+            }
+        };
+    }
+
+    public static boolean areItemStackEqual(ItemStack stackA, ItemStack stackB,
+                                            boolean checkStackSize, boolean checkItem, boolean checkDamage, boolean checkNbt) {
+        if (stackA == null && stackB == null) return true;
+        if (stackA != null && stackB != null) {
+            if (checkStackSize && stackA.stackSize != stackB.stackSize) return false;
+            if (checkItem && stackA.getItem() != stackB.getItem()) return false;
+            if (checkDamage && stackA.getItemDamage() != stackB.getItemDamage()) return false;
+            if (checkNbt && !ItemStack.areItemStackTagsEqual(stackA, stackB)) return false;
+            return true;
+        }
+        return false;
     }
 
 }
