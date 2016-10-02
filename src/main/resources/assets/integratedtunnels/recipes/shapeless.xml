@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<recipes>
+
+	<recipe type="shapeless">
+		<input>
+			<item>integratedtunnels:part_interfaceEnergyItem</item>
+			<item meta="0">integrateddynamics:variableTransformer</item>
+		</input>
+		<output>
+			<item>integratedtunnels:part_exporterEnergyItem</item>
+		</output>
+	</recipe>
+
+	<recipe type="shapeless">
+		<input>
+			<item>integratedtunnels:part_interfaceEnergyItem</item>
+			<item meta="1">integrateddynamics:variableTransformer</item>
+		</input>
+		<output>
+			<item>integratedtunnels:part_importerEnergyItem</item>
+		</output>
+	</recipe>
+
+	<recipe type="shapeless">
+		<input>
+			<item>integratedtunnels:part_interfaceItemItem</item>
+			<item meta="0">integrateddynamics:variableTransformer</item>
+		</input>
+		<output>
+			<item>integratedtunnels:part_exporterItemItem</item>
+		</output>
+	</recipe>
+
+	<recipe type="shapeless">
+		<input>
+			<item>integratedtunnels:part_interfaceItemItem</item>
+			<item meta="1">integrateddynamics:variableTransformer</item>
+		</input>
+		<output>
+			<item>integratedtunnels:part_importerItemItem</item>
+		</output>
+	</recipe>
+
+	<recipe type="shapeless">
+		<input>
+			<item>integratedtunnels:part_interfaceFluidItem</item>
+			<item meta="0">integrateddynamics:variableTransformer</item>
+		</input>
+		<output>
+			<item>integratedtunnels:part_exporterFluidItem</item>
+		</output>
+	</recipe>
+
+	<recipe type="shapeless">
+		<input>
+			<item>integratedtunnels:part_interfaceFluidItem</item>
+			<item meta="1">integrateddynamics:variableTransformer</item>
+		</input>
+		<output>
+			<item>integratedtunnels:part_importerFluidItem</item>
+		</output>
+	</recipe>
+
+</recipes>

@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<recipes>
+
+	<recipe type="shaped">
+		<input>
+			<grid>
+				<gridrow>
+					<item>integrateddynamics:crystalizedMenrilChunk</item>
+					<item>integrateddynamics:energyBattery</item>
+					<item>integrateddynamics:crystalizedMenrilChunk</item>
+				</gridrow>
+				<gridrow>
+					<item>integrateddynamics:crystalizedMenrilChunk</item>
+					<item>integrateddynamics:crystalizedMenrilChunk</item>
+					<item>integrateddynamics:crystalizedMenrilChunk</item>
+				</gridrow>
+			</grid>
+		</input>
+		<output>
+			<item amount="4">integratedtunnels:part_interfaceEnergyItem</item>
+		</output>
+	</recipe>
+
+	<recipe type="shaped">
+		<input>
+			<grid>
+				<gridrow>
+					<item>integrateddynamics:crystalizedMenrilChunk</item>
+					<item type="oredict">chest</item>
+					<item>integrateddynamics:crystalizedMenrilChunk</item>
+				</gridrow>
+				<gridrow>
+					<item>integrateddynamics:crystalizedMenrilChunk</item>
+					<item>integrateddynamics:crystalizedMenrilChunk</item>
+					<item>integrateddynamics:crystalizedMenrilChunk</item>
+				</gridrow>
+			</grid>
+		</input>
+		<output>
+			<item amount="4">integratedtunnels:part_interfaceItemItem</item>
+		</output>
+	</recipe>
+
+	<recipe type="shaped">
+		<input>
+			<grid>
+				<gridrow>
+					<item>integrateddynamics:crystalizedMenrilChunk</item>
+					<item>minecraft:bucket</item>
+					<item>integrateddynamics:crystalizedMenrilChunk</item>
+				</gridrow>
+				<gridrow>
+					<item>integrateddynamics:crystalizedMenrilChunk</item>
+					<item>integrateddynamics:crystalizedMenrilChunk</item>
+					<item>integrateddynamics:crystalizedMenrilChunk</item>
+				</gridrow>
+			</grid>
+		</input>
+		<output>
+			<item amount="4">integratedtunnels:part_interfaceFluidItem</item>
+		</output>
+	</recipe>
+
+</recipes>

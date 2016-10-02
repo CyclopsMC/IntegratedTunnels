@@ -56,7 +56,10 @@ public class IntegratedTunnels extends ModBaseVersionable {
 
     @Override
     protected RecipeHandler constructRecipeHandler() {
-        return new RecipeHandler(this);
+        return new RecipeHandler(this,
+                "shaped.xml",
+                "shapeless.xml"
+        );
     }
 
     /**
