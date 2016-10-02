@@ -111,6 +111,26 @@ public class TunnelAspects {
 
         }
 
+        public static final class Fluid {
+
+            public static final IAspectWrite<ValueTypeBoolean.ValueBoolean, ValueTypeBoolean> BOOLEAN_EXPORT =
+                    TunnelAspectWriteBuilders.Fluid.BUILDER_BOOLEAN
+                            .withProperties(TunnelAspectWriteBuilders.Fluid.PROPERTIES_RATE)
+                            .handle(TunnelAspectWriteBuilders.Fluid.PROP_BOOLEAN_GETRATE)
+                            .handle(TunnelAspectWriteBuilders.Fluid.PROP_INTEGER_FLUIDTARGET)
+                            .handle(TunnelAspectWriteBuilders.Fluid.PROP_EXPORT)
+                            .appendKind("export").buildWrite();
+
+            public static final IAspectWrite<ValueTypeBoolean.ValueBoolean, ValueTypeBoolean> BOOLEAN_IMPORT =
+                    TunnelAspectWriteBuilders.Fluid.BUILDER_BOOLEAN
+                            .withProperties(TunnelAspectWriteBuilders.Fluid.PROPERTIES_RATE)
+                            .handle(TunnelAspectWriteBuilders.Fluid.PROP_BOOLEAN_GETRATE)
+                            .handle(TunnelAspectWriteBuilders.Fluid.PROP_INTEGER_FLUIDTARGET)
+                            .handle(TunnelAspectWriteBuilders.Fluid.PROP_IMPORT)
+                            .appendKind("import").buildWrite();
+
+        }
+
     }
 
 }

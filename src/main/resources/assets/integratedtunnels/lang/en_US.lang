@@ -14,6 +14,12 @@ parttype.parttypes.integratedtunnels.importerItem.name=Item Importer
 parttype.parttypes.integratedtunnels.importerItem.info=Imports items into the network
 parttype.parttypes.integratedtunnels.exporterItem.name=Item Exporter
 parttype.parttypes.integratedtunnels.exporterItem.info=Exports items from the network
+parttype.parttypes.integratedtunnels.interfaceFluid.name=Fluid Interface
+parttype.parttypes.integratedtunnels.interfaceFluid.info=Attaches an fluid tank to the network
+parttype.parttypes.integratedtunnels.importerFluid.name=Fluid Importer
+parttype.parttypes.integratedtunnels.importerFluid.info=Imports fluids into the network
+parttype.parttypes.integratedtunnels.exporterFluid.name=Fluid Exporter
+parttype.parttypes.integratedtunnels.exporterFluid.info=Exports fluids from the network
 
 # Aspect property types
 aspect.aspecttypes.integratedtunnels.integer.energy.rate.name=Energy Transfer Rate
@@ -22,6 +28,7 @@ aspect.aspecttypes.integratedtunnels.integer.item.slot.name=Item Slot
 aspect.aspecttypes.integratedtunnels.boolean.item.checkstacksize.name=Check Stack Size
 aspect.aspecttypes.integratedtunnels.boolean.item.checkdamage.name=Check Damage
 aspect.aspecttypes.integratedtunnels.boolean.item.checknbt.name=Check NBT
+aspect.aspecttypes.integratedtunnels.integer.fluid.rate.name=Fluid Transfer Rate
 
 # Aspects
 
@@ -56,3 +63,9 @@ aspect.aspects.integratedtunnels.write.list.item.import.name=Import Items
 aspect.aspects.integratedtunnels.write.list.item.import.info=Import the given items.
 aspect.aspects.integratedtunnels.write.operator.item.import.name=Import Items Predicate
 aspect.aspects.integratedtunnels.write.operator.item.import.info=Import all items that match the given predicate.
+
+## Fluid
+aspect.aspects.integratedtunnels.write.boolean.fluid.export.name=Export All Fluids
+aspect.aspects.integratedtunnels.write.boolean.fluid.export.info=Export fluids if the boolean is true
+aspect.aspects.integratedtunnels.write.boolean.fluid.import.name=Import All Fluids
+aspect.aspects.integratedtunnels.write.boolean.fluid.import.info=Import fluids if the boolean is true

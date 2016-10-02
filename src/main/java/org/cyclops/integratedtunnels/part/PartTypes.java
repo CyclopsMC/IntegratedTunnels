@@ -20,5 +20,9 @@ public class PartTypes {
     public static final PartTypeImporterItem IMPORTER_ITEM = REGISTRY.register(new PartTypeImporterItem("importerItem"));
     public static final PartTypeExporterItem EXPORTER_ITEM = REGISTRY.register(new PartTypeExporterItem("exporterItem"));
 
+    public static final PartTypeInterfaceFluid INTERFACE_FLUID = REGISTRY.register(new PartTypeInterfaceFluid("interfaceFluid"));
+    public static final PartTypeImporterFluid IMPORTER_FLUID = REGISTRY.register(new PartTypeImporterFluid("importerFluid"));
+    public static final PartTypeExporterFluid EXPORTER_FLUID = REGISTRY.register(new PartTypeExporterFluid("exporterFluid"));
+
 
 }

@@ -16,6 +16,7 @@ import org.cyclops.cyclopscore.init.ItemCreativeTab;
 import org.cyclops.cyclopscore.init.ModBaseVersionable;
 import org.cyclops.cyclopscore.init.RecipeHandler;
 import org.cyclops.cyclopscore.proxy.ICommonProxy;
+import org.cyclops.integratedtunnels.capability.network.FluidNetworkConfig;
 import org.cyclops.integratedtunnels.capability.network.ItemNetworkConfig;
 import org.cyclops.integratedtunnels.capability.network.TunnelNetworkCapabilityConstructors;
 import org.cyclops.integratedtunnels.part.PartTypes;
@@ -141,6 +142,7 @@ public class IntegratedTunnels extends ModBaseVersionable {
     public void onMainConfigsRegister(ConfigHandler configHandler) {
         super.onMainConfigsRegister(configHandler);
         configHandler.add(new ItemNetworkConfig());
+        configHandler.add(new FluidNetworkConfig());
     }
 
     @Override

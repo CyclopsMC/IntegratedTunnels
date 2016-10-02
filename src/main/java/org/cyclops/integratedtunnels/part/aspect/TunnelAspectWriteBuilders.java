@@ -6,6 +6,9 @@ import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
+import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
+import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import org.apache.commons.lang3.tuple.Triple;
@@ -38,9 +41,12 @@ import org.cyclops.integrateddynamics.core.part.aspect.property.AspectPropertyTy
 import org.cyclops.integrateddynamics.part.aspect.write.AspectWriteBuilders;
 import org.cyclops.integratedtunnels.Capabilities;
 import org.cyclops.integratedtunnels.IntegratedTunnels;
+import org.cyclops.integratedtunnels.api.network.IFluidNetwork;
 import org.cyclops.integratedtunnels.api.network.IItemNetwork;
+import org.cyclops.integratedtunnels.capability.network.FluidNetworkConfig;
 import org.cyclops.integratedtunnels.capability.network.ItemNetworkConfig;
 import org.cyclops.integratedtunnels.core.TunnelEnergyHelpers;
+import org.cyclops.integratedtunnels.core.TunnelFluidHelpers;
 import org.cyclops.integratedtunnels.core.TunnelItemHelpers;
 import org.cyclops.integratedtunnels.core.part.PartStatePositionedAddon;
 
@@ -70,7 +76,7 @@ public class TunnelAspectWriteBuilders {
                 PROP_RATE
         ));
         static {
-            PROPERTIES.setValue(PROP_RATE, ValueTypeInteger.ValueInteger.of(Integer.MAX_VALUE));
+            PROPERTIES.setValue(PROP_RATE, ValueTypeInteger.ValueInteger.of(1000));
         }
 
         public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, Boolean>, Triple<PartTarget, IAspectProperties, Integer>>
@@ -365,6 +371,106 @@ public class TunnelAspectWriteBuilders {
 
             public Predicate<ItemStack> getItemStackMatcher() {
                 return itemStackMatcher;
+            }
+        }
+
+    }
+
+    public static final class Fluid {
+
+        public static final IAspectWriteActivator ACTIVATOR = createPositionedNetworkAddonActivator(FluidNetworkConfig.CAPABILITY, CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY);
+        public static final IAspectWriteDeactivator DEACTIVATOR = createPositionedNetworkAddonDeactivator(FluidNetworkConfig.CAPABILITY, CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY);
+
+        public static final AspectBuilder<ValueTypeBoolean.ValueBoolean, ValueTypeBoolean, Triple<PartTarget, IAspectProperties, Boolean>>
+                BUILDER_BOOLEAN = AspectWriteBuilders.BUILDER_BOOLEAN.byMod(IntegratedTunnels._instance)
+                .appendActivator(ACTIVATOR).appendDeactivator(DEACTIVATOR)
+                .appendKind("fluid").handle(AspectWriteBuilders.PROP_GET_BOOLEAN);
+
+        public static final IAspectPropertyTypeInstance<ValueTypeInteger, ValueTypeInteger.ValueInteger> PROP_RATE =
+                new AspectPropertyTypeInstance<ValueTypeInteger, ValueTypeInteger.ValueInteger>(ValueTypes.INTEGER, "aspect.aspecttypes.integratedtunnels.integer.fluid.rate.name");
+
+        public static final IAspectProperties PROPERTIES_RATE = new AspectProperties(ImmutableList.<IAspectPropertyTypeInstance>of(
+                PROP_RATE
+        ));
+        static {
+            PROPERTIES_RATE.setValue(PROP_RATE, ValueTypeInteger.ValueInteger.of(1000));
+        }
+
+        public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, Boolean>, Triple<PartTarget, IAspectProperties, Integer>>
+                PROP_BOOLEAN_GETRATE = new IAspectValuePropagator<Triple<PartTarget, IAspectProperties, Boolean>, Triple<PartTarget, IAspectProperties, Integer>>() {
+            @Override
+            public Triple<PartTarget, IAspectProperties, Integer> getOutput(Triple<PartTarget, IAspectProperties, Boolean> input) {
+                return Triple.of(input.getLeft(), input.getMiddle(), input.getRight() ? input.getMiddle().getValue(PROP_RATE).getRawValue() : 0);
+            }
+        };
+        public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, Integer>, FluidTarget>
+                PROP_INTEGER_FLUIDTARGET = new IAspectValuePropagator<Triple<PartTarget, IAspectProperties, Integer>, FluidTarget>() {
+            @Override
+            public FluidTarget getOutput(Triple<PartTarget, IAspectProperties, Integer> input) {
+                return FluidTarget.of(input.getLeft(), input.getMiddle(), input.getRight(), TunnelFluidHelpers.MATCH_ALL);
+            }
+        };
+
+        public static final IAspectValuePropagator<FluidTarget, Void>
+                PROP_EXPORT = new IAspectValuePropagator<FluidTarget, Void>() {
+            @Override
+            public Void getOutput(FluidTarget input) {
+                if (input.getFluidNetwork() != null && input.getFluidHandler() != null && input.getAmount() != 0) {
+                    TunnelFluidHelpers.moveFluids(input.getFluidNetwork(), input.getFluidHandler(), input.getAmount(), true, input.getFluidStackMatcher());
+                }
+                return null;
+            }
+        };
+        public static final IAspectValuePropagator<FluidTarget, Void>
+                PROP_IMPORT = new IAspectValuePropagator<FluidTarget, Void>() {
+            @Override
+            public Void getOutput(FluidTarget input) {
+                if (input.getFluidNetwork() != null && input.getFluidHandler() != null && input.getAmount() != 0) {
+                    TunnelFluidHelpers.moveFluids(input.getFluidHandler(), input.getFluidNetwork(), input.getAmount(), true, input.getFluidStackMatcher());
+                }
+                return null;
+            }
+        };
+
+        public static class FluidTarget {
+
+            private final IFluidNetwork fluidNetwork;
+            private final IFluidHandler fluidHandler;
+            private final int amount;
+            private final Predicate<FluidStack> fluidStackMatcher;
+
+            public static FluidTarget of(PartTarget partTarget, IAspectProperties properties, int amount,
+                                         Predicate<FluidStack> fluidStackMatcher) {
+                PartPos center = partTarget.getCenter();
+                PartPos target = partTarget.getTarget();
+                INetwork network = NetworkHelpers.getNetwork(center.getPos().getWorld(), center.getPos().getBlockPos());
+                IFluidHandler fluidHandler = TileHelpers.getCapability(target.getPos(), target.getSide(), CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY);
+                return new FluidTarget(network.getCapability(FluidNetworkConfig.CAPABILITY), fluidHandler,
+                        amount, fluidStackMatcher);
+            }
+
+            public FluidTarget(IFluidNetwork fluidNetwork, IFluidHandler fluidHandler,
+                               int amount, Predicate<FluidStack> fluidStackMatcher) {
+                this.fluidNetwork = fluidNetwork;
+                this.fluidHandler = fluidHandler;
+                this.amount = amount;
+                this.fluidStackMatcher = fluidStackMatcher;
+            }
+
+            public IFluidNetwork getFluidNetwork() {
+                return fluidNetwork;
+            }
+
+            public IFluidHandler getFluidHandler() {
+                return fluidHandler;
+            }
+
+            public int getAmount() {
+                return amount;
+            }
+
+            public Predicate<FluidStack> getFluidStackMatcher() {
+                return fluidStackMatcher;
             }
         }
 
