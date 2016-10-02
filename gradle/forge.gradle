@@ -59,6 +59,7 @@ dependencies {
     deobfCompile("org.cyclops.commoncapabilities:CommonCapabilities:1.9.4-${config.commoncapabilities_version}") { // https://dl.bintray.com/cyclopsmc/dev/org/cyclops/commoncapabilities/CommonCapabilities/
         exclude group: 'org.cyclops.cyclopscore', module: 'CyclopsCore'
     }
+    deobfCompile "net.darkhax.tesla:Tesla:${config.minecraft_version}-${config.teslaapi_version}" // http://maven.epoxide.xyz/net/darkhax/tesla/Tesla/
 
     // Project lombok
     compile "org.projectlombok:lombok:1.14.4"

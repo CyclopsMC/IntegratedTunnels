@@ -15,10 +15,12 @@ import org.cyclops.cyclopscore.init.IObjectReference;
 import org.cyclops.cyclopscore.init.ItemCreativeTab;
 import org.cyclops.cyclopscore.init.ModBaseVersionable;
 import org.cyclops.cyclopscore.init.RecipeHandler;
+import org.cyclops.cyclopscore.modcompat.ModCompatLoader;
 import org.cyclops.cyclopscore.proxy.ICommonProxy;
 import org.cyclops.integratedtunnels.capability.network.FluidNetworkConfig;
 import org.cyclops.integratedtunnels.capability.network.ItemNetworkConfig;
 import org.cyclops.integratedtunnels.capability.network.TunnelNetworkCapabilityConstructors;
+import org.cyclops.integratedtunnels.modcompat.tesla.TeslaModCompat;
 import org.cyclops.integratedtunnels.part.PartTypes;
 import org.cyclops.integratedtunnels.part.aspect.TunnelAspects;
 
@@ -60,6 +62,12 @@ public class IntegratedTunnels extends ModBaseVersionable {
                 "shaped.xml",
                 "shapeless.xml"
         );
+    }
+
+    @Override
+    protected void loadModCompats(ModCompatLoader modCompatLoader) {
+        super.loadModCompats(modCompatLoader);
+        modCompatLoader.addModCompat(new TeslaModCompat());
     }
 
     /**
