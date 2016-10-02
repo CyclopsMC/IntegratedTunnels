@@ -5,6 +5,17 @@ import com.google.common.collect.Lists;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidTankProperties;
+import org.cyclops.cyclopscore.helper.L10NHelpers;
+import org.cyclops.integrateddynamics.api.evaluate.EvaluationException;
+import org.cyclops.integrateddynamics.api.evaluate.operator.IOperator;
+import org.cyclops.integrateddynamics.api.evaluate.variable.IValue;
+import org.cyclops.integrateddynamics.api.evaluate.variable.IValueTypeListProxy;
+import org.cyclops.integrateddynamics.api.part.PartTarget;
+import org.cyclops.integrateddynamics.api.part.write.IPartStateWriter;
+import org.cyclops.integrateddynamics.core.evaluate.variable.ValueHelpers;
+import org.cyclops.integrateddynamics.core.evaluate.variable.ValueObjectTypeFluidStack;
+import org.cyclops.integrateddynamics.core.evaluate.variable.ValueTypeBoolean;
+import org.cyclops.integrateddynamics.core.helper.PartHelpers;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -58,6 +69,63 @@ public class TunnelFluidHelpers {
             }
         }
         return null;
+    }
+
+    public static Predicate<FluidStack> matchFluidStack(final FluidStack fluidStack, final boolean checkAmount, final boolean checkNbt) {
+        return new Predicate<FluidStack>() {
+            @Override
+            public boolean apply(@Nullable FluidStack input) {
+                return areFluidStackEqual(input, fluidStack, true, checkAmount, checkNbt);
+            }
+        };
+    }
+
+    public static Predicate<FluidStack> matchFluidStacks(final IValueTypeListProxy<ValueObjectTypeFluidStack, ValueObjectTypeFluidStack.ValueFluidStack> fluidStacks,
+                                                       final boolean checkAmount, final boolean checkNbt) {
+        return new Predicate<FluidStack>() {
+            @Override
+            public boolean apply(@Nullable FluidStack input) {
+                for (ValueObjectTypeFluidStack.ValueFluidStack fluidStack : fluidStacks) {
+                    if (fluidStack.getRawValue().isPresent()
+                            && areFluidStackEqual(input, fluidStack.getRawValue().get(), true, checkAmount, checkNbt)) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+        };
+    }
+
+    public static Predicate<FluidStack> matchPredicate(final PartTarget partTarget, final IOperator predicate) {
+        return new Predicate<FluidStack>() {
+            @Override
+            public boolean apply(@Nullable FluidStack input) {
+                ValueObjectTypeFluidStack.ValueFluidStack valueFluidStack = ValueObjectTypeFluidStack.ValueFluidStack.of(input);
+                try {
+                    IValue result = ValueHelpers.evaluateOperator(predicate, valueFluidStack);
+                    return ((ValueTypeBoolean.ValueBoolean) result).getRawValue();
+                } catch (EvaluationException e) {
+                    PartHelpers.PartStateHolder<?, ?> partData = PartHelpers.getPart(partTarget.getCenter());
+                    if (partData != null) {
+                        IPartStateWriter partState = (IPartStateWriter) partData.getState();
+                        partState.addError(partState.getActiveAspect(), new L10NHelpers.UnlocalizedString(e.getMessage()));
+                    }
+                    return false;
+                }
+            }
+        };
+    }
+
+    public static boolean areFluidStackEqual(FluidStack stackA, FluidStack stackB,
+                                             boolean checkFluid, boolean checkAmount, boolean checkNbt) {
+        if (stackA == null && stackB == null) return true;
+        if (stackA != null && stackB != null) {
+            if (checkAmount && stackA.amount != stackB.amount) return false;
+            if (checkFluid && stackA.getFluid() != stackB.getFluid()) return false;
+            if (checkNbt && !FluidStack.areFluidStackTagsEqual(stackA, stackB)) return false;
+            return true;
+        }
+        return false;
     }
 
 }

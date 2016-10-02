@@ -385,15 +385,44 @@ public class TunnelAspectWriteBuilders {
                 BUILDER_BOOLEAN = AspectWriteBuilders.BUILDER_BOOLEAN.byMod(IntegratedTunnels._instance)
                 .appendActivator(ACTIVATOR).appendDeactivator(DEACTIVATOR)
                 .appendKind("fluid").handle(AspectWriteBuilders.PROP_GET_BOOLEAN);
+        public static final AspectBuilder<ValueTypeInteger.ValueInteger, ValueTypeInteger, Triple<PartTarget, IAspectProperties, Integer>>
+                BUILDER_INTEGER = AspectWriteBuilders.BUILDER_INTEGER.byMod(IntegratedTunnels._instance)
+                .appendActivator(ACTIVATOR).appendDeactivator(DEACTIVATOR)
+                .appendKind("fluid").handle(AspectWriteBuilders.PROP_GET_INTEGER);
+        public static final AspectBuilder<ValueObjectTypeFluidStack.ValueFluidStack, ValueObjectTypeFluidStack, Triple<PartTarget, IAspectProperties, FluidStack>>
+                BUILDER_FLUIDSTACK = AspectWriteBuilders.BUILDER_FLUIDSTACK.byMod(IntegratedTunnels._instance)
+                .appendActivator(ACTIVATOR).appendDeactivator(DEACTIVATOR)
+                .appendKind("fluid").handle(AspectWriteBuilders.PROP_GET_FLUIDSTACK);
+        public static final AspectBuilder<ValueTypeList.ValueList, ValueTypeList, Triple<PartTarget, IAspectProperties, ValueTypeList.ValueList>>
+                BUILDER_LIST = AspectWriteBuilders.BUILDER_LIST.byMod(IntegratedTunnels._instance)
+                .appendActivator(ACTIVATOR).appendDeactivator(DEACTIVATOR)
+                .appendKind("fluid");
+        public static final AspectBuilder<ValueTypeOperator.ValueOperator, ValueTypeOperator, Triple<PartTarget, IAspectProperties, ValueTypeOperator.ValueOperator>>
+                BUILDER_OPERATOR = AspectWriteBuilders.BUILDER_OPERATOR.byMod(IntegratedTunnels._instance)
+                .appendActivator(ACTIVATOR).appendDeactivator(DEACTIVATOR)
+                .appendKind("fluid");
 
         public static final IAspectPropertyTypeInstance<ValueTypeInteger, ValueTypeInteger.ValueInteger> PROP_RATE =
                 new AspectPropertyTypeInstance<ValueTypeInteger, ValueTypeInteger.ValueInteger>(ValueTypes.INTEGER, "aspect.aspecttypes.integratedtunnels.integer.fluid.rate.name");
+        public static final IAspectPropertyTypeInstance<ValueTypeBoolean, ValueTypeBoolean.ValueBoolean> PROP_CHECK_AMOUNT =
+                new AspectPropertyTypeInstance<ValueTypeBoolean, ValueTypeBoolean.ValueBoolean>(ValueTypes.BOOLEAN, "aspect.aspecttypes.integratedtunnels.boolean.fluid.checkamount.name");
+        public static final IAspectPropertyTypeInstance<ValueTypeBoolean, ValueTypeBoolean.ValueBoolean> PROP_CHECK_NBT =
+                new AspectPropertyTypeInstance<ValueTypeBoolean, ValueTypeBoolean.ValueBoolean>(ValueTypes.BOOLEAN, "aspect.aspecttypes.integratedtunnels.boolean.fluid.checknbt.name");
 
         public static final IAspectProperties PROPERTIES_RATE = new AspectProperties(ImmutableList.<IAspectPropertyTypeInstance>of(
                 PROP_RATE
         ));
+        public static final IAspectProperties PROPERTIES_RATECHECKS = new AspectProperties(ImmutableList.<IAspectPropertyTypeInstance>of(
+                PROP_RATE,
+                PROP_CHECK_AMOUNT,
+                PROP_CHECK_NBT
+        ));
         static {
             PROPERTIES_RATE.setValue(PROP_RATE, ValueTypeInteger.ValueInteger.of(1000));
+
+            PROPERTIES_RATECHECKS.setValue(PROP_RATE, ValueTypeInteger.ValueInteger.of(1000));
+            PROPERTIES_RATECHECKS.setValue(PROP_CHECK_AMOUNT, ValueTypeBoolean.ValueBoolean.of(false));
+            PROPERTIES_RATECHECKS.setValue(PROP_CHECK_NBT, ValueTypeBoolean.ValueBoolean.of(true));
         }
 
         public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, Boolean>, Triple<PartTarget, IAspectProperties, Integer>>
@@ -408,6 +437,53 @@ public class TunnelAspectWriteBuilders {
             @Override
             public FluidTarget getOutput(Triple<PartTarget, IAspectProperties, Integer> input) {
                 return FluidTarget.of(input.getLeft(), input.getMiddle(), input.getRight(), TunnelFluidHelpers.MATCH_ALL);
+            }
+        };
+        public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, FluidStack>, FluidTarget>
+                PROP_FLUIDSTACK_FLUIDTARGET = new IAspectValuePropagator<Triple<PartTarget, IAspectProperties, FluidStack>, FluidTarget>() {
+            @Override
+            public FluidTarget getOutput(Triple<PartTarget, IAspectProperties, FluidStack> input) {
+                IAspectProperties properties = input.getMiddle();
+                int rate = properties.getValue(PROP_RATE).getRawValue();
+                boolean checkAmount = properties.getValue(PROP_CHECK_AMOUNT).getRawValue();
+                boolean checkNbt = properties.getValue(PROP_CHECK_NBT).getRawValue();
+                return FluidTarget.of(input.getLeft(), input.getMiddle(), rate,
+                        TunnelFluidHelpers.matchFluidStack(input.getRight(), checkAmount, checkNbt));
+            }
+        };
+        public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, ValueTypeList.ValueList>, FluidTarget>
+                PROP_FLUIDSTACKLIST_FLUIDTARGET = new IAspectValuePropagator<Triple<PartTarget, IAspectProperties, ValueTypeList.ValueList>, FluidTarget>() {
+            @Override
+            public FluidTarget getOutput(Triple<PartTarget, IAspectProperties, ValueTypeList.ValueList> input) throws EvaluationException {
+                ValueTypeList.ValueList list = input.getRight();
+                if (list.getRawValue().getValueType() != ValueTypes.OBJECT_FLUIDSTACK) {
+                    throw new EvaluationException(new L10NHelpers.UnlocalizedString(L10NValues.ASPECT_ERROR_INVALIDTYPE,
+                            ValueTypes.OBJECT_FLUIDSTACK, list.getRawValue().getValueType()).localize());
+                }
+                IAspectProperties properties = input.getMiddle();
+                int rate = properties.getValue(PROP_RATE).getRawValue();
+                boolean checkAmount = properties.getValue(PROP_CHECK_AMOUNT).getRawValue();
+                boolean checkNbt = properties.getValue(PROP_CHECK_NBT).getRawValue();
+                return FluidTarget.of(input.getLeft(), input.getMiddle(), rate,
+                        TunnelFluidHelpers.matchFluidStacks(list.getRawValue(), checkAmount, checkNbt));
+            }
+        };
+        public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, ValueTypeOperator.ValueOperator>, FluidTarget>
+                PROP_FLUIDSTACKPREDICATE_FLUIDTARGET = new IAspectValuePropagator<Triple<PartTarget, IAspectProperties, ValueTypeOperator.ValueOperator>, FluidTarget>() {
+            @Override
+            public FluidTarget getOutput(Triple<PartTarget, IAspectProperties, ValueTypeOperator.ValueOperator> input) throws EvaluationException {
+                IOperator predicate = input.getRight().getRawValue();
+                if (predicate.getInputTypes().length == 1 && ValueHelpers.correspondsTo(predicate.getInputTypes()[0], ValueTypes.OBJECT_FLUIDSTACK)) {
+                    IAspectProperties properties = input.getMiddle();
+                    int rate = properties.getValue(PROP_RATE).getRawValue();
+                    return FluidTarget.of(input.getLeft(), input.getMiddle(), rate,
+                            TunnelFluidHelpers.matchPredicate(input.getLeft(), predicate));
+                } else {
+                    String current = ValueTypeOperator.getSignature(predicate);
+                    String expected = ValueTypeOperator.getSignature(new IValueType[]{ValueTypes.OBJECT_FLUIDSTACK}, ValueTypes.BOOLEAN);
+                    throw new EvaluationException(new L10NHelpers.UnlocalizedString(L10NValues.ASPECT_ERROR_INVALIDTYPE,
+                            expected, current).localize());
+                }
             }
         };
 

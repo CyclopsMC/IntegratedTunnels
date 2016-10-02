@@ -120,12 +120,58 @@ public class TunnelAspects {
                             .handle(TunnelAspectWriteBuilders.Fluid.PROP_INTEGER_FLUIDTARGET)
                             .handle(TunnelAspectWriteBuilders.Fluid.PROP_EXPORT)
                             .appendKind("export").buildWrite();
+            public static final IAspectWrite<ValueTypeInteger.ValueInteger, ValueTypeInteger> INTEGER_EXPORT =
+                    TunnelAspectWriteBuilders.Fluid.BUILDER_INTEGER
+                            .handle(TunnelAspectWriteBuilders.Fluid.PROP_INTEGER_FLUIDTARGET)
+                            .handle(TunnelAspectWriteBuilders.Fluid.PROP_EXPORT)
+                            .appendKind("export").buildWrite();
+            public static final IAspectWrite<ValueObjectTypeFluidStack.ValueFluidStack, ValueObjectTypeFluidStack> FLUIDSTACK_EXPORT =
+                    TunnelAspectWriteBuilders.Fluid.BUILDER_FLUIDSTACK
+                            .withProperties(TunnelAspectWriteBuilders.Fluid.PROPERTIES_RATECHECKS)
+                            .handle(TunnelAspectWriteBuilders.Fluid.PROP_FLUIDSTACK_FLUIDTARGET)
+                            .handle(TunnelAspectWriteBuilders.Fluid.PROP_EXPORT)
+                            .appendKind("export").buildWrite();
+            public static final IAspectWrite<ValueTypeList.ValueList, ValueTypeList> LIST_EXPORT =
+                    TunnelAspectWriteBuilders.Fluid.BUILDER_LIST
+                            .withProperties(TunnelAspectWriteBuilders.Fluid.PROPERTIES_RATECHECKS)
+                            .handle(TunnelAspectWriteBuilders.Fluid.PROP_FLUIDSTACKLIST_FLUIDTARGET)
+                            .handle(TunnelAspectWriteBuilders.Fluid.PROP_EXPORT)
+                            .appendKind("export").buildWrite();
+            public static final IAspectWrite<ValueTypeOperator.ValueOperator, ValueTypeOperator> PREDICATE_EXPORT =
+                    TunnelAspectWriteBuilders.Fluid.BUILDER_OPERATOR
+                            .withProperties(TunnelAspectWriteBuilders.Fluid.PROPERTIES_RATE)
+                            .handle(TunnelAspectWriteBuilders.Fluid.PROP_FLUIDSTACKPREDICATE_FLUIDTARGET)
+                            .handle(TunnelAspectWriteBuilders.Fluid.PROP_EXPORT)
+                            .appendKind("export").buildWrite();
 
             public static final IAspectWrite<ValueTypeBoolean.ValueBoolean, ValueTypeBoolean> BOOLEAN_IMPORT =
                     TunnelAspectWriteBuilders.Fluid.BUILDER_BOOLEAN
                             .withProperties(TunnelAspectWriteBuilders.Fluid.PROPERTIES_RATE)
                             .handle(TunnelAspectWriteBuilders.Fluid.PROP_BOOLEAN_GETRATE)
                             .handle(TunnelAspectWriteBuilders.Fluid.PROP_INTEGER_FLUIDTARGET)
+                            .handle(TunnelAspectWriteBuilders.Fluid.PROP_IMPORT)
+                            .appendKind("import").buildWrite();
+            public static final IAspectWrite<ValueTypeInteger.ValueInteger, ValueTypeInteger> INTEGER_IMPORT =
+                    TunnelAspectWriteBuilders.Fluid.BUILDER_INTEGER
+                            .handle(TunnelAspectWriteBuilders.Fluid.PROP_INTEGER_FLUIDTARGET)
+                            .handle(TunnelAspectWriteBuilders.Fluid.PROP_IMPORT)
+                            .appendKind("import").buildWrite();
+            public static final IAspectWrite<ValueObjectTypeFluidStack.ValueFluidStack, ValueObjectTypeFluidStack> FLUIDSTACK_IMPORT =
+                    TunnelAspectWriteBuilders.Fluid.BUILDER_FLUIDSTACK
+                            .withProperties(TunnelAspectWriteBuilders.Fluid.PROPERTIES_RATECHECKS)
+                            .handle(TunnelAspectWriteBuilders.Fluid.PROP_FLUIDSTACK_FLUIDTARGET)
+                            .handle(TunnelAspectWriteBuilders.Fluid.PROP_IMPORT)
+                            .appendKind("import").buildWrite();
+            public static final IAspectWrite<ValueTypeList.ValueList, ValueTypeList> LIST_IMPORT =
+                    TunnelAspectWriteBuilders.Fluid.BUILDER_LIST
+                            .withProperties(TunnelAspectWriteBuilders.Fluid.PROPERTIES_RATECHECKS)
+                            .handle(TunnelAspectWriteBuilders.Fluid.PROP_FLUIDSTACKLIST_FLUIDTARGET)
+                            .handle(TunnelAspectWriteBuilders.Fluid.PROP_IMPORT)
+                            .appendKind("import").buildWrite();
+            public static final IAspectWrite<ValueTypeOperator.ValueOperator, ValueTypeOperator> PREDICATE_IMPORT =
+                    TunnelAspectWriteBuilders.Fluid.BUILDER_OPERATOR
+                            .withProperties(TunnelAspectWriteBuilders.Fluid.PROPERTIES_RATE)
+                            .handle(TunnelAspectWriteBuilders.Fluid.PROP_FLUIDSTACKPREDICATE_FLUIDTARGET)
                             .handle(TunnelAspectWriteBuilders.Fluid.PROP_IMPORT)
                             .appendKind("import").buildWrite();
 

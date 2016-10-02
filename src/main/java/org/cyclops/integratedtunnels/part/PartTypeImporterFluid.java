@@ -15,7 +15,11 @@ public class PartTypeImporterFluid extends PartTypeTunnelAspects<PartTypeImporte
     public PartTypeImporterFluid(String name) {
         super(name);
         AspectRegistry.getInstance().register(this, Lists.<IAspect>newArrayList(
-                TunnelAspects.Write.Fluid.BOOLEAN_IMPORT
+                TunnelAspects.Write.Fluid.BOOLEAN_IMPORT,
+                TunnelAspects.Write.Fluid.INTEGER_IMPORT,
+                TunnelAspects.Write.Fluid.FLUIDSTACK_IMPORT,
+                TunnelAspects.Write.Fluid.LIST_IMPORT,
+                TunnelAspects.Write.Fluid.PREDICATE_IMPORT
         ));
     }
 

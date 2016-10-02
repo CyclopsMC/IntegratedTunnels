@@ -29,6 +29,8 @@ aspect.aspecttypes.integratedtunnels.boolean.item.checkstacksize.name=Check Stac
 aspect.aspecttypes.integratedtunnels.boolean.item.checkdamage.name=Check Damage
 aspect.aspecttypes.integratedtunnels.boolean.item.checknbt.name=Check NBT
 aspect.aspecttypes.integratedtunnels.integer.fluid.rate.name=Fluid Transfer Rate
+aspect.aspecttypes.integratedtunnels.boolean.fluid.checkamount.name=Check Fluid Amount
+aspect.aspecttypes.integratedtunnels.boolean.fluid.checknbt.name=Check NBT
 
 # Aspects
 
@@ -67,5 +69,21 @@ aspect.aspects.integratedtunnels.write.operator.item.import.info=Import all item
 ## Fluid
 aspect.aspects.integratedtunnels.write.boolean.fluid.export.name=Export All Fluids
 aspect.aspects.integratedtunnels.write.boolean.fluid.export.info=Export fluids if the boolean is true
+aspect.aspects.integratedtunnels.write.integer.fluid.export.name=Export Fluid Amount
+aspect.aspects.integratedtunnels.write.integer.fluid.export.info=Export the given amount of fluids each tick.
+aspect.aspects.integratedtunnels.write.fluidstack.fluid.export.name=Export Fluid
+aspect.aspects.integratedtunnels.write.fluidstack.fluid.export.info=Export the given fluid.
+aspect.aspects.integratedtunnels.write.list.fluid.export.name=Export Fluids
+aspect.aspects.integratedtunnels.write.list.fluid.export.info=Export the given fluids.
+aspect.aspects.integratedtunnels.write.operator.fluid.export.name=Export Fluids Predicate
+aspect.aspects.integratedtunnels.write.operator.fluid.export.info=Export all fluids that match the given predicate.
 aspect.aspects.integratedtunnels.write.boolean.fluid.import.name=Import All Fluids
 aspect.aspects.integratedtunnels.write.boolean.fluid.import.info=Import fluids if the boolean is true
+aspect.aspects.integratedtunnels.write.integer.fluid.import.name=Import Fluid Amount
+aspect.aspects.integratedtunnels.write.integer.fluid.import.info=Import the given amount of fluids each tick.
+aspect.aspects.integratedtunnels.write.fluidstack.fluid.import.name=Import Fluid
+aspect.aspects.integratedtunnels.write.fluidstack.fluid.import.info=Import the given fluid.
+aspect.aspects.integratedtunnels.write.list.fluid.import.name=Import Fluids
+aspect.aspects.integratedtunnels.write.list.fluid.import.info=Import the given fluids.
+aspect.aspects.integratedtunnels.write.operator.fluid.import.name=Import Fluids Predicate
+aspect.aspects.integratedtunnels.write.operator.fluid.import.info=Import all fluids that match the given predicate.
