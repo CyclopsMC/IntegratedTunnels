@@ -7,7 +7,7 @@
   "mcversion": "${mcversion}",
   "logoFile": "assets/integratedtunnels/textures/logo.png",
   "url": "https://github.com/CyclopsMC/IntegratedTunnels",
-  "updateUrl": "todo",
+  "updateUrl": "https://minecraft.curseforge.com/projects/integrated-tunnels/files",
   "authorList": [ "rubensworks (aka kroeserr)" ],
   "credits": "rubensworks (aka kroeserr)",
   "parent": "",

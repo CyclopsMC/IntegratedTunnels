@@ -3,6 +3,7 @@ package org.cyclops.integratedtunnels;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
@@ -139,7 +140,7 @@ public class IntegratedTunnels extends ModBaseVersionable {
         return new ItemCreativeTab(this, new IObjectReference<Item>() {
             @Override
             public Item getObject() {
-                return Items.REDSTONE; // TODO
+                return Item.REGISTRY.getObject(new ResourceLocation(Reference.MOD_ID, "part_interfaceItemItem"));
             }
         });
     }
