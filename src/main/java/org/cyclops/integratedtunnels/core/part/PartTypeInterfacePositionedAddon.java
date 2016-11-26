@@ -12,6 +12,8 @@ import org.cyclops.integrateddynamics.api.part.IPartType;
 import org.cyclops.integrateddynamics.api.part.PartPos;
 import org.cyclops.integrateddynamics.api.part.PartTarget;
 
+import javax.annotation.Nullable;
+
 /**
  * Interface for positioned network addons.
  * @author rubensworks
@@ -40,10 +42,12 @@ public abstract class PartTypeInterfacePositionedAddon<N extends IPositionedAddo
     }
 
     @Override
-    public void onBlockNeighborChange(INetwork network, IPartNetwork partNetwork, PartTarget target, S state, IBlockAccess world, Block neighborBlock) {
+    public void onBlockNeighborChange(@Nullable INetwork network, @Nullable IPartNetwork partNetwork, PartTarget target, S state, IBlockAccess world, Block neighborBlock) {
         super.onBlockNeighborChange(network, partNetwork, target, state, world, neighborBlock);
-        removeTargetFromNetwork(network, target.getTarget());
-        addTargetToNetwork(network, target.getTarget(), state.getPriority());
+        if (network != null) {
+            removeTargetFromNetwork(network, target.getTarget());
+            addTargetToNetwork(network, target.getTarget(), state.getPriority());
+        }
     }
 
     @Override
