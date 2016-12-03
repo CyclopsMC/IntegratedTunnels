@@ -1,0 +1,6 @@
+As always, don't forget to backup your world before updating!
+Requires CyclopsCore version 0.8.2 or higher.
+
+Fixes:
+* Fix interfaces not detecting capabilities when added to existing cable, Closes #4
+* Fix null network crash for external block updates to parts, Closes #1
