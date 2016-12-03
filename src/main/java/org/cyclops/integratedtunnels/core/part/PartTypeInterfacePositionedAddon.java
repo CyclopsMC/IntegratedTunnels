@@ -42,6 +42,12 @@ public abstract class PartTypeInterfacePositionedAddon<N extends IPositionedAddo
     }
 
     @Override
+    public void onNetworkAddition(INetwork network, IPartNetwork partNetwork, PartTarget target, S state) {
+        super.onNetworkAddition(network, partNetwork, target, state);
+        addTargetToNetwork(network, target.getTarget(), state.getPriority());
+    }
+
+    @Override
     public void onBlockNeighborChange(@Nullable INetwork network, @Nullable IPartNetwork partNetwork, PartTarget target, S state, IBlockAccess world, Block neighborBlock) {
         super.onBlockNeighborChange(network, partNetwork, target, state, world, neighborBlock);
         if (network != null) {
