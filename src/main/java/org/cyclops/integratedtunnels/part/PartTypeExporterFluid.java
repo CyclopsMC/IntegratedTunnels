@@ -11,7 +11,7 @@ import org.cyclops.integratedtunnels.part.aspect.TunnelAspects;
  * A part that can export fluids.
  * @author rubensworks
  */
-public class PartTypeExporterFluid extends PartTypeTunnelAspects<PartTypeExporterFluid, PartStateItem<PartTypeExporterFluid>> {
+public class PartTypeExporterFluid extends PartTypeTunnelAspects<PartTypeExporterFluid, PartStateFluid<PartTypeExporterFluid>> {
     public PartTypeExporterFluid(String name) {
         super(name);
         AspectRegistry.getInstance().register(this, Lists.<IAspect>newArrayList(
@@ -24,7 +24,7 @@ public class PartTypeExporterFluid extends PartTypeTunnelAspects<PartTypeExporte
     }
 
     @Override
-    protected PartStateItem<PartTypeExporterFluid> constructDefaultState() {
-        return new PartStateItem<PartTypeExporterFluid>(Aspects.REGISTRY.getWriteAspects(this).size(), false, true);
+    protected PartStateFluid<PartTypeExporterFluid> constructDefaultState() {
+        return new PartStateFluid<PartTypeExporterFluid>(Aspects.REGISTRY.getWriteAspects(this).size(), false, true);
     }
 }
