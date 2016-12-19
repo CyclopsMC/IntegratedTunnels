@@ -1,0 +1,6 @@
+As always, don't forget to backup your world before updating!
+Requires CyclopsCore version 0.8.0 or higher.
+
+Fixes:
+* Fix fluid parts exposing themselves with item capabilities, Closes #5
+
