@@ -1,25 +1,25 @@
 # General
-itemGroup.integratedtunnels=Integrated Tunnels
+item_group.integratedtunnels=Integrated Tunnels
 
 # Part types
-parttype.parttypes.integratedtunnels.interfaceEnergy.name=Energy Interface
-parttype.parttypes.integratedtunnels.interfaceEnergy.info=Attaches an energy holder to the network
-parttype.parttypes.integratedtunnels.importerEnergy.name=Energy Importer
-parttype.parttypes.integratedtunnels.importerEnergy.info=Imports energy into the network
-parttype.parttypes.integratedtunnels.exporterEnergy.name=Energy Exporter
-parttype.parttypes.integratedtunnels.exporterEnergy.info=Exports energy from the network
-parttype.parttypes.integratedtunnels.interfaceItem.name=Item Interface
-parttype.parttypes.integratedtunnels.interfaceItem.info=Attaches an item inventory to the network
-parttype.parttypes.integratedtunnels.importerItem.name=Item Importer
-parttype.parttypes.integratedtunnels.importerItem.info=Imports items into the network
-parttype.parttypes.integratedtunnels.exporterItem.name=Item Exporter
-parttype.parttypes.integratedtunnels.exporterItem.info=Exports items from the network
-parttype.parttypes.integratedtunnels.interfaceFluid.name=Fluid Interface
-parttype.parttypes.integratedtunnels.interfaceFluid.info=Attaches an fluid tank to the network
-parttype.parttypes.integratedtunnels.importerFluid.name=Fluid Importer
-parttype.parttypes.integratedtunnels.importerFluid.info=Imports fluids into the network
-parttype.parttypes.integratedtunnels.exporterFluid.name=Fluid Exporter
-parttype.parttypes.integratedtunnels.exporterFluid.info=Exports fluids from the network
+parttype.parttypes.integratedtunnels.interface_energy.name=Energy Interface
+parttype.parttypes.integratedtunnels.interface_energy.info=Attaches an energy holder to the network
+parttype.parttypes.integratedtunnels.importer_energy.name=Energy Importer
+parttype.parttypes.integratedtunnels.importer_energy.info=Imports energy into the network
+parttype.parttypes.integratedtunnels.exporter_energy.name=Energy Exporter
+parttype.parttypes.integratedtunnels.exporter_energy.info=Exports energy from the network
+parttype.parttypes.integratedtunnels.interface_item.name=Item Interface
+parttype.parttypes.integratedtunnels.interface_item.info=Attaches an item inventory to the network
+parttype.parttypes.integratedtunnels.importer_item.name=Item Importer
+parttype.parttypes.integratedtunnels.importer_item.info=Imports items into the network
+parttype.parttypes.integratedtunnels.exporter_item.name=Item Exporter
+parttype.parttypes.integratedtunnels.exporter_item.info=Exports items from the network
+parttype.parttypes.integratedtunnels.interface_fluid.name=Fluid Interface
+parttype.parttypes.integratedtunnels.interface_fluid.info=Attaches an fluid tank to the network
+parttype.parttypes.integratedtunnels.importer_fluid.name=Fluid Importer
+parttype.parttypes.integratedtunnels.importer_fluid.info=Imports fluids into the network
+parttype.parttypes.integratedtunnels.exporter_fluid.name=Fluid Exporter
+parttype.parttypes.integratedtunnels.exporter_fluid.info=Exports fluids from the network
 
 # Aspect property types
 aspect.aspecttypes.integratedtunnels.integer.energy.rate.name=Energy Transfer Rate

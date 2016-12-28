@@ -61,20 +61,20 @@ public class TunnelItemHelpers {
 
         if (!loopSourceSlots && !loopTargetSlots) {
             ItemStack extracted = source.extractItem(sourceSlot, amount, simulate);
-            if (extracted != null && (!simulate || itemStackMatcher.apply(extracted))) {
+            if (!extracted.isEmpty() && (!simulate || itemStackMatcher.apply(extracted))) {
                 ItemStack remaining = target.insertItem(targetSlot, extracted, simulate);
-                if (remaining == null) {
+                if (remaining.isEmpty()) {
                     return extracted;
                 } else {
                     extracted = extracted.copy();
-                    extracted.stackSize -= remaining.stackSize;
-                    return extracted.stackSize > 0 && (simulate || itemStackMatcher.apply(extracted)) ? extracted : null;
+                    extracted.shrink(remaining.getCount());
+                    return extracted.getCount() > 0 && (simulate || itemStackMatcher.apply(extracted)) ? extracted : null;
                 }
             }
         } else if (loopSourceSlots) {
             for (sourceSlot = 0; sourceSlot < source.getSlots(); sourceSlot++) {
                 if (loopTargetSlots) {
-                    if (source.getStackInSlot(sourceSlot) != null) {
+                    if (!source.getStackInSlot(sourceSlot).isEmpty()) {
                         for (targetSlot = 0; targetSlot < target.getSlots(); targetSlot++) {
                             if (!simulate) {
                                 ItemStack movedSimulated = moveItemsSingle(source, sourceSlot, target, targetSlot, amount, itemStackMatcher, true);
@@ -135,7 +135,7 @@ public class TunnelItemHelpers {
         if (itemStack == null) {
             return 0;
         }
-        return Objects.hashCode(itemStack.stackSize, itemStack.getMetadata(),
+        return Objects.hashCode(itemStack.getCount(), itemStack.getMetadata(),
                 Item.getIdFromItem(itemStack.getItem()), itemStack.hasTagCompound() ? itemStack.getTagCompound() : 0);
     }
 
@@ -170,7 +170,7 @@ public class TunnelItemHelpers {
         if (simulatedTransfer == null) {
             return null;
         }
-        return moveItemsSingle(source, sourceSlot, target, targetSlot, simulatedTransfer.stackSize, MATCH_ALL, false);
+        return moveItemsSingle(source, sourceSlot, target, targetSlot, simulatedTransfer.getCount(), MATCH_ALL, false);
     }
 
     /**
@@ -218,7 +218,7 @@ public class TunnelItemHelpers {
             }
 
             invalidateCachedState(connectionHash);
-            return moveItemsSingle(sourceHandler, sourceSlot, targetHandler, targetSlot, simulatedTransfer.stackSize, itemStackMatcher, false);
+            return moveItemsSingle(sourceHandler, sourceSlot, targetHandler, targetSlot, simulatedTransfer.getCount(), itemStackMatcher, false);
         }
         return null;
     }
@@ -239,8 +239,8 @@ public class TunnelItemHelpers {
             @Override
             public boolean apply(@Nullable ItemStack input) {
                 for (ValueObjectTypeItemStack.ValueItemStack itemStack : itemStacks) {
-                    if (itemStack.getRawValue().isPresent()
-                            && areItemStackEqual(input, itemStack.getRawValue().get(), checkStackSize, true, checkDamage, checkNbt)) {
+                    if (!itemStack.getRawValue().isEmpty()
+                            && areItemStackEqual(input, itemStack.getRawValue(), checkStackSize, true, checkDamage, checkNbt)) {
                         return true;
                     }
                 }
@@ -273,7 +273,7 @@ public class TunnelItemHelpers {
                                             boolean checkStackSize, boolean checkItem, boolean checkDamage, boolean checkNbt) {
         if (stackA == null && stackB == null) return true;
         if (stackA != null && stackB != null) {
-            if (checkStackSize && stackA.stackSize != stackB.stackSize) return false;
+            if (checkStackSize && stackA.getCount() != stackB.getCount()) return false;
             if (checkItem && stackA.getItem() != stackB.getItem()) return false;
             if (checkDamage && stackA.getItemDamage() != stackB.getItemDamage()) return false;
             if (checkNbt && !ItemStack.areItemStackTagsEqual(stackA, stackB)) return false;

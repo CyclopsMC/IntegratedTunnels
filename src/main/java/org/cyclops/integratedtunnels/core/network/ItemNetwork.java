@@ -80,7 +80,7 @@ public class ItemNetwork extends PositionedAddonsNetwork implements IItemNetwork
         if (slottedHandler != null) {
             return slottedHandler.getLeft().getStackInSlot(slottedHandler.getRight());
         }
-        return null;
+        return ItemStack.EMPTY;
     }
 
     @Override
@@ -98,7 +98,16 @@ public class ItemNetwork extends PositionedAddonsNetwork implements IItemNetwork
         if (slottedHandler != null) {
             return slottedHandler.getLeft().extractItem(slottedHandler.getRight(), amount, simulate);
         }
-        return null;
+        return ItemStack.EMPTY;
+    }
+
+    @Override
+    public int getSlotLimit(int slot) {
+        Pair<IItemHandler, Integer> slottedHandler = getItemHandlerForSlot(slot);
+        if (slottedHandler != null) {
+            return slottedHandler.getLeft().getSlotLimit(slottedHandler.getRight());
+        }
+        return 0;
     }
 
     @Override

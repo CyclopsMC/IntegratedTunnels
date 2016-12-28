@@ -140,7 +140,7 @@ public class IntegratedTunnels extends ModBaseVersionable {
         return new ItemCreativeTab(this, new IObjectReference<Item>() {
             @Override
             public Item getObject() {
-                return Item.REGISTRY.getObject(new ResourceLocation(Reference.MOD_ID, "part_interfaceItemItem"));
+                return Item.REGISTRY.getObject(new ResourceLocation(Reference.MOD_ID, "part_interface_item_item"));
             }
         });
     }

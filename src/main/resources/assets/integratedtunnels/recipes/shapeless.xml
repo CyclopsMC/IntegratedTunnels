@@ -3,61 +3,61 @@
 
 	<recipe type="shapeless">
 		<input>
-			<item>integratedtunnels:part_interfaceEnergyItem</item>
-			<item meta="0">integrateddynamics:variableTransformer</item>
+			<item>integratedtunnels:part_interface_energy_item</item>
+			<item meta="0">integrateddynamics:variable_transformer</item>
 		</input>
 		<output>
-			<item>integratedtunnels:part_exporterEnergyItem</item>
+			<item>integratedtunnels:part_exporter_energy_item</item>
 		</output>
 	</recipe>
 
 	<recipe type="shapeless">
 		<input>
-			<item>integratedtunnels:part_interfaceEnergyItem</item>
-			<item meta="1">integrateddynamics:variableTransformer</item>
+			<item>integratedtunnels:part_interface_energy_item</item>
+			<item meta="1">integrateddynamics:variable_transformer</item>
 		</input>
 		<output>
-			<item>integratedtunnels:part_importerEnergyItem</item>
+			<item>integratedtunnels:part_importer_energy_item</item>
 		</output>
 	</recipe>
 
 	<recipe type="shapeless">
 		<input>
-			<item>integratedtunnels:part_interfaceItemItem</item>
-			<item meta="0">integrateddynamics:variableTransformer</item>
+			<item>integratedtunnels:part_interface_item_item</item>
+			<item meta="0">integrateddynamics:variable_transformer</item>
 		</input>
 		<output>
-			<item>integratedtunnels:part_exporterItemItem</item>
+			<item>integratedtunnels:part_exporter_item_item</item>
 		</output>
 	</recipe>
 
 	<recipe type="shapeless">
 		<input>
-			<item>integratedtunnels:part_interfaceItemItem</item>
-			<item meta="1">integrateddynamics:variableTransformer</item>
+			<item>integratedtunnels:part_interface_item_item</item>
+			<item meta="1">integrateddynamics:variable_transformer</item>
 		</input>
 		<output>
-			<item>integratedtunnels:part_importerItemItem</item>
+			<item>integratedtunnels:part_importer_item_item</item>
 		</output>
 	</recipe>
 
 	<recipe type="shapeless">
 		<input>
-			<item>integratedtunnels:part_interfaceFluidItem</item>
-			<item meta="0">integrateddynamics:variableTransformer</item>
+			<item>integratedtunnels:part_interface_fluid_item</item>
+			<item meta="0">integrateddynamics:variable_transformer</item>
 		</input>
 		<output>
-			<item>integratedtunnels:part_exporterFluidItem</item>
+			<item>integratedtunnels:part_exporter_fluid_item</item>
 		</output>
 	</recipe>
 
 	<recipe type="shapeless">
 		<input>
-			<item>integratedtunnels:part_interfaceFluidItem</item>
-			<item meta="1">integrateddynamics:variableTransformer</item>
+			<item>integratedtunnels:part_interface_fluid_item</item>
+			<item meta="1">integrateddynamics:variable_transformer</item>
 		</input>
 		<output>
-			<item>integratedtunnels:part_importerFluidItem</item>
+			<item>integratedtunnels:part_importer_fluid_item</item>
 		</output>
 	</recipe>
 

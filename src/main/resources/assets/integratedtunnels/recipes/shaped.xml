@@ -5,19 +5,19 @@
 		<input>
 			<grid>
 				<gridrow>
-					<item>integrateddynamics:crystalizedMenrilChunk</item>
-					<item>integrateddynamics:energyBattery</item>
-					<item>integrateddynamics:crystalizedMenrilChunk</item>
+					<item>integrateddynamics:crystalized_menril_chunk</item>
+					<item>integrateddynamics:energy_battery</item>
+					<item>integrateddynamics:crystalized_menril_chunk</item>
 				</gridrow>
 				<gridrow>
-					<item>integrateddynamics:crystalizedMenrilChunk</item>
-					<item>integrateddynamics:crystalizedMenrilChunk</item>
-					<item>integrateddynamics:crystalizedMenrilChunk</item>
+					<item>integrateddynamics:crystalized_menril_chunk</item>
+					<item>integrateddynamics:crystalized_menril_chunk</item>
+					<item>integrateddynamics:crystalized_menril_chunk</item>
 				</gridrow>
 			</grid>
 		</input>
 		<output>
-			<item amount="4">integratedtunnels:part_interfaceEnergyItem</item>
+			<item amount="4">integratedtunnels:part_interface_energy_item</item>
 		</output>
 	</recipe>
 
@@ -25,19 +25,19 @@
 		<input>
 			<grid>
 				<gridrow>
-					<item>integrateddynamics:crystalizedMenrilChunk</item>
+					<item>integrateddynamics:crystalized_menril_chunk</item>
 					<item type="oredict">chest</item>
-					<item>integrateddynamics:crystalizedMenrilChunk</item>
+					<item>integrateddynamics:crystalized_menril_chunk</item>
 				</gridrow>
 				<gridrow>
-					<item>integrateddynamics:crystalizedMenrilChunk</item>
-					<item>integrateddynamics:crystalizedMenrilChunk</item>
-					<item>integrateddynamics:crystalizedMenrilChunk</item>
+					<item>integrateddynamics:crystalized_menril_chunk</item>
+					<item>integrateddynamics:crystalized_menril_chunk</item>
+					<item>integrateddynamics:crystalized_menril_chunk</item>
 				</gridrow>
 			</grid>
 		</input>
 		<output>
-			<item amount="4">integratedtunnels:part_interfaceItemItem</item>
+			<item amount="4">integratedtunnels:part_interface_item_item</item>
 		</output>
 	</recipe>
 
@@ -45,19 +45,19 @@
 		<input>
 			<grid>
 				<gridrow>
-					<item>integrateddynamics:crystalizedMenrilChunk</item>
+					<item>integrateddynamics:crystalized_menril_chunk</item>
 					<item>minecraft:bucket</item>
-					<item>integrateddynamics:crystalizedMenrilChunk</item>
+					<item>integrateddynamics:crystalized_menril_chunk</item>
 				</gridrow>
 				<gridrow>
-					<item>integrateddynamics:crystalizedMenrilChunk</item>
-					<item>integrateddynamics:crystalizedMenrilChunk</item>
-					<item>integrateddynamics:crystalizedMenrilChunk</item>
+					<item>integrateddynamics:crystalized_menril_chunk</item>
+					<item>integrateddynamics:crystalized_menril_chunk</item>
+					<item>integrateddynamics:crystalized_menril_chunk</item>
 				</gridrow>
 			</grid>
 		</input>
 		<output>
-			<item amount="4">integratedtunnels:part_interfaceFluidItem</item>
+			<item amount="4">integratedtunnels:part_interface_fluid_item</item>
 		</output>
 	</recipe>
 

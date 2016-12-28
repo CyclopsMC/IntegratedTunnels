@@ -36,4 +36,9 @@ public class PartStateItem<P extends IPartTypeWriter> extends PartStatePositione
     public ItemStack extractItem(int slot, int amount, boolean simulate) {
         return canExtract() && getPositionedAddonsNetwork() != null ? getPositionedAddonsNetwork().extractItem(slot, amount, simulate) : null;
     }
+
+    @Override
+    public int getSlotLimit(int slot) {
+        return getPositionedAddonsNetwork() != null ? getPositionedAddonsNetwork().getSlotLimit(slot) : null;
+    }
 }
