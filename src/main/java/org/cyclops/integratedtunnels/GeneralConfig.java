@@ -20,7 +20,7 @@ public class GeneralConfig extends DummyConfig {
      * The current mod version, will be used to check if the player's config isn't out of date and
      * warn the player accordingly.
      */
-    @ConfigurableProperty(category = ConfigurableTypeCategory.CORE, comment = "Config version for " + Reference.MOD_NAME +".\nDO NOT EDIT MANUALLY!")
+    @ConfigurableProperty(category = ConfigurableTypeCategory.CORE, comment = "Config version for " + Reference.MOD_NAME +".\nDO NOT EDIT MANUALLY!", showInGui = false)
     public static String version = Reference.MOD_VERSION;
 
     /**
