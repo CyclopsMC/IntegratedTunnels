@@ -1,5 +1,5 @@
 # General
-item_group.integratedtunnels=Integrated Tunnels
+itemGroup.integratedtunnels=Integrated Tunnels
 
 # Part types
 parttype.parttypes.integratedtunnels.interface_energy.name=Energy Interface
