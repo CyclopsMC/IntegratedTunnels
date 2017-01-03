@@ -93,9 +93,13 @@ config.integratedtunnels=%s configuration
 
 ## Config categories
 config.integratedtunnels.general=General settings
+config.integratedtunnels.general.tooltip=General settings
 config.integratedtunnels.core=Core settings
+config.integratedtunnels.core.tooltip=Core settings
 config.integratedtunnels.modcompat=Mod compatibility settings
+config.integratedtunnels.modcompat.tooltip=Mod compatibility settings
 config.integratedtunnels.capability=Capability settings
+config.integratedtunnels.capability.tooltip=Capability settings
 
 ## Core settings
 config.integratedtunnels.general.analytics=Send anonymous analytics
