@@ -6,6 +6,7 @@ import net.darkhax.tesla.api.ITeslaProducer;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
 import org.cyclops.commoncapabilities.api.capability.inventorystate.IInventoryState;
+import org.cyclops.commoncapabilities.api.capability.itemhandler.ISlotlessItemHandler;
 import org.cyclops.integrateddynamics.api.network.IEnergyNetwork;
 
 /**
@@ -17,6 +18,8 @@ public class Capabilities {
     public static Capability<IEnergyNetwork> NETWORK_ENERGY = null;
     @CapabilityInject(IInventoryState.class)
     public static Capability<IInventoryState> INVENTORY_STATE = null;
+    @CapabilityInject(ISlotlessItemHandler.class)
+    public static Capability<ISlotlessItemHandler> SLOTLESS_ITEMHANDLER = null;
 
     @CapabilityInject(ITeslaConsumer.class)
     public static Capability<ITeslaConsumer> TESLA_CONSUMER = null;

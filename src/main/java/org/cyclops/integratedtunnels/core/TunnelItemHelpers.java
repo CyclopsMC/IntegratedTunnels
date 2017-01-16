@@ -1,13 +1,14 @@
 package org.cyclops.integratedtunnels.core;
 
 import com.google.common.base.Objects;
-import com.google.common.base.Predicate;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.items.IItemHandler;
 import org.cyclops.commoncapabilities.api.capability.inventorystate.IInventoryState;
+import org.cyclops.commoncapabilities.api.capability.itemhandler.ISlotlessItemHandler;
+import org.cyclops.commoncapabilities.api.capability.itemhandler.ItemMatch;
 import org.cyclops.cyclopscore.helper.L10NHelpers;
 import org.cyclops.cyclopscore.helper.MinecraftHelpers;
 import org.cyclops.integrateddynamics.api.evaluate.EvaluationException;
@@ -30,7 +31,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class TunnelItemHelpers {
 
-    public static final Predicate<ItemStack> MATCH_ALL = new Predicate<ItemStack>() {
+    public static final ItemStackPredicate MATCH_ALL = new ItemStackPredicate(null, ItemMatch.ANY) {
         @Override
         public boolean apply(@Nullable ItemStack input) {
             return true;
@@ -47,22 +48,42 @@ public class TunnelItemHelpers {
      * Move items from source to target.
      * @param source The source item handler.
      * @param sourceSlot The source slot.
+     * @param sourceSlotless The slotless source item handler.
      * @param target The target item handler.
      * @param targetSlot The target slot.
+     * @param targetSlotless The slotless target item handler.
      * @param amount The maximum item amount to transfer.
      * @param itemStackMatcher Only itemstack matching this predicate will be moved.
      * @param simulate If the transfer should be simulated.
      * @return The moved itemstack.
      */
-    public static ItemStack moveItemsSingle(IItemHandler source, int sourceSlot, IItemHandler target, int targetSlot,
-                                            int amount, Predicate<ItemStack> itemStackMatcher, boolean simulate) {
+    public static ItemStack moveItemsSingle(IItemHandler source, int sourceSlot, @Nullable ISlotlessItemHandler sourceSlotless,
+                                            IItemHandler target, int targetSlot, @Nullable ISlotlessItemHandler targetSlotless,
+                                            int amount, ItemStackPredicate itemStackMatcher, boolean simulate) {
         boolean loopSourceSlots = sourceSlot < 0;
         boolean loopTargetSlots = targetSlot < 0;
 
-        if (!loopSourceSlots && !loopTargetSlots) {
-            ItemStack extracted = source.extractItem(sourceSlot, amount, simulate);
-            if (extracted != null && (!simulate || itemStackMatcher.apply(extracted))) {
-                ItemStack remaining = target.insertItem(targetSlot, extracted, simulate);
+        if ((!loopSourceSlots || (sourceSlotless != null && itemStackMatcher.hasMatchFlags())) // Only use slotless source for match flags
+                && (!loopTargetSlots || targetSlotless != null)) {
+            ItemStack extracted;
+            boolean appliedMatcher = false;
+            if (loopSourceSlots && itemStackMatcher.hasMatchFlags()) { // In this case it is implied that sourceSlotless != null
+                if (itemStackMatcher.getItemStack() == null) {
+                    extracted = sourceSlotless.extractItem(amount, simulate);
+                    appliedMatcher = true;
+                } else {
+                    ItemStack itemStack = itemStackMatcher.getItemStack();
+                    if (itemStack != null && itemStack.stackSize != amount) {
+                        itemStack.stackSize = amount;
+                    }
+                    extracted = sourceSlotless.extractItem(itemStack, itemStackMatcher.getMatchFlags(), simulate);
+                    appliedMatcher = true;
+                }
+            } else {
+                extracted = source.extractItem(sourceSlot, amount, simulate);
+            }
+            if (extracted != null && (!simulate || appliedMatcher || itemStackMatcher.apply(extracted))) {
+                ItemStack remaining = !loopTargetSlots ? target.insertItem(targetSlot, extracted, simulate) : targetSlotless.insertItem(extracted, simulate);
                 if (remaining == null) {
                     return extracted;
                 } else {
@@ -77,10 +98,10 @@ public class TunnelItemHelpers {
                     if (source.getStackInSlot(sourceSlot) != null) {
                         for (targetSlot = 0; targetSlot < target.getSlots(); targetSlot++) {
                             if (!simulate) {
-                                ItemStack movedSimulated = moveItemsSingle(source, sourceSlot, target, targetSlot, amount, itemStackMatcher, true);
+                                ItemStack movedSimulated = moveItemsSingle(source, sourceSlot, sourceSlotless, target, targetSlot, targetSlotless, amount, itemStackMatcher, true);
                                 if (movedSimulated == null) continue;
                             }
-                            ItemStack moved = moveItemsSingle(source, sourceSlot, target, targetSlot, amount, itemStackMatcher, simulate);
+                            ItemStack moved = moveItemsSingle(source, sourceSlot, sourceSlotless, target, targetSlot, targetSlotless, amount, itemStackMatcher, simulate);
                             if (moved != null) {
                                 return moved;
                             }
@@ -88,10 +109,10 @@ public class TunnelItemHelpers {
                     }
                 } else {
                     if (!simulate) {
-                        ItemStack movedSimulated = moveItemsSingle(source, sourceSlot, target, targetSlot, amount, itemStackMatcher, true);
+                        ItemStack movedSimulated = moveItemsSingle(source, sourceSlot, sourceSlotless, target, targetSlot, targetSlotless, amount, itemStackMatcher, true);
                         if (movedSimulated == null) continue;
                     }
-                    ItemStack moved = moveItemsSingle(source, sourceSlot, target, targetSlot, amount, itemStackMatcher, simulate);
+                    ItemStack moved = moveItemsSingle(source, sourceSlot, sourceSlotless, target, targetSlot, targetSlotless, amount, itemStackMatcher, simulate);
                     if (moved != null) {
                         return moved;
                     }
@@ -100,10 +121,10 @@ public class TunnelItemHelpers {
         } else if (loopTargetSlots) {
             for (targetSlot = 0; targetSlot < target.getSlots(); targetSlot++) {
                 if (!simulate) {
-                    ItemStack movedSimulated = moveItemsSingle(source, sourceSlot, target, targetSlot, amount, itemStackMatcher, true);
+                    ItemStack movedSimulated = moveItemsSingle(source, sourceSlot, sourceSlotless, target, targetSlot, targetSlotless, amount, itemStackMatcher, true);
                     if (movedSimulated == null) continue;
                 }
-                ItemStack moved = moveItemsSingle(source, sourceSlot, target, targetSlot, amount, itemStackMatcher, simulate);
+                ItemStack moved = moveItemsSingle(source, sourceSlot, sourceSlotless, target, targetSlot, targetSlotless, amount, itemStackMatcher, simulate);
                 if (moved != null) {
                     return moved;
                 }
@@ -160,17 +181,21 @@ public class TunnelItemHelpers {
      * Move items from source to target.
      * @param source The source item handler.
      * @param sourceSlot The source slot.
+     * @param sourceSlotless The slotless source item handler.
      * @param target The target item handler.
      * @param targetSlot The target slot.
+     * @param targetSlotless The slotless target item handler.
      * @param amount The maximum item amount to transfer.
      * @return The moved itemstack.
      */
-    public static ItemStack moveItems(IItemHandler source, int sourceSlot, IItemHandler target, int targetSlot, int amount) {
-        ItemStack simulatedTransfer = moveItemsSingle(source, sourceSlot, target, targetSlot, amount, MATCH_ALL, true);
+    public static ItemStack moveItems(IItemHandler source, int sourceSlot, @Nullable ISlotlessItemHandler sourceSlotless,
+                                      IItemHandler target, int targetSlot, @Nullable ISlotlessItemHandler targetSlotless,
+                                      int amount) {
+        ItemStack simulatedTransfer = moveItemsSingle(source, sourceSlot, sourceSlotless, target, targetSlot, targetSlotless, amount, MATCH_ALL, true);
         if (simulatedTransfer == null) {
             return null;
         }
-        return moveItemsSingle(source, sourceSlot, target, targetSlot, simulatedTransfer.stackSize, MATCH_ALL, false);
+        return moveItemsSingle(source, sourceSlot, sourceSlotless, target, targetSlot, targetSlotless, simulatedTransfer.stackSize, MATCH_ALL, false);
     }
 
     /**
@@ -179,17 +204,19 @@ public class TunnelItemHelpers {
      * @param sourceHandler The source item handler.
      * @param sourceInvState Optional inventory state of the source.
      * @param sourceSlot The source slot.
+     * @param sourceSlotless The slotless source item handler.
      * @param targetHandler The target item handler.
      * @param targetInvState Optional inventory state of the target.
      * @param targetSlot The target slot.
+     * @param targetSlotless The slotless target item handler.
      * @param amount The maximum item amount to transfer.
      * @param itemStackMatcher Only itemstack matching this predicate will be moved.
      * @return The moved itemstack.
      */
     public static ItemStack moveItemsStateOptimized(int connectionHash,
-                                                    IItemHandler sourceHandler, @Nullable IInventoryState sourceInvState, int sourceSlot,
-                                                    IItemHandler targetHandler, @Nullable IInventoryState targetInvState, int targetSlot,
-                                                    int amount, Predicate<ItemStack> itemStackMatcher) {
+                                                    IItemHandler sourceHandler, @Nullable IInventoryState sourceInvState, int sourceSlot, @Nullable ISlotlessItemHandler sourceSlotless,
+                                                    IItemHandler targetHandler, @Nullable IInventoryState targetInvState, int targetSlot, @Nullable ISlotlessItemHandler targetSlotless,
+                                                    int amount, ItemStackPredicate itemStackMatcher) {
         Integer cachedState = getCachedState(connectionHash);
 
         boolean calculatedStates = false;
@@ -206,7 +233,7 @@ public class TunnelItemHelpers {
 
         // If cache miss or a cache state is different
         if (shouldMoveItems) {
-            ItemStack simulatedTransfer = moveItemsSingle(sourceHandler, sourceSlot, targetHandler, targetSlot, amount, itemStackMatcher, true);
+            ItemStack simulatedTransfer = moveItemsSingle(sourceHandler, sourceSlot, sourceSlotless, targetHandler, targetSlot, targetSlotless, amount, itemStackMatcher, true);
 
             // If transfer failed, cache the current states and return
             if (simulatedTransfer == null) {
@@ -218,14 +245,18 @@ public class TunnelItemHelpers {
             }
 
             invalidateCachedState(connectionHash);
-            return moveItemsSingle(sourceHandler, sourceSlot, targetHandler, targetSlot, simulatedTransfer.stackSize, itemStackMatcher, false);
+            return moveItemsSingle(sourceHandler, sourceSlot, sourceSlotless, targetHandler, targetSlot, targetSlotless, simulatedTransfer.stackSize, itemStackMatcher, false);
         }
         return null;
     }
 
-    public static Predicate<ItemStack> matchItemStack(final ItemStack itemStack, final boolean checkStackSize,
+    public static ItemStackPredicate matchItemStack(final ItemStack itemStack, final boolean checkStackSize,
                                                       final boolean checkDamage, final boolean checkNbt) {
-        return new Predicate<ItemStack>() {
+        int matchFlags = ItemMatch.ANY;
+        if (checkDamage)    matchFlags = matchFlags | ItemMatch.DAMAGE;
+        if (checkNbt)       matchFlags = matchFlags | ItemMatch.NBT;
+        if (checkStackSize) matchFlags = matchFlags | ItemMatch.STACKSIZE;
+        return new ItemStackPredicate(itemStack, matchFlags) {
             @Override
             public boolean apply(@Nullable ItemStack input) {
                 return areItemStackEqual(input, itemStack, checkStackSize, true, checkDamage, checkNbt);
@@ -233,9 +264,9 @@ public class TunnelItemHelpers {
         };
     }
 
-    public static Predicate<ItemStack> matchItemStacks(final IValueTypeListProxy<ValueObjectTypeItemStack, ValueObjectTypeItemStack.ValueItemStack> itemStacks,
+    public static ItemStackPredicate matchItemStacks(final IValueTypeListProxy<ValueObjectTypeItemStack, ValueObjectTypeItemStack.ValueItemStack> itemStacks,
                                                        final boolean checkStackSize, final boolean checkDamage, final boolean checkNbt) {
-        return new Predicate<ItemStack>() {
+        return new ItemStackPredicate() {
             @Override
             public boolean apply(@Nullable ItemStack input) {
                 for (ValueObjectTypeItemStack.ValueItemStack itemStack : itemStacks) {
@@ -249,8 +280,8 @@ public class TunnelItemHelpers {
         };
     }
 
-    public static Predicate<ItemStack> matchPredicate(final PartTarget partTarget, final IOperator predicate) {
-        return new Predicate<ItemStack>() {
+    public static ItemStackPredicate matchPredicate(final PartTarget partTarget, final IOperator predicate) {
+        return new ItemStackPredicate() {
             @Override
             public boolean apply(@Nullable ItemStack input) {
                 ValueObjectTypeItemStack.ValueItemStack valueItemStack = ValueObjectTypeItemStack.ValueItemStack.of(input);
