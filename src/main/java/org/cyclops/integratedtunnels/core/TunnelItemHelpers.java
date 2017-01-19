@@ -6,6 +6,7 @@ import com.google.common.cache.CacheBuilder;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.items.IItemHandler;
+import org.apache.logging.log4j.Level;
 import org.cyclops.commoncapabilities.api.capability.inventorystate.IInventoryState;
 import org.cyclops.commoncapabilities.api.capability.itemhandler.ISlotlessItemHandler;
 import org.cyclops.commoncapabilities.api.capability.itemhandler.ItemMatch;
@@ -22,6 +23,7 @@ import org.cyclops.integrateddynamics.core.evaluate.variable.ValueObjectTypeItem
 import org.cyclops.integrateddynamics.core.evaluate.variable.ValueTypeBoolean;
 import org.cyclops.integrateddynamics.core.helper.PartHelpers;
 import org.cyclops.integratedtunnels.GeneralConfig;
+import org.cyclops.integratedtunnels.IntegratedTunnels;
 
 import javax.annotation.Nullable;
 import java.util.concurrent.TimeUnit;
@@ -89,6 +91,13 @@ public class TunnelItemHelpers {
                 } else {
                     extracted = extracted.copy();
                     extracted.stackSize -= remaining.stackSize;
+                    if (!simulate) {
+                        // Re-insert remaining stacks that failed to go into the target, back into the source.
+                        remaining = loopSourceSlots ? sourceSlotless.insertItem(remaining, false) : source.insertItem(sourceSlot, remaining, false);
+                        if (remaining != null) {
+                            IntegratedTunnels.clog(Level.WARN, "Just lost stack " + remaining + " while transfering items, report this to the Integrated Tunnels issue tracker with some details about your setup!");
+                        }
+                    }
                     return extracted.stackSize > 0 && (simulate || itemStackMatcher.apply(extracted)) ? extracted : null;
                 }
             }
