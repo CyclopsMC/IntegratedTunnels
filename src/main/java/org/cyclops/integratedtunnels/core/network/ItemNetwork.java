@@ -7,6 +7,8 @@ import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import org.apache.commons.lang3.tuple.Pair;
 import org.cyclops.commoncapabilities.api.capability.inventorystate.IInventoryState;
+import org.cyclops.commoncapabilities.api.capability.itemhandler.DefaultSlotlessItemHandlerWrapper;
+import org.cyclops.commoncapabilities.api.capability.itemhandler.ISlotlessItemHandler;
 import org.cyclops.cyclopscore.helper.MinecraftHelpers;
 import org.cyclops.cyclopscore.helper.TileHelpers;
 import org.cyclops.integrateddynamics.api.part.PartPos;
@@ -15,7 +17,6 @@ import org.cyclops.integratedtunnels.Capabilities;
 import org.cyclops.integratedtunnels.api.network.IItemNetwork;
 import org.cyclops.integratedtunnels.core.TunnelItemHelpers;
 
-import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -28,6 +29,8 @@ public class ItemNetwork extends PositionedAddonsNetwork implements IItemNetwork
     // Caching is important because IItemHandler's can possibly be looked up many times per tick, when actively exporting for example.
     private static final Cache<PartPos, IItemHandler> CACHE_ITEMHANDLER = CacheBuilder.newBuilder()
             .weakValues().expireAfterAccess(1000 / MinecraftHelpers.SECOND_IN_TICKS, TimeUnit.MILLISECONDS).build();
+    private static final Cache<PartPos, ISlotlessItemHandler> CACHE_SLOTLESSITEMHANDLER = CacheBuilder.newBuilder()
+            .weakValues().expireAfterAccess(1000 / MinecraftHelpers.SECOND_IN_TICKS, TimeUnit.MILLISECONDS).build();
 
     protected static IItemHandler getItemHandler(PrioritizedPartPos pos) {
         IItemHandler itemHandler = CACHE_ITEMHANDLER.getIfPresent(pos.getPartPos());
@@ -36,6 +39,21 @@ public class ItemNetwork extends PositionedAddonsNetwork implements IItemNetwork
             CACHE_ITEMHANDLER.put(pos.getPartPos(), itemHandler);
         }
         return itemHandler;
+    }
+
+    protected static ISlotlessItemHandler getSlotlessItemHandler(PrioritizedPartPos pos) {
+        ISlotlessItemHandler slotlessItemHandler = CACHE_SLOTLESSITEMHANDLER.getIfPresent(pos.getPartPos());
+        if (slotlessItemHandler == null) {
+            slotlessItemHandler = TileHelpers.getCapability(pos.getPartPos().getPos(), pos.getPartPos().getSide(), Capabilities.SLOTLESS_ITEMHANDLER);
+            if (slotlessItemHandler == null) {
+                IItemHandler itemHandler = getItemHandler(pos);
+                if (itemHandler != null) {
+                    slotlessItemHandler = new DefaultSlotlessItemHandlerWrapper(itemHandler);
+                }
+            }
+            CACHE_SLOTLESSITEMHANDLER.put(pos.getPartPos(), slotlessItemHandler);
+        }
+        return slotlessItemHandler;
     }
 
     protected static IInventoryState getInventoryState(PrioritizedPartPos pos) {
@@ -119,5 +137,45 @@ public class ItemNetwork extends PositionedAddonsNetwork implements IItemNetwork
             hash += TunnelItemHelpers.calculateInventoryState(itemHandler, getInventoryState(partPos)) + i++;
         }
         return hash;
+    }
+
+    @Override
+    public ItemStack insertItem(ItemStack stack, boolean simulate) {
+        for(PrioritizedPartPos partPos : getPositions()) {
+            ISlotlessItemHandler itemHandler = getSlotlessItemHandler(partPos);
+            if (itemHandler != null) {
+                stack = itemHandler.insertItem(stack, simulate);
+                if (stack == null) return null;
+            }
+        }
+        return stack;
+    }
+
+    @Override
+    public ItemStack extractItem(int amount, boolean simulate) {
+        for(PrioritizedPartPos partPos : getPositions()) {
+            ISlotlessItemHandler itemHandler = getSlotlessItemHandler(partPos);
+            if (itemHandler != null) {
+                ItemStack extracted = itemHandler.extractItem(amount, simulate);
+                if (extracted != null) {
+                    return extracted;
+                }
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public ItemStack extractItem(ItemStack matchStack, int matchFlags, boolean simulate) {
+        for(PrioritizedPartPos partPos : getPositions()) {
+            ISlotlessItemHandler itemHandler = getSlotlessItemHandler(partPos);
+            if (itemHandler != null) {
+                ItemStack extracted = itemHandler.extractItem(matchStack, matchFlags, simulate);
+                if (extracted != null) {
+                    return extracted;
+                }
+            }
+        }
+        return null;
     }
 }

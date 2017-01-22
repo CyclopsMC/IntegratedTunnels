@@ -7,6 +7,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import org.cyclops.commoncapabilities.api.capability.inventorystate.IInventoryState;
+import org.cyclops.commoncapabilities.api.capability.itemhandler.ISlotlessItemHandler;
 import org.cyclops.cyclopscore.modcompat.capabilities.DefaultCapabilityProvider;
 import org.cyclops.integrateddynamics.Reference;
 import org.cyclops.integrateddynamics.api.network.AttachCapabilitiesEventNetwork;
@@ -31,6 +32,8 @@ public class TunnelNetworkCapabilityConstructors {
                 new DefaultCapabilityProvider<IItemHandler>(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, itemNetwork));
         event.addCapability(new ResourceLocation(Reference.MOD_ID, "inventoryStateItemNetwork"),
                 new DefaultCapabilityProvider<IInventoryState>(Capabilities.INVENTORY_STATE, itemNetwork));
+        event.addCapability(new ResourceLocation(Reference.MOD_ID, "itemStorageSlotlessNetwork"),
+                new DefaultCapabilityProvider<ISlotlessItemHandler>(Capabilities.SLOTLESS_ITEMHANDLER, itemNetwork));
 
         FluidNetwork fluidNetwork = new FluidNetwork();
         event.addCapability(new ResourceLocation(Reference.MOD_ID, "fluidNetwork"),
