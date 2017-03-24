@@ -28,11 +28,6 @@ public class PartTypeInterfaceEnergy extends PartTypeInterfacePositionedAddon<IE
     }
 
     @Override
-    protected boolean isTargetCapabilityValid(IEnergyStorage capability) {
-        return super.isTargetCapabilityValid(capability) && capability.canExtract() && capability.canReceive();
-    }
-
-    @Override
     protected PartStateEmpty<PartTypeInterfaceEnergy> constructDefaultState() {
         return new PartStateEmpty<PartTypeInterfaceEnergy>();
     }

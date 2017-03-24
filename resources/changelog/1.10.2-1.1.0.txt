@@ -1,0 +1,8 @@
+As always, don't forget to backup your world before updating!
+Requires CyclopsCore version 0.9.1 or higher.
+
+Additions:
+* Support slotless item handlers for item transfer
+
+Fixes:
+* Fix items getting lost when item handlers are present multiple times
