@@ -112,3 +112,28 @@ config.integratedtunnels.general.versionChecker=Version check
 
 ## Mod compatibility settings
 config.integratedtunnels.tesla=Tesla
+
+# ------ On the Dynamics of Integration contents ------
+
+info_book.integratedtunnels.section.main=Tunnels
+
+info_book.integratedtunnels.introduction=Introduction
+info_book.integratedtunnels.introduction.text1=&lIntegrated Tunnels&r is an extension to &lIntegrated Dynamics&r to transfer items, fluids and energy over &lIntegrated Dynamics&r networks.
+info_book.integratedtunnels.introduction.text2=You can use &lIntegrated Dynamics&r logic to configure filters, which can be as complex as you desire. &o"I want to send 3 enchantable pickaxes with a damage value less than 10 to this chest every tick"&r or &o"I want to fill this tank until it has 1000mB of oil, but only when my machine is working and if I have less than 10 iron ingots in this chest"&r No problem! &lIntegrated Tunnels&r can do that for you, and it will do it efficiently as well!
+
+info_book.integratedtunnels.concepts=Concepts
+info_book.integratedtunnels.concepts.text1=&lIntegrated Tunnels&r adds 3 part types for the different transport types, namely &oImporters&r, &oExporters&r and &oInterfaces&r.
+info_book.integratedtunnels.concepts.text2=Importers (blue) always try to pull from a target, to Interfaces (white) in the same network.
+info_book.integratedtunnels.concepts.text3=Exporters (orange) always try to push to a target, from Interfaces (white) in the same network. Items in this case will always transfer from left to right.
+info_book.integratedtunnels.concepts.text4=You could add multiple interfaces to your network, and assign priorities to specify which should be filled/emptied first.
+info_book.integratedtunnels.concepts.text5=Furthermore, you can also add multiple Importers and Exporter, again with relative priorities.
+info_book.integratedtunnels.concepts.text6=Using &lIntegrated Dynamics&r variables, you have to specify what items should be moved. If you want to keep it simple, and just move everything, simply use a blank &lVariable Card&r.
+
+info_book.integratedtunnels.item=Items
+info_book.integratedtunnels.item.text1=Move items over the network. Import items into the network using &lItem Importers&r into &lItem Interfaces&r. Export items from the network using &lItem Exporters&r from &lItem Interfaces&r.
+
+info_book.integratedtunnels.fluid=Fluids
+info_book.integratedtunnels.fluid.text1=Move energy over the network. Import energy into the network using &lEnergy Importers&r into &lEnergy Interfaces&r. Export energy from the network using &lEnergy Exporters&r from &lEnergy Interfaces&r.
+
+info_book.integratedtunnels.energy=Energy
+info_book.integratedtunnels.energy.text1=Move energy over the network. Import energy into the network using &lEnergy Importers&r into &lEnergy Interfaces&r. Export energy from the network using &lEnergy Exporters&r from &lEnergy Interfaces&r.
