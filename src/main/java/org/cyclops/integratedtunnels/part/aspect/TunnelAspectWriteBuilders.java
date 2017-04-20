@@ -244,7 +244,7 @@ public class TunnelAspectWriteBuilders {
             public ItemTarget getOutput(Triple<PartTarget, IAspectProperties, ValueTypeList.ValueList> input) throws EvaluationException {
                 ValueTypeList.ValueList list = input.getRight();
                 if (list.getRawValue().getValueType() != ValueTypes.OBJECT_ITEMSTACK) {
-                    throw new EvaluationException(new L10NHelpers.UnlocalizedString(L10NValues.ASPECT_ERROR_INVALIDTYPE,
+                    throw new EvaluationException(new L10NHelpers.UnlocalizedString(L10NValues.VALUETYPE_ERROR_INVALIDLISTVALUETYPE,
                             ValueTypes.OBJECT_ITEMSTACK, list.getRawValue().getValueType()).localize());
                 }
                 IAspectProperties properties = input.getMiddle();
@@ -474,7 +474,7 @@ public class TunnelAspectWriteBuilders {
             public FluidTarget getOutput(Triple<PartTarget, IAspectProperties, ValueTypeList.ValueList> input) throws EvaluationException {
                 ValueTypeList.ValueList list = input.getRight();
                 if (list.getRawValue().getValueType() != ValueTypes.OBJECT_FLUIDSTACK) {
-                    throw new EvaluationException(new L10NHelpers.UnlocalizedString(L10NValues.ASPECT_ERROR_INVALIDTYPE,
+                    throw new EvaluationException(new L10NHelpers.UnlocalizedString(L10NValues.VALUETYPE_ERROR_INVALIDLISTVALUETYPE,
                             ValueTypes.OBJECT_FLUIDSTACK, list.getRawValue().getValueType()).localize());
                 }
                 IAspectProperties properties = input.getMiddle();
