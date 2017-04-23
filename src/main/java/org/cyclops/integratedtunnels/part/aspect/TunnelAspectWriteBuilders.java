@@ -95,7 +95,7 @@ public class TunnelAspectWriteBuilders {
                 PartPos center = input.getLeft().getCenter();
                 PartPos target = input.getLeft().getTarget();
                 INetwork network = NetworkHelpers.getNetwork(center.getPos().getWorld(), center.getPos().getBlockPos());
-                IEnergyStorage energyStorage = EnergyHelpers.getEnergyStorage(target.getPos().getWorld(), target.getPos().getBlockPos(), target.getSide());
+                IEnergyStorage energyStorage = EnergyHelpers.getEnergyStorage(target);
                 return new EnergyTarget(network.getCapability(Capabilities.NETWORK_ENERGY), energyStorage, input.getRight());
             }
         };
