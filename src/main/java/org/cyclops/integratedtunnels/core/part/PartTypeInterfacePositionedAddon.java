@@ -65,9 +65,13 @@ public abstract class PartTypeInterfacePositionedAddon<N extends IPositionedAddo
         addTargetToNetwork(network, target.getTarget(), priority);
     }
 
+    protected T getTargetCapabilityInstance(PartPos pos) {
+        return TileHelpers.getCapability(pos.getPos(), pos.getSide(), getTargetCapability());
+    }
+
     protected void addTargetToNetwork(INetwork network, PartPos pos, int priority) {
         if (network.hasCapability(getNetworkCapability())) {
-            T capability = TileHelpers.getCapability(pos.getPos(), getTargetCapability());
+            T capability = getTargetCapabilityInstance(pos);
             if (isTargetCapabilityValid(capability)) {
                 N networkCapability = network.getCapability(getNetworkCapability());
                 networkCapability.addPosition(pos, priority);
