@@ -1,0 +1,8 @@
+As always, don't forget to backup your world before updating!
+Requires CyclopsCore version 0.10.1 or higher.
+
+Changes:
+* Improve error messages when list type is wrong, Closes #28
+
+Fixes:
+* Add better energy support for machines not supporting FE, Closes #14
