@@ -1,7 +1,6 @@
 package org.cyclops.integratedtunnels;
 
 import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
@@ -96,6 +95,9 @@ public class IntegratedTunnels extends ModBaseVersionable {
     @Override
     public void init(FMLInitializationEvent event) {
         super.init(event);
+
+        // Register achievements
+        Achievements.registerAchievements();
     }
     
     /**
@@ -108,9 +110,14 @@ public class IntegratedTunnels extends ModBaseVersionable {
         super.postInit(event);
 
         // Initialize info book
-        IntegratedDynamics._instance.getRegistryManager().getRegistry(IInfoBookRegistry.class).registerSection(
-                OnTheDynamicsOfIntegrationBook.getInstance(), "info_book.integrateddynamics.manual",
-                "/assets/" + Reference.MOD_ID + "/info/tunnels_info.xml");
+        IntegratedDynamics._instance.getRegistryManager().getRegistry(IInfoBookRegistry.class)
+                .registerSection(
+                        OnTheDynamicsOfIntegrationBook.getInstance(), "info_book.integrateddynamics.manual",
+                        "/assets/" + Reference.MOD_ID + "/info/tunnels_info.xml");
+        IntegratedDynamics._instance.getRegistryManager().getRegistry(IInfoBookRegistry.class)
+                .registerSection(
+                        OnTheDynamicsOfIntegrationBook.getInstance(), "info_book.integrateddynamics.tutorials",
+                        "/assets/" + Reference.MOD_ID + "/info/tunnels_tutorials.xml");
     }
     
     /**

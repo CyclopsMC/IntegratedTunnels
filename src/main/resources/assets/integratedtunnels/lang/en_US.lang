@@ -1,6 +1,26 @@
 # General
 itemGroup.integratedtunnels=Integrated Tunnels
 
+# Achievements
+achievement.integratedtunnels.interfaceItem=Item Interfacing
+achievement.integratedtunnels.interfaceItem.desc=Craft an Item Interface
+achievement.integratedtunnels.interfaceFluid=Fluid Interfacing
+achievement.integratedtunnels.interfaceFluid.desc=Craft a Fluid Interface
+achievement.integratedtunnels.interfaceEnergy=Energy Interfacing
+achievement.integratedtunnels.interfaceEnergy.desc=Craft an Energy Interface
+achievement.integratedtunnels.exporterItem=Advanced Item Exporting
+achievement.integratedtunnels.exporterItem.desc=Craft an Item Exporter
+achievement.integratedtunnels.importerItem=Advanced Item Importing
+achievement.integratedtunnels.importerItem.desc=Craft an Item Importer
+achievement.integratedtunnels.importAllItems=Omni Item Importing
+achievement.integratedtunnels.importAllItems.desc=Import all items using an Item Importer
+achievement.integratedtunnels.exportItemsLimit=Limited Item Exporting
+achievement.integratedtunnels.exportItemsLimit.desc=Export items into an inventory until 10 items are in that inventory using an Item Exporter
+achievement.integratedtunnels.importItemsList=List-based Item Importing
+achievement.integratedtunnels.importItemsList.desc=Import all items from a list into an inventory using an Item Importer
+achievement.integratedtunnels.exportEnchantableItems=Export Enchantable Items
+achievement.integratedtunnels.exportEnchantableItems.desc=Use the Enchantable Operator to export all enchantable items into an inventory using an Item Exporter
+
 # Part types
 parttype.parttypes.integratedtunnels.interfaceEnergy.name=Energy Interface
 parttype.parttypes.integratedtunnels.interfaceEnergy.info=Attaches an energy holder to the network
@@ -137,3 +157,26 @@ info_book.integratedtunnels.fluid.text1=Move energy over the network. Import ene
 
 info_book.integratedtunnels.energy=Energy
 info_book.integratedtunnels.energy.text1=Move energy over the network. Import energy into the network using &lEnergy Importers&r into &lEnergy Interfaces&r. Export energy from the network using &lEnergy Exporters&r from &lEnergy Interfaces&r.
+
+info_book.integratedtunnels.section.tutorials=Tunnel Tutorials
+
+info_book.integratedtunnels.tutorials.introduction=Introduction
+info_book.integratedtunnels.tutorials.introduction.text1=This section contains several tutorials that help you to learn &lIntegrated Tunnels&r, the &lIntegrated Dynamics&r add-on for item, fluid and energy transfer.
+
+info_book.integratedtunnels.tutorials.interfaces=Interfaces
+info_book.integratedtunnels.tutorials.interfaces.text1=&oInterfaces&r are parts that can be attached to &lCables&r. An item, fluid and energy version exists for them, which respectively connect to inventories, tanks and energy machines. &oInterfaces&r make the target accessible to the network.
+
+info_book.integratedtunnels.tutorials.importerExporter=Importer Exporter
+info_book.integratedtunnels.tutorials.importerExporter.text1=&oItem Importers&r will move items from the target towards one of the &oItem Interfaces&r. &oItem Exporters&r do the opposite, they will move items from any of the &oItem Interfaces&r to the target.
+
+info_book.integratedtunnels.tutorials.importAllItems=Import All Items
+info_book.integratedtunnels.tutorials.importAllItems.text1=Place an empty &lVariable Card&r inside a &lItem Importer&r to import all items into the network from a target inventory.
+
+info_book.integratedtunnels.tutorials.exportItemsLimit=Export Items with Limit
+info_book.integratedtunnels.tutorials.exportItemsLimit.text1=Read the number of items in the target inventory using an &lInventory Reader&r, and only move items until the total number of items is larger than &610&0.
+
+info_book.integratedtunnels.tutorials.importItemsList=Import Item List
+info_book.integratedtunnels.tutorials.importItemsList.text1=Import all items a certain list to the target inventory. An item list can be created by reading it from any &lInventory Reader&r.
+
+info_book.integratedtunnels.tutorials.exportEnchantableItems=Export Enchantable Items
+info_book.integratedtunnels.tutorials.exportEnchantableItems.text1=Export all enchantable items to the target inventory. This can be done using a certain &lOperator&r.
