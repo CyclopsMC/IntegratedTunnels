@@ -60,6 +60,12 @@ public class GeneralConfig extends DummyConfig {
     public static int inventoryUnchangedTickTimeout = 10;
 
     /**
+     * The maximum network fluid transfer rate.
+     */
+    @ConfigurableProperty(category = ConfigurableTypeCategory.CORE, comment = "The maximum network fluid transfer rate.", isCommandable = true, minimalValue = 0)
+    public static int fluidRateLimit = Integer.MAX_VALUE;
+
+    /**
      * The type of this config.
      */
     public static ConfigurableType TYPE = ConfigurableType.DUMMY;

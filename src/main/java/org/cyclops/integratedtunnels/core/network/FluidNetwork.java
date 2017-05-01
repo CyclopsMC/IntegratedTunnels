@@ -10,6 +10,7 @@ import org.cyclops.cyclopscore.helper.FluidHelpers;
 import org.cyclops.cyclopscore.helper.TileHelpers;
 import org.cyclops.integrateddynamics.api.part.PartPos;
 import org.cyclops.integrateddynamics.core.network.PositionedAddonsNetwork;
+import org.cyclops.integratedtunnels.GeneralConfig;
 import org.cyclops.integratedtunnels.api.network.IFluidNetwork;
 
 import javax.annotation.Nullable;
@@ -46,6 +47,7 @@ public class FluidNetwork extends PositionedAddonsNetwork implements IFluidNetwo
     @Override
     public int fill(FluidStack resource, boolean doFill) {
         int amount = FluidHelpers.getAmount(resource);
+        amount = Math.min(amount, GeneralConfig.fluidRateLimit);
         int toFill = amount;
         for(PrioritizedPartPos partPos : getPositions()) {
             IFluidHandler fluidHandler = getFluidHandler(partPos);
@@ -64,6 +66,7 @@ public class FluidNetwork extends PositionedAddonsNetwork implements IFluidNetwo
     public FluidStack drain(FluidStack resource, boolean doDrain) {
         resource = resource.copy();
         int maxDrain = FluidHelpers.getAmount(resource);
+        maxDrain = Math.min(maxDrain, GeneralConfig.fluidRateLimit);
         Fluid fluid = null;
         for(PrioritizedPartPos partPos : getPositions()) {
             IFluidHandler fluidHandler = getFluidHandler(partPos);
@@ -85,6 +88,7 @@ public class FluidNetwork extends PositionedAddonsNetwork implements IFluidNetwo
     @Nullable
     @Override
     public FluidStack drain(int maxDrain, boolean doDrain) {
+        maxDrain = Math.min(maxDrain, GeneralConfig.fluidRateLimit);
         int toDrain = maxDrain;
         Fluid fluid = null;
         for(PrioritizedPartPos partPos : getPositions()) {

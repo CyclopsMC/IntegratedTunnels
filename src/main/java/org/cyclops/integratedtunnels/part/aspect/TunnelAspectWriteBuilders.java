@@ -1,6 +1,7 @@
 package org.cyclops.integratedtunnels.part.aspect;
 
 import com.google.common.base.Predicate;
+import com.google.common.base.Predicates;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.capabilities.Capability;
@@ -39,8 +40,10 @@ import org.cyclops.integrateddynamics.core.part.aspect.build.IAspectWriteActivat
 import org.cyclops.integrateddynamics.core.part.aspect.build.IAspectWriteDeactivator;
 import org.cyclops.integrateddynamics.core.part.aspect.property.AspectProperties;
 import org.cyclops.integrateddynamics.core.part.aspect.property.AspectPropertyTypeInstance;
+import org.cyclops.integrateddynamics.part.aspect.read.AspectReadBuilders;
 import org.cyclops.integrateddynamics.part.aspect.write.AspectWriteBuilders;
 import org.cyclops.integratedtunnels.Capabilities;
+import org.cyclops.integratedtunnels.GeneralConfig;
 import org.cyclops.integratedtunnels.IntegratedTunnels;
 import org.cyclops.integratedtunnels.api.network.IFluidNetwork;
 import org.cyclops.integratedtunnels.api.network.IItemNetwork;
@@ -72,8 +75,16 @@ public class TunnelAspectWriteBuilders {
                 .appendActivator(ACTIVATOR).appendDeactivator(DEACTIVATOR)
                 .appendKind("energy").handle(AspectWriteBuilders.PROP_GET_INTEGER);
 
+        public static final Predicate<ValueTypeInteger.ValueInteger> VALIDATOR_INTEGER_MAXRATE = new Predicate<ValueTypeInteger.ValueInteger>() {
+            @Override
+            public boolean apply(ValueTypeInteger.ValueInteger input) {
+                return input.getRawValue() <= org.cyclops.integrateddynamics.GeneralConfig.energyRateLimit;
+            }
+        };
+
         public static final IAspectPropertyTypeInstance<ValueTypeInteger, ValueTypeInteger.ValueInteger> PROP_RATE =
-                new AspectPropertyTypeInstance<ValueTypeInteger, ValueTypeInteger.ValueInteger>(ValueTypes.INTEGER, "aspect.aspecttypes.integratedtunnels.integer.energy.rate.name");
+                new AspectPropertyTypeInstance<ValueTypeInteger, ValueTypeInteger.ValueInteger>(ValueTypes.INTEGER, "aspect.aspecttypes.integratedtunnels.integer.energy.rate.name",
+                        Predicates.and(AspectReadBuilders.VALIDATOR_INTEGER_POSITIVE, VALIDATOR_INTEGER_MAXRATE));
         public static final IAspectProperties PROPERTIES = new AspectProperties(ImmutableList.<IAspectPropertyTypeInstance>of(
                 PROP_RATE
         ));
@@ -419,8 +430,16 @@ public class TunnelAspectWriteBuilders {
                 .appendActivator(ACTIVATOR).appendDeactivator(DEACTIVATOR)
                 .appendKind("fluid");
 
+        public static final Predicate<ValueTypeInteger.ValueInteger> VALIDATOR_INTEGER_MAXRATE = new Predicate<ValueTypeInteger.ValueInteger>() {
+            @Override
+            public boolean apply(ValueTypeInteger.ValueInteger input) {
+                return input.getRawValue() <= GeneralConfig.fluidRateLimit;
+            }
+        };
+
         public static final IAspectPropertyTypeInstance<ValueTypeInteger, ValueTypeInteger.ValueInteger> PROP_RATE =
-                new AspectPropertyTypeInstance<ValueTypeInteger, ValueTypeInteger.ValueInteger>(ValueTypes.INTEGER, "aspect.aspecttypes.integratedtunnels.integer.fluid.rate.name");
+                new AspectPropertyTypeInstance<ValueTypeInteger, ValueTypeInteger.ValueInteger>(ValueTypes.INTEGER, "aspect.aspecttypes.integratedtunnels.integer.fluid.rate.name",
+                        Predicates.and(AspectReadBuilders.VALIDATOR_INTEGER_POSITIVE, VALIDATOR_INTEGER_MAXRATE));
         public static final IAspectPropertyTypeInstance<ValueTypeBoolean, ValueTypeBoolean.ValueBoolean> PROP_CHECK_AMOUNT =
                 new AspectPropertyTypeInstance<ValueTypeBoolean, ValueTypeBoolean.ValueBoolean>(ValueTypes.BOOLEAN, "aspect.aspecttypes.integratedtunnels.boolean.fluid.checkamount.name");
         public static final IAspectPropertyTypeInstance<ValueTypeBoolean, ValueTypeBoolean.ValueBoolean> PROP_CHECK_NBT =
