@@ -6,6 +6,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.commons.lang3.tuple.Triple;
 import org.cyclops.commoncapabilities.api.capability.inventorystate.IInventoryState;
 import org.cyclops.commoncapabilities.api.capability.itemhandler.DefaultSlotlessItemHandlerWrapper;
 import org.cyclops.commoncapabilities.api.capability.itemhandler.ISlotlessItemHandler;
@@ -32,7 +33,10 @@ public class ItemNetwork extends PositionedAddonsNetwork implements IItemNetwork
     private static final Cache<PartPos, ISlotlessItemHandler> CACHE_SLOTLESSITEMHANDLER = CacheBuilder.newBuilder()
             .weakValues().expireAfterAccess(1000 / MinecraftHelpers.SECOND_IN_TICKS, TimeUnit.MILLISECONDS).build();
 
-    protected static IItemHandler getItemHandler(PrioritizedPartPos pos) {
+    protected IItemHandler getItemHandler(PrioritizedPartPos pos) {
+        if (isPositionDisabled(pos.getPartPos())) {
+            return null;
+        }
         IItemHandler itemHandler = CACHE_ITEMHANDLER.getIfPresent(pos.getPartPos());
         if (itemHandler == null) {
             itemHandler = TileHelpers.getCapability(pos.getPartPos().getPos(), pos.getPartPos().getSide(), CapabilityItemHandler.ITEM_HANDLER_CAPABILITY);
@@ -41,7 +45,10 @@ public class ItemNetwork extends PositionedAddonsNetwork implements IItemNetwork
         return itemHandler;
     }
 
-    protected static ISlotlessItemHandler getSlotlessItemHandler(PrioritizedPartPos pos) {
+    protected ISlotlessItemHandler getSlotlessItemHandler(PrioritizedPartPos pos) {
+        if (isPositionDisabled(pos.getPartPos())) {
+            return null;
+        }
         ISlotlessItemHandler slotlessItemHandler = CACHE_SLOTLESSITEMHANDLER.getIfPresent(pos.getPartPos());
         if (slotlessItemHandler == null) {
             slotlessItemHandler = TileHelpers.getCapability(pos.getPartPos().getPos(), pos.getPartPos().getSide(), Capabilities.SLOTLESS_ITEMHANDLER);
@@ -56,7 +63,10 @@ public class ItemNetwork extends PositionedAddonsNetwork implements IItemNetwork
         return slotlessItemHandler;
     }
 
-    protected static IInventoryState getInventoryState(PrioritizedPartPos pos) {
+    protected IInventoryState getInventoryState(PrioritizedPartPos pos) {
+        if (isPositionDisabled(pos.getPartPos())) {
+            return null;
+        }
         return TileHelpers.getCapability(pos.getPartPos().getPos(), pos.getPartPos().getSide(), Capabilities.INVENTORY_STATE);
     }
 
@@ -72,19 +82,21 @@ public class ItemNetwork extends PositionedAddonsNetwork implements IItemNetwork
         for(PrioritizedPartPos partPos : getPositions()) {
             IItemHandler itemHandler = getItemHandler(partPos);
             if (itemHandler != null) {
+                disablePosition(partPos.getPartPos());
                 slots += itemHandler.getSlots();
+                enablePosition(partPos.getPartPos());
             }
         }
         return slots;
     }
 
-    protected Pair<IItemHandler, Integer> getItemHandlerForSlot(int slot) {
+    protected Triple<IItemHandler, Integer, PrioritizedPartPos> getItemHandlerForSlot(int slot) {
         for(PrioritizedPartPos partPos : getPositions()) {
             IItemHandler itemHandler = getItemHandler(partPos);
             if (itemHandler != null) {
                 int slots = itemHandler.getSlots();
                 if (slot < slots) {
-                    return Pair.of(itemHandler, slot);
+                    return Triple.of(itemHandler, slot, partPos);
                 }
                 slot -= slots;
             }
@@ -94,27 +106,36 @@ public class ItemNetwork extends PositionedAddonsNetwork implements IItemNetwork
 
     @Override
     public ItemStack getStackInSlot(int slot) {
-        Pair<IItemHandler, Integer> slottedHandler = getItemHandlerForSlot(slot);
+        Triple<IItemHandler, Integer, PrioritizedPartPos> slottedHandler = getItemHandlerForSlot(slot);
         if (slottedHandler != null) {
-            return slottedHandler.getLeft().getStackInSlot(slottedHandler.getRight());
+            disablePosition(slottedHandler.getRight().getPartPos());
+            ItemStack ret = slottedHandler.getLeft().getStackInSlot(slottedHandler.getMiddle());
+            enablePosition(slottedHandler.getRight().getPartPos());
+            return ret;
         }
         return null;
     }
 
     @Override
     public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
-        Pair<IItemHandler, Integer> slottedHandler = getItemHandlerForSlot(slot);
+        Triple<IItemHandler, Integer, PrioritizedPartPos> slottedHandler = getItemHandlerForSlot(slot);
         if (slottedHandler != null) {
-            return slottedHandler.getLeft().insertItem(slottedHandler.getRight(), stack, simulate);
+            disablePosition(slottedHandler.getRight().getPartPos());
+            ItemStack ret = slottedHandler.getLeft().insertItem(slottedHandler.getMiddle(), stack, simulate);
+            enablePosition(slottedHandler.getRight().getPartPos());
+            return ret;
         }
         return stack;
     }
 
     @Override
     public ItemStack extractItem(int slot, int amount, boolean simulate) {
-        Pair<IItemHandler, Integer> slottedHandler = getItemHandlerForSlot(slot);
+        Triple<IItemHandler, Integer, PrioritizedPartPos> slottedHandler = getItemHandlerForSlot(slot);
         if (slottedHandler != null) {
-            return slottedHandler.getLeft().extractItem(slottedHandler.getRight(), amount, simulate);
+            disablePosition(slottedHandler.getRight().getPartPos());
+            ItemStack ret = slottedHandler.getLeft().extractItem(slottedHandler.getMiddle(), amount, simulate);
+            enablePosition(slottedHandler.getRight().getPartPos());
+            return ret;
         }
         return null;
     }
@@ -135,7 +156,9 @@ public class ItemNetwork extends PositionedAddonsNetwork implements IItemNetwork
         for(PrioritizedPartPos partPos : getPositions()) {
             ISlotlessItemHandler itemHandler = getSlotlessItemHandler(partPos);
             if (itemHandler != null) {
+                disablePosition(partPos.getPartPos());
                 stack = itemHandler.insertItem(stack, simulate);
+                enablePosition(partPos.getPartPos());
                 if (stack == null) return null;
             }
         }
@@ -147,7 +170,9 @@ public class ItemNetwork extends PositionedAddonsNetwork implements IItemNetwork
         for(PrioritizedPartPos partPos : getPositions()) {
             ISlotlessItemHandler itemHandler = getSlotlessItemHandler(partPos);
             if (itemHandler != null) {
+                disablePosition(partPos.getPartPos());
                 ItemStack extracted = itemHandler.extractItem(amount, simulate);
+                enablePosition(partPos.getPartPos());
                 if (extracted != null) {
                     return extracted;
                 }
@@ -161,7 +186,9 @@ public class ItemNetwork extends PositionedAddonsNetwork implements IItemNetwork
         for(PrioritizedPartPos partPos : getPositions()) {
             ISlotlessItemHandler itemHandler = getSlotlessItemHandler(partPos);
             if (itemHandler != null) {
+                disablePosition(partPos.getPartPos());
                 ItemStack extracted = itemHandler.extractItem(matchStack, matchFlags, simulate);
+                enablePosition(partPos.getPartPos());
                 if (extracted != null) {
                     return extracted;
                 }
