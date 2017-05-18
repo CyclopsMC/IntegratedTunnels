@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<section name="info_book.integratedtunnels.section.tutorials">
+    <section name="info_book.integratedtunnels.tutorials.introduction">
+        <paragraph>info_book.integratedtunnels.tutorials.introduction.text1</paragraph>
+    </section>
+
+    <section name="info_book.integratedtunnels.tutorials.interfaces">
+        <paragraph>info_book.integratedtunnels.tutorials.interfaces.text1</paragraph>
+        <appendix type="crafting_recipe">integratedtunnels:part_interface_item_item</appendix>
+        <appendix type="crafting_recipe">integratedtunnels:part_interface_fluid_item</appendix>
+        <appendix type="crafting_recipe">integratedtunnels:part_interface_energy_item</appendix>
+        <appendix type="achievement_rewards" id="integratedtunnels:interfaces">
+            <achievements>
+                <achievement id="integratedtunnels.interface_item" />
+                <achievement id="integratedtunnels.interface_fluid" />
+                <achievement id="integratedtunnels.interface_energy" />
+            </achievements>
+            <rewards>
+                <reward type="item" amount="2">integratedtunnels:part_interface_item_item</reward>
+                <reward type="item" amount="2">integratedtunnels:part_interface_fluid_item</reward>
+                <reward type="item" amount="2">integratedtunnels:part_interface_energy_item</reward>
+            </rewards>
+        </appendix>
+    </section>
+
+    <section name="info_book.integratedtunnels.tutorials.importer_exporter">
+        <paragraph>info_book.integratedtunnels.tutorials.importer_exporter.text1</paragraph>
+        <appendix type="crafting_recipe">integratedtunnels:part_exporter_item_item</appendix>
+        <appendix type="crafting_recipe">integratedtunnels:part_importer_item_item</appendix>
+        <appendix type="achievement_rewards" id="integratedtunnels:importer_exporter">
+            <achievements>
+                <achievement id="integratedtunnels.exporterItem" />
+                <achievement id="integratedtunnels.importerItem" />
+            </achievements>
+            <rewards>
+                <reward type="item" amount="2">integratedtunnels:part_exporter_item_item</reward>
+                <reward type="item" amount="2">integratedtunnels:part_importer_item_item</reward>
+            </rewards>
+        </appendix>
+    </section>
+
+    <section name="info_book.integratedtunnels.tutorials.import_all_items">
+        <paragraph>info_book.integratedtunnels.tutorials.import_all_items.text1</paragraph>
+        <appendix type="integrateddynamics:aspect">aspect.aspects.integratedtunnels.write.boolean.item.import.name</appendix>
+        <appendix type="achievement_rewards" id="integratedtunnels:import_all_items">
+            <achievements>
+                <achievement id="integratedtunnels.import_all_items" />
+            </achievements>
+            <rewards>
+                <reward type="item" amount="5">integratedtunnels:part_interface_item_item</reward>
+            </rewards>
+        </appendix>
+    </section>
+
+    <section name="info_book.integratedtunnels.tutorials.export_items_limit">
+        <paragraph>info_book.integratedtunnels.tutorials.export_items_limit.text1</paragraph>
+        <appendix type="crafting_recipe">integrateddynamics:part_inventory_reader_item</appendix>
+        <appendix type="integrateddynamics:aspect">aspect.aspects.integrateddynamics.read.integer.inventory.count.name</appendix>
+        <appendix type="integrateddynamics:operator">operator.operators.integrateddynamics.relational.lt.name</appendix>
+        <appendix type="integrateddynamics:aspect">aspect.aspects.integratedtunnels.write.boolean.item.export.name</appendix>
+        <appendix type="achievement_rewards" id="integratedtunnels:export_items_limit">
+            <achievements>
+                <achievement id="integratedtunnels.export_items_limit" />
+            </achievements>
+            <rewards>
+                <reward type="item" amount="5">integratedtunnels:part_interface_item_item</reward>
+            </rewards>
+        </appendix>
+    </section>
+
+    <section name="info_book.integratedtunnels.tutorials.import_items_list">
+        <paragraph>info_book.integratedtunnels.tutorials.import_items_list.text1</paragraph>
+        <appendix type="crafting_recipe">integrateddynamics:part_inventory_reader_item</appendix>
+        <appendix type="integrateddynamics:aspect">aspect.aspects.integrateddynamics.read.list.inventory.itemstacks.name</appendix>
+        <appendix type="integrateddynamics:aspect">aspect.aspects.integratedtunnels.write.list.item.import.name</appendix>
+        <appendix type="achievement_rewards" id="integratedtunnels:import_items_list">
+            <achievements>
+                <achievement id="integratedtunnels.import_items_list" />
+            </achievements>
+            <rewards>
+                <reward type="item" amount="5">integratedtunnels:part_exporter_item_item</reward>
+            </rewards>
+        </appendix>
+    </section>
+
+    <section name="info_book.integratedtunnels.tutorials.export_enchantable_items">
+        <paragraph>info_book.integratedtunnels.tutorials.export_enchantable_items.text1</paragraph>
+        <appendix type="integrateddynamics:operator">operator.operators.integrateddynamics.itemstack.enchantable.name</appendix>
+        <appendix type="integrateddynamics:aspect">aspect.aspects.integratedtunnels.write.operator.item.import.name</appendix>
+        <appendix type="achievement_rewards" id="integratedtunnels:export_enchantable_items">
+            <achievements>
+                <achievement id="integratedtunnels.export_enchantable_items" />
+            </achievements>
+            <rewards>
+                <reward type="item" amount="5">integratedtunnels:part_interface_item_item</reward>
+            </rewards>
+        </appendix>
+    </section>
+</section>

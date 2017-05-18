@@ -1,7 +1,6 @@
 package org.cyclops.integratedtunnels;
 
 import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
@@ -12,12 +11,15 @@ import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.*;
 import org.apache.logging.log4j.Level;
 import org.cyclops.cyclopscore.config.ConfigHandler;
+import org.cyclops.cyclopscore.infobook.IInfoBookRegistry;
 import org.cyclops.cyclopscore.init.IObjectReference;
 import org.cyclops.cyclopscore.init.ItemCreativeTab;
 import org.cyclops.cyclopscore.init.ModBaseVersionable;
 import org.cyclops.cyclopscore.init.RecipeHandler;
 import org.cyclops.cyclopscore.modcompat.ModCompatLoader;
 import org.cyclops.cyclopscore.proxy.ICommonProxy;
+import org.cyclops.integrateddynamics.IntegratedDynamics;
+import org.cyclops.integrateddynamics.infobook.OnTheDynamicsOfIntegrationBook;
 import org.cyclops.integratedtunnels.capability.network.FluidNetworkConfig;
 import org.cyclops.integratedtunnels.capability.network.ItemNetworkConfig;
 import org.cyclops.integratedtunnels.capability.network.TunnelNetworkCapabilityConstructors;
@@ -93,6 +95,9 @@ public class IntegratedTunnels extends ModBaseVersionable {
     @Override
     public void init(FMLInitializationEvent event) {
         super.init(event);
+
+        // Register achievements
+        Achievements.registerAchievements();
     }
     
     /**
@@ -103,6 +108,16 @@ public class IntegratedTunnels extends ModBaseVersionable {
     @Override
     public void postInit(FMLPostInitializationEvent event) {
         super.postInit(event);
+
+        // Initialize info book
+        IntegratedDynamics._instance.getRegistryManager().getRegistry(IInfoBookRegistry.class)
+                .registerSection(
+                        OnTheDynamicsOfIntegrationBook.getInstance(), "info_book.integrateddynamics.manual",
+                        "/assets/" + Reference.MOD_ID + "/info/tunnels_info.xml");
+        IntegratedDynamics._instance.getRegistryManager().getRegistry(IInfoBookRegistry.class)
+                .registerSection(
+                        OnTheDynamicsOfIntegrationBook.getInstance(), "info_book.integrateddynamics.tutorials",
+                        "/assets/" + Reference.MOD_ID + "/info/tunnels_tutorials.xml");
     }
     
     /**

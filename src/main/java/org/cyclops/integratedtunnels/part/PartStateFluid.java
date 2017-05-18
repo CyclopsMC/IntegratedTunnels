@@ -4,6 +4,7 @@ import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidTankProperties;
 import org.cyclops.integrateddynamics.api.part.write.IPartTypeWriter;
+import org.cyclops.integratedtunnels.GeneralConfig;
 import org.cyclops.integratedtunnels.api.network.IFluidNetwork;
 import org.cyclops.integratedtunnels.core.part.PartStatePositionedAddon;
 
@@ -25,20 +26,27 @@ public class PartStateFluid<P extends IPartTypeWriter> extends PartStatePosition
         return getPositionedAddonsNetwork() != null ? getPositionedAddonsNetwork().getTankProperties() : new IFluidTankProperties[0];
     }
 
+    protected FluidStack rateLimitFluid(FluidStack fluidStack) {
+        if (fluidStack != null && fluidStack.amount > GeneralConfig.fluidRateLimit) {
+            return new FluidStack(fluidStack.getFluid(), GeneralConfig.fluidRateLimit);
+        }
+        return fluidStack;
+    }
+
     @Override
     public int fill(FluidStack resource, boolean doFill) {
-        return canReceive() && getPositionedAddonsNetwork() != null ? getPositionedAddonsNetwork().fill(resource, doFill) : 0;
+        return canReceive() && getPositionedAddonsNetwork() != null ? getPositionedAddonsNetwork().fill(rateLimitFluid(resource), doFill) : 0;
     }
 
     @Nullable
     @Override
     public FluidStack drain(FluidStack resource, boolean doDrain) {
-        return canExtract() && getPositionedAddonsNetwork() != null ? getPositionedAddonsNetwork().drain(resource, doDrain) : null;
+        return canExtract() && getPositionedAddonsNetwork() != null ? getPositionedAddonsNetwork().drain(rateLimitFluid(resource), doDrain) : null;
     }
 
     @Nullable
     @Override
     public FluidStack drain(int maxDrain, boolean doDrain) {
-        return canExtract() && getPositionedAddonsNetwork() != null ? getPositionedAddonsNetwork().drain(maxDrain, doDrain) : null;
+        return canExtract() && getPositionedAddonsNetwork() != null ? getPositionedAddonsNetwork().drain(Math.min(maxDrain, GeneralConfig.fluidRateLimit), doDrain) : null;
     }
 }

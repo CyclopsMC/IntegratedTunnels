@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<section name="info_book.integratedtunnels.section.main">
+    <section name="info_book.integratedtunnels.introduction">
+        <paragraph>info_book.integratedtunnels.introduction.text1</paragraph>
+        <paragraph>info_book.integratedtunnels.introduction.text2</paragraph>
+    </section>
+
+    <section name="info_book.integratedtunnels.concepts">
+        <paragraph>info_book.integratedtunnels.concepts.text1</paragraph>
+        <paragraph>info_book.integratedtunnels.concepts.text2</paragraph>
+        <paragraph>info_book.integratedtunnels.concepts.text3</paragraph>
+        <paragraph>info_book.integratedtunnels.concepts.text4</paragraph>
+        <paragraph>info_book.integratedtunnels.concepts.text5</paragraph>
+        <paragraph>info_book.integratedtunnels.concepts.text6</paragraph>
+        <appendix type="image" width="120" height="44">integratedtunnels:textures/gui/infobook/importer.png</appendix>
+        <appendix type="image" width="120" height="47">integratedtunnels:textures/gui/infobook/exporter.png</appendix>
+        <appendix type="image" width="120" height="48">integratedtunnels:textures/gui/infobook/importerexporter.png</appendix>
+        <appendix type="image" width="120" height="67">integratedtunnels:textures/gui/infobook/complexnetwork.png</appendix>
+        <appendix type="image" width="120" height="67">integratedtunnels:textures/gui/infobook/allparts.png</appendix>
+    </section>
+
+    <section name="info_book.integratedtunnels.item">
+        <tag>integratedtunnels:part_interface_item_item</tag>
+        <tag>integratedtunnels:part_exporter_item_item</tag>
+        <tag>integratedtunnels:part_importer_item_item</tag>
+        <paragraph>info_book.integratedtunnels.item.text1</paragraph>
+        <appendix type="crafting_recipe">integratedtunnels:part_interface_item_item</appendix>
+        <appendix type="crafting_recipe">integratedtunnels:part_exporter_item_item</appendix>
+        <appendix_list factory="integrateddynamics:part_aspects">exporter_item</appendix_list>
+        <appendix type="crafting_recipe">integratedtunnels:part_importer_item_item</appendix>
+        <appendix_list factory="integrateddynamics:part_aspects">importer_item</appendix_list>
+    </section>
+
+    <section name="info_book.integratedtunnels.fluid">
+        <tag>integratedtunnels:part_interface_fluid_item</tag>
+        <tag>integratedtunnels:part_exporter_fluid_item</tag>
+        <tag>integratedtunnels:part_importer_fluid_item</tag>
+        <paragraph>info_book.integratedtunnels.fluid.text1</paragraph>
+        <appendix type="crafting_recipe">integratedtunnels:part_interface_fluid_item</appendix>
+        <appendix type="crafting_recipe">integratedtunnels:part_exporter_fluid_item</appendix>
+        <appendix_list factory="integrateddynamics:part_aspects">exporter_fluid</appendix_list>
+        <appendix type="crafting_recipe">integratedtunnels:part_importer_fluid_item</appendix>
+        <appendix_list factory="integrateddynamics:part_aspects">importer_fluid</appendix_list>
+    </section>
+
+    <section name="info_book.integratedtunnels.energy">
+        <tag>integratedtunnels:part_interface_energy_item</tag>
+        <tag>integratedtunnels:part_exporter_energy_item</tag>
+        <tag>integratedtunnels:part_importer_energy_item</tag>
+        <paragraph>info_book.integratedtunnels.energy.text1</paragraph>
+        <appendix type="crafting_recipe">integratedtunnels:part_interface_energy_item</appendix>
+        <appendix type="crafting_recipe">integratedtunnels:part_exporter_energy_item</appendix>
+        <appendix_list factory="integrateddynamics:part_aspects">exporter_energy</appendix_list>
+        <appendix type="crafting_recipe">integratedtunnels:part_importer_energy_item</appendix>
+        <appendix_list factory="integrateddynamics:part_aspects">importer_energy</appendix_list>
+    </section>
+</section>

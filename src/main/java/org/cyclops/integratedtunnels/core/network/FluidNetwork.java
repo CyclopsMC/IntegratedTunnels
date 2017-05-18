@@ -10,6 +10,7 @@ import org.cyclops.cyclopscore.helper.FluidHelpers;
 import org.cyclops.cyclopscore.helper.TileHelpers;
 import org.cyclops.integrateddynamics.api.part.PartPos;
 import org.cyclops.integrateddynamics.core.network.PositionedAddonsNetwork;
+import org.cyclops.integratedtunnels.GeneralConfig;
 import org.cyclops.integratedtunnels.api.network.IFluidNetwork;
 
 import javax.annotation.Nullable;
@@ -21,7 +22,10 @@ import java.util.List;
  */
 public class FluidNetwork extends PositionedAddonsNetwork implements IFluidNetwork {
 
-    protected static IFluidHandler getFluidHandler(PrioritizedPartPos pos) {
+    protected IFluidHandler getFluidHandler(PrioritizedPartPos pos) {
+        if (isPositionDisabled(pos.getPartPos())) {
+            return null;
+        }
         return TileHelpers.getCapability(pos.getPartPos().getPos(), pos.getPartPos().getSide(), CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY);
     }
 
@@ -37,7 +41,9 @@ public class FluidNetwork extends PositionedAddonsNetwork implements IFluidNetwo
         for(PrioritizedPartPos partPos : getPositions()) {
             IFluidHandler fluidHandler = getFluidHandler(partPos);
             if (fluidHandler != null) {
+                disablePosition(partPos.getPartPos());
                 properties.addAll(Lists.newArrayList(fluidHandler.getTankProperties()));
+                enablePosition(partPos.getPartPos());
             }
         }
         return properties.toArray(new IFluidTankProperties[properties.size()]);
@@ -46,11 +52,14 @@ public class FluidNetwork extends PositionedAddonsNetwork implements IFluidNetwo
     @Override
     public int fill(FluidStack resource, boolean doFill) {
         int amount = FluidHelpers.getAmount(resource);
+        amount = Math.min(amount, GeneralConfig.fluidRateLimit);
         int toFill = amount;
         for(PrioritizedPartPos partPos : getPositions()) {
             IFluidHandler fluidHandler = getFluidHandler(partPos);
             if (fluidHandler != null) {
+                disablePosition(partPos.getPartPos());
                 toFill -= fluidHandler.fill(resource, doFill);
+                enablePosition(partPos.getPartPos());
                 if (toFill <= 0) {
                     break;
                 }
@@ -64,11 +73,14 @@ public class FluidNetwork extends PositionedAddonsNetwork implements IFluidNetwo
     public FluidStack drain(FluidStack resource, boolean doDrain) {
         resource = resource.copy();
         int maxDrain = FluidHelpers.getAmount(resource);
+        maxDrain = Math.min(maxDrain, GeneralConfig.fluidRateLimit);
         Fluid fluid = null;
         for(PrioritizedPartPos partPos : getPositions()) {
             IFluidHandler fluidHandler = getFluidHandler(partPos);
             if (fluidHandler != null) {
+                disablePosition(partPos.getPartPos());
                 FluidStack drainedFluid = fluidHandler.drain(resource, doDrain);
+                enablePosition(partPos.getPartPos());
                 resource.amount -= FluidHelpers.getAmount(drainedFluid);
                 if (drainedFluid != null) {
                     fluid = drainedFluid.getFluid();
@@ -85,12 +97,15 @@ public class FluidNetwork extends PositionedAddonsNetwork implements IFluidNetwo
     @Nullable
     @Override
     public FluidStack drain(int maxDrain, boolean doDrain) {
+        maxDrain = Math.min(maxDrain, GeneralConfig.fluidRateLimit);
         int toDrain = maxDrain;
         Fluid fluid = null;
         for(PrioritizedPartPos partPos : getPositions()) {
             IFluidHandler fluidHandler = getFluidHandler(partPos);
             if (fluidHandler != null) {
+                disablePosition(partPos.getPartPos());
                 FluidStack drainedFluid = fluidHandler.drain(toDrain, doDrain);
+                enablePosition(partPos.getPartPos());
                 toDrain -= FluidHelpers.getAmount(drainedFluid);
                 if (drainedFluid != null) {
                     fluid = drainedFluid.getFluid();
