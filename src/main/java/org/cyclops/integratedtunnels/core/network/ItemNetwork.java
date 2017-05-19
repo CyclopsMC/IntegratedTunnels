@@ -171,7 +171,7 @@ public class ItemNetwork extends PositionedAddonsNetwork implements IItemNetwork
                 disablePosition(partPos.getPartPos());
                 stack = itemHandler.insertItem(stack, simulate);
                 enablePosition(partPos.getPartPos());
-                if (stack == null) return null;
+                if (stack.isEmpty()) return ItemStack.EMPTY;
             }
         }
         return stack;
@@ -185,12 +185,12 @@ public class ItemNetwork extends PositionedAddonsNetwork implements IItemNetwork
                 disablePosition(partPos.getPartPos());
                 ItemStack extracted = itemHandler.extractItem(amount, simulate);
                 enablePosition(partPos.getPartPos());
-                if (extracted != null) {
+                if (!extracted.isEmpty()) {
                     return extracted;
                 }
             }
         }
-        return null;
+        return ItemStack.EMPTY;
     }
 
     @Override
@@ -201,11 +201,11 @@ public class ItemNetwork extends PositionedAddonsNetwork implements IItemNetwork
                 disablePosition(partPos.getPartPos());
                 ItemStack extracted = itemHandler.extractItem(matchStack, matchFlags, simulate);
                 enablePosition(partPos.getPartPos());
-                if (extracted != null) {
+                if (!extracted.isEmpty()) {
                     return extracted;
                 }
             }
         }
-        return null;
+        return ItemStack.EMPTY;
     }
 }
