@@ -158,7 +158,9 @@ public class ItemNetwork extends PositionedAddonsNetwork implements IItemNetwork
         int i = 0;
         for(PrioritizedPartPos partPos : getPositions()) {
             IItemHandler itemHandler = getItemHandler(partPos);
-            hash += TunnelItemHelpers.calculateInventoryState(itemHandler, getInventoryState(partPos)) + i++;
+            if (itemHandler != null) {
+                hash += TunnelItemHelpers.calculateInventoryState(itemHandler, getInventoryState(partPos)) + i++;
+            }
         }
         return hash;
     }
