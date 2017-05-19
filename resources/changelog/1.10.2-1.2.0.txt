@@ -1,0 +1,9 @@
+As always, don't forget to backup your world before updating!
+Requires CyclopsCore version 0.10.3 or higher.
+Requires IntegratedDynamics version 0.7.0 or higher.
+
+Additions:
+* Expose capabilities in interfaces. This allows external machines to actively interact with the interfaces, which are passive by-default.
+* Add config options to change max network energy and fluid transfer rates
+* Add tunnels sections to Integrated Dynamic's 'On the Dynamics of Integration' with achievement-based tutorials
+* Add achievements
