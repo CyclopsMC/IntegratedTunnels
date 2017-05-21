@@ -134,7 +134,7 @@ public class ItemNetwork extends PositionedAddonsNetwork implements IItemNetwork
         if (slottedHandler != null) {
             disablePosition(slottedHandler.getRight().getPartPos());
             ItemStack ret = slottedHandler.getLeft().extractItem(slottedHandler.getMiddle(), amount, simulate);
-            disablePosition(slottedHandler.getRight().getPartPos());
+            enablePosition(slottedHandler.getRight().getPartPos());
             return ret;
         }
         return ItemStack.EMPTY;
@@ -146,7 +146,7 @@ public class ItemNetwork extends PositionedAddonsNetwork implements IItemNetwork
         if (slottedHandler != null) {
             disablePosition(slottedHandler.getRight().getPartPos());
             int ret = slottedHandler.getLeft().getSlotLimit(slottedHandler.getMiddle());
-            disablePosition(slottedHandler.getRight().getPartPos());
+            enablePosition(slottedHandler.getRight().getPartPos());
             return ret;
         }
         return 0;
