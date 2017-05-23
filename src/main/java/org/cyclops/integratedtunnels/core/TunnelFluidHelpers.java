@@ -60,7 +60,7 @@ public class TunnelFluidHelpers {
             if (drainable != null && drainable.amount > 0) {
                 int fillableAmount = target.fill(drainable, false);
                 if (fillableAmount > 0) {
-                    FluidStack drained = source.drain(fillableAmount, doTransfer);
+                    FluidStack drained = source.drain(new FluidStack(drainable.getFluid(), fillableAmount), doTransfer);
                     if (drained != null) {
                         drained.amount = target.fill(drained, doTransfer);
                         return drained;
