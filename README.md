@@ -1,6 +1,6 @@
 ## Integrated Tunnels
 
-[![Build Status](https://travis-ci.org/CyclopsMC/IntegratedTunnels.svg?branch=master-1.10)](https://travis-ci.org/CyclopsMC/IntegratedTunnels)
+[![Build Status](https://travis-ci.org/CyclopsMC/IntegratedTunnels.svg?branch=master-1.11)](https://travis-ci.org/CyclopsMC/IntegratedTunnels)
 [![Download](https://api.bintray.com/packages/cyclopsmc/dev/IntegratedTunnels/images/download.svg) ](https://bintray.com/cyclopsmc/dev/IntegratedTunnels/_latestVersion)
 [![CurseForge](http://cf.way2muchnoise.eu/full_251389_downloads.svg)](http://minecraft.curseforge.com/projects/251389)
 
