@@ -306,6 +306,7 @@ public class TunnelItemHelpers {
                     if (partData != null) {
                         IPartStateWriter partState = (IPartStateWriter) partData.getState();
                         partState.addError(partState.getActiveAspect(), new L10NHelpers.UnlocalizedString(e.getMessage()));
+                        partState.setDeactivated(true);
                     }
                     return false;
                 }
