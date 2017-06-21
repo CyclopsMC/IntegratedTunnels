@@ -16,10 +16,7 @@ import org.cyclops.integrateddynamics.api.part.aspect.IAspectVariable;
 import org.cyclops.integrateddynamics.api.part.write.IPartStateWriter;
 import org.cyclops.integrateddynamics.core.evaluate.expression.LazyExpression;
 import org.cyclops.integrateddynamics.core.evaluate.operator.Operators;
-import org.cyclops.integrateddynamics.core.evaluate.variable.ValueTypeBoolean;
-import org.cyclops.integrateddynamics.core.evaluate.variable.ValueTypeInteger;
-import org.cyclops.integrateddynamics.core.evaluate.variable.ValueTypeList;
-import org.cyclops.integrateddynamics.core.evaluate.variable.ValueTypes;
+import org.cyclops.integrateddynamics.core.evaluate.variable.*;
 import org.cyclops.integrateddynamics.core.item.AspectVariableFacade;
 import org.cyclops.integrateddynamics.core.part.event.PartWriterAspectEvent;
 import org.cyclops.integrateddynamics.item.ItemVariable;
@@ -117,8 +114,9 @@ public class Achievements {
                         event.getEntityPlayer().addStat(EXPORT_ITEMS_LIMIT);
                     }
                 } else if (event.getAspect() == TunnelAspects.Write.Item.PREDICATE_EXPORT
-                        && variable instanceof LazyExpression
-                        && ((LazyExpression) variable).getOperator() == Operators.OBJECT_ITEMSTACK_ISENCHANTABLE) {
+                        && variable.getValue() instanceof ValueTypeOperator.ValueOperator
+                        && ((ValueTypeOperator.ValueOperator) variable.getValue()).getRawValue()
+                            == Operators.OBJECT_ITEMSTACK_ISENCHANTABLE) {
                     event.getEntityPlayer().addStat(EXPORT_ENCHANTABLE_ITEMS);
                 }
             }
