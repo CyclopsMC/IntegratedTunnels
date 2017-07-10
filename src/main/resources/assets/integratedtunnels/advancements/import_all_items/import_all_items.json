@@ -2,12 +2,7 @@
   "display": {
     "icon": {
       "item": "integrateddynamics:variable",
-      "nbt": {
-        "aspectName" : "aspect.aspects.integratedtunnels.write.boolean.item.import.name",
-        "partId": 1,
-        "_type": "aspect",
-        "_id": 1
-      }
+      "nbt": "{\"aspectName\":\"aspect.aspects.integratedtunnels.write.boolean.item.import.name\",\"partId\":1,\"_type\":\"aspect\",\"_id\":1}"
     },
     "title": {
       "translate": "advancement.integratedtunnels.import_all_items"
