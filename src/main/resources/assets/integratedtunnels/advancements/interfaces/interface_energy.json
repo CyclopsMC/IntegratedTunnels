@@ -1,0 +1,26 @@
+{
+  "display": {
+    "icon": {
+      "item": "integratedtunnels:part_interface_energy_item"
+    },
+    "title": {
+      "translate": "advancement.integratedtunnels.interface_energy"
+    },
+    "description": {
+      "translate": "advancement.integratedtunnels.interface_energy.desc"
+    }
+  },
+  "parent": "integratedtunnels:root",
+  "criteria": {
+    "criteria_0": {
+      "trigger": "cyclopscore:item_crafted",
+      "conditions": {
+        "items": [
+          {
+            "item": "integratedtunnels:part_interface_energy_item"
+          }
+        ]
+      }
+    }
+  }
+}

@@ -95,9 +95,6 @@ public class IntegratedTunnels extends ModBaseVersionable {
     @Override
     public void init(FMLInitializationEvent event) {
         super.init(event);
-
-        // Register achievements
-        Achievements.registerAchievements();
     }
     
     /**

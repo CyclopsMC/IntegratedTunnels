@@ -1,0 +1,34 @@
+{
+  "display": {
+    "icon": {
+      "item": "integrateddynamics:variable",
+      "nbt": {
+        "aspectName" : "aspect.aspects.integratedtunnels.write.operator.item.export.name",
+        "partId": 1,
+        "_type": "aspect",
+        "_id": 1
+      }
+    },
+    "title": {
+      "translate": "advancement.integratedtunnels.export_enchantable_items"
+    },
+    "description": {
+      "translate": "advancement.integratedtunnels.export_enchantable_items.desc"
+    },
+    "frame": "challenge"
+  },
+  "parent": "integratedtunnels:importer_exporter/exporter_item",
+  "criteria": {
+    "criteria_0": {
+      "trigger": "integrateddynamics:part_writer_aspect",
+      "conditions": {
+        "parttype": "exporter_item",
+        "aspect": "aspect.aspects.integratedtunnels.write.operator.item.export.name",
+        "variable": {
+          "valuetype": "valuetype.valuetypes.integrateddynamics.operator.name",
+          "value": "operator.operators.integrateddynamics.itemstack.enchantable.name"
+        }
+      }
+    }
+  }
+}

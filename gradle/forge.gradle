@@ -6,40 +6,8 @@ repositories {
         url "https://dl.bintray.com/cyclopsmc/dev/"
     }
     maven {
-        name "Amadornes"
-        url "http://maven.amadornes.com/"
-    }
-    maven {
-        name "Mobius Repo"
-        url "http://mobiusstrip.eu/maven"
-    }
-    maven {
-        name 'DVS1 Maven FS'
-        url 'http://dvs1.progwml6.com/files/maven'
-    }
-    maven {
-        name = "bdew"
-        url = "http://jenkins.bdew.net/maven"
-    }
-    maven {
-        name = "Charset Maven"
-        url = "http://charset.asie.pl/maven"
-    }
-    maven {
         name = "Dankhax"
-        url = "http://maven.epoxide.xyz"
-    }
-    maven {
-        name 'Player Maven FS'
-        url 'http://maven.ic2.player.to/'
-    }
-    maven {
-        name 'tterrag'
-        url 'http://maven.tterrag.com/'
-    }
-    maven {
-        name "Raoulvdberge Repo"
-        url "https://dl.bintray.com/raoulvdberge/dev/"
+        url = "http://maven.epoxide.org"
     }
 }
 dependencies {
@@ -59,7 +27,7 @@ dependencies {
     deobfCompile("org.cyclops.commoncapabilities:CommonCapabilities:${config.commoncapabilities_version}") { // https://dl.bintray.com/cyclopsmc/dev/org/cyclops/commoncapabilities/CommonCapabilities/
         exclude group: 'org.cyclops.cyclopscore', module: 'CyclopsCore'
     }
-    deobfCompile "net.darkhax.tesla:Tesla:${config.teslaapi_version}" // http://maven.epoxide.xyz/net/darkhax/tesla/Tesla/
+    deobfCompile "net.darkhax.tesla:Tesla-${config.teslaapi_version}" // http://maven.epoxide.org/net/darkhax/tesla/Tesla/
 
     // Project lombok
     compile "org.projectlombok:lombok:1.14.4"

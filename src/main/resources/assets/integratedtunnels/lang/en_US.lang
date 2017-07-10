@@ -1,25 +1,26 @@
 # General
 itemGroup.integratedtunnels=Integrated Tunnels
+general.integratedtunnels.description=Transfer other stuff over Integrated Dynamics networks.
 
 # Achievements
-achievement.integratedtunnels.interface_item=Item Interfacing
-achievement.integratedtunnels.interface_item.desc=Craft an Item Interface
-achievement.integratedtunnels.interface_fluid=Fluid Interfacing
-achievement.integratedtunnels.interface_fluid.desc=Craft a Fluid Interface
-achievement.integratedtunnels.interface_energy=Energy Interfacing
-achievement.integratedtunnels.interface_energy.desc=Craft an Energy Interface
-achievement.integratedtunnels.exporter_item=Advanced Item Exporting
-achievement.integratedtunnels.exporter_item.desc=Craft an Item Exporter
-achievement.integratedtunnels.importer_item=Advanced Item Importing
-achievement.integratedtunnels.importer_item.desc=Craft an Item Importer
-achievement.integratedtunnels.import_all_items=Omni Item Importing
-achievement.integratedtunnels.import_all_items.desc=Import all items using an Item Importer
-achievement.integratedtunnels.export_items_limit=Limited Item Exporting
-achievement.integratedtunnels.export_items_limit.desc=Export items into an inventory until 10 items are in that inventory using an Item Exporter
-achievement.integratedtunnels.import_items_list=List-based Item Importing
-achievement.integratedtunnels.import_items_list.desc=Import all items from a list into an inventory using an Item Importer
-achievement.integratedtunnels.export_enchantable_items=Export Enchantable Items
-achievement.integratedtunnels.export_enchantable_items.desc=Use the Enchantable Operator to export all enchantable items into an inventory using an Item Exporter
+advancement.integratedtunnels.interface_item=Item Interfacing
+advancement.integratedtunnels.interface_item.desc=Craft an Item Interface
+advancement.integratedtunnels.interface_fluid=Fluid Interfacing
+advancement.integratedtunnels.interface_fluid.desc=Craft a Fluid Interface
+advancement.integratedtunnels.interface_energy=Energy Interfacing
+advancement.integratedtunnels.interface_energy.desc=Craft an Energy Interface
+advancement.integratedtunnels.exporter_item=Advanced Item Exporting
+advancement.integratedtunnels.exporter_item.desc=Craft an Item Exporter
+advancement.integratedtunnels.importer_item=Advanced Item Importing
+advancement.integratedtunnels.importer_item.desc=Craft an Item Importer
+advancement.integratedtunnels.import_all_items=Omni Item Importing
+advancement.integratedtunnels.import_all_items.desc=Import all items using an Item Importer
+advancement.integratedtunnels.export_items_limit=Limited Item Exporting
+advancement.integratedtunnels.export_items_limit.desc=Export items into an inventory until 10 items are in that inventory using an Item Exporter
+advancement.integratedtunnels.import_items_list=List-based Item Importing
+advancement.integratedtunnels.import_items_list.desc=Import all items from a list into an inventory using an Item Importer
+advancement.integratedtunnels.export_enchantable_items=Export Enchantable Items
+advancement.integratedtunnels.export_enchantable_items.desc=Use the Enchantable Operator to export all enchantable items into an inventory using an Item Exporter
 
 # Part types
 parttype.parttypes.integratedtunnels.interface_energy.name=Energy Interface
