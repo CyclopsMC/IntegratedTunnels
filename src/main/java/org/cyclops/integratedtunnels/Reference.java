@@ -17,7 +17,7 @@ public class Reference {
     public static final String MOD_CHANNEL = MOD_ID;
     public static final String MOD_MC_VERSION = "@MC_VERSION@";
     public static final String GA_TRACKING_ID = "UA-65307010-10";
-    public static final String VERSION_URL = "https://raw.githubusercontent.com/CyclopsMC/Versions/master/1.11/IntegratedTunnels.txt";
+    public static final String VERSION_URL = "https://raw.githubusercontent.com/CyclopsMC/Versions/master/1.12/IntegratedTunnels.txt";
     
     // Paths
     public static final String TEXTURE_PATH_GUI = "textures/gui/";
