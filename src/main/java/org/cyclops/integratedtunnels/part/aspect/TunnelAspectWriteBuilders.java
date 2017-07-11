@@ -3,7 +3,9 @@ package org.cyclops.integratedtunnels.part.aspect;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.collect.ImmutableList;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.EnumHand;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
@@ -352,6 +354,8 @@ public class TunnelAspectWriteBuilders {
             private final int slot;
             private final int amount;
             private final ItemStackPredicate itemStackMatcher;
+            private final PartTarget partTarget;
+            private final IAspectProperties properties;
 
             public static ItemTarget of(PartTarget partTarget, IAspectProperties properties, int amount,
                                         ItemStackPredicate itemStackMatcher, int transferHash) {
@@ -366,14 +370,15 @@ public class TunnelAspectWriteBuilders {
                         TileHelpers.getCapability(target.getPos(), target.getSide(), Capabilities.INVENTORY_STATE),
                         network.hasCapability(Capabilities.SLOTLESS_ITEMHANDLER) ? network.getCapability(Capabilities.SLOTLESS_ITEMHANDLER) : null,
                         TileHelpers.getCapability(target.getPos(), target.getSide(), Capabilities.SLOTLESS_ITEMHANDLER),
-                        target.hashCode(), slot, amount, itemStackMatcher, transferHash);
+                        target.hashCode(), slot, amount, itemStackMatcher, transferHash, partTarget, properties);
             }
 
             public ItemTarget(IItemNetwork itemNetwork, IItemHandler itemStorage,
                               IInventoryState inventoryStateNetwork, IInventoryState inventoryStateStorage,
                               ISlotlessItemHandler itemNetworkSlotless, ISlotlessItemHandler itemStorageSlotless,
                               int storagePosHash, int slot,
-                              int amount, ItemStackPredicate itemStackMatcher, int transferHash) {
+                              int amount, ItemStackPredicate itemStackMatcher, int transferHash, PartTarget partTarget,
+                              IAspectProperties properties) {
                 this.itemNetwork = itemNetwork;
                 this.itemStorage = itemStorage;
                 this.inventoryStateNetwork = inventoryStateNetwork;
@@ -384,6 +389,8 @@ public class TunnelAspectWriteBuilders {
                 this.slot = slot;
                 this.amount = amount;
                 this.itemStackMatcher = itemStackMatcher;
+                this.partTarget = partTarget;
+                this.properties = properties;
             }
 
             public IItemNetwork getItemNetwork() {
@@ -424,6 +431,14 @@ public class TunnelAspectWriteBuilders {
 
             public ItemStackPredicate getItemStackMatcher() {
                 return itemStackMatcher;
+            }
+
+            public PartTarget getPartTarget() {
+                return partTarget;
+            }
+
+            public IAspectProperties getProperties() {
+                return properties;
             }
         }
 
@@ -639,6 +654,9 @@ public class TunnelAspectWriteBuilders {
 
     public static final class World {
 
+        public static final AspectBuilder<ValueObjectTypeBlock.ValueBlock, ValueObjectTypeBlock, Triple<PartTarget, IAspectProperties, ValueObjectTypeBlock.ValueBlock>>
+                BUILDER_BLOCK_BASE = AspectWriteBuilders.getValue(AspectBuilder.forWriteType(ValueTypes.OBJECT_BLOCK));
+
         public static final AspectBuilder<ValueTypeBoolean.ValueBoolean, ValueTypeBoolean, Triple<PartTarget, IAspectProperties, Boolean>>
                 BUILDER_BOOLEAN = AspectWriteBuilders.BUILDER_BOOLEAN.byMod(IntegratedTunnels._instance)
                 .appendKind("world").handle(AspectWriteBuilders.PROP_GET_BOOLEAN);
@@ -648,6 +666,9 @@ public class TunnelAspectWriteBuilders {
         public static final AspectBuilder<ValueObjectTypeItemStack.ValueItemStack, ValueObjectTypeItemStack, Triple<PartTarget, IAspectProperties, ItemStack>>
                 BUILDER_ITEMSTACK = AspectWriteBuilders.BUILDER_ITEMSTACK.byMod(IntegratedTunnels._instance)
                 .appendKind("world").handle(AspectWriteBuilders.PROP_GET_ITEMSTACK);
+        public static final AspectBuilder<ValueObjectTypeBlock.ValueBlock, ValueObjectTypeBlock, Triple<PartTarget, IAspectProperties, IBlockState>>
+                BUILDER_BLOCK = BUILDER_BLOCK_BASE.byMod(IntegratedTunnels._instance)
+                .appendKind("world").handle(AspectWriteBuilders.PROP_GET_BLOCK);
         public static final AspectBuilder<ValueObjectTypeFluidStack.ValueFluidStack, ValueObjectTypeFluidStack, Triple<PartTarget, IAspectProperties, FluidStack>>
                 BUILDER_FLUIDSTACK = AspectWriteBuilders.BUILDER_FLUIDSTACK.byMod(IntegratedTunnels._instance)
                 .appendKind("world").handle(AspectWriteBuilders.PROP_GET_FLUIDSTACK);
@@ -660,6 +681,8 @@ public class TunnelAspectWriteBuilders {
 
         public static final IAspectPropertyTypeInstance<ValueTypeBoolean, ValueTypeBoolean.ValueBoolean> PROP_BLOCK_UPDATE =
                 new AspectPropertyTypeInstance<ValueTypeBoolean, ValueTypeBoolean.ValueBoolean>(ValueTypes.BOOLEAN, "aspect.aspecttypes.integratedtunnels.boolean.world.blockupdate.name");
+        public static final IAspectPropertyTypeInstance<ValueTypeBoolean, ValueTypeBoolean.ValueBoolean> PROP_HAND_LEFT =
+                new AspectPropertyTypeInstance<ValueTypeBoolean, ValueTypeBoolean.ValueBoolean>(ValueTypes.BOOLEAN, "aspect.aspecttypes.integratedtunnels.boolean.world.lefthand.name");
 
         public static final IAspectProperties PROPERTIES_FLUID_UPDATE = new AspectProperties(ImmutableList.<IAspectPropertyTypeInstance>of(
                 Fluid.PROP_CHECK_NBT,
@@ -668,11 +691,22 @@ public class TunnelAspectWriteBuilders {
         public static final IAspectProperties PROPERTIES_FLUID = new AspectProperties(ImmutableList.<IAspectPropertyTypeInstance>of(
                 Fluid.PROP_CHECK_NBT
         ));
+        public static final IAspectProperties PROPERTIES_ITEM_UPDATE = new AspectProperties(ImmutableList.<IAspectPropertyTypeInstance>of(
+                Item.PROP_CHECK_DAMAGE,
+                Item.PROP_CHECK_NBT,
+                PROP_BLOCK_UPDATE,
+                PROP_HAND_LEFT
+        ));
         static {
             PROPERTIES_FLUID_UPDATE.setValue(Fluid.PROP_CHECK_NBT, ValueTypeBoolean.ValueBoolean.of(true));
             PROPERTIES_FLUID_UPDATE.setValue(PROP_BLOCK_UPDATE, ValueTypeBoolean.ValueBoolean.of(false));
 
             PROPERTIES_FLUID.setValue(Fluid.PROP_CHECK_NBT, ValueTypeBoolean.ValueBoolean.of(true));
+
+            PROPERTIES_ITEM_UPDATE.setValue(Item.PROP_CHECK_DAMAGE, ValueTypeBoolean.ValueBoolean.of(true));
+            PROPERTIES_ITEM_UPDATE.setValue(Item.PROP_CHECK_NBT, ValueTypeBoolean.ValueBoolean.of(true));
+            PROPERTIES_ITEM_UPDATE.setValue(PROP_BLOCK_UPDATE, ValueTypeBoolean.ValueBoolean.of(false));
+            PROPERTIES_ITEM_UPDATE.setValue(PROP_HAND_LEFT, ValueTypeBoolean.ValueBoolean.of(true));
         }
 
         public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, Boolean>, Fluid.FluidTarget>
@@ -680,7 +714,7 @@ public class TunnelAspectWriteBuilders {
             @Override
             public Fluid.FluidTarget getOutput(Triple<PartTarget, IAspectProperties, Boolean> input) {
                 return Fluid.FluidTarget.of(input.getLeft(), input.getMiddle(), net.minecraftforge.fluids.Fluid.BUCKET_VOLUME,
-                        TunnelFluidHelpers.MATCH_ALL);
+                        input.getRight() ? TunnelFluidHelpers.MATCH_ALL : TunnelFluidHelpers.MATCH_NONE);
             }
         };
         public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, FluidStack>, Fluid.FluidTarget>
@@ -732,7 +766,7 @@ public class TunnelAspectWriteBuilders {
                 PartPos target = input.getPartTarget().getTarget();
                 IFluidNetwork fluidNetwork = input.getFluidNetwork();
                 final DimPos pos = target.getPos();
-                if (pos.isLoaded()) {
+                if (pos.isLoaded() && input.getFluidNetwork() != null) {
                     TunnelFluidHelpers.placeFluids(fluidNetwork, pos.getWorld(), pos.getBlockPos(),
                             input.getFluidStackMatcher(), input.getProperties().getValue(PROP_BLOCK_UPDATE).getRawValue());
                 }
@@ -748,11 +782,52 @@ public class TunnelAspectWriteBuilders {
                 PartPos target = input.getPartTarget().getTarget();
                 IFluidNetwork fluidNetwork = input.getFluidNetwork();
                 final DimPos pos = target.getPos();
-                if (pos.isLoaded()) {
+                if (pos.isLoaded() && input.getFluidNetwork() != null) {
                     TunnelFluidHelpers.pickUpFluids(target.getPos().getWorld(), target.getPos().getBlockPos(),
                             target.getSide(), fluidNetwork, input.getFluidStackMatcher());
                 }
                 return null;
+            }
+        };
+
+        public static <T> IAspectValuePropagator<Triple<PartTarget, IAspectProperties, T>, Triple<PartTarget, IAspectProperties, T>>
+            ignoreStackSize() {
+            return new IAspectValuePropagator<Triple<PartTarget, IAspectProperties, T>, Triple<PartTarget, IAspectProperties, T>>() {
+                @Override
+                public Triple<PartTarget, IAspectProperties, T> getOutput(Triple<PartTarget, IAspectProperties, T> input) {
+                    IAspectProperties aspectProperties = input.getMiddle().clone();
+                    aspectProperties.setValue(Item.PROP_CHECK_STACKSIZE, ValueTypeBoolean.ValueBoolean.of(false));
+                    return Triple.of(input.getLeft(), aspectProperties, input.getRight());
+                }
+            };
+        }
+        public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, Boolean>, Item.ItemTarget>
+                PROP_BOOLEAN_ITEMTARGET = new IAspectValuePropagator<Triple<PartTarget, IAspectProperties, Boolean>, Item.ItemTarget>() {
+            @Override
+            public Item.ItemTarget getOutput(Triple<PartTarget, IAspectProperties, Boolean> input) {
+                return Item.ItemTarget.of(input.getLeft(), input.getMiddle(), 1,
+                        input.getRight() ? TunnelItemHelpers.MATCH_ALL : TunnelItemHelpers.MATCH_NONE,
+                        input.getRight() ? 1 : 0);
+            }
+        };
+
+        public static final IAspectValuePropagator<Item.ItemTarget, Void>
+                PROP_ITEM_EXPORT = new IAspectValuePropagator<Item.ItemTarget, Void>() {
+            @Override
+            public Void getOutput(Item.ItemTarget input) {
+                PartPos target = input.getPartTarget().getTarget();
+                IItemNetwork itemNetwork = input.getItemNetwork();
+                if (target.getPos().isLoaded() && itemNetwork != null) {
+                    EnumHand hand = input.getProperties().getValue(PROP_HAND_LEFT).getRawValue()
+                            ? EnumHand.MAIN_HAND : EnumHand.OFF_HAND;
+                    boolean blockUpdate = input.getProperties().getValue(PROP_BLOCK_UPDATE).getRawValue();
+                    TunnelItemHelpers.placeItems(input.getConnectionHash(), itemNetwork,
+                            input.getInventoryStateNetwork(), input.getItemNetworkSlotless(),
+                            target.getPos().getWorld(), target.getPos().getBlockPos(), target.getSide(),
+                            input.getItemStackMatcher(), hand, blockUpdate);
+                }
+                return null;
+
             }
         };
 

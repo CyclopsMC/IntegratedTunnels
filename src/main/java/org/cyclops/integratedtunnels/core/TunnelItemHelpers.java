@@ -3,8 +3,15 @@ package org.cyclops.integratedtunnels.core;
 import com.google.common.base.Objects;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import net.minecraft.block.material.Material;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
+import net.minecraft.world.WorldServer;
 import net.minecraftforge.items.IItemHandler;
 import org.apache.logging.log4j.Level;
 import org.cyclops.commoncapabilities.api.capability.inventorystate.IInventoryState;
@@ -38,6 +45,12 @@ public class TunnelItemHelpers {
         @Override
         public boolean apply(@Nullable ItemStack input) {
             return true;
+        }
+    };
+    public static final ItemStackPredicate MATCH_NONE = new ItemStackPredicate(ItemStack.EMPTY, ItemMatch.ANY) {
+        @Override
+        public boolean apply(@Nullable ItemStack input) {
+            return false;
         }
     };
 
@@ -325,6 +338,39 @@ public class TunnelItemHelpers {
             return true;
         }
         return false;
+    }
+
+    /**
+     * Place items from the given source in the world.
+     * @param connectionHash The connection hash.
+     * @param sourceHandler The source item handler.
+     * @param sourceInvState Optional inventory state of the source.
+     * @param sourceSlotless The slotless source item handler.
+     * @param world The target world.
+     * @param pos The target position.
+     * @param itemStackMatcher The itemstack match predicate.
+     * @param hand The hand to place the block with.
+     * @param blockUpdate If a block update should occur after placement.
+     * @return The placed item.
+     */
+    public static ItemStack placeItems(int connectionHash,
+                                       IItemHandler sourceHandler, @Nullable IInventoryState sourceInvState,
+                                       @Nullable ISlotlessItemHandler sourceSlotless,
+                                       World world, BlockPos pos, EnumFacing side,
+                                       ItemStackPredicate itemStackMatcher, EnumHand hand, boolean blockUpdate) {
+        IBlockState destBlockState = world.getBlockState(pos);
+        final Material destMaterial = destBlockState.getMaterial();
+        final boolean isDestNonSolid = !destMaterial.isSolid();
+        final boolean isDestReplaceable = destBlockState.getBlock().isReplaceable(world, pos);
+        // TODO: add parameter to not replace replacables
+        if (!world.isAirBlock(pos)
+                && (!isDestNonSolid || !isDestReplaceable || destMaterial.isLiquid())) {
+            return null;
+        }
+
+        IItemHandler targetBlock = new ItemHandlerBlockWrapper((WorldServer) world, pos, side, hand, blockUpdate);
+        return TunnelItemHelpers.moveItemsStateOptimized(connectionHash, sourceHandler, sourceInvState, -1,
+                sourceSlotless, targetBlock, null, 0, null, 1, itemStackMatcher);
     }
 
 }

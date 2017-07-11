@@ -58,6 +58,7 @@ aspect.aspecttypes.integratedtunnels.integer.fluid.rate.name=Fluid Transfer Rate
 aspect.aspecttypes.integratedtunnels.boolean.fluid.checkamount.name=Check Fluid Amount
 aspect.aspecttypes.integratedtunnels.boolean.fluid.checknbt.name=Check NBT
 aspect.aspecttypes.integratedtunnels.boolean.world.blockupdate.name=Cause Block Update
+aspect.aspecttypes.integratedtunnels.boolean.world.lefthand.name=Left Hand
 
 # Aspects
 
@@ -124,6 +125,14 @@ aspect.aspects.integratedtunnels.write.list.world.fluid.export.name=Place Fluids
 aspect.aspects.integratedtunnels.write.list.world.fluid.export.info=Place the given fluids in the world.
 aspect.aspects.integratedtunnels.write.operator.world.fluid.export.name=Place Fluids Predicate
 aspect.aspects.integratedtunnels.write.operator.world.fluid.export.info=Place the given fluids in the world that match the given predicate.
+aspect.aspects.integratedtunnels.write.boolean.world.block.export.name=Place All Item Blocks
+aspect.aspects.integratedtunnels.write.boolean.world.block.export.info=Place all item blocks in the world.
+aspect.aspects.integratedtunnels.write.itemstack.world.block.export.name=Place Item Block
+aspect.aspects.integratedtunnels.write.itemstack.world.block.export.info=Place the item block in the world.
+aspect.aspects.integratedtunnels.write.list.world.block.export.name=Place Item Blocks
+aspect.aspects.integratedtunnels.write.list.world.block.export.info=Place the given item blocks in the world.
+aspect.aspects.integratedtunnels.write.operator.world.block.export.name=Place Item Blocks Predicate
+aspect.aspects.integratedtunnels.write.operator.world.block.export.info=Place the item blocks in the world that match the given predicate.
 aspect.aspects.integratedtunnels.write.boolean.world.fluid.import.name=Pick Up All Fluids
 aspect.aspects.integratedtunnels.write.boolean.world.fluid.import.info=Pick up all fluids in the world.
 aspect.aspects.integratedtunnels.write.fluidstack.world.fluid.import.name=Pick Up Fluid

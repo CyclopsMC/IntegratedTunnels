@@ -46,6 +46,12 @@ public class TunnelFluidHelpers {
             return true;
         }
     };
+    public static final Predicate<FluidStack> MATCH_NONE = new Predicate<FluidStack>() {
+        @Override
+        public boolean apply(@Nullable FluidStack input) {
+            return false;
+        }
+    };
 
     /**
      * Move all fluids matching the predicate from source to target.

@@ -1,5 +1,6 @@
 package org.cyclops.integratedtunnels.part.aspect;
 
+import net.minecraft.item.ItemStack;
 import org.cyclops.integrateddynamics.api.part.aspect.IAspectWrite;
 import org.cyclops.integrateddynamics.core.evaluate.variable.*;
 
@@ -228,6 +229,34 @@ public class TunnelAspects {
                             .handle(TunnelAspectWriteBuilders.World.PROP_FLUIDSTACKPREDICATE_FLUIDTARGET)
                             .handle(TunnelAspectWriteBuilders.World.PROP_FLUIDSTACK_IMPORT)
                             .appendKind("fluid").appendKind("import").buildWrite();
+
+            public static final IAspectWrite<ValueTypeBoolean.ValueBoolean, ValueTypeBoolean> BLOCK_BOOLEAN_EXPORT =
+                    TunnelAspectWriteBuilders.World.BUILDER_BOOLEAN
+                            .withProperties(TunnelAspectWriteBuilders.World.PROPERTIES_ITEM_UPDATE)
+                            .handle(TunnelAspectWriteBuilders.World.PROP_BOOLEAN_ITEMTARGET)
+                            .handle(TunnelAspectWriteBuilders.World.PROP_ITEM_EXPORT)
+                            .appendKind("block").appendKind("export").buildWrite();
+            public static final IAspectWrite<ValueObjectTypeItemStack.ValueItemStack, ValueObjectTypeItemStack> BLOCK_ITEMSTACK_EXPORT =
+                    TunnelAspectWriteBuilders.World.BUILDER_ITEMSTACK
+                            .withProperties(TunnelAspectWriteBuilders.World.PROPERTIES_ITEM_UPDATE)
+                            .handle(TunnelAspectWriteBuilders.World.<ItemStack>ignoreStackSize())
+                            .handle(TunnelAspectWriteBuilders.Item.PROP_ITEMSTACK_ITEMTARGET)
+                            .handle(TunnelAspectWriteBuilders.World.PROP_ITEM_EXPORT)
+                            .appendKind("block").appendKind("export").buildWrite();
+            public static final IAspectWrite<ValueTypeList.ValueList, ValueTypeList> BLOCK_LISTITEMSTACK_EXPORT =
+                    TunnelAspectWriteBuilders.World.BUILDER_LIST
+                            .withProperties(TunnelAspectWriteBuilders.World.PROPERTIES_ITEM_UPDATE)
+                            .handle(TunnelAspectWriteBuilders.World.<ValueTypeList.ValueList>ignoreStackSize())
+                            .handle(TunnelAspectWriteBuilders.Item.PROP_ITEMSTACKLIST_ITEMTARGET)
+                            .handle(TunnelAspectWriteBuilders.World.PROP_ITEM_EXPORT)
+                            .appendKind("block").appendKind("export").buildWrite();
+            public static final IAspectWrite<ValueTypeOperator.ValueOperator, ValueTypeOperator> BLOCK_PREDICATEITEMSTACK_EXPORT =
+                    TunnelAspectWriteBuilders.World.BUILDER_OPERATOR
+                            .withProperties(TunnelAspectWriteBuilders.World.PROPERTIES_ITEM_UPDATE)
+                            .handle(TunnelAspectWriteBuilders.World.<ValueTypeOperator.ValueOperator>ignoreStackSize())
+                            .handle(TunnelAspectWriteBuilders.Item.PROP_ITEMSTACKPREDICATE_ITEMTARGET)
+                            .handle(TunnelAspectWriteBuilders.World.PROP_ITEM_EXPORT)
+                            .appendKind("block").appendKind("export").buildWrite();
 
         }
 

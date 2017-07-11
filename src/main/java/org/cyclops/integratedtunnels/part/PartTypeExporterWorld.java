@@ -19,7 +19,12 @@ public class PartTypeExporterWorld extends PartTypeTunnelAspects<PartTypeExporte
                 TunnelAspects.Write.World.FLUID_BOOLEAN_EXPORT,
                 TunnelAspects.Write.World.FLUID_FLUIDSTACK_EXPORT,
                 TunnelAspects.Write.World.FLUID_LIST_EXPORT,
-                TunnelAspects.Write.World.FLUID_PREDICATE_EXPORT
+                TunnelAspects.Write.World.FLUID_PREDICATE_EXPORT,
+
+                TunnelAspects.Write.World.BLOCK_BOOLEAN_EXPORT,
+                TunnelAspects.Write.World.BLOCK_ITEMSTACK_EXPORT,
+                TunnelAspects.Write.World.BLOCK_LISTITEMSTACK_EXPORT,
+                TunnelAspects.Write.World.BLOCK_PREDICATEITEMSTACK_EXPORT
         ));
     }
 
