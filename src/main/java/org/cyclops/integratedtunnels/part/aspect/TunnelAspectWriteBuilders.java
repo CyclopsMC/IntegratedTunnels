@@ -1,26 +1,16 @@
 package org.cyclops.integratedtunnels.part.aspect;
 
-import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.collect.ImmutableList;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockLiquid;
-import net.minecraft.block.material.Material;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidUtil;
-import net.minecraftforge.fluids.IFluidBlock;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
-import net.minecraftforge.fluids.capability.wrappers.BlockLiquidWrapper;
-import net.minecraftforge.fluids.capability.wrappers.BlockWrapper;
-import net.minecraftforge.fluids.capability.wrappers.FluidBlockWrapper;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import org.apache.commons.lang3.tuple.Triple;
@@ -65,8 +55,6 @@ import org.cyclops.integratedtunnels.core.TunnelEnergyHelpers;
 import org.cyclops.integratedtunnels.core.TunnelFluidHelpers;
 import org.cyclops.integratedtunnels.core.TunnelItemHelpers;
 import org.cyclops.integratedtunnels.core.part.PartStatePositionedAddon;
-
-import javax.annotation.Nullable;
 
 /**
  * Collection of tunnel aspect write builders and value propagators.
@@ -741,52 +729,15 @@ public class TunnelAspectWriteBuilders {
                 PROP_FLUIDSTACK_EXPORT = new IAspectValuePropagator<Fluid.FluidTarget, Void>() {
             @Override
             public Void getOutput(Fluid.FluidTarget input) {
-                PartPos center = input.getPartTarget().getCenter();
                 PartPos target = input.getPartTarget().getTarget();
-                INetwork network = NetworkHelpers.getNetwork(center.getPos().getWorld(), center.getPos().getBlockPos());
-                IFluidNetwork fluidNetwork = network.getCapability(FluidNetworkConfig.CAPABILITY);
+                IFluidNetwork fluidNetwork = input.getFluidNetwork();
                 final DimPos pos = target.getPos();
-                if (!pos.isLoaded()) {
-                    return null;
+                if (pos.isLoaded()) {
+                    TunnelFluidHelpers.placeFluids(fluidNetwork, pos.getWorld(), pos.getBlockPos(),
+                            input.getFluidStackMatcher(), input.getProperties().getValue(PROP_BLOCK_UPDATE).getRawValue());
                 }
-
-                IBlockState destBlockState = pos.getWorld().getBlockState(pos.getBlockPos());
-                final Material destMaterial = destBlockState.getMaterial();
-                final boolean isDestNonSolid = !destMaterial.isSolid();
-                final boolean isDestReplaceable = destBlockState.getBlock().isReplaceable(pos.getWorld(), pos.getBlockPos());
-                if (!pos.getWorld().isAirBlock(pos.getBlockPos())
-                        && (!isDestNonSolid || !isDestReplaceable || destMaterial.isLiquid())) {
-                    return null;
-                }
-
-                FluidStack moved = TunnelFluidHelpers.moveFluids(fluidNetwork, new Function<FluidStack, IFluidHandler>() {
-                    @Nullable
-                    @Override
-                    public IFluidHandler apply(FluidStack input) {
-                        net.minecraftforge.fluids.Fluid fluid = input.getFluid();
-                        if (pos.getWorld().provider.doesWaterVaporize() && fluid.doesVaporize(input)) {
-                            return null;
-                        }
-
-                        Block block = fluid.getBlock();
-                        IFluidHandler handler;
-                        if (block instanceof IFluidBlock) {
-                            handler = new FluidBlockWrapper((IFluidBlock) block, pos.getWorld(), pos.getBlockPos());
-                        } else if (block instanceof BlockLiquid) {
-                            handler = new BlockLiquidWrapper((BlockLiquid) block, pos.getWorld(), pos.getBlockPos());
-                        } else {
-                            handler = new BlockWrapper(block, pos.getWorld(), pos.getBlockPos());
-                        }
-
-                        return handler;
-                    }
-                }, input.getAmount(), true, input.getFluidStackMatcher());
-
-                if (moved != null && input.getProperties().getValue(PROP_BLOCK_UPDATE).getRawValue()) {
-                    pos.getWorld().neighborChanged(pos.getBlockPos(), Blocks.AIR, pos.getBlockPos());
-                }
-
                 return null;
+
             }
         };
 
@@ -794,26 +745,13 @@ public class TunnelAspectWriteBuilders {
                 PROP_FLUIDSTACK_IMPORT = new IAspectValuePropagator<Fluid.FluidTarget, Void>() {
             @Override
             public Void getOutput(Fluid.FluidTarget input) {
-                PartPos center = input.getPartTarget().getCenter();
                 PartPos target = input.getPartTarget().getTarget();
-                INetwork network = NetworkHelpers.getNetwork(center.getPos().getWorld(), center.getPos().getBlockPos());
-                IFluidNetwork fluidNetwork = network.getCapability(FluidNetworkConfig.CAPABILITY);
+                IFluidNetwork fluidNetwork = input.getFluidNetwork();
                 final DimPos pos = target.getPos();
-                if (!pos.isLoaded()) {
-                    return null;
+                if (pos.isLoaded()) {
+                    TunnelFluidHelpers.pickUpFluids(target.getPos().getWorld(), target.getPos().getBlockPos(),
+                            target.getSide(), fluidNetwork, input.getFluidStackMatcher());
                 }
-
-                IBlockState state = target.getPos().getWorld().getBlockState(target.getPos().getBlockPos());
-                Block block = state.getBlock();
-                if (block instanceof IFluidBlock || block instanceof BlockLiquid) {
-                    IFluidHandler targetFluidHandler = FluidUtil.getFluidHandler(target.getPos().getWorld(),
-                            target.getPos().getBlockPos(), target.getSide());
-                    if (targetFluidHandler != null) {
-                        TunnelFluidHelpers.moveFluids(targetFluidHandler, fluidNetwork, input.getAmount(), true,
-                                input.getFluidStackMatcher());
-                    }
-                }
-
                 return null;
             }
         };

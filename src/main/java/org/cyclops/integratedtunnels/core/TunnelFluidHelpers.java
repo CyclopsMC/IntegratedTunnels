@@ -3,9 +3,23 @@ package org.cyclops.integratedtunnels.core;
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Lists;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockLiquid;
+import net.minecraft.block.material.Material;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.init.Blocks;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
+import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.FluidUtil;
+import net.minecraftforge.fluids.IFluidBlock;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidTankProperties;
+import net.minecraftforge.fluids.capability.wrappers.BlockLiquidWrapper;
+import net.minecraftforge.fluids.capability.wrappers.BlockWrapper;
+import net.minecraftforge.fluids.capability.wrappers.FluidBlockWrapper;
 import org.cyclops.cyclopscore.helper.L10NHelpers;
 import org.cyclops.integrateddynamics.api.evaluate.EvaluationException;
 import org.cyclops.integrateddynamics.api.evaluate.operator.IOperator;
@@ -151,6 +165,78 @@ public class TunnelFluidHelpers {
             return true;
         }
         return false;
+    }
+
+    /**
+     * Place fluids from the given source in the world.
+     * @param source The source fluid handler.
+     * @param world The target world.
+     * @param pos The target position.
+     * @param fluidStackMatcher The fluidstack match predicate.
+     * @param blockUpdate If a block update should occur after placement.
+     * @return The placed fluid.
+     */
+    public static FluidStack placeFluids(IFluidHandler source, final World world, final BlockPos pos,
+                                         Predicate<FluidStack> fluidStackMatcher, boolean blockUpdate) {
+        IBlockState destBlockState = world.getBlockState(pos);
+        final Material destMaterial = destBlockState.getMaterial();
+        final boolean isDestNonSolid = !destMaterial.isSolid();
+        final boolean isDestReplaceable = destBlockState.getBlock().isReplaceable(world, pos);
+        if (!world.isAirBlock(pos)
+                && (!isDestNonSolid || !isDestReplaceable || destMaterial.isLiquid())) {
+            return null;
+        }
+
+        FluidStack moved = TunnelFluidHelpers.moveFluids(source, new Function<FluidStack, IFluidHandler>() {
+            @Nullable
+            @Override
+            public IFluidHandler apply(FluidStack input) {
+                net.minecraftforge.fluids.Fluid fluid = input.getFluid();
+                if (world.provider.doesWaterVaporize() && fluid.doesVaporize(input)) {
+                    return null;
+                }
+
+                Block block = fluid.getBlock();
+                IFluidHandler handler;
+                if (block instanceof IFluidBlock) {
+                    handler = new FluidBlockWrapper((IFluidBlock) block, world, pos);
+                } else if (block instanceof BlockLiquid) {
+                    handler = new BlockLiquidWrapper((BlockLiquid) block, world, pos);
+                } else {
+                    handler = new BlockWrapper(block, world, pos);
+                }
+
+                return handler;
+            }
+        }, Fluid.BUCKET_VOLUME, true, fluidStackMatcher);
+
+        if (moved != null && blockUpdate) {
+            world.neighborChanged(pos, Blocks.AIR, pos);
+        }
+        return moved;
+    }
+
+    /**
+     * Place fluids from the given source in the world.
+     * @param world The source world.
+     * @param pos The source position.
+     * @param side The source side.
+     * @param target The source fluid handler.
+     * @param fluidStackMatcher The fluidstack match predicate.
+     * @return The picked-up fluid.
+     */
+    public static FluidStack pickUpFluids(World world, BlockPos pos, EnumFacing side, IFluidHandler target,
+                                         Predicate<FluidStack> fluidStackMatcher) {
+        IBlockState state = world.getBlockState(pos);
+        Block block = state.getBlock();
+        if (block instanceof IFluidBlock || block instanceof BlockLiquid) {
+            IFluidHandler targetFluidHandler = FluidUtil.getFluidHandler(world, pos, side);
+            if (targetFluidHandler != null) {
+                return TunnelFluidHelpers.moveFluids(targetFluidHandler, target, Fluid.BUCKET_VOLUME, true,
+                        fluidStackMatcher);
+            }
+        }
+        return null;
     }
 
 }
