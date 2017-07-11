@@ -41,6 +41,11 @@ parttype.parttypes.integratedtunnels.importer_fluid.name=Fluid Importer
 parttype.parttypes.integratedtunnels.importer_fluid.info=Imports fluids into the network
 parttype.parttypes.integratedtunnels.exporter_fluid.name=Fluid Exporter
 parttype.parttypes.integratedtunnels.exporter_fluid.info=Exports fluids from the network
+parttype.parttypes.integratedtunnels.exporter_fluid.name=Fluid Exporter
+parttype.parttypes.integratedtunnels.importer_world.name=World Importer
+parttype.parttypes.integratedtunnels.importer_world.info=Pick up items or fluids in the world
+parttype.parttypes.integratedtunnels.exporter_world.name=World Exporter
+parttype.parttypes.integratedtunnels.exporter_world.info=Place items or fluids in the world
 
 # Aspect property types
 aspect.aspecttypes.integratedtunnels.integer.energy.rate.name=Energy Transfer Rate
@@ -52,6 +57,7 @@ aspect.aspecttypes.integratedtunnels.boolean.item.checknbt.name=Check NBT
 aspect.aspecttypes.integratedtunnels.integer.fluid.rate.name=Fluid Transfer Rate
 aspect.aspecttypes.integratedtunnels.boolean.fluid.checkamount.name=Check Fluid Amount
 aspect.aspecttypes.integratedtunnels.boolean.fluid.checknbt.name=Check NBT
+aspect.aspecttypes.integratedtunnels.boolean.world.blockupdate.name=Cause Block Update
 
 # Aspects
 
@@ -108,6 +114,24 @@ aspect.aspects.integratedtunnels.write.list.fluid.import.name=Import Fluids
 aspect.aspects.integratedtunnels.write.list.fluid.import.info=Import the given fluids.
 aspect.aspects.integratedtunnels.write.operator.fluid.import.name=Import Fluids Predicate
 aspect.aspects.integratedtunnels.write.operator.fluid.import.info=Import all fluids that match the given predicate.
+
+## World
+aspect.aspects.integratedtunnels.write.boolean.world.fluid.export.name=Place All Fluids
+aspect.aspects.integratedtunnels.write.boolean.world.fluid.export.info=Place all fluids in the world.
+aspect.aspects.integratedtunnels.write.fluidstack.world.fluid.export.name=Place Fluid
+aspect.aspects.integratedtunnels.write.fluidstack.world.fluid.export.info=Place the given fluid in the world.
+aspect.aspects.integratedtunnels.write.list.world.fluid.export.name=Place Fluids
+aspect.aspects.integratedtunnels.write.list.world.fluid.export.info=Place the given fluids in the world.
+aspect.aspects.integratedtunnels.write.operator.world.fluid.export.name=Place Fluids Predicate
+aspect.aspects.integratedtunnels.write.operator.world.fluid.export.info=Place the given fluids in the world that match the given predicate.
+aspect.aspects.integratedtunnels.write.boolean.world.fluid.import.name=Pick Up All Fluids
+aspect.aspects.integratedtunnels.write.boolean.world.fluid.import.info=Pick up all fluids in the world.
+aspect.aspects.integratedtunnels.write.fluidstack.world.fluid.import.name=Pick Up Fluid
+aspect.aspects.integratedtunnels.write.fluidstack.world.fluid.import.info=Pick up the given fluid in the world.
+aspect.aspects.integratedtunnels.write.list.world.fluid.import.name=Pick Up Fluids
+aspect.aspects.integratedtunnels.write.list.world.fluid.import.info=Pick up the given fluids in the world.
+aspect.aspects.integratedtunnels.write.operator.world.fluid.import.name=Pick Up Fluids Predicate
+aspect.aspects.integratedtunnels.write.operator.world.fluid.import.info=Pick up the given fluids in the world that match the given predicate.
 
 # Configuration
 config.integratedtunnels=%s configuration

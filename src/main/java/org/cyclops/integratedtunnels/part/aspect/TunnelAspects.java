@@ -177,6 +177,60 @@ public class TunnelAspects {
 
         }
 
+        public static final class World {
+
+            public static final IAspectWrite<ValueTypeBoolean.ValueBoolean, ValueTypeBoolean> FLUID_BOOLEAN_EXPORT =
+                    TunnelAspectWriteBuilders.World.BUILDER_BOOLEAN
+                            .withProperties(TunnelAspectWriteBuilders.World.PROPERTIES_FLUID_UPDATE)
+                            .handle(TunnelAspectWriteBuilders.World.PROP_BOOLEAN_FLUIDTARGET)
+                            .handle(TunnelAspectWriteBuilders.World.PROP_FLUIDSTACK_EXPORT)
+                            .appendKind("fluid").appendKind("export").buildWrite();
+            public static final IAspectWrite<ValueObjectTypeFluidStack.ValueFluidStack, ValueObjectTypeFluidStack> FLUID_FLUIDSTACK_EXPORT =
+                    TunnelAspectWriteBuilders.World.BUILDER_FLUIDSTACK
+                            .withProperties(TunnelAspectWriteBuilders.World.PROPERTIES_FLUID_UPDATE)
+                            .handle(TunnelAspectWriteBuilders.World.PROP_FLUIDSTACK_FLUIDTARGET)
+                            .handle(TunnelAspectWriteBuilders.World.PROP_FLUIDSTACK_EXPORT)
+                            .appendKind("fluid").appendKind("export").buildWrite();
+            public static final IAspectWrite<ValueTypeList.ValueList, ValueTypeList> FLUID_LIST_EXPORT =
+                    TunnelAspectWriteBuilders.World.BUILDER_LIST
+                            .withProperties(TunnelAspectWriteBuilders.World.PROPERTIES_FLUID_UPDATE)
+                            .handle(TunnelAspectWriteBuilders.World.PROP_FLUIDSTACKLIST_FLUIDTARGET)
+                            .handle(TunnelAspectWriteBuilders.World.PROP_FLUIDSTACK_EXPORT)
+                            .appendKind("fluid").appendKind("export").buildWrite();
+            public static final IAspectWrite<ValueTypeOperator.ValueOperator, ValueTypeOperator> FLUID_PREDICATE_EXPORT =
+                    TunnelAspectWriteBuilders.World.BUILDER_OPERATOR
+                            .withProperties(TunnelAspectWriteBuilders.World.PROPERTIES_FLUID_UPDATE)
+                            .handle(TunnelAspectWriteBuilders.World.PROP_FLUIDSTACKPREDICATE_FLUIDTARGET)
+                            .handle(TunnelAspectWriteBuilders.World.PROP_FLUIDSTACK_EXPORT)
+                            .appendKind("fluid").appendKind("export").buildWrite();
+
+            public static final IAspectWrite<ValueTypeBoolean.ValueBoolean, ValueTypeBoolean> FLUID_BOOLEAN_IMPORT =
+                    TunnelAspectWriteBuilders.World.BUILDER_BOOLEAN
+                            .withProperties(TunnelAspectWriteBuilders.World.PROPERTIES_FLUID)
+                            .handle(TunnelAspectWriteBuilders.World.PROP_BOOLEAN_FLUIDTARGET)
+                            .handle(TunnelAspectWriteBuilders.World.PROP_FLUIDSTACK_IMPORT)
+                            .appendKind("fluid").appendKind("import").buildWrite();
+            public static final IAspectWrite<ValueObjectTypeFluidStack.ValueFluidStack, ValueObjectTypeFluidStack> FLUID_FLUIDSTACK_IMPORT =
+                    TunnelAspectWriteBuilders.World.BUILDER_FLUIDSTACK
+                            .withProperties(TunnelAspectWriteBuilders.World.PROPERTIES_FLUID)
+                            .handle(TunnelAspectWriteBuilders.World.PROP_FLUIDSTACK_FLUIDTARGET)
+                            .handle(TunnelAspectWriteBuilders.World.PROP_FLUIDSTACK_IMPORT)
+                            .appendKind("fluid").appendKind("import").buildWrite();
+            public static final IAspectWrite<ValueTypeList.ValueList, ValueTypeList> FLUID_LIST_IMPORT =
+                    TunnelAspectWriteBuilders.World.BUILDER_LIST
+                            .withProperties(TunnelAspectWriteBuilders.World.PROPERTIES_FLUID)
+                            .handle(TunnelAspectWriteBuilders.World.PROP_FLUIDSTACKLIST_FLUIDTARGET)
+                            .handle(TunnelAspectWriteBuilders.World.PROP_FLUIDSTACK_IMPORT)
+                            .appendKind("fluid").appendKind("import").buildWrite();
+            public static final IAspectWrite<ValueTypeOperator.ValueOperator, ValueTypeOperator> FLUID_PREDICATE_IMPORT =
+                    TunnelAspectWriteBuilders.World.BUILDER_OPERATOR
+                            .withProperties(TunnelAspectWriteBuilders.World.PROPERTIES_FLUID)
+                            .handle(TunnelAspectWriteBuilders.World.PROP_FLUIDSTACKPREDICATE_FLUIDTARGET)
+                            .handle(TunnelAspectWriteBuilders.World.PROP_FLUIDSTACK_IMPORT)
+                            .appendKind("fluid").appendKind("import").buildWrite();
+
+        }
+
     }
 
 }

@@ -4,13 +4,23 @@ import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.collect.ImmutableList;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockLiquid;
+import net.minecraft.block.material.Material;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.FluidUtil;
+import net.minecraftforge.fluids.IFluidBlock;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
+import net.minecraftforge.fluids.capability.wrappers.BlockLiquidWrapper;
+import net.minecraftforge.fluids.capability.wrappers.BlockWrapper;
+import net.minecraftforge.fluids.capability.wrappers.FluidBlockWrapper;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import org.apache.commons.lang3.tuple.Triple;
@@ -585,27 +595,35 @@ public class TunnelAspectWriteBuilders {
 
         public static class FluidTarget {
 
+            private final PartTarget partTarget;
             private final IFluidNetwork fluidNetwork;
             private final IFluidHandler fluidHandler;
             private final int amount;
             private final Predicate<FluidStack> fluidStackMatcher;
+            private final IAspectProperties properties;
 
             public static FluidTarget of(PartTarget partTarget, IAspectProperties properties, int amount,
                                          Predicate<FluidStack> fluidStackMatcher) {
                 PartPos center = partTarget.getCenter();
                 PartPos target = partTarget.getTarget();
                 INetwork network = NetworkHelpers.getNetwork(center.getPos().getWorld(), center.getPos().getBlockPos());
-                IFluidHandler fluidHandler = TileHelpers.getCapability(target.getPos(), target.getSide(), CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY);
-                return new FluidTarget(network.getCapability(FluidNetworkConfig.CAPABILITY), fluidHandler,
-                        amount, fluidStackMatcher);
+                IFluidHandler fluidHandler = FluidUtil.getFluidHandler(target.getPos().getWorld(), target.getPos().getBlockPos(), target.getSide());
+                return new FluidTarget(partTarget, network.getCapability(FluidNetworkConfig.CAPABILITY), fluidHandler,
+                        amount, fluidStackMatcher, properties);
             }
 
-            public FluidTarget(IFluidNetwork fluidNetwork, IFluidHandler fluidHandler,
-                               int amount, Predicate<FluidStack> fluidStackMatcher) {
+            public FluidTarget(PartTarget partTarget, IFluidNetwork fluidNetwork, IFluidHandler fluidHandler,
+                               int amount, Predicate<FluidStack> fluidStackMatcher, IAspectProperties properties) {
+                this.partTarget = partTarget;
                 this.fluidNetwork = fluidNetwork;
                 this.fluidHandler = fluidHandler;
                 this.amount = amount;
                 this.fluidStackMatcher = fluidStackMatcher;
+                this.properties = properties;
+            }
+
+            public PartTarget getPartTarget() {
+                return partTarget;
             }
 
             public IFluidNetwork getFluidNetwork() {
@@ -623,7 +641,182 @@ public class TunnelAspectWriteBuilders {
             public Predicate<FluidStack> getFluidStackMatcher() {
                 return fluidStackMatcher;
             }
+
+            public IAspectProperties getProperties() {
+                return properties;
+            }
         }
+
+    }
+
+    public static final class World {
+
+        public static final AspectBuilder<ValueTypeBoolean.ValueBoolean, ValueTypeBoolean, Triple<PartTarget, IAspectProperties, Boolean>>
+                BUILDER_BOOLEAN = AspectWriteBuilders.BUILDER_BOOLEAN.byMod(IntegratedTunnels._instance)
+                .appendKind("world").handle(AspectWriteBuilders.PROP_GET_BOOLEAN);
+        public static final AspectBuilder<ValueTypeInteger.ValueInteger, ValueTypeInteger, Triple<PartTarget, IAspectProperties, Integer>>
+                BUILDER_INTEGER = AspectWriteBuilders.BUILDER_INTEGER.byMod(IntegratedTunnels._instance)
+                .appendKind("world").handle(AspectWriteBuilders.PROP_GET_INTEGER);
+        public static final AspectBuilder<ValueObjectTypeItemStack.ValueItemStack, ValueObjectTypeItemStack, Triple<PartTarget, IAspectProperties, ItemStack>>
+                BUILDER_ITEMSTACK = AspectWriteBuilders.BUILDER_ITEMSTACK.byMod(IntegratedTunnels._instance)
+                .appendKind("world").handle(AspectWriteBuilders.PROP_GET_ITEMSTACK);
+        public static final AspectBuilder<ValueObjectTypeFluidStack.ValueFluidStack, ValueObjectTypeFluidStack, Triple<PartTarget, IAspectProperties, FluidStack>>
+                BUILDER_FLUIDSTACK = AspectWriteBuilders.BUILDER_FLUIDSTACK.byMod(IntegratedTunnels._instance)
+                .appendKind("world").handle(AspectWriteBuilders.PROP_GET_FLUIDSTACK);
+        public static final AspectBuilder<ValueTypeList.ValueList, ValueTypeList, Triple<PartTarget, IAspectProperties, ValueTypeList.ValueList>>
+                BUILDER_LIST = AspectWriteBuilders.BUILDER_LIST.byMod(IntegratedTunnels._instance)
+                .appendKind("world");
+        public static final AspectBuilder<ValueTypeOperator.ValueOperator, ValueTypeOperator, Triple<PartTarget, IAspectProperties, ValueTypeOperator.ValueOperator>>
+                BUILDER_OPERATOR = AspectWriteBuilders.BUILDER_OPERATOR.byMod(IntegratedTunnels._instance)
+                .appendKind("world");
+
+        public static final IAspectPropertyTypeInstance<ValueTypeBoolean, ValueTypeBoolean.ValueBoolean> PROP_BLOCK_UPDATE =
+                new AspectPropertyTypeInstance<ValueTypeBoolean, ValueTypeBoolean.ValueBoolean>(ValueTypes.BOOLEAN, "aspect.aspecttypes.integratedtunnels.boolean.world.blockupdate.name");
+
+        public static final IAspectProperties PROPERTIES_FLUID_UPDATE = new AspectProperties(ImmutableList.<IAspectPropertyTypeInstance>of(
+                Fluid.PROP_CHECK_NBT,
+                PROP_BLOCK_UPDATE
+        ));
+        public static final IAspectProperties PROPERTIES_FLUID = new AspectProperties(ImmutableList.<IAspectPropertyTypeInstance>of(
+                Fluid.PROP_CHECK_NBT
+        ));
+        static {
+            PROPERTIES_FLUID_UPDATE.setValue(Fluid.PROP_CHECK_NBT, ValueTypeBoolean.ValueBoolean.of(true));
+            PROPERTIES_FLUID_UPDATE.setValue(PROP_BLOCK_UPDATE, ValueTypeBoolean.ValueBoolean.of(false));
+
+            PROPERTIES_FLUID.setValue(Fluid.PROP_CHECK_NBT, ValueTypeBoolean.ValueBoolean.of(true));
+        }
+
+        public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, Boolean>, Fluid.FluidTarget>
+                PROP_BOOLEAN_FLUIDTARGET = new IAspectValuePropagator<Triple<PartTarget, IAspectProperties, Boolean>, Fluid.FluidTarget>() {
+            @Override
+            public Fluid.FluidTarget getOutput(Triple<PartTarget, IAspectProperties, Boolean> input) {
+                return Fluid.FluidTarget.of(input.getLeft(), input.getMiddle(), net.minecraftforge.fluids.Fluid.BUCKET_VOLUME,
+                        TunnelFluidHelpers.MATCH_ALL);
+            }
+        };
+        public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, FluidStack>, Fluid.FluidTarget>
+                PROP_FLUIDSTACK_FLUIDTARGET = new IAspectValuePropagator<Triple<PartTarget, IAspectProperties, FluidStack>, Fluid.FluidTarget>() {
+            @Override
+            public Fluid.FluidTarget getOutput(Triple<PartTarget, IAspectProperties, FluidStack> input) {
+                IAspectProperties properties = input.getMiddle();
+                boolean checkNbt = properties.getValue(Fluid.PROP_CHECK_NBT).getRawValue();
+                return Fluid.FluidTarget.of(input.getLeft(), input.getMiddle(), net.minecraftforge.fluids.Fluid.BUCKET_VOLUME,
+                        TunnelFluidHelpers.matchFluidStack(input.getRight(), false, checkNbt));
+            }
+        };
+        public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, ValueTypeList.ValueList>, Fluid.FluidTarget>
+                PROP_FLUIDSTACKLIST_FLUIDTARGET = new IAspectValuePropagator<Triple<PartTarget, IAspectProperties, ValueTypeList.ValueList>, Fluid.FluidTarget>() {
+            @Override
+            public Fluid.FluidTarget getOutput(Triple<PartTarget, IAspectProperties, ValueTypeList.ValueList> input) throws EvaluationException {
+                ValueTypeList.ValueList list = input.getRight();
+                if (list.getRawValue().getValueType() != ValueTypes.OBJECT_FLUIDSTACK) {
+                    throw new EvaluationException(new L10NHelpers.UnlocalizedString(L10NValues.VALUETYPE_ERROR_INVALIDLISTVALUETYPE,
+                            ValueTypes.OBJECT_FLUIDSTACK, list.getRawValue().getValueType()).localize());
+                }
+                IAspectProperties properties = input.getMiddle();
+                boolean checkNbt = properties.getValue(Fluid.PROP_CHECK_NBT).getRawValue();
+                return Fluid.FluidTarget.of(input.getLeft(), input.getMiddle(), net.minecraftforge.fluids.Fluid.BUCKET_VOLUME,
+                        TunnelFluidHelpers.matchFluidStacks(list.getRawValue(), false, checkNbt));
+            }
+        };
+        public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, ValueTypeOperator.ValueOperator>, Fluid.FluidTarget>
+                PROP_FLUIDSTACKPREDICATE_FLUIDTARGET = new IAspectValuePropagator<Triple<PartTarget, IAspectProperties, ValueTypeOperator.ValueOperator>, Fluid.FluidTarget>() {
+            @Override
+            public Fluid.FluidTarget getOutput(Triple<PartTarget, IAspectProperties, ValueTypeOperator.ValueOperator> input) throws EvaluationException {
+                IOperator predicate = input.getRight().getRawValue();
+                if (predicate.getInputTypes().length == 1 && ValueHelpers.correspondsTo(predicate.getInputTypes()[0], ValueTypes.OBJECT_FLUIDSTACK)) {
+                    return Fluid.FluidTarget.of(input.getLeft(), input.getMiddle(), net.minecraftforge.fluids.Fluid.BUCKET_VOLUME,
+                            TunnelFluidHelpers.matchPredicate(input.getLeft(), predicate));
+                } else {
+                    String current = ValueTypeOperator.getSignature(predicate);
+                    String expected = ValueTypeOperator.getSignature(new IValueType[]{ValueTypes.OBJECT_FLUIDSTACK}, ValueTypes.BOOLEAN);
+                    throw new EvaluationException(new L10NHelpers.UnlocalizedString(L10NValues.ASPECT_ERROR_INVALIDTYPE,
+                            expected, current).localize());
+                }
+            }
+        };
+
+        public static final IAspectValuePropagator<Fluid.FluidTarget, Void>
+                PROP_FLUIDSTACK_EXPORT = new IAspectValuePropagator<Fluid.FluidTarget, Void>() {
+            @Override
+            public Void getOutput(Fluid.FluidTarget input) {
+                PartPos center = input.getPartTarget().getCenter();
+                PartPos target = input.getPartTarget().getTarget();
+                INetwork network = NetworkHelpers.getNetwork(center.getPos().getWorld(), center.getPos().getBlockPos());
+                IFluidNetwork fluidNetwork = network.getCapability(FluidNetworkConfig.CAPABILITY);
+                final DimPos pos = target.getPos();
+                if (!pos.isLoaded()) {
+                    return null;
+                }
+
+                IBlockState destBlockState = pos.getWorld().getBlockState(pos.getBlockPos());
+                final Material destMaterial = destBlockState.getMaterial();
+                final boolean isDestNonSolid = !destMaterial.isSolid();
+                final boolean isDestReplaceable = destBlockState.getBlock().isReplaceable(pos.getWorld(), pos.getBlockPos());
+                if (!pos.getWorld().isAirBlock(pos.getBlockPos())
+                        && (!isDestNonSolid || !isDestReplaceable || destMaterial.isLiquid())) {
+                    return null;
+                }
+
+                FluidStack moved = TunnelFluidHelpers.moveFluids(fluidNetwork, new Function<FluidStack, IFluidHandler>() {
+                    @Nullable
+                    @Override
+                    public IFluidHandler apply(FluidStack input) {
+                        net.minecraftforge.fluids.Fluid fluid = input.getFluid();
+                        if (pos.getWorld().provider.doesWaterVaporize() && fluid.doesVaporize(input)) {
+                            return null;
+                        }
+
+                        Block block = fluid.getBlock();
+                        IFluidHandler handler;
+                        if (block instanceof IFluidBlock) {
+                            handler = new FluidBlockWrapper((IFluidBlock) block, pos.getWorld(), pos.getBlockPos());
+                        } else if (block instanceof BlockLiquid) {
+                            handler = new BlockLiquidWrapper((BlockLiquid) block, pos.getWorld(), pos.getBlockPos());
+                        } else {
+                            handler = new BlockWrapper(block, pos.getWorld(), pos.getBlockPos());
+                        }
+
+                        return handler;
+                    }
+                }, input.getAmount(), true, input.getFluidStackMatcher());
+
+                if (moved != null && input.getProperties().getValue(PROP_BLOCK_UPDATE).getRawValue()) {
+                    pos.getWorld().neighborChanged(pos.getBlockPos(), Blocks.AIR, pos.getBlockPos());
+                }
+
+                return null;
+            }
+        };
+
+        public static final IAspectValuePropagator<Fluid.FluidTarget, Void>
+                PROP_FLUIDSTACK_IMPORT = new IAspectValuePropagator<Fluid.FluidTarget, Void>() {
+            @Override
+            public Void getOutput(Fluid.FluidTarget input) {
+                PartPos center = input.getPartTarget().getCenter();
+                PartPos target = input.getPartTarget().getTarget();
+                INetwork network = NetworkHelpers.getNetwork(center.getPos().getWorld(), center.getPos().getBlockPos());
+                IFluidNetwork fluidNetwork = network.getCapability(FluidNetworkConfig.CAPABILITY);
+                final DimPos pos = target.getPos();
+                if (!pos.isLoaded()) {
+                    return null;
+                }
+
+                IBlockState state = target.getPos().getWorld().getBlockState(target.getPos().getBlockPos());
+                Block block = state.getBlock();
+                if (block instanceof IFluidBlock || block instanceof BlockLiquid) {
+                    IFluidHandler targetFluidHandler = FluidUtil.getFluidHandler(target.getPos().getWorld(),
+                            target.getPos().getBlockPos(), target.getSide());
+                    if (targetFluidHandler != null) {
+                        TunnelFluidHelpers.moveFluids(targetFluidHandler, fluidNetwork, input.getAmount(), true,
+                                input.getFluidStackMatcher());
+                    }
+                }
+
+                return null;
+            }
+        };
 
     }
 
