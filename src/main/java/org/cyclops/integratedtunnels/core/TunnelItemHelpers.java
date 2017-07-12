@@ -3,9 +3,11 @@ package org.cyclops.integratedtunnels.core;
 import com.google.common.base.Objects;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import com.google.common.collect.Lists;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
@@ -34,6 +36,7 @@ import org.cyclops.integratedtunnels.IntegratedTunnels;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -47,10 +50,16 @@ public class TunnelItemHelpers {
             return true;
         }
     };
-    public static final ItemStackPredicate MATCH_NONE = new ItemStackPredicate(ItemStack.EMPTY, ItemMatch.ANY) {
+    public static final ItemStackPredicate MATCH_NONE = new ItemStackPredicate(ItemStack.EMPTY, ItemMatch.EXACT) {
         @Override
         public boolean apply(@Nullable ItemStack input) {
             return false;
+        }
+    };
+    public static final ItemStackPredicate MATCH_BLOCK = new ItemStackPredicate() {
+        @Override
+        public boolean apply(@Nullable ItemStack input) {
+            return !input.isEmpty();
         }
     };
 
@@ -341,36 +350,82 @@ public class TunnelItemHelpers {
     }
 
     /**
-     * Place items from the given source in the world.
+     * Place item blocks from the given source in the world.
      * @param connectionHash The connection hash.
      * @param sourceHandler The source item handler.
      * @param sourceInvState Optional inventory state of the source.
      * @param sourceSlotless The slotless source item handler.
      * @param world The target world.
      * @param pos The target position.
+     * @param side The target side.
      * @param itemStackMatcher The itemstack match predicate.
      * @param hand The hand to place the block with.
      * @param blockUpdate If a block update should occur after placement.
+     * @param ignoreReplacable If replacable blocks should be overriden when placing blocks.
      * @return The placed item.
      */
     public static ItemStack placeItems(int connectionHash,
                                        IItemHandler sourceHandler, @Nullable IInventoryState sourceInvState,
                                        @Nullable ISlotlessItemHandler sourceSlotless,
                                        World world, BlockPos pos, EnumFacing side,
-                                       ItemStackPredicate itemStackMatcher, EnumHand hand, boolean blockUpdate) {
+                                       ItemStackPredicate itemStackMatcher, EnumHand hand,
+                                       boolean blockUpdate, boolean ignoreReplacable) {
         IBlockState destBlockState = world.getBlockState(pos);
         final Material destMaterial = destBlockState.getMaterial();
         final boolean isDestNonSolid = !destMaterial.isSolid();
         final boolean isDestReplaceable = destBlockState.getBlock().isReplaceable(world, pos);
-        // TODO: add parameter to not replace replacables
         if (!world.isAirBlock(pos)
-                && (!isDestNonSolid || !isDestReplaceable || destMaterial.isLiquid())) {
+                && (!isDestNonSolid || !(ignoreReplacable && isDestReplaceable) || destMaterial.isLiquid())) {
             return null;
         }
 
-        IItemHandler targetBlock = new ItemHandlerBlockWrapper((WorldServer) world, pos, side, hand, blockUpdate);
+        IItemHandler targetBlock = new ItemHandlerBlockWrapper(true, (WorldServer) world, pos, side,
+                hand, blockUpdate, 0, false, ignoreReplacable, true);
         return TunnelItemHelpers.moveItemsStateOptimized(connectionHash, sourceHandler, sourceInvState, -1,
                 sourceSlotless, targetBlock, null, 0, null, 1, itemStackMatcher);
+    }
+
+    /**
+     * Pick up item blocks from the given source in the world.
+     * @param connectionHash The connection hash.
+     * @param world The target world.
+     * @param pos The target position.
+     * @param side The target side.
+     * @param targetHandler The source item handler.
+     * @param targetInvState Optional inventory state of the source.
+     * @param targetSlotless The slotless source item handler.
+     * @param itemStackMatcher The itemstack match predicate.
+     * @param hand The hand to place the block with.
+     * @param blockUpdate If a block update should occur after placement.
+     * @param ignoreReplacable If replacable blocks should be ignored from picking up.
+     * @param fortune The fortune level.
+     * @param silkTouch If the block should be broken with silk touch.
+     * @param breakOnNoDrops If the block should be broken if it produced no drops.
+     * @return The picked-up items.
+     */
+    public static List<ItemStack> pickUpItems(int connectionHash, World world, BlockPos pos, EnumFacing side,
+                                              IItemHandler targetHandler, @Nullable IInventoryState targetInvState,
+                                              @Nullable ISlotlessItemHandler targetSlotless,
+                                              ItemStackPredicate itemStackMatcher, EnumHand hand, boolean blockUpdate,
+                                              boolean ignoreReplacable, int fortune, boolean silkTouch,
+                                              boolean breakOnNoDrops) {
+        IBlockState destBlockState = world.getBlockState(pos);
+        final Material destMaterial = destBlockState.getMaterial();
+        final boolean isDestReplaceable = destBlockState.getBlock().isReplaceable(world, pos);
+        if (world.isAirBlock(pos)
+                || ((ignoreReplacable && isDestReplaceable) || destMaterial.isLiquid())) {
+            return null;
+        }
+
+        IItemHandler sourceBlock = new ItemHandlerBlockWrapper(false, (WorldServer) world, pos, side,
+                hand, blockUpdate, fortune, silkTouch, ignoreReplacable, breakOnNoDrops);
+        List<ItemStack> itemStacks = Lists.newArrayList();
+        ItemStack itemStack;
+        while (!(itemStack = TunnelItemHelpers.moveItemsStateOptimized(connectionHash, sourceBlock, null, -1, null,
+                targetHandler, targetInvState, -1, targetSlotless, Integer.MAX_VALUE, itemStackMatcher)).isEmpty()) {
+            itemStacks.add(itemStack);
+        }
+        return itemStacks;
     }
 
 }

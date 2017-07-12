@@ -59,6 +59,9 @@ aspect.aspecttypes.integratedtunnels.boolean.fluid.checkamount.name=Check Fluid 
 aspect.aspecttypes.integratedtunnels.boolean.fluid.checknbt.name=Check NBT
 aspect.aspecttypes.integratedtunnels.boolean.world.blockupdate.name=Cause Block Update
 aspect.aspecttypes.integratedtunnels.boolean.world.lefthand.name=Left Hand
+aspect.aspecttypes.integratedtunnels.boolean.world.silktouch.name=Silk Touch
+aspect.aspecttypes.integratedtunnels.boolean.world.ignorereplacable.name=Ignore Replacable
+aspect.aspecttypes.integratedtunnels.boolean.world.breaknodrops.name=Break Block When No Drops
 
 # Aspects
 
@@ -141,6 +144,14 @@ aspect.aspects.integratedtunnels.write.list.world.fluid.import.name=Pick Up Flui
 aspect.aspects.integratedtunnels.write.list.world.fluid.import.info=Pick up the given fluids in the world.
 aspect.aspects.integratedtunnels.write.operator.world.fluid.import.name=Pick Up Fluids Predicate
 aspect.aspects.integratedtunnels.write.operator.world.fluid.import.info=Pick up the given fluids in the world that match the given predicate.
+aspect.aspects.integratedtunnels.write.boolean.world.block.import.name=Pick Up All Item Blocks
+aspect.aspects.integratedtunnels.write.boolean.world.block.import.info=Pick up all item blocks in the world.
+aspect.aspects.integratedtunnels.write.itemstack.world.block.import.name=Pick Up Item Block
+aspect.aspects.integratedtunnels.write.itemstack.world.block.import.info=Pick up the item block in the world.
+aspect.aspects.integratedtunnels.write.list.world.block.import.name=Pick Up Item Blocks
+aspect.aspects.integratedtunnels.write.list.world.block.import.info=Pick ip the given item blocks in the world.
+aspect.aspects.integratedtunnels.write.operator.world.block.import.name=Pick Up Item Blocks Predicate
+aspect.aspects.integratedtunnels.write.operator.world.block.import.info=Pick up the item blocks in the world that match the given predicate.
 
 # Configuration
 config.integratedtunnels=%s configuration

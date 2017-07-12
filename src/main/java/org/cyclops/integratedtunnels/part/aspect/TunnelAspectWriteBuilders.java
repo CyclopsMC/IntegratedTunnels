@@ -683,30 +683,57 @@ public class TunnelAspectWriteBuilders {
                 new AspectPropertyTypeInstance<ValueTypeBoolean, ValueTypeBoolean.ValueBoolean>(ValueTypes.BOOLEAN, "aspect.aspecttypes.integratedtunnels.boolean.world.blockupdate.name");
         public static final IAspectPropertyTypeInstance<ValueTypeBoolean, ValueTypeBoolean.ValueBoolean> PROP_HAND_LEFT =
                 new AspectPropertyTypeInstance<ValueTypeBoolean, ValueTypeBoolean.ValueBoolean>(ValueTypes.BOOLEAN, "aspect.aspecttypes.integratedtunnels.boolean.world.lefthand.name");
+        public static final IAspectPropertyTypeInstance<ValueTypeBoolean, ValueTypeBoolean.ValueBoolean> PROP_SILK_TOUCH =
+                new AspectPropertyTypeInstance<ValueTypeBoolean, ValueTypeBoolean.ValueBoolean>(ValueTypes.BOOLEAN, "aspect.aspecttypes.integratedtunnels.boolean.world.silktouch.name");
+        public static final IAspectPropertyTypeInstance<ValueTypeBoolean, ValueTypeBoolean.ValueBoolean> PROP_IGNORE_REPLACABLE =
+                new AspectPropertyTypeInstance<ValueTypeBoolean, ValueTypeBoolean.ValueBoolean>(ValueTypes.BOOLEAN, "aspect.aspecttypes.integratedtunnels.boolean.world.ignorereplacable.name");
+        public static final IAspectPropertyTypeInstance<ValueTypeBoolean, ValueTypeBoolean.ValueBoolean> PROP_BREAK_ON_NO_DROPS =
+                new AspectPropertyTypeInstance<ValueTypeBoolean, ValueTypeBoolean.ValueBoolean>(ValueTypes.BOOLEAN, "aspect.aspecttypes.integratedtunnels.boolean.world.breaknodrops.name");
 
         public static final IAspectProperties PROPERTIES_FLUID_UPDATE = new AspectProperties(ImmutableList.<IAspectPropertyTypeInstance>of(
                 Fluid.PROP_CHECK_NBT,
-                PROP_BLOCK_UPDATE
+                PROP_BLOCK_UPDATE,
+                PROP_IGNORE_REPLACABLE
         ));
         public static final IAspectProperties PROPERTIES_FLUID = new AspectProperties(ImmutableList.<IAspectPropertyTypeInstance>of(
                 Fluid.PROP_CHECK_NBT
         ));
-        public static final IAspectProperties PROPERTIES_ITEM_UPDATE = new AspectProperties(ImmutableList.<IAspectPropertyTypeInstance>of(
+        public static final IAspectProperties PROPERTIES_BLOCK_PLACE = new AspectProperties(ImmutableList.<IAspectPropertyTypeInstance>of(
                 Item.PROP_CHECK_DAMAGE,
                 Item.PROP_CHECK_NBT,
                 PROP_BLOCK_UPDATE,
-                PROP_HAND_LEFT
+                PROP_HAND_LEFT,
+                PROP_IGNORE_REPLACABLE
+        ));
+        public static final IAspectProperties PROPERTIES_BLOCK_PICK_UP = new AspectProperties(ImmutableList.<IAspectPropertyTypeInstance>of(
+                Item.PROP_CHECK_DAMAGE,
+                Item.PROP_CHECK_NBT,
+                PROP_BLOCK_UPDATE,
+                PROP_HAND_LEFT,
+                PROP_SILK_TOUCH,
+                PROP_IGNORE_REPLACABLE,
+                PROP_BREAK_ON_NO_DROPS
         ));
         static {
             PROPERTIES_FLUID_UPDATE.setValue(Fluid.PROP_CHECK_NBT, ValueTypeBoolean.ValueBoolean.of(true));
             PROPERTIES_FLUID_UPDATE.setValue(PROP_BLOCK_UPDATE, ValueTypeBoolean.ValueBoolean.of(false));
+            PROPERTIES_FLUID_UPDATE.setValue(PROP_IGNORE_REPLACABLE, ValueTypeBoolean.ValueBoolean.of(false));
 
             PROPERTIES_FLUID.setValue(Fluid.PROP_CHECK_NBT, ValueTypeBoolean.ValueBoolean.of(true));
 
-            PROPERTIES_ITEM_UPDATE.setValue(Item.PROP_CHECK_DAMAGE, ValueTypeBoolean.ValueBoolean.of(true));
-            PROPERTIES_ITEM_UPDATE.setValue(Item.PROP_CHECK_NBT, ValueTypeBoolean.ValueBoolean.of(true));
-            PROPERTIES_ITEM_UPDATE.setValue(PROP_BLOCK_UPDATE, ValueTypeBoolean.ValueBoolean.of(false));
-            PROPERTIES_ITEM_UPDATE.setValue(PROP_HAND_LEFT, ValueTypeBoolean.ValueBoolean.of(true));
+            PROPERTIES_BLOCK_PLACE.setValue(Item.PROP_CHECK_DAMAGE, ValueTypeBoolean.ValueBoolean.of(true));
+            PROPERTIES_BLOCK_PLACE.setValue(Item.PROP_CHECK_NBT, ValueTypeBoolean.ValueBoolean.of(true));
+            PROPERTIES_BLOCK_PLACE.setValue(PROP_BLOCK_UPDATE, ValueTypeBoolean.ValueBoolean.of(false));
+            PROPERTIES_BLOCK_PLACE.setValue(PROP_HAND_LEFT, ValueTypeBoolean.ValueBoolean.of(true));
+            PROPERTIES_BLOCK_PLACE.setValue(PROP_IGNORE_REPLACABLE, ValueTypeBoolean.ValueBoolean.of(false));
+
+            PROPERTIES_BLOCK_PICK_UP.setValue(Item.PROP_CHECK_DAMAGE, ValueTypeBoolean.ValueBoolean.of(true));
+            PROPERTIES_BLOCK_PICK_UP.setValue(Item.PROP_CHECK_NBT, ValueTypeBoolean.ValueBoolean.of(true));
+            PROPERTIES_BLOCK_PICK_UP.setValue(PROP_BLOCK_UPDATE, ValueTypeBoolean.ValueBoolean.of(false));
+            PROPERTIES_BLOCK_PICK_UP.setValue(PROP_HAND_LEFT, ValueTypeBoolean.ValueBoolean.of(true));
+            PROPERTIES_BLOCK_PICK_UP.setValue(PROP_SILK_TOUCH, ValueTypeBoolean.ValueBoolean.of(false));
+            PROPERTIES_BLOCK_PICK_UP.setValue(PROP_IGNORE_REPLACABLE, ValueTypeBoolean.ValueBoolean.of(false));
+            PROPERTIES_BLOCK_PICK_UP.setValue(PROP_BREAK_ON_NO_DROPS, ValueTypeBoolean.ValueBoolean.of(true));
         }
 
         public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, Boolean>, Fluid.FluidTarget>
@@ -768,7 +795,8 @@ public class TunnelAspectWriteBuilders {
                 final DimPos pos = target.getPos();
                 if (pos.isLoaded() && input.getFluidNetwork() != null) {
                     TunnelFluidHelpers.placeFluids(fluidNetwork, pos.getWorld(), pos.getBlockPos(),
-                            input.getFluidStackMatcher(), input.getProperties().getValue(PROP_BLOCK_UPDATE).getRawValue());
+                            input.getFluidStackMatcher(), input.getProperties().getValue(PROP_BLOCK_UPDATE).getRawValue(),
+                            input.getProperties().getValue(PROP_IGNORE_REPLACABLE).getRawValue());
                 }
                 return null;
 
@@ -806,7 +834,7 @@ public class TunnelAspectWriteBuilders {
             @Override
             public Item.ItemTarget getOutput(Triple<PartTarget, IAspectProperties, Boolean> input) {
                 return Item.ItemTarget.of(input.getLeft(), input.getMiddle(), 1,
-                        input.getRight() ? TunnelItemHelpers.MATCH_ALL : TunnelItemHelpers.MATCH_NONE,
+                        input.getRight() ? TunnelItemHelpers.MATCH_BLOCK : TunnelItemHelpers.MATCH_NONE,
                         input.getRight() ? 1 : 0);
             }
         };
@@ -821,10 +849,36 @@ public class TunnelAspectWriteBuilders {
                     EnumHand hand = input.getProperties().getValue(PROP_HAND_LEFT).getRawValue()
                             ? EnumHand.MAIN_HAND : EnumHand.OFF_HAND;
                     boolean blockUpdate = input.getProperties().getValue(PROP_BLOCK_UPDATE).getRawValue();
+                    boolean ignoreReplacable = input.getProperties().getValue(PROP_IGNORE_REPLACABLE).getRawValue();
                     TunnelItemHelpers.placeItems(input.getConnectionHash(), itemNetwork,
                             input.getInventoryStateNetwork(), input.getItemNetworkSlotless(),
                             target.getPos().getWorld(), target.getPos().getBlockPos(), target.getSide(),
-                            input.getItemStackMatcher(), hand, blockUpdate);
+                            input.getItemStackMatcher(), hand, blockUpdate, ignoreReplacable);
+                }
+                return null;
+
+            }
+        };
+
+        public static final IAspectValuePropagator<Item.ItemTarget, Void>
+                PROP_ITEM_IMPORT = new IAspectValuePropagator<Item.ItemTarget, Void>() {
+            @Override
+            public Void getOutput(Item.ItemTarget input) {
+                PartPos target = input.getPartTarget().getTarget();
+                IItemNetwork itemNetwork = input.getItemNetwork();
+                if (target.getPos().isLoaded() && itemNetwork != null) {
+                    EnumHand hand = input.getProperties().getValue(PROP_HAND_LEFT).getRawValue()
+                            ? EnumHand.MAIN_HAND : EnumHand.OFF_HAND;
+                    boolean blockUpdate = input.getProperties().getValue(PROP_BLOCK_UPDATE).getRawValue();
+                    boolean ignoreReplacable = input.getProperties().getValue(PROP_IGNORE_REPLACABLE).getRawValue();
+                    int fortune = 0;
+                    boolean silkTouch = input.getProperties().getValue(PROP_SILK_TOUCH).getRawValue();
+                    boolean breakOnNoDrops = input.getProperties().getValue(PROP_BREAK_ON_NO_DROPS).getRawValue();
+                    TunnelItemHelpers.pickUpItems(input.getConnectionHash(),
+                            target.getPos().getWorld(), target.getPos().getBlockPos(), target.getSide(),
+                            itemNetwork, input.getInventoryStateNetwork(), input.getItemNetworkSlotless(),
+                            input.getItemStackMatcher(), hand, blockUpdate, ignoreReplacable,
+                            fortune, silkTouch, breakOnNoDrops);
                 }
                 return null;
 

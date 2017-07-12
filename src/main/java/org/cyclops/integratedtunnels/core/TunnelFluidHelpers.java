@@ -180,16 +180,18 @@ public class TunnelFluidHelpers {
      * @param pos The target position.
      * @param fluidStackMatcher The fluidstack match predicate.
      * @param blockUpdate If a block update should occur after placement.
+     * @param ignoreReplacable If replacable blocks should be overriden when placing blocks.
      * @return The placed fluid.
      */
     public static FluidStack placeFluids(IFluidHandler source, final World world, final BlockPos pos,
-                                         Predicate<FluidStack> fluidStackMatcher, boolean blockUpdate) {
+                                         Predicate<FluidStack> fluidStackMatcher, boolean blockUpdate,
+                                         boolean ignoreReplacable) {
         IBlockState destBlockState = world.getBlockState(pos);
         final Material destMaterial = destBlockState.getMaterial();
         final boolean isDestNonSolid = !destMaterial.isSolid();
         final boolean isDestReplaceable = destBlockState.getBlock().isReplaceable(world, pos);
         if (!world.isAirBlock(pos)
-                && (!isDestNonSolid || !isDestReplaceable || destMaterial.isLiquid())) {
+                && (!isDestNonSolid || !(ignoreReplacable && isDestReplaceable) || destMaterial.isLiquid())) {
             return null;
         }
 

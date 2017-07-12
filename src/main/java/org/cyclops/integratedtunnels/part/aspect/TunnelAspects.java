@@ -232,31 +232,59 @@ public class TunnelAspects {
 
             public static final IAspectWrite<ValueTypeBoolean.ValueBoolean, ValueTypeBoolean> BLOCK_BOOLEAN_EXPORT =
                     TunnelAspectWriteBuilders.World.BUILDER_BOOLEAN
-                            .withProperties(TunnelAspectWriteBuilders.World.PROPERTIES_ITEM_UPDATE)
+                            .withProperties(TunnelAspectWriteBuilders.World.PROPERTIES_BLOCK_PLACE)
                             .handle(TunnelAspectWriteBuilders.World.PROP_BOOLEAN_ITEMTARGET)
                             .handle(TunnelAspectWriteBuilders.World.PROP_ITEM_EXPORT)
                             .appendKind("block").appendKind("export").buildWrite();
             public static final IAspectWrite<ValueObjectTypeItemStack.ValueItemStack, ValueObjectTypeItemStack> BLOCK_ITEMSTACK_EXPORT =
                     TunnelAspectWriteBuilders.World.BUILDER_ITEMSTACK
-                            .withProperties(TunnelAspectWriteBuilders.World.PROPERTIES_ITEM_UPDATE)
+                            .withProperties(TunnelAspectWriteBuilders.World.PROPERTIES_BLOCK_PLACE)
                             .handle(TunnelAspectWriteBuilders.World.<ItemStack>ignoreStackSize())
                             .handle(TunnelAspectWriteBuilders.Item.PROP_ITEMSTACK_ITEMTARGET)
                             .handle(TunnelAspectWriteBuilders.World.PROP_ITEM_EXPORT)
                             .appendKind("block").appendKind("export").buildWrite();
             public static final IAspectWrite<ValueTypeList.ValueList, ValueTypeList> BLOCK_LISTITEMSTACK_EXPORT =
                     TunnelAspectWriteBuilders.World.BUILDER_LIST
-                            .withProperties(TunnelAspectWriteBuilders.World.PROPERTIES_ITEM_UPDATE)
+                            .withProperties(TunnelAspectWriteBuilders.World.PROPERTIES_BLOCK_PLACE)
                             .handle(TunnelAspectWriteBuilders.World.<ValueTypeList.ValueList>ignoreStackSize())
                             .handle(TunnelAspectWriteBuilders.Item.PROP_ITEMSTACKLIST_ITEMTARGET)
                             .handle(TunnelAspectWriteBuilders.World.PROP_ITEM_EXPORT)
                             .appendKind("block").appendKind("export").buildWrite();
             public static final IAspectWrite<ValueTypeOperator.ValueOperator, ValueTypeOperator> BLOCK_PREDICATEITEMSTACK_EXPORT =
                     TunnelAspectWriteBuilders.World.BUILDER_OPERATOR
-                            .withProperties(TunnelAspectWriteBuilders.World.PROPERTIES_ITEM_UPDATE)
+                            .withProperties(TunnelAspectWriteBuilders.World.PROPERTIES_BLOCK_PLACE)
                             .handle(TunnelAspectWriteBuilders.World.<ValueTypeOperator.ValueOperator>ignoreStackSize())
                             .handle(TunnelAspectWriteBuilders.Item.PROP_ITEMSTACKPREDICATE_ITEMTARGET)
                             .handle(TunnelAspectWriteBuilders.World.PROP_ITEM_EXPORT)
                             .appendKind("block").appendKind("export").buildWrite();
+
+            public static final IAspectWrite<ValueTypeBoolean.ValueBoolean, ValueTypeBoolean> BLOCK_BOOLEAN_IMPORT =
+                    TunnelAspectWriteBuilders.World.BUILDER_BOOLEAN
+                            .withProperties(TunnelAspectWriteBuilders.World.PROPERTIES_BLOCK_PICK_UP)
+                            .handle(TunnelAspectWriteBuilders.World.PROP_BOOLEAN_ITEMTARGET)
+                            .handle(TunnelAspectWriteBuilders.World.PROP_ITEM_IMPORT)
+                            .appendKind("block").appendKind("import").buildWrite();
+            public static final IAspectWrite<ValueObjectTypeItemStack.ValueItemStack, ValueObjectTypeItemStack> BLOCK_ITEMSTACK_IMPORT =
+                    TunnelAspectWriteBuilders.World.BUILDER_ITEMSTACK
+                            .withProperties(TunnelAspectWriteBuilders.World.PROPERTIES_BLOCK_PICK_UP)
+                            .handle(TunnelAspectWriteBuilders.World.<ItemStack>ignoreStackSize())
+                            .handle(TunnelAspectWriteBuilders.Item.PROP_ITEMSTACK_ITEMTARGET)
+                            .handle(TunnelAspectWriteBuilders.World.PROP_ITEM_IMPORT)
+                            .appendKind("block").appendKind("import").buildWrite();
+            public static final IAspectWrite<ValueTypeList.ValueList, ValueTypeList> BLOCK_LISTITEMSTACK_IMPORT =
+                    TunnelAspectWriteBuilders.World.BUILDER_LIST
+                            .withProperties(TunnelAspectWriteBuilders.World.PROPERTIES_BLOCK_PICK_UP)
+                            .handle(TunnelAspectWriteBuilders.World.<ValueTypeList.ValueList>ignoreStackSize())
+                            .handle(TunnelAspectWriteBuilders.Item.PROP_ITEMSTACKLIST_ITEMTARGET)
+                            .handle(TunnelAspectWriteBuilders.World.PROP_ITEM_IMPORT)
+                            .appendKind("block").appendKind("import").buildWrite();
+            public static final IAspectWrite<ValueTypeOperator.ValueOperator, ValueTypeOperator> BLOCK_PREDICATEITEMSTACK_IMPORT =
+                    TunnelAspectWriteBuilders.World.BUILDER_OPERATOR
+                            .withProperties(TunnelAspectWriteBuilders.World.PROPERTIES_BLOCK_PICK_UP)
+                            .handle(TunnelAspectWriteBuilders.World.<ValueTypeOperator.ValueOperator>ignoreStackSize())
+                            .handle(TunnelAspectWriteBuilders.Item.PROP_ITEMSTACKPREDICATE_ITEMTARGET)
+                            .handle(TunnelAspectWriteBuilders.World.PROP_ITEM_IMPORT)
+                            .appendKind("block").appendKind("import").buildWrite();
 
         }
 

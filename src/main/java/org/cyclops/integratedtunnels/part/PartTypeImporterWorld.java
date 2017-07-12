@@ -19,7 +19,12 @@ public class PartTypeImporterWorld extends PartTypeTunnelAspects<PartTypeImporte
                 TunnelAspects.Write.World.FLUID_BOOLEAN_IMPORT,
                 TunnelAspects.Write.World.FLUID_FLUIDSTACK_IMPORT,
                 TunnelAspects.Write.World.FLUID_LIST_IMPORT,
-                TunnelAspects.Write.World.FLUID_PREDICATE_IMPORT
+                TunnelAspects.Write.World.FLUID_PREDICATE_IMPORT,
+
+                TunnelAspects.Write.World.BLOCK_BOOLEAN_IMPORT,
+                TunnelAspects.Write.World.BLOCK_ITEMSTACK_IMPORT,
+                TunnelAspects.Write.World.BLOCK_LISTITEMSTACK_IMPORT,
+                TunnelAspects.Write.World.BLOCK_PREDICATEITEMSTACK_IMPORT
         ));
     }
 
