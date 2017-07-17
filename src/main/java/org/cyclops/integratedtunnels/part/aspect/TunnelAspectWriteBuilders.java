@@ -1,5 +1,6 @@
 package org.cyclops.integratedtunnels.part.aspect;
 
+import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.collect.ImmutableList;
@@ -55,6 +56,8 @@ import org.cyclops.integratedtunnels.core.TunnelFluidHelpers;
 import org.cyclops.integratedtunnels.core.TunnelItemHelpers;
 import org.cyclops.integratedtunnels.core.part.PartStatePositionedAddon;
 
+import javax.annotation.Nullable;
+
 /**
  * Collection of tunnel aspect write builders and value propagators.
  * @author rubensworks
@@ -63,8 +66,20 @@ public class TunnelAspectWriteBuilders {
 
     public static final class Energy {
 
-        public static final IAspectWriteActivator ACTIVATOR = createPositionedNetworkAddonActivator(Capabilities.NETWORK_ENERGY, CapabilityEnergy.ENERGY);
-        public static final IAspectWriteDeactivator DEACTIVATOR = createPositionedNetworkAddonDeactivator(Capabilities.NETWORK_ENERGY, CapabilityEnergy.ENERGY);
+        public static final IAspectWriteActivator ACTIVATOR = createPositionedNetworkAddonActivator(new Function<Void, Capability<IEnergyNetwork>>() {
+            @Nullable
+            @Override
+            public Capability<IEnergyNetwork> apply(Void input) {
+                return Capabilities.NETWORK_ENERGY;
+            }
+        }, CapabilityEnergy.ENERGY);
+        public static final IAspectWriteDeactivator DEACTIVATOR = createPositionedNetworkAddonDeactivator(new Function<Void, Capability<IEnergyNetwork>>() {
+            @Nullable
+            @Override
+            public Capability<IEnergyNetwork> apply(Void input) {
+                return Capabilities.NETWORK_ENERGY;
+            }
+        }, CapabilityEnergy.ENERGY);
 
         public static final AspectBuilder<ValueTypeBoolean.ValueBoolean, ValueTypeBoolean, Triple<PartTarget, IAspectProperties, Boolean>>
                 BUILDER_BOOLEAN = AspectWriteBuilders.BUILDER_BOOLEAN.byMod(IntegratedTunnels._instance)
@@ -160,8 +175,20 @@ public class TunnelAspectWriteBuilders {
 
     public static final class Item {
 
-        public static final IAspectWriteActivator ACTIVATOR = createPositionedNetworkAddonActivator(ItemNetworkConfig.CAPABILITY, CapabilityItemHandler.ITEM_HANDLER_CAPABILITY);
-        public static final IAspectWriteDeactivator DEACTIVATOR = createPositionedNetworkAddonDeactivator(ItemNetworkConfig.CAPABILITY, CapabilityItemHandler.ITEM_HANDLER_CAPABILITY);
+        public static final IAspectWriteActivator ACTIVATOR = createPositionedNetworkAddonActivator(new Function<Void, Capability<IItemNetwork>>() {
+            @Nullable
+            @Override
+            public Capability<IItemNetwork> apply(Void input) {
+                return ItemNetworkConfig.CAPABILITY;
+            }
+        }, CapabilityItemHandler.ITEM_HANDLER_CAPABILITY);
+        public static final IAspectWriteDeactivator DEACTIVATOR = createPositionedNetworkAddonDeactivator(new Function<Void, Capability<IItemNetwork>>() {
+            @Nullable
+            @Override
+            public Capability<IItemNetwork> apply(Void input) {
+                return ItemNetworkConfig.CAPABILITY;
+            }
+        }, CapabilityItemHandler.ITEM_HANDLER_CAPABILITY);
 
         public static final AspectBuilder<ValueTypeBoolean.ValueBoolean, ValueTypeBoolean, Triple<PartTarget, IAspectProperties, Boolean>>
                 BUILDER_BOOLEAN = AspectWriteBuilders.BUILDER_BOOLEAN.byMod(IntegratedTunnels._instance)
@@ -406,8 +433,20 @@ public class TunnelAspectWriteBuilders {
 
     public static final class Fluid {
 
-        public static final IAspectWriteActivator ACTIVATOR = createPositionedNetworkAddonActivator(FluidNetworkConfig.CAPABILITY, CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY);
-        public static final IAspectWriteDeactivator DEACTIVATOR = createPositionedNetworkAddonDeactivator(FluidNetworkConfig.CAPABILITY, CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY);
+        public static final IAspectWriteActivator ACTIVATOR = createPositionedNetworkAddonActivator(new Function<Void, Capability<IFluidNetwork>>() {
+            @Nullable
+            @Override
+            public Capability<IFluidNetwork> apply(Void input) {
+                return FluidNetworkConfig.CAPABILITY;
+            }
+        }, CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY);
+        public static final IAspectWriteDeactivator DEACTIVATOR = createPositionedNetworkAddonDeactivator(new Function<Void, Capability<IFluidNetwork>>() {
+            @Nullable
+            @Override
+            public Capability<IFluidNetwork> apply(Void input) {
+                return FluidNetworkConfig.CAPABILITY;
+            }
+        }, CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY);
 
         public static final AspectBuilder<ValueTypeBoolean.ValueBoolean, ValueTypeBoolean, Triple<PartTarget, IAspectProperties, Boolean>>
                 BUILDER_BOOLEAN = AspectWriteBuilders.BUILDER_BOOLEAN.byMod(IntegratedTunnels._instance)
@@ -589,30 +628,30 @@ public class TunnelAspectWriteBuilders {
     }
 
     public static <N extends IPositionedAddonsNetwork, T> IAspectWriteActivator
-    createPositionedNetworkAddonActivator(final Capability<N> networkCapability, final Capability<T> targetCapability) {
+    createPositionedNetworkAddonActivator(final Function<Void, Capability<N>> networkCapability, final Capability<T> targetCapability) {
         return new IAspectWriteActivator() {
             @Override
             public <P extends IPartTypeWriter<P, S>, S extends IPartStateWriter<P>> void onActivate(P partType, PartTarget target, S state) {
                 state.addVolatileCapability(targetCapability, (T) state);
                 DimPos pos = target.getCenter().getPos();
                 INetwork network = NetworkHelpers.getNetwork(pos.getWorld(), pos.getBlockPos());
-                if (network != null && network.hasCapability(networkCapability)) {
-                    ((PartStatePositionedAddon<?, N>) state).setPositionedAddonsNetwork(network.getCapability(networkCapability));
+                if (network != null && network.hasCapability(networkCapability.apply(null))) {
+                    ((PartStatePositionedAddon<?, N>) state).setPositionedAddonsNetwork(network.getCapability(networkCapability.apply(null)));
                 }
             }
         };
     }
 
     public static <N extends IPositionedAddonsNetwork, T> IAspectWriteDeactivator
-    createPositionedNetworkAddonDeactivator(final Capability<N> networkCapability, final Capability<T> targetCapability) {
+    createPositionedNetworkAddonDeactivator(final Function<Void, Capability<N>> networkCapability, final Capability<T> targetCapability) {
         return new IAspectWriteDeactivator() {
             @Override
             public <P extends IPartTypeWriter<P, S>, S extends IPartStateWriter<P>> void onDeactivate(P partType, PartTarget target, S state) {
                 state.removeVolatileCapability(targetCapability);
                 DimPos pos = target.getCenter().getPos();
                 INetwork network = NetworkHelpers.getNetwork(pos.getWorld(), pos.getBlockPos());
-                if (network != null && network.hasCapability(networkCapability)) {
-                    ((PartStatePositionedAddon<?, N>) state).setPositionedAddonsNetwork(network.getCapability(networkCapability));
+                if (network != null && network.hasCapability(networkCapability.apply(null))) {
+                    ((PartStatePositionedAddon<?, N>) state).setPositionedAddonsNetwork(network.getCapability(networkCapability.apply(null)));
                 }
             }
         };
