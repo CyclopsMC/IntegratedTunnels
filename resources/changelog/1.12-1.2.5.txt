@@ -1,0 +1,10 @@
+As always, don't forget to backup your world before updating!
+Requires CyclopsCore version 0.10.8 or higher.
+
+Changes:
+* Disable config version warning
+
+Fixes:
+* Fix importers/exporters not accepting external interaction, Closes #41
+* Fix version checker URL
+
