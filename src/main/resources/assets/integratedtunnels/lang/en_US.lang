@@ -62,6 +62,15 @@ aspect.aspecttypes.integratedtunnels.boolean.world.lefthand.name=Left Hand
 aspect.aspecttypes.integratedtunnels.boolean.world.silktouch.name=Silk Touch
 aspect.aspecttypes.integratedtunnels.boolean.world.ignorereplacable.name=Ignore Replacable
 aspect.aspecttypes.integratedtunnels.boolean.world.breaknodrops.name=Break Block When No Drops
+aspect.aspecttypes.integratedtunnels.boolean.world.ignorepickupdelay.name=Ignore Pickup Delay
+aspect.aspecttypes.integratedtunnels.double.world.offsetx.name=Offset X
+aspect.aspecttypes.integratedtunnels.double.world.offsety.name=Offset Y
+aspect.aspecttypes.integratedtunnels.double.world.offsetz.name=Offset Z
+aspect.aspecttypes.integratedtunnels.boolean.world.lifespan.name=Lifespan (ticks)
+aspect.aspecttypes.integratedtunnels.boolean.world.delaybeforepickup.name=Pickup Delay (ticks)
+aspect.aspecttypes.integratedtunnels.double.world.velocity.name=Velocity
+aspect.aspecttypes.integratedtunnels.double.world.yaw.name=Yaw
+aspect.aspecttypes.integratedtunnels.double.world.pitch.name=Pitch
 
 # Aspects
 
@@ -136,6 +145,15 @@ aspect.aspects.integratedtunnels.write.list.world.block.export.name=Place Item B
 aspect.aspects.integratedtunnels.write.list.world.block.export.info=Place the given item blocks in the world.
 aspect.aspects.integratedtunnels.write.operator.world.block.export.name=Place Item Blocks Predicate
 aspect.aspects.integratedtunnels.write.operator.world.block.export.info=Place the item blocks in the world that match the given predicate.
+aspect.aspects.integratedtunnels.write.boolean.world.entityitem.export.name=Place All Item Entities
+aspect.aspects.integratedtunnels.write.boolean.world.entityitem.export.info=Place all items into the world.
+aspect.aspects.integratedtunnels.write.itemstack.world.entityitem.export.name=Place Item Entity
+aspect.aspects.integratedtunnels.write.itemstack.world.entityitem.export.info=Place the item into the world.
+aspect.aspects.integratedtunnels.write.list.world.entityitem.export.name=Place Item Entities
+aspect.aspects.integratedtunnels.write.list.world.entityitem.export.info=Place the given items into the world.
+aspect.aspects.integratedtunnels.write.operator.world.entityitem.export.name=Place Item Entities Predicate
+aspect.aspects.integratedtunnels.write.operator.world.entityitem.export.info=Place the item entities into the world that match the given predicate.
+
 aspect.aspects.integratedtunnels.write.boolean.world.fluid.import.name=Pick Up All Fluids
 aspect.aspects.integratedtunnels.write.boolean.world.fluid.import.info=Pick up all fluids in the world.
 aspect.aspects.integratedtunnels.write.fluidstack.world.fluid.import.name=Pick Up Fluid
@@ -149,9 +167,17 @@ aspect.aspects.integratedtunnels.write.boolean.world.block.import.info=Pick up a
 aspect.aspects.integratedtunnels.write.itemstack.world.block.import.name=Pick Up Item Block
 aspect.aspects.integratedtunnels.write.itemstack.world.block.import.info=Pick up the item block in the world.
 aspect.aspects.integratedtunnels.write.list.world.block.import.name=Pick Up Item Blocks
-aspect.aspects.integratedtunnels.write.list.world.block.import.info=Pick ip the given item blocks in the world.
+aspect.aspects.integratedtunnels.write.list.world.block.import.info=Pick up the given item blocks in the world.
 aspect.aspects.integratedtunnels.write.operator.world.block.import.name=Pick Up Item Blocks Predicate
 aspect.aspects.integratedtunnels.write.operator.world.block.import.info=Pick up the item blocks in the world that match the given predicate.
+aspect.aspects.integratedtunnels.write.boolean.world.entityitem.import.name=Pick Up All Item Entities
+aspect.aspects.integratedtunnels.write.boolean.world.entityitem.import.info=Pick up all items from the world.
+aspect.aspects.integratedtunnels.write.itemstack.world.entityitem.import.name=Pick Up Item Entity
+aspect.aspects.integratedtunnels.write.itemstack.world.entityitem.import.info=Pick up the item from the world.
+aspect.aspects.integratedtunnels.write.list.world.entityitem.import.name=Pick Up Item Entities
+aspect.aspects.integratedtunnels.write.list.world.entityitem.import.info=Pick up the given items from the world.
+aspect.aspects.integratedtunnels.write.operator.world.entityitem.import.name=Pick Up Item Entities Predicate
+aspect.aspects.integratedtunnels.write.operator.world.entityitem.import.info=Pick up the item entities from the world that match the given predicate.
 
 # Configuration
 config.integratedtunnels=%s configuration

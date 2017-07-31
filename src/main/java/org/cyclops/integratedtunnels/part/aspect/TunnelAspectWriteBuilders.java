@@ -5,7 +5,9 @@ import com.google.common.base.Predicates;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
+import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
@@ -52,10 +54,7 @@ import org.cyclops.integratedtunnels.api.network.IFluidNetwork;
 import org.cyclops.integratedtunnels.api.network.IItemNetwork;
 import org.cyclops.integratedtunnels.capability.network.FluidNetworkConfig;
 import org.cyclops.integratedtunnels.capability.network.ItemNetworkConfig;
-import org.cyclops.integratedtunnels.core.ItemStackPredicate;
-import org.cyclops.integratedtunnels.core.TunnelEnergyHelpers;
-import org.cyclops.integratedtunnels.core.TunnelFluidHelpers;
-import org.cyclops.integratedtunnels.core.TunnelItemHelpers;
+import org.cyclops.integratedtunnels.core.*;
 import org.cyclops.integratedtunnels.core.part.PartStatePositionedAddon;
 
 /**
@@ -248,70 +247,87 @@ public class TunnelAspectWriteBuilders {
             PROPERTIES_RATESLOTCHECKS.setValue(PROP_CHECK_NBT, ValueTypeBoolean.ValueBoolean.of(true));
         }
 
-        public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, Boolean>, Triple<PartTarget, IAspectProperties, Integer>>
-                PROP_BOOLEAN_GETRATE = new IAspectValuePropagator<Triple<PartTarget, IAspectProperties, Boolean>, Triple<PartTarget, IAspectProperties, Integer>>() {
+        public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, Boolean>, Triple<PartTarget, IAspectProperties, Triple<ItemStackPredicate, Integer, Integer>>>
+                PROP_BOOLEAN_ITEMPREDICATE = new IAspectValuePropagator<Triple<PartTarget, IAspectProperties, Boolean>, Triple<PartTarget, IAspectProperties, Triple<ItemStackPredicate, Integer, Integer>>>() {
             @Override
-            public Triple<PartTarget, IAspectProperties, Integer> getOutput(Triple<PartTarget, IAspectProperties, Boolean> input) {
-                return Triple.of(input.getLeft(), input.getMiddle(), input.getRight() ? input.getMiddle().getValue(PROP_RATE).getRawValue() : 0);
+            public Triple<PartTarget, IAspectProperties, Triple<ItemStackPredicate, Integer, Integer>> getOutput(Triple<PartTarget, IAspectProperties, Boolean> input) throws EvaluationException {
+                ItemStackPredicate itemStackMatcher = input.getRight() ? TunnelItemHelpers.MATCH_BLOCK : TunnelItemHelpers.MATCH_NONE;
+                int amount = input.getRight() ? 1 : 0;
+                int transferHash = input.getRight() ? 1 : 0;
+                return Triple.of(input.getLeft(), input.getMiddle(), Triple.of(itemStackMatcher, amount, transferHash));
             }
         };
-        public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, Integer>, ItemTarget>
-                PROP_INTEGER_ITEMTARGET = new IAspectValuePropagator<Triple<PartTarget, IAspectProperties, Integer>, ItemTarget>() {
+        public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, Integer>, Triple<PartTarget, IAspectProperties, Triple<ItemStackPredicate, Integer, Integer>>>
+                PROP_INTEGER_ITEMPREDICATE = new IAspectValuePropagator<Triple<PartTarget, IAspectProperties, Integer>, Triple<PartTarget, IAspectProperties, Triple<ItemStackPredicate, Integer, Integer>>>() {
             @Override
-            public ItemTarget getOutput(Triple<PartTarget, IAspectProperties, Integer> input) {
-                return ItemTarget.of(input.getLeft(), input.getMiddle(), input.getRight(), TunnelItemHelpers.MATCH_ALL, input.getRight());
+            public Triple<PartTarget, IAspectProperties, Triple<ItemStackPredicate, Integer, Integer>> getOutput(Triple<PartTarget, IAspectProperties, Integer> input) throws EvaluationException {
+                ItemStackPredicate itemStackMatcher = TunnelItemHelpers.MATCH_ALL;
+                int amount = input.getRight();
+                int transferHash = input.getRight();
+                return Triple.of(input.getLeft(), input.getMiddle(), Triple.of(itemStackMatcher, amount, transferHash));
             }
         };
-        public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, ItemStack>, ItemTarget>
-                PROP_ITEMSTACK_ITEMTARGET = new IAspectValuePropagator<Triple<PartTarget, IAspectProperties, ItemStack>, ItemTarget>() {
+        public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, ItemStack>, Triple<PartTarget, IAspectProperties, Triple<ItemStackPredicate, Integer, Integer>>>
+                PROP_ITEMSTACK_ITEMPREDICATE = new IAspectValuePropagator<Triple<PartTarget, IAspectProperties, ItemStack>, Triple<PartTarget, IAspectProperties, Triple<ItemStackPredicate, Integer, Integer>>>() {
             @Override
-            public ItemTarget getOutput(Triple<PartTarget, IAspectProperties, ItemStack> input) {
+            public Triple<PartTarget, IAspectProperties, Triple<ItemStackPredicate, Integer, Integer>> getOutput(Triple<PartTarget, IAspectProperties, ItemStack> input) throws EvaluationException {
                 IAspectProperties properties = input.getMiddle();
-                int rate = properties.getValue(PROP_RATE).getRawValue();
                 boolean checkStackSize = properties.getValue(PROP_CHECK_STACKSIZE).getRawValue();
                 boolean checkDamage = properties.getValue(PROP_CHECK_DAMAGE).getRawValue();
                 boolean checkNbt = properties.getValue(PROP_CHECK_NBT).getRawValue();
-                return ItemTarget.of(input.getLeft(), input.getMiddle(), rate,
-                        TunnelItemHelpers.matchItemStack(input.getRight(), checkStackSize, checkDamage, checkNbt),
-                        TunnelItemHelpers.getItemStackHashCode(input.getRight()));
+
+                ItemStackPredicate itemStackMatcher = TunnelItemHelpers.matchItemStack(input.getRight(), checkStackSize, checkDamage, checkNbt);
+                int amount = properties.getValue(PROP_RATE).getRawValue();
+                int transferHash = TunnelItemHelpers.getItemStackHashCode(input.getRight());
+                return Triple.of(input.getLeft(), input.getMiddle(), Triple.of(itemStackMatcher, amount, transferHash));
             }
         };
-        public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, ValueTypeList.ValueList>, ItemTarget>
-                PROP_ITEMSTACKLIST_ITEMTARGET = new IAspectValuePropagator<Triple<PartTarget, IAspectProperties, ValueTypeList.ValueList>, ItemTarget>() {
+        public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, ValueTypeList.ValueList>, Triple<PartTarget, IAspectProperties, Triple<ItemStackPredicate, Integer, Integer>>>
+                PROP_ITEMSTACKLIST_ITEMPREDICATE = new IAspectValuePropagator<Triple<PartTarget, IAspectProperties, ValueTypeList.ValueList>, Triple<PartTarget, IAspectProperties, Triple<ItemStackPredicate, Integer, Integer>>>() {
             @Override
-            public ItemTarget getOutput(Triple<PartTarget, IAspectProperties, ValueTypeList.ValueList> input) throws EvaluationException {
+            public Triple<PartTarget, IAspectProperties, Triple<ItemStackPredicate, Integer, Integer>> getOutput(Triple<PartTarget, IAspectProperties, ValueTypeList.ValueList> input) throws EvaluationException {
                 ValueTypeList.ValueList list = input.getRight();
                 if (list.getRawValue().getValueType() != ValueTypes.OBJECT_ITEMSTACK) {
                     throw new EvaluationException(new L10NHelpers.UnlocalizedString(L10NValues.VALUETYPE_ERROR_INVALIDLISTVALUETYPE,
                             ValueTypes.OBJECT_ITEMSTACK, list.getRawValue().getValueType()).localize());
                 }
                 IAspectProperties properties = input.getMiddle();
-                int rate = properties.getValue(PROP_RATE).getRawValue();
                 boolean checkStackSize = properties.getValue(PROP_CHECK_STACKSIZE).getRawValue();
                 boolean checkDamage = properties.getValue(PROP_CHECK_DAMAGE).getRawValue();
                 boolean checkNbt = properties.getValue(PROP_CHECK_NBT).getRawValue();
-                return ItemTarget.of(input.getLeft(), input.getMiddle(), rate,
-                        TunnelItemHelpers.matchItemStacks(list.getRawValue(), checkStackSize, checkDamage, checkNbt),
-                        list.getRawValue().hashCode());
+
+                ItemStackPredicate itemStackMatcher = TunnelItemHelpers.matchItemStacks(list.getRawValue(), checkStackSize, checkDamage, checkNbt);
+                int amount = properties.getValue(PROP_RATE).getRawValue();
+                int transferHash = list.getRawValue().hashCode();
+                return Triple.of(input.getLeft(), input.getMiddle(), Triple.of(itemStackMatcher, amount, transferHash));
             }
         };
-        public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, ValueTypeOperator.ValueOperator>, ItemTarget>
-                PROP_ITEMSTACKPREDICATE_ITEMTARGET = new IAspectValuePropagator<Triple<PartTarget, IAspectProperties, ValueTypeOperator.ValueOperator>, ItemTarget>() {
+        public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, ValueTypeOperator.ValueOperator>, Triple<PartTarget, IAspectProperties, Triple<ItemStackPredicate, Integer, Integer>>>
+                PROP_ITEMSTACKPREDICATE_ITEMPREDICATE = new IAspectValuePropagator<Triple<PartTarget, IAspectProperties, ValueTypeOperator.ValueOperator>, Triple<PartTarget, IAspectProperties, Triple<ItemStackPredicate, Integer, Integer>>>() {
             @Override
-            public ItemTarget getOutput(Triple<PartTarget, IAspectProperties, ValueTypeOperator.ValueOperator> input) throws EvaluationException {
+            public Triple<PartTarget, IAspectProperties, Triple<ItemStackPredicate, Integer, Integer>> getOutput(Triple<PartTarget, IAspectProperties, ValueTypeOperator.ValueOperator> input) throws EvaluationException {
                 IOperator predicate = input.getRight().getRawValue();
                 if (predicate.getInputTypes().length == 1 && ValueHelpers.correspondsTo(predicate.getInputTypes()[0], ValueTypes.OBJECT_ITEMSTACK)) {
                     IAspectProperties properties = input.getMiddle();
-                    int rate = properties.getValue(PROP_RATE).getRawValue();
-                    return ItemTarget.of(input.getLeft(), input.getMiddle(), rate,
-                            TunnelItemHelpers.matchPredicate(input.getLeft(), predicate),
-                            predicate.hashCode());
+                    ItemStackPredicate itemStackMatcher = TunnelItemHelpers.matchPredicate(input.getLeft(), predicate);
+                    int amount = properties.getValue(PROP_RATE).getRawValue();
+                    int transferHash = predicate.hashCode();
+                    return Triple.of(input.getLeft(), input.getMiddle(), Triple.of(itemStackMatcher, amount, transferHash));
                 } else {
                     String current = ValueTypeOperator.getSignature(predicate);
                     String expected = ValueTypeOperator.getSignature(new IValueType[]{ValueTypes.OBJECT_ITEMSTACK}, ValueTypes.BOOLEAN);
                     throw new EvaluationException(new L10NHelpers.UnlocalizedString(L10NValues.ASPECT_ERROR_INVALIDTYPE,
                             expected, current).localize());
                 }
+            }
+        };
+
+        public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, Triple<ItemStackPredicate, Integer, Integer>>, ItemTarget>
+                PROP_ITEMTARGET = new IAspectValuePropagator<Triple<PartTarget, IAspectProperties, Triple<ItemStackPredicate, Integer, Integer>>, ItemTarget>() {
+            @Override
+            public ItemTarget getOutput(Triple<PartTarget, IAspectProperties, Triple<ItemStackPredicate, Integer, Integer>> input) throws EvaluationException {
+                return ItemTarget.of(input.getLeft(), input.getMiddle(), input.getRight().getMiddle(),
+                        input.getRight().getLeft(), input.getRight().getRight());
             }
         };
 
@@ -365,25 +381,25 @@ public class TunnelAspectWriteBuilders {
                 IItemHandler itemHandler = TileHelpers.getCapability(target.getPos(), target.getSide(), CapabilityItemHandler.ITEM_HANDLER_CAPABILITY);
                 int slot = properties.getValue(PROP_SLOT).getRawValue();
                 return new ItemTarget(
-                        network.getCapability(ItemNetworkConfig.CAPABILITY), itemHandler,
-                        network.hasCapability(Capabilities.INVENTORY_STATE) ? network.getCapability(Capabilities.INVENTORY_STATE) : null,
+                        network, itemHandler,
                         TileHelpers.getCapability(target.getPos(), target.getSide(), Capabilities.INVENTORY_STATE),
-                        network.hasCapability(Capabilities.SLOTLESS_ITEMHANDLER) ? network.getCapability(Capabilities.SLOTLESS_ITEMHANDLER) : null,
                         TileHelpers.getCapability(target.getPos(), target.getSide(), Capabilities.SLOTLESS_ITEMHANDLER),
                         target.hashCode(), slot, amount, itemStackMatcher, transferHash, partTarget, properties);
             }
 
-            public ItemTarget(IItemNetwork itemNetwork, IItemHandler itemStorage,
-                              IInventoryState inventoryStateNetwork, IInventoryState inventoryStateStorage,
-                              ISlotlessItemHandler itemNetworkSlotless, ISlotlessItemHandler itemStorageSlotless,
+            public ItemTarget(INetwork network, IItemHandler itemStorage,
+                              IInventoryState inventoryStateStorage,
+                              ISlotlessItemHandler itemStorageSlotless,
                               int storagePosHash, int slot,
                               int amount, ItemStackPredicate itemStackMatcher, int transferHash, PartTarget partTarget,
                               IAspectProperties properties) {
-                this.itemNetwork = itemNetwork;
+                this.itemNetwork = network.getCapability(ItemNetworkConfig.CAPABILITY);
                 this.itemStorage = itemStorage;
-                this.inventoryStateNetwork = inventoryStateNetwork;
+                this.inventoryStateNetwork = network.hasCapability(Capabilities.INVENTORY_STATE)
+                        ? network.getCapability(Capabilities.INVENTORY_STATE) : null;
                 this.inventoryStateStorage = inventoryStateStorage;
-                this.itemNetworkSlotless = itemNetworkSlotless;
+                this.itemNetworkSlotless = network.hasCapability(Capabilities.SLOTLESS_ITEMHANDLER)
+                        ? network.getCapability(Capabilities.SLOTLESS_ITEMHANDLER) : null;
                 this.itemStorageSlotless = itemStorageSlotless;
                 this.connectionHash = transferHash << 4 + storagePosHash + itemNetwork.hashCode();
                 this.slot = slot;
@@ -679,6 +695,19 @@ public class TunnelAspectWriteBuilders {
                 BUILDER_OPERATOR = AspectWriteBuilders.BUILDER_OPERATOR.byMod(IntegratedTunnels._instance)
                 .appendKind("world");
 
+        public static final Predicate<ValueTypeDouble.ValueDouble> VALIDATOR_DOUBLE_ANGLE = new Predicate<ValueTypeDouble.ValueDouble>() {
+            @Override
+            public boolean apply(ValueTypeDouble.ValueDouble input) {
+                return input.getRawValue() >= -180D && input.getRawValue() <= 180F;
+            }
+        };
+        public static final Predicate<ValueTypeDouble.ValueDouble> VALIDATOR_DOUBLE_OFFSET = new Predicate<ValueTypeDouble.ValueDouble>() {
+            @Override
+            public boolean apply(ValueTypeDouble.ValueDouble input) {
+                return input.getRawValue() >= 0D && input.getRawValue() <= 1F;
+            }
+        };
+
         public static final IAspectPropertyTypeInstance<ValueTypeBoolean, ValueTypeBoolean.ValueBoolean> PROP_BLOCK_UPDATE =
                 new AspectPropertyTypeInstance<ValueTypeBoolean, ValueTypeBoolean.ValueBoolean>(ValueTypes.BOOLEAN, "aspect.aspecttypes.integratedtunnels.boolean.world.blockupdate.name");
         public static final IAspectPropertyTypeInstance<ValueTypeBoolean, ValueTypeBoolean.ValueBoolean> PROP_HAND_LEFT =
@@ -689,6 +718,29 @@ public class TunnelAspectWriteBuilders {
                 new AspectPropertyTypeInstance<ValueTypeBoolean, ValueTypeBoolean.ValueBoolean>(ValueTypes.BOOLEAN, "aspect.aspecttypes.integratedtunnels.boolean.world.ignorereplacable.name");
         public static final IAspectPropertyTypeInstance<ValueTypeBoolean, ValueTypeBoolean.ValueBoolean> PROP_BREAK_ON_NO_DROPS =
                 new AspectPropertyTypeInstance<ValueTypeBoolean, ValueTypeBoolean.ValueBoolean>(ValueTypes.BOOLEAN, "aspect.aspecttypes.integratedtunnels.boolean.world.breaknodrops.name");
+        public static final IAspectPropertyTypeInstance<ValueTypeBoolean, ValueTypeBoolean.ValueBoolean> PROP_IGNORE_PICK_UP_DELAY =
+                new AspectPropertyTypeInstance<ValueTypeBoolean, ValueTypeBoolean.ValueBoolean>(ValueTypes.BOOLEAN, "aspect.aspecttypes.integratedtunnels.boolean.world.ignorepickupdelay.name");
+        public static final IAspectPropertyTypeInstance<ValueTypeDouble, ValueTypeDouble.ValueDouble> PROP_OFFSET_X =
+                new AspectPropertyTypeInstance<ValueTypeDouble, ValueTypeDouble.ValueDouble>(ValueTypes.DOUBLE, "aspect.aspecttypes.integratedtunnels.double.world.offsetx.name", VALIDATOR_DOUBLE_OFFSET);
+        public static final IAspectPropertyTypeInstance<ValueTypeDouble, ValueTypeDouble.ValueDouble> PROP_OFFSET_Y =
+                new AspectPropertyTypeInstance<ValueTypeDouble, ValueTypeDouble.ValueDouble>(ValueTypes.DOUBLE, "aspect.aspecttypes.integratedtunnels.double.world.offsety.name", VALIDATOR_DOUBLE_OFFSET);
+        public static final IAspectPropertyTypeInstance<ValueTypeDouble, ValueTypeDouble.ValueDouble> PROP_OFFSET_Z =
+                new AspectPropertyTypeInstance<ValueTypeDouble, ValueTypeDouble.ValueDouble>(ValueTypes.DOUBLE, "aspect.aspecttypes.integratedtunnels.double.world.offsetz.name", VALIDATOR_DOUBLE_OFFSET);
+        public static final IAspectPropertyTypeInstance<ValueTypeInteger, ValueTypeInteger.ValueInteger> PROP_LIFESPAN =
+                new AspectPropertyTypeInstance<ValueTypeInteger, ValueTypeInteger.ValueInteger>(ValueTypes.INTEGER, "aspect.aspecttypes.integratedtunnels.boolean.world.lifespan.name", AspectReadBuilders.VALIDATOR_INTEGER_POSITIVE);
+        public static final IAspectPropertyTypeInstance<ValueTypeInteger, ValueTypeInteger.ValueInteger> PROP_DELAY_BEFORE_PICKUP =
+                new AspectPropertyTypeInstance<ValueTypeInteger, ValueTypeInteger.ValueInteger>(ValueTypes.INTEGER, "aspect.aspecttypes.integratedtunnels.boolean.world.delaybeforepickup.name", AspectReadBuilders.VALIDATOR_INTEGER_POSITIVE);
+        public static final IAspectPropertyTypeInstance<ValueTypeDouble, ValueTypeDouble.ValueDouble> PROP_VELOCITY =
+                new AspectPropertyTypeInstance<ValueTypeDouble, ValueTypeDouble.ValueDouble>(ValueTypes.DOUBLE, "aspect.aspecttypes.integratedtunnels.double.world.velocity.name", new Predicate<ValueTypeDouble.ValueDouble>() {
+                    @Override
+                    public boolean apply(ValueTypeDouble.ValueDouble input) {
+                        return input.getRawValue() >= 0 && input.getRawValue() <= 25D;
+                    }
+                });
+        public static final IAspectPropertyTypeInstance<ValueTypeDouble, ValueTypeDouble.ValueDouble> PROP_YAW =
+                new AspectPropertyTypeInstance<ValueTypeDouble, ValueTypeDouble.ValueDouble>(ValueTypes.DOUBLE, "aspect.aspecttypes.integratedtunnels.double.world.yaw.name", VALIDATOR_DOUBLE_ANGLE);
+        public static final IAspectPropertyTypeInstance<ValueTypeDouble, ValueTypeDouble.ValueDouble> PROP_PITCH =
+                new AspectPropertyTypeInstance<ValueTypeDouble, ValueTypeDouble.ValueDouble>(ValueTypes.DOUBLE, "aspect.aspecttypes.integratedtunnels.double.world.pitch.name", VALIDATOR_DOUBLE_ANGLE);
 
         public static final IAspectProperties PROPERTIES_FLUID_UPDATE = new AspectProperties(ImmutableList.<IAspectPropertyTypeInstance>of(
                 Fluid.PROP_CHECK_NBT,
@@ -714,6 +766,23 @@ public class TunnelAspectWriteBuilders {
                 PROP_IGNORE_REPLACABLE,
                 PROP_BREAK_ON_NO_DROPS
         ));
+        public static final IAspectProperties PROPERTIES_ENTITYITEM_PICK_UP = new AspectProperties(ImmutableList.<IAspectPropertyTypeInstance>of(
+                Item.PROP_CHECK_DAMAGE,
+                Item.PROP_CHECK_NBT,
+                PROP_IGNORE_PICK_UP_DELAY
+        ));
+        public static final IAspectProperties PROPERTIES_ENTITYITEM_PLACE = new AspectProperties(ImmutableList.<IAspectPropertyTypeInstance>of(
+                Item.PROP_CHECK_DAMAGE,
+                Item.PROP_CHECK_NBT,
+                PROP_OFFSET_X,
+                PROP_OFFSET_Y,
+                PROP_OFFSET_Z,
+                PROP_LIFESPAN,
+                PROP_DELAY_BEFORE_PICKUP,
+                PROP_VELOCITY,
+                PROP_YAW,
+                PROP_PITCH
+        ));
         static {
             PROPERTIES_FLUID_UPDATE.setValue(Fluid.PROP_CHECK_NBT, ValueTypeBoolean.ValueBoolean.of(true));
             PROPERTIES_FLUID_UPDATE.setValue(PROP_BLOCK_UPDATE, ValueTypeBoolean.ValueBoolean.of(false));
@@ -734,6 +803,21 @@ public class TunnelAspectWriteBuilders {
             PROPERTIES_BLOCK_PICK_UP.setValue(PROP_SILK_TOUCH, ValueTypeBoolean.ValueBoolean.of(false));
             PROPERTIES_BLOCK_PICK_UP.setValue(PROP_IGNORE_REPLACABLE, ValueTypeBoolean.ValueBoolean.of(false));
             PROPERTIES_BLOCK_PICK_UP.setValue(PROP_BREAK_ON_NO_DROPS, ValueTypeBoolean.ValueBoolean.of(true));
+
+            PROPERTIES_ENTITYITEM_PICK_UP.setValue(Item.PROP_CHECK_DAMAGE, ValueTypeBoolean.ValueBoolean.of(true));
+            PROPERTIES_ENTITYITEM_PICK_UP.setValue(Item.PROP_CHECK_NBT, ValueTypeBoolean.ValueBoolean.of(true));
+            PROPERTIES_ENTITYITEM_PICK_UP.setValue(PROP_IGNORE_PICK_UP_DELAY, ValueTypeBoolean.ValueBoolean.of(true));
+
+            PROPERTIES_ENTITYITEM_PLACE.setValue(Item.PROP_CHECK_DAMAGE, ValueTypeBoolean.ValueBoolean.of(true));
+            PROPERTIES_ENTITYITEM_PLACE.setValue(Item.PROP_CHECK_NBT, ValueTypeBoolean.ValueBoolean.of(true));
+            PROPERTIES_ENTITYITEM_PLACE.setValue(PROP_OFFSET_X, ValueTypeDouble.ValueDouble.of(0.5D));
+            PROPERTIES_ENTITYITEM_PLACE.setValue(PROP_OFFSET_Y, ValueTypeDouble.ValueDouble.of(0.5D));
+            PROPERTIES_ENTITYITEM_PLACE.setValue(PROP_OFFSET_Z, ValueTypeDouble.ValueDouble.of(0.5D));
+            PROPERTIES_ENTITYITEM_PLACE.setValue(PROP_LIFESPAN, ValueTypeInteger.ValueInteger.of(6000));
+            PROPERTIES_ENTITYITEM_PLACE.setValue(PROP_DELAY_BEFORE_PICKUP, ValueTypeInteger.ValueInteger.of(10));
+            PROPERTIES_ENTITYITEM_PLACE.setValue(PROP_VELOCITY, ValueTypeDouble.ValueDouble.of(0.1D));
+            PROPERTIES_ENTITYITEM_PLACE.setValue(PROP_YAW, ValueTypeDouble.ValueDouble.of(0D));
+            PROPERTIES_ENTITYITEM_PLACE.setValue(PROP_PITCH, ValueTypeDouble.ValueDouble.of(0D));
         }
 
         public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, Boolean>, Fluid.FluidTarget>
@@ -840,7 +924,7 @@ public class TunnelAspectWriteBuilders {
         };
 
         public static final IAspectValuePropagator<Item.ItemTarget, Void>
-                PROP_ITEM_EXPORT = new IAspectValuePropagator<Item.ItemTarget, Void>() {
+                PROP_ITEMBLOCK_EXPORT = new IAspectValuePropagator<Item.ItemTarget, Void>() {
             @Override
             public Void getOutput(Item.ItemTarget input) {
                 PartPos target = input.getPartTarget().getTarget();
@@ -861,7 +945,7 @@ public class TunnelAspectWriteBuilders {
         };
 
         public static final IAspectValuePropagator<Item.ItemTarget, Void>
-                PROP_ITEM_IMPORT = new IAspectValuePropagator<Item.ItemTarget, Void>() {
+                PROP_ITEMBLOCK_IMPORT = new IAspectValuePropagator<Item.ItemTarget, Void>() {
             @Override
             public Void getOutput(Item.ItemTarget input) {
                 PartPos target = input.getPartTarget().getTarget();
@@ -884,6 +968,54 @@ public class TunnelAspectWriteBuilders {
 
             }
         };
+
+        public static IAspectValuePropagator<Triple<PartTarget, IAspectProperties, Triple<ItemStackPredicate, Integer, Integer>>, Item.ItemTarget>
+        newPropEntityItemItemTarget(final boolean doImport) {
+            return new IAspectValuePropagator<Triple<PartTarget, IAspectProperties, Triple<ItemStackPredicate, Integer, Integer>>, Item.ItemTarget>() {
+                @Override
+                public Item.ItemTarget getOutput(Triple<PartTarget, IAspectProperties, Triple<ItemStackPredicate, Integer, Integer>> input) {
+                    PartTarget partTarget = input.getLeft();
+                    IAspectProperties properties = input.getMiddle();
+                    int amount = input.getRight().getMiddle();
+                    int transferHash = input.getRight().getRight();
+                    ItemStackPredicate itemStackMatcher = input.getRight().getLeft();
+
+                    PartPos center = partTarget.getCenter();
+                    PartPos target = partTarget.getTarget();
+                    INetwork network = NetworkHelpers.getNetwork(center.getPos().getWorld(), center.getPos().getBlockPos());
+                    IItemHandler itemHandler;
+                    if (doImport) {
+                        boolean ignorePickupDelay = properties.getValue(PROP_IGNORE_PICK_UP_DELAY).getRawValue();
+                        itemHandler = new ItemHandlerWorldEntityImportWrapper((WorldServer) target.getPos().getWorld(),
+                                target.getPos().getBlockPos(), ignorePickupDelay
+                        );
+                    } else {
+                        double offsetX = properties.getValue(PROP_OFFSET_X).getRawValue();
+                        double offsetY = properties.getValue(PROP_OFFSET_Y).getRawValue();
+                        double offsetZ = properties.getValue(PROP_OFFSET_Z).getRawValue();
+                        int lifespan = properties.getValue(PROP_LIFESPAN).getRawValue();
+                        int delayBeforePickup = properties.getValue(PROP_DELAY_BEFORE_PICKUP).getRawValue();
+                        EnumFacing facing = center.getSide();
+                        double velocity = properties.getValue(PROP_VELOCITY).getRawValue();
+                        double yaw = properties.getValue(PROP_YAW).getRawValue();
+                        double pitch = properties.getValue(PROP_PITCH).getRawValue();
+                        itemHandler = new ItemHandlerWorldEntityExportWrapper(
+                                (WorldServer) target.getPos().getWorld(),
+                                target.getPos().getBlockPos(), offsetX, offsetY, offsetZ,
+                                lifespan, delayBeforePickup, facing, velocity, yaw, pitch
+                        );
+                    }
+                    int slot = properties.getValue(Item.PROP_SLOT).getRawValue();
+                    return new Item.ItemTarget(network, itemHandler, null, null, target.hashCode(), slot, amount,
+                            itemStackMatcher, transferHash, partTarget, properties);
+                }
+            };
+        }
+
+        public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, Triple<ItemStackPredicate, Integer, Integer>>, Item.ItemTarget>
+                PROP_ENTITYITEM_ITEMTARGET_IMPORT = newPropEntityItemItemTarget(true);
+        public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, Triple<ItemStackPredicate, Integer, Integer>>, Item.ItemTarget>
+                PROP_ENTITYITEM_ITEMTARGET_EXPORT = newPropEntityItemItemTarget(false);
 
     }
 
