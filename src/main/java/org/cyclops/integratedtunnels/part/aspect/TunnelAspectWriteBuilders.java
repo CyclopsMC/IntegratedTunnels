@@ -720,6 +720,8 @@ public class TunnelAspectWriteBuilders {
                 new AspectPropertyTypeInstance<ValueTypeBoolean, ValueTypeBoolean.ValueBoolean>(ValueTypes.BOOLEAN, "aspect.aspecttypes.integratedtunnels.boolean.world.breaknodrops.name");
         public static final IAspectPropertyTypeInstance<ValueTypeBoolean, ValueTypeBoolean.ValueBoolean> PROP_IGNORE_PICK_UP_DELAY =
                 new AspectPropertyTypeInstance<ValueTypeBoolean, ValueTypeBoolean.ValueBoolean>(ValueTypes.BOOLEAN, "aspect.aspecttypes.integratedtunnels.boolean.world.ignorepickupdelay.name");
+        public static final IAspectPropertyTypeInstance<ValueTypeBoolean, ValueTypeBoolean.ValueBoolean> PROP_DISPENSE =
+                new AspectPropertyTypeInstance<ValueTypeBoolean, ValueTypeBoolean.ValueBoolean>(ValueTypes.BOOLEAN, "aspect.aspecttypes.integratedtunnels.boolean.world.dispense.name");
         public static final IAspectPropertyTypeInstance<ValueTypeDouble, ValueTypeDouble.ValueDouble> PROP_OFFSET_X =
                 new AspectPropertyTypeInstance<ValueTypeDouble, ValueTypeDouble.ValueDouble>(ValueTypes.DOUBLE, "aspect.aspecttypes.integratedtunnels.double.world.offsetx.name", VALIDATOR_DOUBLE_OFFSET);
         public static final IAspectPropertyTypeInstance<ValueTypeDouble, ValueTypeDouble.ValueDouble> PROP_OFFSET_Y =
@@ -774,6 +776,7 @@ public class TunnelAspectWriteBuilders {
         public static final IAspectProperties PROPERTIES_ENTITYITEM_PLACE = new AspectProperties(ImmutableList.<IAspectPropertyTypeInstance>of(
                 Item.PROP_CHECK_DAMAGE,
                 Item.PROP_CHECK_NBT,
+                PROP_DISPENSE,
                 PROP_OFFSET_X,
                 PROP_OFFSET_Y,
                 PROP_OFFSET_Z,
@@ -810,6 +813,7 @@ public class TunnelAspectWriteBuilders {
 
             PROPERTIES_ENTITYITEM_PLACE.setValue(Item.PROP_CHECK_DAMAGE, ValueTypeBoolean.ValueBoolean.of(true));
             PROPERTIES_ENTITYITEM_PLACE.setValue(Item.PROP_CHECK_NBT, ValueTypeBoolean.ValueBoolean.of(true));
+            PROPERTIES_ENTITYITEM_PLACE.setValue(PROP_DISPENSE, ValueTypeBoolean.ValueBoolean.of(false));
             PROPERTIES_ENTITYITEM_PLACE.setValue(PROP_OFFSET_X, ValueTypeDouble.ValueDouble.of(0.5D));
             PROPERTIES_ENTITYITEM_PLACE.setValue(PROP_OFFSET_Y, ValueTypeDouble.ValueDouble.of(0.5D));
             PROPERTIES_ENTITYITEM_PLACE.setValue(PROP_OFFSET_Z, ValueTypeDouble.ValueDouble.of(0.5D));
@@ -999,10 +1003,12 @@ public class TunnelAspectWriteBuilders {
                         double velocity = properties.getValue(PROP_VELOCITY).getRawValue();
                         double yaw = properties.getValue(PROP_YAW).getRawValue();
                         double pitch = properties.getValue(PROP_PITCH).getRawValue();
+                        boolean dispense = properties.getValue(PROP_DISPENSE).getRawValue();
                         itemHandler = new ItemHandlerWorldEntityExportWrapper(
                                 (WorldServer) target.getPos().getWorld(),
                                 target.getPos().getBlockPos(), offsetX, offsetY, offsetZ,
-                                lifespan, delayBeforePickup, facing, velocity, yaw, pitch
+                                lifespan, delayBeforePickup, facing, velocity, yaw, pitch,
+                                dispense, network.getCapability(Capabilities.SLOTLESS_ITEMHANDLER)
                         );
                     }
                     int slot = properties.getValue(Item.PROP_SLOT).getRawValue();

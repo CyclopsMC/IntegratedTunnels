@@ -338,21 +338,21 @@ public class TunnelAspects {
                                 .appendKind("entityitem").appendKind("export").buildWrite();
                 public static final IAspectWrite<ValueObjectTypeItemStack.ValueItemStack, ValueObjectTypeItemStack> ENTITYITEM_ITEMSTACK_EXPORT =
                         TunnelAspectWriteBuilders.World.BUILDER_ITEMSTACK
-                                .withProperties(TunnelAspectWriteBuilders.World.PROPERTIES_ENTITYITEM_PICK_UP)
+                                .withProperties(TunnelAspectWriteBuilders.World.PROPERTIES_ENTITYITEM_PLACE)
                                 .handle(TunnelAspectWriteBuilders.Item.PROP_ITEMSTACK_ITEMPREDICATE)
                                 .handle(TunnelAspectWriteBuilders.World.PROP_ENTITYITEM_ITEMTARGET_EXPORT)
                                 .handle(TunnelAspectWriteBuilders.Item.PROP_EXPORT)
                                 .appendKind("entityitem").appendKind("export").buildWrite();
                 public static final IAspectWrite<ValueTypeList.ValueList, ValueTypeList> ENTITYITEM_LISTITEMSTACK_EXPORT =
                         TunnelAspectWriteBuilders.World.BUILDER_LIST
-                                .withProperties(TunnelAspectWriteBuilders.World.PROPERTIES_ENTITYITEM_PICK_UP)
+                                .withProperties(TunnelAspectWriteBuilders.World.PROPERTIES_ENTITYITEM_PLACE)
                                 .handle(TunnelAspectWriteBuilders.Item.PROP_ITEMSTACKLIST_ITEMPREDICATE)
                                 .handle(TunnelAspectWriteBuilders.World.PROP_ENTITYITEM_ITEMTARGET_EXPORT)
                                 .handle(TunnelAspectWriteBuilders.Item.PROP_EXPORT)
                                 .appendKind("entityitem").appendKind("export").buildWrite();
                 public static final IAspectWrite<ValueTypeOperator.ValueOperator, ValueTypeOperator> ENTITYITEM_PREDICATEITEMSTACK_EXPORT =
                         TunnelAspectWriteBuilders.World.BUILDER_OPERATOR
-                                .withProperties(TunnelAspectWriteBuilders.World.PROPERTIES_ENTITYITEM_PICK_UP)
+                                .withProperties(TunnelAspectWriteBuilders.World.PROPERTIES_ENTITYITEM_PLACE)
                                 .handle(TunnelAspectWriteBuilders.Item.PROP_ITEMSTACKPREDICATE_ITEMPREDICATE)
                                 .handle(TunnelAspectWriteBuilders.World.PROP_ENTITYITEM_ITEMTARGET_EXPORT)
                                 .handle(TunnelAspectWriteBuilders.Item.PROP_EXPORT)

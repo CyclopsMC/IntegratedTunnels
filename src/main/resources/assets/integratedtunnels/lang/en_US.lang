@@ -71,6 +71,7 @@ aspect.aspecttypes.integratedtunnels.boolean.world.silktouch.name=Silk Touch
 aspect.aspecttypes.integratedtunnels.boolean.world.ignorereplacable.name=Ignore Replacable
 aspect.aspecttypes.integratedtunnels.boolean.world.breaknodrops.name=Break Block When No Drops
 aspect.aspecttypes.integratedtunnels.boolean.world.ignorepickupdelay.name=Ignore Pickup Delay
+aspect.aspecttypes.integratedtunnels.boolean.world.dispense.name=Dispense
 aspect.aspecttypes.integratedtunnels.double.world.offsetx.name=Offset X
 aspect.aspecttypes.integratedtunnels.double.world.offsety.name=Offset Y
 aspect.aspecttypes.integratedtunnels.double.world.offsetz.name=Offset Z
