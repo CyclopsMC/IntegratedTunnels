@@ -9,23 +9,13 @@ import org.cyclops.integratedtunnels.core.part.PartTypeTunnelAspectsWorld;
 import org.cyclops.integratedtunnels.part.aspect.TunnelAspects;
 
 /**
- * A part that can export to the world.
+ * A part that can export items to the world.
  * @author rubensworks
  */
-public class PartTypeExporterWorld extends PartTypeTunnelAspectsWorld<PartTypeExporterWorld, PartStateWriterBase<PartTypeExporterWorld>> {
-    public PartTypeExporterWorld(String name) {
+public class PartTypeExporterWorldItem extends PartTypeTunnelAspectsWorld<PartTypeExporterWorldItem, PartStateWriterBase<PartTypeExporterWorldItem>> {
+    public PartTypeExporterWorldItem(String name) {
         super(name);
         AspectRegistry.getInstance().register(this, Lists.<IAspect>newArrayList(
-                TunnelAspects.Write.World.FLUID_BOOLEAN_EXPORT,
-                TunnelAspects.Write.World.FLUID_FLUIDSTACK_EXPORT,
-                TunnelAspects.Write.World.FLUID_LIST_EXPORT,
-                TunnelAspects.Write.World.FLUID_PREDICATE_EXPORT,
-
-                TunnelAspects.Write.World.BLOCK_BOOLEAN_EXPORT,
-                TunnelAspects.Write.World.BLOCK_ITEMSTACK_EXPORT,
-                TunnelAspects.Write.World.BLOCK_LISTITEMSTACK_EXPORT,
-                TunnelAspects.Write.World.BLOCK_PREDICATEITEMSTACK_EXPORT,
-
                 TunnelAspects.Write.World.ENTITYITEM_BOOLEAN_EXPORT,
                 TunnelAspects.Write.World.ENTITYITEM_ITEMSTACK_EXPORT,
                 TunnelAspects.Write.World.ENTITYITEM_LISTITEMSTACK_EXPORT,
@@ -34,12 +24,12 @@ public class PartTypeExporterWorld extends PartTypeTunnelAspectsWorld<PartTypeEx
     }
 
     @Override
-    protected PartStateWriterBase<PartTypeExporterWorld> constructDefaultState() {
-        return new PartStateWriterBase<PartTypeExporterWorld>(Aspects.REGISTRY.getWriteAspects(this).size());
+    protected PartStateWriterBase<PartTypeExporterWorldItem> constructDefaultState() {
+        return new PartStateWriterBase<PartTypeExporterWorldItem>(Aspects.REGISTRY.getWriteAspects(this).size());
     }
 
     @Override
-    public int getConsumptionRate(PartStateWriterBase<PartTypeExporterWorld> state) {
+    public int getConsumptionRate(PartStateWriterBase<PartTypeExporterWorldItem> state) {
         return state.hasVariable() ? 32 : super.getConsumptionRate(state);
     }
 }

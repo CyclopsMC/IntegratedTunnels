@@ -6,13 +6,13 @@
   "variants": {
     "status": {
       "active": {"textures": {
-        "texture" : "integratedtunnels:parts/importer_world_active"
+        "texture" : "integratedtunnels:parts/importer_world_fluid_active"
       }},
       "inactive": {"textures": {
-        "texture" : "integratedtunnels:parts/importer_world_inactive"
+        "texture" : "integratedtunnels:parts/importer_world_fluid_inactive"
       }},
       "error": {"textures": {
-        "texture" : "integratedtunnels:parts/importer_world_error"
+        "texture" : "integratedtunnels:parts/importer_world_fluid_error"
       }}
     },
     "facing": {
@@ -24,7 +24,7 @@
       "down" : { "x": 270 }
     },
     "inventory": {
-      "model": "integratedtunnels:connector"
+      "model": "integratedtunnels:world_interface"
     }
   }
 }
