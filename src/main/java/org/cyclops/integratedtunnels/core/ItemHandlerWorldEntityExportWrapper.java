@@ -84,9 +84,6 @@ public class ItemHandlerWorldEntityExportWrapper implements IItemHandler {
         x = x / (double)f;
         y = y / (double)f;
         z = z / (double)f;
-        x = x + this.world.rand.nextGaussian() * 0.0075D;
-        y = y + this.world.rand.nextGaussian() * 0.0075D;
-        z = z + this.world.rand.nextGaussian() * 0.0075D;
         x = x * velocity;
         y = y * velocity;
         z = z * velocity;
