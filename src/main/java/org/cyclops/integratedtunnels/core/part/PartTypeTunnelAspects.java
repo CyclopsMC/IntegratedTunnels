@@ -15,7 +15,11 @@ import org.cyclops.integratedtunnels.IntegratedTunnels;
 public abstract class PartTypeTunnelAspects<P extends IPartTypeWriter<P, S>, S extends IPartStateWriter<P>> extends PartTypeWriteBase<P, S> {
 
     public PartTypeTunnelAspects(String name) {
-        super(name, new PartRenderPosition(0.25F, 0.25F, 0.375F, 0.375F));
+        this(name, new PartRenderPosition(0.25F, 0.25F, 0.375F, 0.375F));
+    }
+
+    protected PartTypeTunnelAspects(String name, PartRenderPosition partRenderPosition) {
+        super(name, partRenderPosition);
     }
 
     @Override

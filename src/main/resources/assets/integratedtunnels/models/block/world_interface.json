@@ -1,0 +1,19 @@
+{
+    "parent": "integrateddynamics:block/part",
+    "__comment": "Model generated using Mr_crayfish's Model Creator (http://mrcrayfish.com/modelcreator/)",
+    "elements": [
+        {
+            "name": "one",
+            "from": [ 3.0, 3.0, 13.0 ],
+            "to": [ 13.0, 13.0, 16.0 ],
+            "faces": {
+                "north": { "texture": "#texture", "uv": [ 3.0, 3.0, 13.0, 13.0 ] },
+                "east": { "texture": "#texture", "uv": [ 0.0, 3.0, 3.0, 13.0 ] },
+                "south": { "texture": "#texture", "uv": [ 3.0, 3.0, 13.0, 13.0 ] },
+                "west": { "texture": "#texture", "uv": [ 13.0, 3.0, 16.0, 13.0 ] },
+                "up": { "texture": "#texture", "uv": [ 3.0, 13.0, 13.0, 16.0 ] },
+                "down": { "texture": "#texture", "uv": [ 3.0, 0.0, 13.0, 3.0 ] }
+            }
+        }
+    ]
+}

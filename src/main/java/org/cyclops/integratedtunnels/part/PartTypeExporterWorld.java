@@ -5,14 +5,14 @@ import org.cyclops.integrateddynamics.api.part.aspect.IAspect;
 import org.cyclops.integrateddynamics.core.part.aspect.AspectRegistry;
 import org.cyclops.integrateddynamics.core.part.write.PartStateWriterBase;
 import org.cyclops.integrateddynamics.part.aspect.Aspects;
-import org.cyclops.integratedtunnels.core.part.PartTypeTunnelAspects;
+import org.cyclops.integratedtunnels.core.part.PartTypeTunnelAspectsWorld;
 import org.cyclops.integratedtunnels.part.aspect.TunnelAspects;
 
 /**
  * A part that can export to the world.
  * @author rubensworks
  */
-public class PartTypeExporterWorld extends PartTypeTunnelAspects<PartTypeExporterWorld, PartStateWriterBase<PartTypeExporterWorld>> {
+public class PartTypeExporterWorld extends PartTypeTunnelAspectsWorld<PartTypeExporterWorld, PartStateWriterBase<PartTypeExporterWorld>> {
     public PartTypeExporterWorld(String name) {
         super(name);
         AspectRegistry.getInstance().register(this, Lists.<IAspect>newArrayList(
