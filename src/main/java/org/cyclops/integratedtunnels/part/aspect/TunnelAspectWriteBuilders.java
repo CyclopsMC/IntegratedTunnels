@@ -769,11 +769,13 @@ public class TunnelAspectWriteBuilders {
                 PROP_BREAK_ON_NO_DROPS
         ));
         public static final IAspectProperties PROPERTIES_ENTITYITEM_PICK_UP = new AspectProperties(ImmutableList.<IAspectPropertyTypeInstance>of(
+                Item.PROP_RATE,
                 Item.PROP_CHECK_DAMAGE,
                 Item.PROP_CHECK_NBT,
                 PROP_IGNORE_PICK_UP_DELAY
         ));
         public static final IAspectProperties PROPERTIES_ENTITYITEM_PLACE = new AspectProperties(ImmutableList.<IAspectPropertyTypeInstance>of(
+                Item.PROP_RATE,
                 Item.PROP_CHECK_DAMAGE,
                 Item.PROP_CHECK_NBT,
                 PROP_DISPENSE,
@@ -807,10 +809,12 @@ public class TunnelAspectWriteBuilders {
             PROPERTIES_BLOCK_PICK_UP.setValue(PROP_IGNORE_REPLACABLE, ValueTypeBoolean.ValueBoolean.of(false));
             PROPERTIES_BLOCK_PICK_UP.setValue(PROP_BREAK_ON_NO_DROPS, ValueTypeBoolean.ValueBoolean.of(true));
 
+            PROPERTIES_ENTITYITEM_PICK_UP.setValue(Item.PROP_RATE, ValueTypeInteger.ValueInteger.of(64));
             PROPERTIES_ENTITYITEM_PICK_UP.setValue(Item.PROP_CHECK_DAMAGE, ValueTypeBoolean.ValueBoolean.of(true));
             PROPERTIES_ENTITYITEM_PICK_UP.setValue(Item.PROP_CHECK_NBT, ValueTypeBoolean.ValueBoolean.of(true));
             PROPERTIES_ENTITYITEM_PICK_UP.setValue(PROP_IGNORE_PICK_UP_DELAY, ValueTypeBoolean.ValueBoolean.of(true));
 
+            PROPERTIES_ENTITYITEM_PLACE.setValue(Item.PROP_RATE, ValueTypeInteger.ValueInteger.of(64));
             PROPERTIES_ENTITYITEM_PLACE.setValue(Item.PROP_CHECK_DAMAGE, ValueTypeBoolean.ValueBoolean.of(true));
             PROPERTIES_ENTITYITEM_PLACE.setValue(Item.PROP_CHECK_NBT, ValueTypeBoolean.ValueBoolean.of(true));
             PROPERTIES_ENTITYITEM_PLACE.setValue(PROP_DISPENSE, ValueTypeBoolean.ValueBoolean.of(false));
@@ -913,6 +917,7 @@ public class TunnelAspectWriteBuilders {
                 public Triple<PartTarget, IAspectProperties, T> getOutput(Triple<PartTarget, IAspectProperties, T> input) {
                     IAspectProperties aspectProperties = input.getMiddle().clone();
                     aspectProperties.setValue(Item.PROP_CHECK_STACKSIZE, ValueTypeBoolean.ValueBoolean.of(false));
+                    aspectProperties.setValue(Item.PROP_RATE, ValueTypeInteger.ValueInteger.of(1));
                     return Triple.of(input.getLeft(), aspectProperties, input.getRight());
                 }
             };
