@@ -17,6 +17,7 @@ public class PartTypeExporterWorldItem extends PartTypeTunnelAspectsWorld<PartTy
         super(name);
         AspectRegistry.getInstance().register(this, Lists.<IAspect>newArrayList(
                 TunnelAspects.Write.World.ENTITYITEM_BOOLEAN_EXPORT,
+                TunnelAspects.Write.World.ENTITYITEM_INTEGER_EXPORT,
                 TunnelAspects.Write.World.ENTITYITEM_ITEMSTACK_EXPORT,
                 TunnelAspects.Write.World.ENTITYITEM_LISTITEMSTACK_EXPORT,
                 TunnelAspects.Write.World.ENTITYITEM_PREDICATEITEMSTACK_EXPORT

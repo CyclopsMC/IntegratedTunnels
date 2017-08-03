@@ -307,6 +307,13 @@ public class TunnelAspects {
                                 .handle(TunnelAspectWriteBuilders.World.PROP_ENTITYITEM_ITEMTARGET_IMPORT)
                                 .handle(TunnelAspectWriteBuilders.Item.PROP_IMPORT)
                                 .appendKind("entityitem").appendKind("import").buildWrite();
+                public static final IAspectWrite<ValueTypeInteger.ValueInteger, ValueTypeInteger> ENTITYITEM_INTEGER_IMPORT =
+                        TunnelAspectWriteBuilders.World.BUILDER_INTEGER
+                                .withProperties(TunnelAspectWriteBuilders.World.PROPERTIES_ENTITYITEM_PICK_UP_NORATE)
+                                .handle(TunnelAspectWriteBuilders.Item.PROP_INTEGER_ITEMPREDICATE)
+                                .handle(TunnelAspectWriteBuilders.World.PROP_ENTITYITEM_ITEMTARGET_IMPORT)
+                                .handle(TunnelAspectWriteBuilders.Item.PROP_IMPORT)
+                                .appendKind("entityitem").appendKind("import").buildWrite();
                 public static final IAspectWrite<ValueObjectTypeItemStack.ValueItemStack, ValueObjectTypeItemStack> ENTITYITEM_ITEMSTACK_IMPORT =
                         TunnelAspectWriteBuilders.World.BUILDER_ITEMSTACK
                                 .withProperties(TunnelAspectWriteBuilders.World.PROPERTIES_ENTITYITEM_PICK_UP)
@@ -333,6 +340,13 @@ public class TunnelAspects {
                         TunnelAspectWriteBuilders.World.BUILDER_BOOLEAN
                                 .withProperties(TunnelAspectWriteBuilders.World.PROPERTIES_ENTITYITEM_PLACE)
                                 .handle(TunnelAspectWriteBuilders.Item.PROP_BOOLEAN_ITEMPREDICATE)
+                                .handle(TunnelAspectWriteBuilders.World.PROP_ENTITYITEM_ITEMTARGET_EXPORT)
+                                .handle(TunnelAspectWriteBuilders.Item.PROP_EXPORT)
+                                .appendKind("entityitem").appendKind("export").buildWrite();
+                public static final IAspectWrite<ValueTypeInteger.ValueInteger, ValueTypeInteger> ENTITYITEM_INTEGER_EXPORT =
+                        TunnelAspectWriteBuilders.World.BUILDER_INTEGER
+                                .withProperties(TunnelAspectWriteBuilders.World.PROPERTIES_ENTITYITEM_PLACE_NORATE)
+                                .handle(TunnelAspectWriteBuilders.Item.PROP_INTEGER_ITEMPREDICATE)
                                 .handle(TunnelAspectWriteBuilders.World.PROP_ENTITYITEM_ITEMTARGET_EXPORT)
                                 .handle(TunnelAspectWriteBuilders.Item.PROP_EXPORT)
                                 .appendKind("entityitem").appendKind("export").buildWrite();

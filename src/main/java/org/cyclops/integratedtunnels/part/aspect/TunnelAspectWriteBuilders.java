@@ -252,7 +252,7 @@ public class TunnelAspectWriteBuilders {
             @Override
             public Triple<PartTarget, IAspectProperties, Triple<ItemStackPredicate, Integer, Integer>> getOutput(Triple<PartTarget, IAspectProperties, Boolean> input) throws EvaluationException {
                 ItemStackPredicate itemStackMatcher = input.getRight() ? TunnelItemHelpers.MATCH_BLOCK : TunnelItemHelpers.MATCH_NONE;
-                int amount = input.getRight() ? 1 : 0;
+                int amount = input.getRight() ? input.getMiddle().getValue(PROP_RATE).getRawValue() : 0;
                 int transferHash = input.getRight() ? 1 : 0;
                 return Triple.of(input.getLeft(), input.getMiddle(), Triple.of(itemStackMatcher, amount, transferHash));
             }
@@ -768,14 +768,12 @@ public class TunnelAspectWriteBuilders {
                 PROP_IGNORE_REPLACABLE,
                 PROP_BREAK_ON_NO_DROPS
         ));
-        public static final IAspectProperties PROPERTIES_ENTITYITEM_PICK_UP = new AspectProperties(ImmutableList.<IAspectPropertyTypeInstance>of(
-                Item.PROP_RATE,
+        public static final IAspectProperties PROPERTIES_ENTITYITEM_PICK_UP_NORATE = new AspectProperties(ImmutableList.<IAspectPropertyTypeInstance>of(
                 Item.PROP_CHECK_DAMAGE,
                 Item.PROP_CHECK_NBT,
                 PROP_IGNORE_PICK_UP_DELAY
         ));
-        public static final IAspectProperties PROPERTIES_ENTITYITEM_PLACE = new AspectProperties(ImmutableList.<IAspectPropertyTypeInstance>of(
-                Item.PROP_RATE,
+        public static final IAspectProperties PROPERTIES_ENTITYITEM_PLACE_NORATE = new AspectProperties(ImmutableList.<IAspectPropertyTypeInstance>of(
                 Item.PROP_CHECK_DAMAGE,
                 Item.PROP_CHECK_NBT,
                 PROP_DISPENSE,
@@ -809,23 +807,28 @@ public class TunnelAspectWriteBuilders {
             PROPERTIES_BLOCK_PICK_UP.setValue(PROP_IGNORE_REPLACABLE, ValueTypeBoolean.ValueBoolean.of(false));
             PROPERTIES_BLOCK_PICK_UP.setValue(PROP_BREAK_ON_NO_DROPS, ValueTypeBoolean.ValueBoolean.of(true));
 
+            PROPERTIES_ENTITYITEM_PICK_UP_NORATE.setValue(Item.PROP_CHECK_DAMAGE, ValueTypeBoolean.ValueBoolean.of(true));
+            PROPERTIES_ENTITYITEM_PICK_UP_NORATE.setValue(Item.PROP_CHECK_NBT, ValueTypeBoolean.ValueBoolean.of(true));
+            PROPERTIES_ENTITYITEM_PICK_UP_NORATE.setValue(PROP_IGNORE_PICK_UP_DELAY, ValueTypeBoolean.ValueBoolean.of(true));
+
+            PROPERTIES_ENTITYITEM_PLACE_NORATE.setValue(Item.PROP_CHECK_DAMAGE, ValueTypeBoolean.ValueBoolean.of(true));
+            PROPERTIES_ENTITYITEM_PLACE_NORATE.setValue(Item.PROP_CHECK_NBT, ValueTypeBoolean.ValueBoolean.of(true));
+            PROPERTIES_ENTITYITEM_PLACE_NORATE.setValue(PROP_DISPENSE, ValueTypeBoolean.ValueBoolean.of(false));
+            PROPERTIES_ENTITYITEM_PLACE_NORATE.setValue(PROP_OFFSET_X, ValueTypeDouble.ValueDouble.of(0.5D));
+            PROPERTIES_ENTITYITEM_PLACE_NORATE.setValue(PROP_OFFSET_Y, ValueTypeDouble.ValueDouble.of(0.5D));
+            PROPERTIES_ENTITYITEM_PLACE_NORATE.setValue(PROP_OFFSET_Z, ValueTypeDouble.ValueDouble.of(0.5D));
+            PROPERTIES_ENTITYITEM_PLACE_NORATE.setValue(PROP_LIFESPAN, ValueTypeInteger.ValueInteger.of(6000));
+            PROPERTIES_ENTITYITEM_PLACE_NORATE.setValue(PROP_DELAY_BEFORE_PICKUP, ValueTypeInteger.ValueInteger.of(10));
+            PROPERTIES_ENTITYITEM_PLACE_NORATE.setValue(PROP_VELOCITY, ValueTypeDouble.ValueDouble.of(0.1D));
+            PROPERTIES_ENTITYITEM_PLACE_NORATE.setValue(PROP_YAW, ValueTypeDouble.ValueDouble.of(0D));
+            PROPERTIES_ENTITYITEM_PLACE_NORATE.setValue(PROP_PITCH, ValueTypeDouble.ValueDouble.of(0D));
+        }
+        public static final IAspectProperties PROPERTIES_ENTITYITEM_PICK_UP = PROPERTIES_ENTITYITEM_PICK_UP_NORATE.clone();
+        public static final IAspectProperties PROPERTIES_ENTITYITEM_PLACE = PROPERTIES_ENTITYITEM_PLACE_NORATE.clone();
+        static {
             PROPERTIES_ENTITYITEM_PICK_UP.setValue(Item.PROP_RATE, ValueTypeInteger.ValueInteger.of(64));
-            PROPERTIES_ENTITYITEM_PICK_UP.setValue(Item.PROP_CHECK_DAMAGE, ValueTypeBoolean.ValueBoolean.of(true));
-            PROPERTIES_ENTITYITEM_PICK_UP.setValue(Item.PROP_CHECK_NBT, ValueTypeBoolean.ValueBoolean.of(true));
-            PROPERTIES_ENTITYITEM_PICK_UP.setValue(PROP_IGNORE_PICK_UP_DELAY, ValueTypeBoolean.ValueBoolean.of(true));
 
             PROPERTIES_ENTITYITEM_PLACE.setValue(Item.PROP_RATE, ValueTypeInteger.ValueInteger.of(64));
-            PROPERTIES_ENTITYITEM_PLACE.setValue(Item.PROP_CHECK_DAMAGE, ValueTypeBoolean.ValueBoolean.of(true));
-            PROPERTIES_ENTITYITEM_PLACE.setValue(Item.PROP_CHECK_NBT, ValueTypeBoolean.ValueBoolean.of(true));
-            PROPERTIES_ENTITYITEM_PLACE.setValue(PROP_DISPENSE, ValueTypeBoolean.ValueBoolean.of(false));
-            PROPERTIES_ENTITYITEM_PLACE.setValue(PROP_OFFSET_X, ValueTypeDouble.ValueDouble.of(0.5D));
-            PROPERTIES_ENTITYITEM_PLACE.setValue(PROP_OFFSET_Y, ValueTypeDouble.ValueDouble.of(0.5D));
-            PROPERTIES_ENTITYITEM_PLACE.setValue(PROP_OFFSET_Z, ValueTypeDouble.ValueDouble.of(0.5D));
-            PROPERTIES_ENTITYITEM_PLACE.setValue(PROP_LIFESPAN, ValueTypeInteger.ValueInteger.of(6000));
-            PROPERTIES_ENTITYITEM_PLACE.setValue(PROP_DELAY_BEFORE_PICKUP, ValueTypeInteger.ValueInteger.of(10));
-            PROPERTIES_ENTITYITEM_PLACE.setValue(PROP_VELOCITY, ValueTypeDouble.ValueDouble.of(0.1D));
-            PROPERTIES_ENTITYITEM_PLACE.setValue(PROP_YAW, ValueTypeDouble.ValueDouble.of(0D));
-            PROPERTIES_ENTITYITEM_PLACE.setValue(PROP_PITCH, ValueTypeDouble.ValueDouble.of(0D));
         }
 
         public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, Boolean>, Fluid.FluidTarget>
