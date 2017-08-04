@@ -999,7 +999,7 @@ public class TunnelAspectWriteBuilders {
                     if (doImport) {
                         boolean ignorePickupDelay = properties.getValue(PROP_IGNORE_PICK_UP_DELAY).getRawValue();
                         itemHandler = new ItemHandlerWorldEntityImportWrapper((WorldServer) target.getPos().getWorld(),
-                                target.getPos().getBlockPos(), ignorePickupDelay
+                                target.getPos().getBlockPos(), target.getSide(), ignorePickupDelay
                         );
                     } else {
                         double offsetX = properties.getValue(PROP_OFFSET_X).getRawValue();

@@ -65,6 +65,12 @@ public class GeneralConfig extends DummyConfig {
     public static int fluidRateLimit = Integer.MAX_VALUE;
 
     /**
+     * If particles should be shown and sounds should be played when tunnels are interacting with the world.
+     */
+    @ConfigurableProperty(category = ConfigurableTypeCategory.CORE, comment = "If particles should be shown and sounds should be played when tunnels are interacting with the world.", isCommandable = true)
+    public static boolean worldInteractionEvents = true;
+
+    /**
      * The type of this config.
      */
     public static ConfigurableType TYPE = ConfigurableType.DUMMY;

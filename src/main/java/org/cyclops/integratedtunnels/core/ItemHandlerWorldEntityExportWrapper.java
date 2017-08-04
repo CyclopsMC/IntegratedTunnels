@@ -18,6 +18,7 @@ import net.minecraft.world.WorldServer;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.items.IItemHandler;
 import org.cyclops.commoncapabilities.api.capability.itemhandler.ISlotlessItemHandler;
+import org.cyclops.integratedtunnels.GeneralConfig;
 
 import javax.annotation.Nonnull;
 
@@ -104,6 +105,11 @@ public class ItemHandlerWorldEntityExportWrapper implements IItemHandler, IBlock
                     this.velocity);
             entity.setPickupDelay(delayBeforePickup);
             world.spawnEntity(entity);
+
+            if (GeneralConfig.worldInteractionEvents) {
+                world.playEvent(1000, pos, 0); // Sound
+                world.playEvent(2000, pos.offset(facing.getOpposite()), facing.getFrontOffsetX() + 1 + (facing.getFrontOffsetZ() + 1) * 3); // Particles
+            }
         } else if (this.dispense) {
             stack = stack.copy();
             stack.splitStack(1);

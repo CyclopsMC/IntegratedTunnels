@@ -9,6 +9,8 @@ import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.SoundCategory;
+import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fluids.Fluid;
@@ -31,6 +33,7 @@ import org.cyclops.integrateddynamics.core.evaluate.variable.ValueHelpers;
 import org.cyclops.integrateddynamics.core.evaluate.variable.ValueObjectTypeFluidStack;
 import org.cyclops.integrateddynamics.core.evaluate.variable.ValueTypeBoolean;
 import org.cyclops.integrateddynamics.core.helper.PartHelpers;
+import org.cyclops.integratedtunnels.GeneralConfig;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -218,8 +221,15 @@ public class TunnelFluidHelpers {
             }
         }, Fluid.BUCKET_VOLUME, true, fluidStackMatcher);
 
-        if (moved != null && blockUpdate) {
-            world.neighborChanged(pos, Blocks.AIR, pos);
+        if (moved != null) {
+            if (GeneralConfig.worldInteractionEvents) {
+                SoundEvent soundevent = moved.getFluid().getEmptySound(moved);
+                world.playSound(null, pos, soundevent, SoundCategory.BLOCKS, 1.0F, 1.0F);
+            }
+
+            if (blockUpdate) {
+                world.neighborChanged(pos, Blocks.AIR, pos);
+            }
         }
         return moved;
     }
@@ -240,8 +250,13 @@ public class TunnelFluidHelpers {
         if (block instanceof IFluidBlock || block instanceof BlockLiquid) {
             IFluidHandler targetFluidHandler = FluidUtil.getFluidHandler(world, pos, side);
             if (targetFluidHandler != null) {
-                return TunnelFluidHelpers.moveFluids(targetFluidHandler, target, Fluid.BUCKET_VOLUME, true,
+                FluidStack pickedUp = TunnelFluidHelpers.moveFluids(targetFluidHandler, target, Fluid.BUCKET_VOLUME, true,
                         fluidStackMatcher);
+                if (pickedUp != null && GeneralConfig.worldInteractionEvents) {
+                    SoundEvent soundevent = pickedUp.getFluid().getFillSound(pickedUp);
+                    world.playSound(null, pos, soundevent, SoundCategory.BLOCKS, 1.0F, 1.0F);
+                }
+                return pickedUp;
             }
         }
         return null;

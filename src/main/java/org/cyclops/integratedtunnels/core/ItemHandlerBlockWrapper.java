@@ -1,6 +1,8 @@
 package org.cyclops.integratedtunnels.core;
 
 import com.google.common.collect.Lists;
+import net.minecraft.block.Block;
+import net.minecraft.block.SoundType;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
@@ -9,6 +11,7 @@ import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.MinecraftForge;
@@ -16,6 +19,7 @@ import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.items.IItemHandler;
 import org.cyclops.cyclopscore.helper.BlockHelpers;
+import org.cyclops.integratedtunnels.GeneralConfig;
 import org.cyclops.integratedtunnels.core.helper.obfuscation.ObfuscationHelpers;
 
 import javax.annotation.Nonnull;
@@ -74,6 +78,9 @@ public class ItemHandlerBlockWrapper implements IItemHandler {
 
     protected void removeBlock(IBlockState blockState, EntityPlayer player) {
         blockState.getBlock().removedByPlayer(blockState, world, pos, player, false);
+        if (GeneralConfig.worldInteractionEvents) {
+            world.playEvent(2001, pos, Block.getStateId(blockState)); // Particles + Sound
+        }
         if (blockUpdate) {
             sendBlockUpdate();
         }
@@ -150,6 +157,10 @@ public class ItemHandlerBlockWrapper implements IItemHandler {
                             .placeBlockAt(itemStack, player, world, pos, side.getOpposite(), 0, 0, 0, blockState))) {
                     if (!simulate) {
                         itemBlock.getBlock().onBlockPlacedBy(world, pos, blockState, player, itemStack);
+                        if (GeneralConfig.worldInteractionEvents) {
+                            SoundType soundtype = world.getBlockState(pos).getBlock().getSoundType(world.getBlockState(pos), world, pos, player);
+                            world.playSound(player, pos, soundtype.getPlaceSound(), SoundCategory.BLOCKS, (soundtype.getVolume() + 1.0F) / 2.0F, soundtype.getPitch() * 0.8F); // Sound
+                        }
                         if (blockUpdate) {
                             sendBlockUpdate();
                         }
