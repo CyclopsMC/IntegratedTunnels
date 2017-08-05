@@ -103,8 +103,9 @@
 
 	<recipe type="shapeless">
 		<input>
-			<item>integratedtunnels:part_exporter_block_item</item>
+			<item>integratedtunnels:part_exporter_item_item</item>
 			<item>integrateddynamics:logic_director</item>
+			<item>minecraft:diamond_pickaxe</item>
 		</input>
 		<output>
 			<item>integratedtunnels:part_exporter_world_block_item</item>
@@ -113,8 +114,9 @@
 
 	<recipe type="shapeless">
 		<input>
-			<item>integratedtunnels:part_importer_block_item</item>
+			<item>integratedtunnels:part_importer_item_item</item>
 			<item>integrateddynamics:logic_director</item>
+			<item>minecraft:diamond_pickaxe</item>
 		</input>
 		<output>
 			<item>integratedtunnels:part_importer_world_block_item</item>
