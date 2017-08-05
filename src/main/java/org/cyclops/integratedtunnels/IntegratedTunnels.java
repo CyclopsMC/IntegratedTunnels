@@ -20,9 +20,15 @@ import org.cyclops.cyclopscore.modcompat.ModCompatLoader;
 import org.cyclops.cyclopscore.proxy.ICommonProxy;
 import org.cyclops.integrateddynamics.IntegratedDynamics;
 import org.cyclops.integrateddynamics.infobook.OnTheDynamicsOfIntegrationBook;
+import org.cyclops.integratedtunnels.api.world.IBlockBreakHandlerRegistry;
+import org.cyclops.integratedtunnels.api.world.IBlockPlaceHandlerRegistry;
 import org.cyclops.integratedtunnels.capability.network.FluidNetworkConfig;
 import org.cyclops.integratedtunnels.capability.network.ItemNetworkConfig;
 import org.cyclops.integratedtunnels.capability.network.TunnelNetworkCapabilityConstructors;
+import org.cyclops.integratedtunnels.core.world.BlockBreakHandlerRegistry;
+import org.cyclops.integratedtunnels.core.world.BlockBreakHandlers;
+import org.cyclops.integratedtunnels.core.world.BlockBreakPlaceRegistry;
+import org.cyclops.integratedtunnels.core.world.BlockPlaceHandlers;
 import org.cyclops.integratedtunnels.modcompat.tesla.TeslaModCompat;
 import org.cyclops.integratedtunnels.part.PartTypes;
 import org.cyclops.integratedtunnels.part.aspect.TunnelAspects;
@@ -80,8 +86,14 @@ public class IntegratedTunnels extends ModBaseVersionable {
     @EventHandler
     @Override
     public void preInit(FMLPreInitializationEvent event) {
+        // Registries
+        getRegistryManager().addRegistry(IBlockBreakHandlerRegistry.class, BlockBreakHandlerRegistry.getInstance());
+        getRegistryManager().addRegistry(IBlockPlaceHandlerRegistry.class, BlockBreakPlaceRegistry.getInstance());
+
         TunnelAspects.load();
         PartTypes.load();
+        BlockBreakHandlers.load();
+        BlockPlaceHandlers.load();
         super.preInit(event);
 
         MinecraftForge.EVENT_BUS.register(new TunnelNetworkCapabilityConstructors());

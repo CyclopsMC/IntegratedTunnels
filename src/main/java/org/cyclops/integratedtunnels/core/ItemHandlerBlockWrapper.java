@@ -13,6 +13,7 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.ForgeEventFactory;
@@ -20,6 +21,11 @@ import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.items.IItemHandler;
 import org.cyclops.cyclopscore.helper.BlockHelpers;
 import org.cyclops.integratedtunnels.GeneralConfig;
+import org.cyclops.integratedtunnels.IntegratedTunnels;
+import org.cyclops.integratedtunnels.api.world.IBlockBreakHandler;
+import org.cyclops.integratedtunnels.api.world.IBlockBreakHandlerRegistry;
+import org.cyclops.integratedtunnels.api.world.IBlockPlaceHandler;
+import org.cyclops.integratedtunnels.api.world.IBlockPlaceHandlerRegistry;
 import org.cyclops.integratedtunnels.core.helper.obfuscation.ObfuscationHelpers;
 
 import javax.annotation.Nonnull;
@@ -43,6 +49,7 @@ public class ItemHandlerBlockWrapper implements IItemHandler {
     private final boolean ignoreReplacable;
     private final boolean breakOnNoDrops;
 
+    private IBlockBreakHandler blockBreakHandler = null;
     private List<ItemStack> cachedDrops = null;
 
     public ItemHandlerBlockWrapper(boolean writeOnly, WorldServer world, BlockPos pos, EnumFacing side, EnumHand hand,
@@ -76,8 +83,17 @@ public class ItemHandlerBlockWrapper implements IItemHandler {
         world.neighborChanged(pos, Blocks.AIR, pos);
     }
 
+    protected IBlockBreakHandler getBlockBreakHandler(IBlockState blockState, World world, BlockPos pos, EntityPlayer player) {
+        return IntegratedTunnels._instance.getRegistryManager().getRegistry(IBlockBreakHandlerRegistry.class)
+                .getHandler(blockState, world, pos, player);
+    }
+
     protected void removeBlock(IBlockState blockState, EntityPlayer player) {
-        blockState.getBlock().removedByPlayer(blockState, world, pos, player, false);
+        if (blockBreakHandler != null) {
+            blockBreakHandler.breakBlock(blockState, world, pos, player);
+        } else {
+            blockState.getBlock().removedByPlayer(blockState, world, pos, player, false);
+        }
         if (GeneralConfig.worldInteractionEvents) {
             world.playEvent(2001, pos, Block.getStateId(blockState)); // Particles + Sound
         }
@@ -105,40 +121,51 @@ public class ItemHandlerBlockWrapper implements IItemHandler {
                 EntityPlayer player = PlayerHelpers.getFakePlayer(world);
                 PlayerHelpers.setPlayerState(player, hand, pos, side);
 
-                BlockEvent.BreakEvent blockBreakEvent = new BlockEvent.BreakEvent(world, pos, blockState, player);
-                if (!MinecraftForge.EVENT_BUS.post(blockBreakEvent)) {
-                    boolean doSilkTouch = silkTouch && blockState.getBlock().canSilkHarvest(world, pos, blockState, player);
-                    List<ItemStack> drops;
-                    if (doSilkTouch) {
-                        drops = Lists.newArrayList(ObfuscationHelpers.getSilkTouchDrop(blockState));
-                    } else {
-                        // Create a mutable arraylist, because the given one may not be mutable.
-                        drops = Lists.newArrayList(blockState.getBlock().getDrops(world, pos, blockState, fortune));
-                    }
-                    float dropChance = ForgeEventFactory.fireBlockHarvesting(drops, world, pos, blockState, fortune,
-                            1, doSilkTouch, player);
-                    if (drops.size() == 0) {
-                        // Remove the block if it dropped nothing (and will drop nothing)
-                        if (breakOnNoDrops) {
-                            removeBlock(blockState, player);
+                blockBreakHandler = getBlockBreakHandler(blockState, world, pos, player);
+                if (blockBreakHandler != null) {
+                    cachedDrops = blockBreakHandler.getDrops(blockState, world, pos, player);
+                } else {
+                    BlockEvent.BreakEvent blockBreakEvent = new BlockEvent.BreakEvent(world, pos, blockState, player);
+                    if (!MinecraftForge.EVENT_BUS.post(blockBreakEvent)) {
+                        boolean doSilkTouch = silkTouch && blockState.getBlock().canSilkHarvest(world, pos, blockState, player);
+                        List<ItemStack> drops;
+                        if (doSilkTouch) {
+                            drops = Lists.newArrayList(ObfuscationHelpers.getSilkTouchDrop(blockState));
+                        } else {
+                            // Create a mutable arraylist, because the given one may not be mutable.
+                            drops = Lists.newArrayList(blockState.getBlock().getDrops(world, pos, blockState, fortune));
                         }
-                        drops = Lists.newArrayList(ItemStack.EMPTY);
-                    } else {
-                        // Make sure there are no empty stacks in the list
-                        Iterator<ItemStack> it = drops.iterator();
-                        while (it.hasNext()) {
-                            if (it.next().isEmpty()) {
-                                it.remove();
+                        float dropChance = ForgeEventFactory.fireBlockHarvesting(drops, world, pos, blockState, fortune,
+                                1, doSilkTouch, player);
+                        if (drops.size() == 0) {
+                            // Remove the block if it dropped nothing (and will drop nothing)
+                            if (breakOnNoDrops) {
+                                removeBlock(blockState, player);
+                            }
+                            drops = Lists.newArrayList(ItemStack.EMPTY);
+                        } else {
+                            // Make sure there are no empty stacks in the list
+                            Iterator<ItemStack> it = drops.iterator();
+                            while (it.hasNext()) {
+                                if (it.next().isEmpty()) {
+                                    it.remove();
+                                }
                             }
                         }
-                    }
-                    if (world.rand.nextFloat() <= dropChance) {
-                        return cachedDrops = drops;
+                        if (world.rand.nextFloat() <= dropChance) {
+                            return cachedDrops = drops;
+                        }
                     }
                 }
             }
         }
         return Lists.newArrayList(ItemStack.EMPTY);
+    }
+
+    protected IBlockPlaceHandler getBlockPlaceHandler(ItemStack itemStack, World world, BlockPos pos, EnumFacing side,
+                                                      float hitX, float hitY, float hitZ, EntityPlayer player) {
+        return IntegratedTunnels._instance.getRegistryManager().getRegistry(IBlockPlaceHandlerRegistry.class)
+                .getHandler(itemStack, world, pos, side, hitX, hitY, hitZ, player);
     }
 
     protected ItemStack setItemStack(ItemStack itemStack, boolean simulate) {
@@ -150,22 +177,28 @@ public class ItemHandlerBlockWrapper implements IItemHandler {
                 EntityPlayer player = PlayerHelpers.getFakePlayer(world);
                 PlayerHelpers.setPlayerState(player, hand, pos, side);
 
-                IBlockState blockState = itemBlock.getBlock().getStateForPlacement(world, pos, side.getOpposite(),
-                        0, 0, 0, itemStack.getMetadata(), player, hand);
-                if (itemBlock.canPlaceBlockOnSide(world, pos, side.getOpposite(), player, itemStack)
-                        && (simulate || itemBlock
+                IBlockPlaceHandler blockPlaceHandler = getBlockPlaceHandler(itemStack, world, pos, side.getOpposite(),
+                        0, 0, 0, player);
+                if (blockPlaceHandler != null) {
+                    blockPlaceHandler.placeBlock(itemStack, world, pos, side.getOpposite(), 0, 0, 0, player);
+                } else {
+                    IBlockState blockState = itemBlock.getBlock().getStateForPlacement(world, pos, side.getOpposite(),
+                            0, 0, 0, itemStack.getMetadata(), player, hand);
+                    if (itemBlock.canPlaceBlockOnSide(world, pos, side.getOpposite(), player, itemStack)
+                            && (simulate || itemBlock
                             .placeBlockAt(itemStack, player, world, pos, side.getOpposite(), 0, 0, 0, blockState))) {
-                    if (!simulate) {
-                        itemBlock.getBlock().onBlockPlacedBy(world, pos, blockState, player, itemStack);
-                        if (GeneralConfig.worldInteractionEvents) {
-                            SoundType soundtype = world.getBlockState(pos).getBlock().getSoundType(world.getBlockState(pos), world, pos, player);
-                            world.playSound(player, pos, soundtype.getPlaceSound(), SoundCategory.BLOCKS, (soundtype.getVolume() + 1.0F) / 2.0F, soundtype.getPitch() * 0.8F); // Sound
+                        if (!simulate) {
+                            itemBlock.getBlock().onBlockPlacedBy(world, pos, blockState, player, itemStack);
+                            if (GeneralConfig.worldInteractionEvents) {
+                                SoundType soundtype = world.getBlockState(pos).getBlock().getSoundType(world.getBlockState(pos), world, pos, player);
+                                world.playSound(player, pos, soundtype.getPlaceSound(), SoundCategory.BLOCKS, (soundtype.getVolume() + 1.0F) / 2.0F, soundtype.getPitch() * 0.8F); // Sound
+                            }
+                            if (blockUpdate) {
+                                sendBlockUpdate();
+                            }
                         }
-                        if (blockUpdate) {
-                            sendBlockUpdate();
-                        }
+                        return ItemStack.EMPTY;
                     }
-                    return ItemStack.EMPTY;
                 }
             }
         }
