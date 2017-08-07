@@ -31,5 +31,7 @@ public class PartTypes {
     public static final PartTypeImporterWorldBlock IMPORTER_WORLD_BLOCK = REGISTRY.register(new PartTypeImporterWorldBlock("importer_world_block"));
     public static final PartTypeExporterWorldBlock EXPORTER_WORLD_BLOCK = REGISTRY.register(new PartTypeExporterWorldBlock("exporter_world_block"));
 
+    public static final PartTypePlayerSimulator PLAYER_SIMULATOR = REGISTRY.register(new PartTypePlayerSimulator("player_simulator"));
+
 
 }

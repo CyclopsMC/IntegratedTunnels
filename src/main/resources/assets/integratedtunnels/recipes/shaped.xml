@@ -61,4 +61,24 @@
 		</output>
 	</recipe>
 
+	<recipe type="shaped">
+		<input>
+			<grid>
+				<gridrow>
+					<item>integrateddynamics:part_importer_world_block_item</item>
+					<item />
+					<item>integratedtunnels:part_exporter_world_item_item</item>
+				</gridrow>
+				<gridrow>
+					<item>integrateddynamics:part_importer_world_item_item</item>
+					<item type="oredict">gemEmerald</item>
+					<item>integratedtunnels:part_exporter_world_block_item</item>
+				</gridrow>
+			</grid>
+		</input>
+		<output>
+			<item>integratedtunnels:part_player_simulator_item</item>
+		</output>
+	</recipe>
+
 </recipes>

@@ -119,7 +119,7 @@ public class ItemHandlerBlockWrapper implements IItemHandler {
                 IBlockState blockState = world.getBlockState(pos);
 
                 EntityPlayer player = PlayerHelpers.getFakePlayer(world);
-                PlayerHelpers.setPlayerState(player, hand, pos, side);
+                PlayerHelpers.setPlayerState(player, hand, pos, side, false);
 
                 blockBreakHandler = getBlockBreakHandler(blockState, world, pos, player);
                 if (blockBreakHandler != null) {
@@ -175,7 +175,7 @@ public class ItemHandlerBlockWrapper implements IItemHandler {
                 ItemBlock itemBlock = (ItemBlock) item;
 
                 EntityPlayer player = PlayerHelpers.getFakePlayer(world);
-                PlayerHelpers.setPlayerState(player, hand, pos, side);
+                PlayerHelpers.setPlayerState(player, hand, pos, side, false);
 
                 IBlockPlaceHandler blockPlaceHandler = getBlockPlaceHandler(itemStack, world, pos, side.getOpposite(),
                         0, 0, 0, player);

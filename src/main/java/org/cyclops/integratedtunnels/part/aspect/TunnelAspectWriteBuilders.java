@@ -39,6 +39,7 @@ import org.cyclops.integrateddynamics.core.evaluate.variable.*;
 import org.cyclops.integrateddynamics.core.helper.EnergyHelpers;
 import org.cyclops.integrateddynamics.core.helper.L10NValues;
 import org.cyclops.integrateddynamics.core.helper.NetworkHelpers;
+import org.cyclops.integrateddynamics.core.helper.PartHelpers;
 import org.cyclops.integrateddynamics.core.part.aspect.build.AspectBuilder;
 import org.cyclops.integrateddynamics.core.part.aspect.build.IAspectValuePropagator;
 import org.cyclops.integrateddynamics.core.part.aspect.build.IAspectWriteActivator;
@@ -56,6 +57,7 @@ import org.cyclops.integratedtunnels.capability.network.FluidNetworkConfig;
 import org.cyclops.integratedtunnels.capability.network.ItemNetworkConfig;
 import org.cyclops.integratedtunnels.core.*;
 import org.cyclops.integratedtunnels.core.part.PartStatePositionedAddon;
+import org.cyclops.integratedtunnels.part.PartStatePlayerSimulator;
 
 /**
  * Collection of tunnel aspect write builders and value propagators.
@@ -1030,6 +1032,177 @@ public class TunnelAspectWriteBuilders {
                 PROP_ENTITYITEM_ITEMTARGET_IMPORT = newPropEntityItemItemTarget(true);
         public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, Triple<ItemStackPredicate, Integer, Integer>>, Item.ItemTarget>
                 PROP_ENTITYITEM_ITEMTARGET_EXPORT = newPropEntityItemItemTarget(false);
+
+    }
+
+    public static final class Player {
+
+        public static final AspectBuilder<ValueTypeBoolean.ValueBoolean, ValueTypeBoolean, Triple<PartTarget, IAspectProperties, Boolean>>
+                BUILDER_BOOLEAN = AspectWriteBuilders.BUILDER_BOOLEAN.byMod(IntegratedTunnels._instance)
+                .appendKind("player").handle(AspectWriteBuilders.PROP_GET_BOOLEAN);
+        public static final AspectBuilder<ValueTypeInteger.ValueInteger, ValueTypeInteger, Triple<PartTarget, IAspectProperties, Integer>>
+                BUILDER_INTEGER = AspectWriteBuilders.BUILDER_INTEGER.byMod(IntegratedTunnels._instance)
+                .appendKind("player").handle(AspectWriteBuilders.PROP_GET_INTEGER);
+        public static final AspectBuilder<ValueObjectTypeItemStack.ValueItemStack, ValueObjectTypeItemStack, Triple<PartTarget, IAspectProperties, ItemStack>>
+                BUILDER_ITEMSTACK = AspectWriteBuilders.BUILDER_ITEMSTACK.byMod(IntegratedTunnels._instance)
+                .appendKind("player").handle(AspectWriteBuilders.PROP_GET_ITEMSTACK);
+        public static final AspectBuilder<ValueObjectTypeFluidStack.ValueFluidStack, ValueObjectTypeFluidStack, Triple<PartTarget, IAspectProperties, FluidStack>>
+                BUILDER_FLUIDSTACK = AspectWriteBuilders.BUILDER_FLUIDSTACK.byMod(IntegratedTunnels._instance)
+                .appendKind("player").handle(AspectWriteBuilders.PROP_GET_FLUIDSTACK);
+        public static final AspectBuilder<ValueTypeList.ValueList, ValueTypeList, Triple<PartTarget, IAspectProperties, ValueTypeList.ValueList>>
+                BUILDER_LIST = AspectWriteBuilders.BUILDER_LIST.byMod(IntegratedTunnels._instance)
+                .appendKind("player");
+        public static final AspectBuilder<ValueTypeOperator.ValueOperator, ValueTypeOperator, Triple<PartTarget, IAspectProperties, ValueTypeOperator.ValueOperator>>
+                BUILDER_OPERATOR = AspectWriteBuilders.BUILDER_OPERATOR.byMod(IntegratedTunnels._instance)
+                .appendKind("player");
+
+        public static final IAspectPropertyTypeInstance<ValueTypeBoolean, ValueTypeBoolean.ValueBoolean> PROP_RIGHT_CLICK =
+                new AspectPropertyTypeInstance<ValueTypeBoolean, ValueTypeBoolean.ValueBoolean>(ValueTypes.BOOLEAN, "aspect.aspecttypes.integratedtunnels.boolean.player.rightclick.name");
+        public static final IAspectPropertyTypeInstance<ValueTypeInteger, ValueTypeInteger.ValueInteger> PROPERTY_ENTITYINDEX =
+                new AspectPropertyTypeInstance<ValueTypeInteger, ValueTypeInteger.ValueInteger>(ValueTypes.INTEGER, "aspect.aspecttypes.integratedtunnels.integer.entityindex.name");
+        public static final IAspectPropertyTypeInstance<ValueTypeBoolean, ValueTypeBoolean.ValueBoolean> PROP_CONTINUOUS_CLICK =
+                new AspectPropertyTypeInstance<ValueTypeBoolean, ValueTypeBoolean.ValueBoolean>(ValueTypes.BOOLEAN, "aspect.aspecttypes.integratedtunnels.boolean.player.continuousclick.name");
+
+        public static final IAspectProperties PROPERTIES_CLICK_EMPTY = new AspectProperties(ImmutableList.<IAspectPropertyTypeInstance>of(
+                PROP_RIGHT_CLICK,
+                World.PROP_HAND_LEFT,
+                PROP_CONTINUOUS_CLICK,
+                PROPERTY_ENTITYINDEX,
+                World.PROP_OFFSET_X,
+                World.PROP_OFFSET_Y,
+                World.PROP_OFFSET_Z
+        ));
+        public static final IAspectProperties PROPERTIES_CLICK_SIMPLE = new AspectProperties(ImmutableList.<IAspectPropertyTypeInstance>of(
+                PROP_RIGHT_CLICK,
+                World.PROP_HAND_LEFT,
+                PROP_CONTINUOUS_CLICK,
+                Item.PROP_RATE,
+                PROPERTY_ENTITYINDEX,
+                World.PROP_OFFSET_X,
+                World.PROP_OFFSET_Y,
+                World.PROP_OFFSET_Z
+        ));
+        public static final IAspectProperties PROPERTIES_CLICK_NORATE = new AspectProperties(ImmutableList.<IAspectPropertyTypeInstance>of(
+                PROP_RIGHT_CLICK,
+                World.PROP_HAND_LEFT,
+                PROP_CONTINUOUS_CLICK,
+                PROPERTY_ENTITYINDEX,
+                World.PROP_OFFSET_X,
+                World.PROP_OFFSET_Y,
+                World.PROP_OFFSET_Z
+        ));
+        public static final IAspectProperties PROPERTIES_CLICK = new AspectProperties(ImmutableList.<IAspectPropertyTypeInstance>of(
+                PROP_RIGHT_CLICK,
+                World.PROP_HAND_LEFT,
+                PROP_CONTINUOUS_CLICK,
+                Item.PROP_CHECK_STACKSIZE,
+                Item.PROP_CHECK_DAMAGE,
+                Item.PROP_CHECK_NBT,
+                Item.PROP_RATE,
+                PROPERTY_ENTITYINDEX,
+                World.PROP_OFFSET_X,
+                World.PROP_OFFSET_Y,
+                World.PROP_OFFSET_Z
+        ));
+        static {
+            PROPERTIES_CLICK_EMPTY.setValue(PROP_RIGHT_CLICK, ValueTypeBoolean.ValueBoolean.of(true));
+            PROPERTIES_CLICK_EMPTY.setValue(World.PROP_HAND_LEFT, ValueTypeBoolean.ValueBoolean.of(true));
+            PROPERTIES_CLICK_EMPTY.setValue(PROP_CONTINUOUS_CLICK, ValueTypeBoolean.ValueBoolean.of(true));
+            PROPERTIES_CLICK_EMPTY.setValue(PROPERTY_ENTITYINDEX, ValueTypeInteger.ValueInteger.of(-1));
+            PROPERTIES_CLICK_EMPTY.setValue(World.PROP_OFFSET_X, ValueTypeDouble.ValueDouble.of(0.5D));
+            PROPERTIES_CLICK_EMPTY.setValue(World.PROP_OFFSET_Y, ValueTypeDouble.ValueDouble.of(0.5D));
+            PROPERTIES_CLICK_EMPTY.setValue(World.PROP_OFFSET_Z, ValueTypeDouble.ValueDouble.of(0.5D));
+
+            PROPERTIES_CLICK_SIMPLE.setValue(PROP_RIGHT_CLICK, ValueTypeBoolean.ValueBoolean.of(true));
+            PROPERTIES_CLICK_SIMPLE.setValue(World.PROP_HAND_LEFT, ValueTypeBoolean.ValueBoolean.of(true));
+            PROPERTIES_CLICK_SIMPLE.setValue(PROP_CONTINUOUS_CLICK, ValueTypeBoolean.ValueBoolean.of(true));
+            PROPERTIES_CLICK_SIMPLE.setValue(Item.PROP_RATE, ValueTypeInteger.ValueInteger.of(1));
+            PROPERTIES_CLICK_SIMPLE.setValue(PROPERTY_ENTITYINDEX, ValueTypeInteger.ValueInteger.of(-1));
+            PROPERTIES_CLICK_SIMPLE.setValue(World.PROP_OFFSET_X, ValueTypeDouble.ValueDouble.of(0.5D));
+            PROPERTIES_CLICK_SIMPLE.setValue(World.PROP_OFFSET_Y, ValueTypeDouble.ValueDouble.of(0.5D));
+            PROPERTIES_CLICK_SIMPLE.setValue(World.PROP_OFFSET_Z, ValueTypeDouble.ValueDouble.of(0.5D));
+
+            PROPERTIES_CLICK_NORATE.setValue(PROP_RIGHT_CLICK, ValueTypeBoolean.ValueBoolean.of(true));
+            PROPERTIES_CLICK_NORATE.setValue(World.PROP_HAND_LEFT, ValueTypeBoolean.ValueBoolean.of(true));
+            PROPERTIES_CLICK_NORATE.setValue(PROP_CONTINUOUS_CLICK, ValueTypeBoolean.ValueBoolean.of(true));
+            PROPERTIES_CLICK_NORATE.setValue(PROPERTY_ENTITYINDEX, ValueTypeInteger.ValueInteger.of(-1));
+            PROPERTIES_CLICK_NORATE.setValue(World.PROP_OFFSET_X, ValueTypeDouble.ValueDouble.of(0.5D));
+            PROPERTIES_CLICK_NORATE.setValue(World.PROP_OFFSET_Y, ValueTypeDouble.ValueDouble.of(0.5D));
+            PROPERTIES_CLICK_NORATE.setValue(World.PROP_OFFSET_Z, ValueTypeDouble.ValueDouble.of(0.5D));
+
+            PROPERTIES_CLICK.setValue(PROP_RIGHT_CLICK, ValueTypeBoolean.ValueBoolean.of(true));
+            PROPERTIES_CLICK.setValue(World.PROP_HAND_LEFT, ValueTypeBoolean.ValueBoolean.of(true));
+            PROPERTIES_CLICK.setValue(PROP_CONTINUOUS_CLICK, ValueTypeBoolean.ValueBoolean.of(true));
+            PROPERTIES_CLICK.setValue(Item.PROP_CHECK_STACKSIZE, ValueTypeBoolean.ValueBoolean.of(false));
+            PROPERTIES_CLICK.setValue(Item.PROP_CHECK_DAMAGE, ValueTypeBoolean.ValueBoolean.of(true));
+            PROPERTIES_CLICK.setValue(Item.PROP_CHECK_NBT, ValueTypeBoolean.ValueBoolean.of(true));
+            PROPERTIES_CLICK.setValue(Item.PROP_RATE, ValueTypeInteger.ValueInteger.of(1));
+            PROPERTIES_CLICK.setValue(PROPERTY_ENTITYINDEX, ValueTypeInteger.ValueInteger.of(-1));
+            PROPERTIES_CLICK.setValue(World.PROP_OFFSET_X, ValueTypeDouble.ValueDouble.of(0.5D));
+            PROPERTIES_CLICK.setValue(World.PROP_OFFSET_Y, ValueTypeDouble.ValueDouble.of(0.5D));
+            PROPERTIES_CLICK.setValue(World.PROP_OFFSET_Z, ValueTypeDouble.ValueDouble.of(0.5D));
+        }
+
+        public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, Boolean>, Void>
+                PROP_CLICK_EMPTY = new IAspectValuePropagator<Triple<PartTarget, IAspectProperties, Boolean>, Void>() {
+            @Override
+            public Void getOutput(Triple<PartTarget, IAspectProperties, Boolean> input) {
+                PartTarget partTarget = input.getLeft();
+                IAspectProperties properties = input.getMiddle();
+                EnumHand hand = properties.getValue(World.PROP_HAND_LEFT).getRawValue()
+                        ? EnumHand.MAIN_HAND : EnumHand.OFF_HAND;
+                boolean rightClick = properties.getValue(PROP_RIGHT_CLICK).getRawValue();
+                boolean continuousClick = properties.getValue(PROP_CONTINUOUS_CLICK).getRawValue();
+                int entityIndex = properties.getValue(PROPERTY_ENTITYINDEX).getRawValue();
+                double offsetX = properties.getValue(World.PROP_OFFSET_X).getRawValue();
+                double offsetY = properties.getValue(World.PROP_OFFSET_Y).getRawValue();
+                double offsetZ = properties.getValue(World.PROP_OFFSET_Z).getRawValue();
+
+                PartPos center = partTarget.getCenter();
+                PartPos target = partTarget.getTarget();
+                INetwork network = NetworkHelpers.getNetwork(center.getPos().getWorld(), center.getPos().getBlockPos());
+                PartStatePlayerSimulator partState = (PartStatePlayerSimulator) PartHelpers.getPart(center).getState();
+
+                IItemHandler itemHandler = new ItemHandlerPlayerWrapper(partState.getPlayer(),
+                        (WorldServer) target.getPos().getWorld(), target.getPos().getBlockPos(),
+                        offsetX, offsetY, offsetZ, target.getSide(), hand,
+                        rightClick, false, continuousClick, entityIndex, network.getCapability(Capabilities.SLOTLESS_ITEMHANDLER));
+                itemHandler.insertItem(0, ItemStack.EMPTY, false);
+                return null;
+            }
+        };
+
+        public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, Triple<ItemStackPredicate, Integer, Integer>>, Item.ItemTarget>
+                PROP_ITEMTARGET_CLICK = new IAspectValuePropagator<Triple<PartTarget, IAspectProperties, Triple<ItemStackPredicate, Integer, Integer>>, Item.ItemTarget>() {
+            @Override
+            public Item.ItemTarget getOutput(Triple<PartTarget, IAspectProperties, Triple<ItemStackPredicate, Integer, Integer>> input) {
+                PartTarget partTarget = input.getLeft();
+                IAspectProperties properties = input.getMiddle();
+                int amount = input.getRight().getMiddle();
+                int transferHash = input.getRight().getRight();
+                ItemStackPredicate itemStackMatcher = input.getRight().getLeft();
+                EnumHand hand = input.getMiddle().getValue(World.PROP_HAND_LEFT).getRawValue()
+                        ? EnumHand.MAIN_HAND : EnumHand.OFF_HAND;
+                boolean rightClick = input.getMiddle().getValue(PROP_RIGHT_CLICK).getRawValue();
+                boolean continuousClick = properties.getValue(PROP_CONTINUOUS_CLICK).getRawValue();
+                int entityIndex = properties.getValue(PROPERTY_ENTITYINDEX).getRawValue();
+                double offsetX = properties.getValue(World.PROP_OFFSET_X).getRawValue();
+                double offsetY = properties.getValue(World.PROP_OFFSET_Y).getRawValue();
+                double offsetZ = properties.getValue(World.PROP_OFFSET_Z).getRawValue();
+
+                PartPos center = partTarget.getCenter();
+                PartPos target = partTarget.getTarget();
+                INetwork network = NetworkHelpers.getNetwork(center.getPos().getWorld(), center.getPos().getBlockPos());
+                PartStatePlayerSimulator partState = (PartStatePlayerSimulator) PartHelpers.getPart(center).getState();
+
+                IItemHandler itemHandler = new ItemHandlerPlayerWrapper(partState.getPlayer(),
+                        (WorldServer) target.getPos().getWorld(), target.getPos().getBlockPos(),
+                        offsetX, offsetY, offsetZ, target.getSide(), hand,
+                        rightClick, false, continuousClick, entityIndex, network.getCapability(Capabilities.SLOTLESS_ITEMHANDLER));
+                return new Item.ItemTarget(network, itemHandler, null, null, target.hashCode(), 0, amount,
+                        itemStackMatcher, transferHash, partTarget, properties);
+            }
+        };
 
     }
 

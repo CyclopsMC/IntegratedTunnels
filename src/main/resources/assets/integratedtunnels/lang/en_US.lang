@@ -54,6 +54,8 @@ parttype.parttypes.integratedtunnels.importer_world_block.name=World Block Impor
 parttype.parttypes.integratedtunnels.importer_world_block.info=Pick up blocks from the world
 parttype.parttypes.integratedtunnels.exporter_world_block.name=World Block Exporter
 parttype.parttypes.integratedtunnels.exporter_world_block.info=Place blocks into the world
+parttype.parttypes.integratedtunnels.player_simulator.name=Player Simulator
+parttype.parttypes.integratedtunnels.player_simulator.info=Simulates player actions
 
 # Aspect property types
 aspect.aspecttypes.integratedtunnels.integer.energy.rate.name=Energy Transfer Rate
@@ -80,6 +82,9 @@ aspect.aspecttypes.integratedtunnels.boolean.world.delaybeforepickup.name=Pickup
 aspect.aspecttypes.integratedtunnels.double.world.velocity.name=Velocity
 aspect.aspecttypes.integratedtunnels.double.world.yaw.name=Yaw
 aspect.aspecttypes.integratedtunnels.double.world.pitch.name=Pitch
+aspect.aspecttypes.integratedtunnels.boolean.player.rightclick.name=Right Click
+aspect.aspecttypes.integratedtunnels.integer.entityindex.name=Entity Index
+aspect.aspecttypes.integratedtunnels.boolean.player.continuousclick.name=Continuous Click
 
 # Aspects
 
@@ -191,6 +196,20 @@ aspect.aspects.integratedtunnels.write.list.world.entityitem.import.name=Pick Up
 aspect.aspects.integratedtunnels.write.list.world.entityitem.import.info=Pick up the given items from the world.
 aspect.aspects.integratedtunnels.write.operator.world.entityitem.import.name=Pick Up Item Entities Predicate
 aspect.aspects.integratedtunnels.write.operator.world.entityitem.import.info=Pick up the item entities from the world that match the given predicate.
+
+# Player
+aspect.aspects.integratedtunnels.write.boolean.player.clickempty.name=Click Empty
+aspect.aspects.integratedtunnels.write.boolean.player.clickempty.info=Click with an empty hand.
+aspect.aspects.integratedtunnels.write.boolean.player.click.name=Click
+aspect.aspects.integratedtunnels.write.boolean.player.click.info=Click with any item.
+aspect.aspects.integratedtunnels.write.integer.player.click.name=Click Amount
+aspect.aspects.integratedtunnels.write.integer.player.click.info=Click with the given amount of items.
+aspect.aspects.integratedtunnels.write.itemstack.player.click.name=Click Item
+aspect.aspects.integratedtunnels.write.itemstack.player.click.info=Click with the given item.
+aspect.aspects.integratedtunnels.write.list.player.click.name=Click Items
+aspect.aspects.integratedtunnels.write.list.player.click.info=Click with the given items.
+aspect.aspects.integratedtunnels.write.operator.player.click.name=Click Item Predicate
+aspect.aspects.integratedtunnels.write.operator.player.click.info=Click with the items that match the given predicate.
 
 # Configuration
 config.integratedtunnels=%s configuration

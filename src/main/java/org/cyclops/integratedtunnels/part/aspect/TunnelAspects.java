@@ -374,6 +374,52 @@ public class TunnelAspects {
 
         }
 
+        public static final class Player {
+
+                public static final IAspectWrite<ValueTypeBoolean.ValueBoolean, ValueTypeBoolean> CLICK_EMPTY_BOOLEAN =
+                        TunnelAspectWriteBuilders.Player.BUILDER_BOOLEAN
+                                .withProperties(TunnelAspectWriteBuilders.Player.PROPERTIES_CLICK_EMPTY)
+                                .handle(TunnelAspectWriteBuilders.Player.PROP_CLICK_EMPTY)
+                                .appendKind("clickempty").buildWrite();
+
+                public static final IAspectWrite<ValueTypeBoolean.ValueBoolean, ValueTypeBoolean> CLICK_ITEM_BOOLEAN =
+                        TunnelAspectWriteBuilders.Player.BUILDER_BOOLEAN
+                                .withProperties(TunnelAspectWriteBuilders.Player.PROPERTIES_CLICK_SIMPLE)
+                                .handle(TunnelAspectWriteBuilders.Item.PROP_BOOLEAN_ITEMPREDICATE)
+                                .handle(TunnelAspectWriteBuilders.Player.PROP_ITEMTARGET_CLICK)
+                                .handle(TunnelAspectWriteBuilders.Item.PROP_EXPORT)
+                                .appendKind("click").buildWrite();
+                public static final IAspectWrite<ValueTypeInteger.ValueInteger, ValueTypeInteger> CLICK_ITEM_INTEGER =
+                        TunnelAspectWriteBuilders.Player.BUILDER_INTEGER
+                                .withProperties(TunnelAspectWriteBuilders.Player.PROPERTIES_CLICK_NORATE)
+                                .handle(TunnelAspectWriteBuilders.Item.PROP_INTEGER_ITEMPREDICATE)
+                                .handle(TunnelAspectWriteBuilders.Player.PROP_ITEMTARGET_CLICK)
+                                .handle(TunnelAspectWriteBuilders.Item.PROP_EXPORT)
+                                .appendKind("click").buildWrite();
+                public static final IAspectWrite<ValueObjectTypeItemStack.ValueItemStack, ValueObjectTypeItemStack> CLICK_ITEM_ITEMSTACK =
+                        TunnelAspectWriteBuilders.Player.BUILDER_ITEMSTACK
+                                .withProperties(TunnelAspectWriteBuilders.Player.PROPERTIES_CLICK)
+                                .handle(TunnelAspectWriteBuilders.Item.PROP_ITEMSTACK_ITEMPREDICATE)
+                                .handle(TunnelAspectWriteBuilders.Player.PROP_ITEMTARGET_CLICK)
+                                .handle(TunnelAspectWriteBuilders.Item.PROP_EXPORT)
+                                .appendKind("click").buildWrite();
+                public static final IAspectWrite<ValueTypeList.ValueList, ValueTypeList> CLICK_ITEM_LISTITEMSTACK =
+                        TunnelAspectWriteBuilders.Player.BUILDER_LIST
+                                .withProperties(TunnelAspectWriteBuilders.Player.PROPERTIES_CLICK)
+                                .handle(TunnelAspectWriteBuilders.Item.PROP_ITEMSTACKLIST_ITEMPREDICATE)
+                                .handle(TunnelAspectWriteBuilders.Player.PROP_ITEMTARGET_CLICK)
+                                .handle(TunnelAspectWriteBuilders.Item.PROP_EXPORT)
+                                .appendKind("click").buildWrite();
+                public static final IAspectWrite<ValueTypeOperator.ValueOperator, ValueTypeOperator> CLICK_ITEM_PREDICATEITEMSTACK =
+                        TunnelAspectWriteBuilders.Player.BUILDER_OPERATOR
+                                .withProperties(TunnelAspectWriteBuilders.Player.PROPERTIES_CLICK)
+                                .handle(TunnelAspectWriteBuilders.Item.PROP_ITEMSTACKPREDICATE_ITEMPREDICATE)
+                                .handle(TunnelAspectWriteBuilders.Player.PROP_ITEMTARGET_CLICK)
+                                .handle(TunnelAspectWriteBuilders.Item.PROP_EXPORT)
+                                .appendKind("click").buildWrite();
+
+        }
+
     }
 
 }
