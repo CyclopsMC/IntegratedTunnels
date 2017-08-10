@@ -15,6 +15,8 @@ public class PartTypes {
     public static final PartTypeInterfaceEnergy INTERFACE_ENERGY = REGISTRY.register(new PartTypeInterfaceEnergy("interface_energy"));
     public static final PartTypeImporterEnergy IMPORTER_ENERGY = REGISTRY.register(new PartTypeImporterEnergy("importer_energy"));
     public static final PartTypeExporterEnergy EXPORTER_ENERGY = REGISTRY.register(new PartTypeExporterEnergy("exporter_energy"));
+    public static final PartTypeImporterWorldEnergy IMPORTER_WORLD_ENERGY = REGISTRY.register(new PartTypeImporterWorldEnergy("importer_world_energy"));
+    public static final PartTypeExporterWorldEnergy EXPORTER_WORLD_ENERGY = REGISTRY.register(new PartTypeExporterWorldEnergy("exporter_world_energy"));
 
     public static final PartTypeInterfaceItem INTERFACE_ITEM = REGISTRY.register(new PartTypeInterfaceItem("interface_item"));
     public static final PartTypeImporterItem IMPORTER_ITEM = REGISTRY.register(new PartTypeImporterItem("importer_item"));

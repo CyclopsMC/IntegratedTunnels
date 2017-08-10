@@ -24,8 +24,12 @@ dependencies {
         compile "org.cyclops.cyclopscore:CyclopsCore:${config.minecraft_version}-${config.cyclopscore_version}:deobf"
     }
 
-    deobfCompile("org.cyclops.commoncapabilities:CommonCapabilities:${config.commoncapabilities_version}") { // https://dl.bintray.com/cyclopsmc/dev/org/cyclops/commoncapabilities/CommonCapabilities/
-        exclude group: 'org.cyclops.cyclopscore', module: 'CyclopsCore'
+    if(project.hasProperty("commoncapabilities_version_local")) {
+        compile "org.cyclops.commoncapabilities:CommonCapabilities:${config.minecraft_version}-${project.commoncapabilities_version_local}:deobf"
+    } else {
+        deobfCompile("org.cyclops.commoncapabilities:CommonCapabilities:${config.commoncapabilities_version}") { // https://dl.bintray.com/cyclopsmc/dev/org/cyclops/commoncapabilities/CommonCapabilities/
+            exclude group: 'org.cyclops.cyclopscore', module: 'CyclopsCore'
+        }
     }
     deobfCompile "net.darkhax.tesla:Tesla-${config.teslaapi_version}" // http://maven.epoxide.org/net/darkhax/tesla/Tesla/
 

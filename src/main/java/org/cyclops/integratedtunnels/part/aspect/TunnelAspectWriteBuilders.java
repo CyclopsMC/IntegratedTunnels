@@ -3,10 +3,13 @@ package org.cyclops.integratedtunnels.part.aspect;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterables;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.energy.CapabilityEnergy;
@@ -17,6 +20,7 @@ import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.lang3.tuple.Triple;
 import org.cyclops.commoncapabilities.api.capability.inventorystate.IInventoryState;
 import org.cyclops.commoncapabilities.api.capability.itemhandler.ISlotlessItemHandler;
@@ -538,30 +542,31 @@ public class TunnelAspectWriteBuilders {
                 return Triple.of(input.getLeft(), input.getMiddle(), input.getRight() ? input.getMiddle().getValue(PROP_RATE).getRawValue() : 0);
             }
         };
-        public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, Integer>, FluidTarget>
-                PROP_INTEGER_FLUIDTARGET = new IAspectValuePropagator<Triple<PartTarget, IAspectProperties, Integer>, FluidTarget>() {
+
+        public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, Integer>, Triple<PartTarget, IAspectProperties, Pair<Predicate<FluidStack>, Integer>>>
+                PROP_INTEGER_FLUIDPREDICATE = new IAspectValuePropagator<Triple<PartTarget, IAspectProperties, Integer>, Triple<PartTarget, IAspectProperties, Pair<Predicate<FluidStack>, Integer>>>() {
             @Override
-            public FluidTarget getOutput(Triple<PartTarget, IAspectProperties, Integer> input) {
-                return FluidTarget.of(input.getLeft(), input.getMiddle(), input.getRight(), TunnelFluidHelpers.MATCH_ALL);
+            public Triple<PartTarget, IAspectProperties, Pair<Predicate<FluidStack>, Integer>> getOutput(Triple<PartTarget, IAspectProperties, Integer> input) {
+                return Triple.of(input.getLeft(), input.getMiddle(), Pair.of(TunnelFluidHelpers.MATCH_ALL, input.getRight()));
             }
         };
-        public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, FluidStack>, FluidTarget>
-                PROP_FLUIDSTACK_FLUIDTARGET = new IAspectValuePropagator<Triple<PartTarget, IAspectProperties, FluidStack>, FluidTarget>() {
+        public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, FluidStack>, Triple<PartTarget, IAspectProperties, Pair<Predicate<FluidStack>, Integer>>>
+                PROP_FLUIDSTACK_FLUIDPREDICATE = new IAspectValuePropagator<Triple<PartTarget, IAspectProperties, FluidStack>, Triple<PartTarget, IAspectProperties, Pair<Predicate<FluidStack>, Integer>>>() {
             @Override
-            public FluidTarget getOutput(Triple<PartTarget, IAspectProperties, FluidStack> input) {
+            public Triple<PartTarget, IAspectProperties, Pair<Predicate<FluidStack>, Integer>> getOutput(Triple<PartTarget, IAspectProperties, FluidStack> input) {
                 IAspectProperties properties = input.getMiddle();
                 int rate = properties.getValue(PROP_RATE).getRawValue();
                 boolean checkAmount = properties.getValue(PROP_CHECK_AMOUNT).getRawValue();
                 boolean checkNbt = properties.getValue(PROP_CHECK_NBT).getRawValue();
-                return FluidTarget.of(input.getLeft(), input.getMiddle(), rate,
-                        TunnelFluidHelpers.matchFluidStack(input.getRight(), checkAmount, checkNbt));
+                return Triple.of(input.getLeft(), input.getMiddle(),
+                        Pair.of(TunnelFluidHelpers.matchFluidStack(input.getRight(), checkAmount, checkNbt), rate));
             }
         };
-        public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, ValueTypeList.ValueList>, FluidTarget>
-                PROP_FLUIDSTACKLIST_FLUIDTARGET = new IAspectValuePropagator<Triple<PartTarget, IAspectProperties, ValueTypeList.ValueList>, FluidTarget>() {
+        public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, ValueTypeList.ValueList>, Triple<PartTarget, IAspectProperties, Pair<Predicate<FluidStack>, Integer>>>
+                PROP_FLUIDSTACKLIST_FLUIDPREDICATE = new IAspectValuePropagator<Triple<PartTarget, IAspectProperties, ValueTypeList.ValueList>, Triple<PartTarget, IAspectProperties, Pair<Predicate<FluidStack>, Integer>>>() {
             @Override
-            public FluidTarget getOutput(Triple<PartTarget, IAspectProperties, ValueTypeList.ValueList> input) throws EvaluationException {
-                ValueTypeList.ValueList list = input.getRight();
+            public Triple<PartTarget, IAspectProperties, Pair<Predicate<FluidStack>, Integer>> getOutput(Triple<PartTarget, IAspectProperties, ValueTypeList.ValueList> input) throws EvaluationException {
+                ValueTypeList.ValueList<ValueObjectTypeFluidStack, ValueObjectTypeFluidStack.ValueFluidStack> list = input.getRight();
                 if (list.getRawValue().getValueType() != ValueTypes.OBJECT_FLUIDSTACK) {
                     throw new EvaluationException(new L10NHelpers.UnlocalizedString(L10NValues.VALUETYPE_ERROR_INVALIDLISTVALUETYPE,
                             ValueTypes.OBJECT_FLUIDSTACK, list.getRawValue().getValueType()).localize());
@@ -570,26 +575,34 @@ public class TunnelAspectWriteBuilders {
                 int rate = properties.getValue(PROP_RATE).getRawValue();
                 boolean checkAmount = properties.getValue(PROP_CHECK_AMOUNT).getRawValue();
                 boolean checkNbt = properties.getValue(PROP_CHECK_NBT).getRawValue();
-                return FluidTarget.of(input.getLeft(), input.getMiddle(), rate,
-                        TunnelFluidHelpers.matchFluidStacks(list.getRawValue(), checkAmount, checkNbt));
+                return Triple.of(input.getLeft(), input.getMiddle(),
+                        Pair.of(TunnelFluidHelpers.matchFluidStacks(list.getRawValue(), checkAmount, checkNbt), rate));
             }
         };
-        public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, ValueTypeOperator.ValueOperator>, FluidTarget>
-                PROP_FLUIDSTACKPREDICATE_FLUIDTARGET = new IAspectValuePropagator<Triple<PartTarget, IAspectProperties, ValueTypeOperator.ValueOperator>, FluidTarget>() {
+        public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, ValueTypeOperator.ValueOperator>, Triple<PartTarget, IAspectProperties, Pair<Predicate<FluidStack>, Integer>>>
+                PROP_FLUIDSTACKPREDICATE_FLUIDPREDICATE = new IAspectValuePropagator<Triple<PartTarget, IAspectProperties, ValueTypeOperator.ValueOperator>, Triple<PartTarget, IAspectProperties, Pair<Predicate<FluidStack>, Integer>>>() {
             @Override
-            public FluidTarget getOutput(Triple<PartTarget, IAspectProperties, ValueTypeOperator.ValueOperator> input) throws EvaluationException {
+            public Triple<PartTarget, IAspectProperties, Pair<Predicate<FluidStack>, Integer>> getOutput(Triple<PartTarget, IAspectProperties, ValueTypeOperator.ValueOperator> input) throws EvaluationException {
                 IOperator predicate = input.getRight().getRawValue();
                 if (predicate.getInputTypes().length == 1 && ValueHelpers.correspondsTo(predicate.getInputTypes()[0], ValueTypes.OBJECT_FLUIDSTACK)) {
                     IAspectProperties properties = input.getMiddle();
                     int rate = properties.getValue(PROP_RATE).getRawValue();
-                    return FluidTarget.of(input.getLeft(), input.getMiddle(), rate,
-                            TunnelFluidHelpers.matchPredicate(input.getLeft(), predicate));
+                    return Triple.of(input.getLeft(), input.getMiddle(),
+                            Pair.of(TunnelFluidHelpers.matchPredicate(input.getLeft(), predicate), rate));
                 } else {
                     String current = ValueTypeOperator.getSignature(predicate);
                     String expected = ValueTypeOperator.getSignature(new IValueType[]{ValueTypes.OBJECT_FLUIDSTACK}, ValueTypes.BOOLEAN);
                     throw new EvaluationException(new L10NHelpers.UnlocalizedString(L10NValues.ASPECT_ERROR_INVALIDTYPE,
                             expected, current).localize());
                 }
+            }
+        };
+        public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, Pair<Predicate<FluidStack>, Integer>>, FluidTarget>
+                PROP_FLUIDTARGET = new IAspectValuePropagator<Triple<PartTarget, IAspectProperties, Pair<Predicate<FluidStack>, Integer>>, FluidTarget>() {
+            @Override
+            public FluidTarget getOutput(Triple<PartTarget, IAspectProperties, Pair<Predicate<FluidStack>, Integer>> input) throws EvaluationException {
+                return FluidTarget.of(input.getLeft(), input.getMiddle(),
+                        input.getRight().getRight(), input.getRight().getLeft());
             }
         };
 
@@ -832,6 +845,33 @@ public class TunnelAspectWriteBuilders {
 
             PROPERTIES_ENTITYITEM_PLACE.setValue(Item.PROP_RATE, ValueTypeInteger.ValueInteger.of(64));
         }
+        public static final IAspectProperties PROPERTIES_ITEM_RATESLOT = Item.PROPERTIES_RATESLOT.clone();
+        public static final IAspectProperties PROPERTIES_ITEM_SLOT = Item.PROPERTIES_SLOT.clone();
+        public static final IAspectProperties PROPERTIES_ITEM_RATESLOTCHECKS = Item.PROPERTIES_RATESLOTCHECKS.clone();
+        static {
+            PROPERTIES_ITEM_RATESLOT.setValue(Player.PROPERTY_ENTITYINDEX, ValueTypeInteger.ValueInteger.of(0));
+
+            PROPERTIES_ITEM_SLOT.setValue(Player.PROPERTY_ENTITYINDEX, ValueTypeInteger.ValueInteger.of(0));
+
+            PROPERTIES_ITEM_RATESLOTCHECKS.setValue(Player.PROPERTY_ENTITYINDEX, ValueTypeInteger.ValueInteger.of(0));
+        }
+        public static final IAspectProperties PROPERTIES_FLUID_RATE = Fluid.PROPERTIES_RATE.clone();
+        public static final IAspectProperties PROPERTIES_FLUID_RATECHECKS = Fluid.PROPERTIES_RATECHECKS.clone();
+        static {
+            PROPERTIES_FLUID_RATE.setValue(Player.PROPERTY_ENTITYINDEX, ValueTypeInteger.ValueInteger.of(0));
+
+            PROPERTIES_FLUID_RATECHECKS.setValue(Player.PROPERTY_ENTITYINDEX, ValueTypeInteger.ValueInteger.of(0));
+        }
+        public static final IAspectProperties PROPERTIES_ENERGY = Energy.PROPERTIES.clone();
+        static {
+            PROPERTIES_ENERGY.setValue(Player.PROPERTY_ENTITYINDEX, ValueTypeInteger.ValueInteger.of(0));
+        }
+        public static final IAspectProperties PROPERTIES_ENTITY = new AspectProperties(ImmutableList.<IAspectPropertyTypeInstance>of(
+                Player.PROPERTY_ENTITYINDEX
+        ));
+        static {
+            PROPERTIES_ENTITY.setValue(Player.PROPERTY_ENTITYINDEX, ValueTypeInteger.ValueInteger.of(0));
+        }
 
         public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, Boolean>, Fluid.FluidTarget>
                 PROP_BOOLEAN_FLUIDTARGET = new IAspectValuePropagator<Triple<PartTarget, IAspectProperties, Boolean>, Fluid.FluidTarget>() {
@@ -1032,6 +1072,77 @@ public class TunnelAspectWriteBuilders {
                 PROP_ENTITYITEM_ITEMTARGET_IMPORT = newPropEntityItemItemTarget(true);
         public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, Triple<ItemStackPredicate, Integer, Integer>>, Item.ItemTarget>
                 PROP_ENTITYITEM_ITEMTARGET_EXPORT = newPropEntityItemItemTarget(false);
+
+        public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, Triple<ItemStackPredicate, Integer, Integer>>, Item.ItemTarget>
+                PROP_ENTITY_ITEMTARGET = new IAspectValuePropagator<Triple<PartTarget, IAspectProperties, Triple<ItemStackPredicate, Integer, Integer>>, Item.ItemTarget>() {
+            @Override
+            public Item.ItemTarget getOutput(Triple<PartTarget, IAspectProperties, Triple<ItemStackPredicate, Integer, Integer>> input) throws EvaluationException {
+                PartTarget partTarget = input.getLeft();
+                IAspectProperties properties = input.getMiddle();
+                int amount = input.getRight().getMiddle();
+                int transferHash = input.getRight().getRight();
+                ItemStackPredicate itemStackMatcher = input.getRight().getLeft();
+                int entityIndex = properties.getValue(Player.PROPERTY_ENTITYINDEX).getRawValue();
+
+                PartPos center = partTarget.getCenter();
+                PartPos target = partTarget.getTarget();
+                INetwork network = NetworkHelpers.getNetwork(center.getPos().getWorld(), center.getPos().getBlockPos());
+                IItemHandler itemHandler = null;
+                Entity entity = Iterables.get(target.getPos().getWorld().getEntitiesWithinAABB(Entity.class,
+                        new AxisAlignedBB(target.getPos().getBlockPos())), entityIndex, null);
+                if (entity != null && entity.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, target.getSide())) {
+                    itemHandler = entity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, target.getSide());
+                }
+                int slot = properties.getValue(Item.PROP_SLOT).getRawValue();
+                return new Item.ItemTarget(network, itemHandler, null, null, target.hashCode(), slot, amount,
+                        itemStackMatcher, transferHash, partTarget, properties);
+            }
+        };
+
+        public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, Integer>, Energy.EnergyTarget>
+                PROP_ENTITY_ENERGYTARGET = new IAspectValuePropagator<Triple<PartTarget, IAspectProperties, Integer>, Energy.EnergyTarget>() {
+            @Override
+            public Energy.EnergyTarget getOutput(Triple<PartTarget, IAspectProperties, Integer> input) throws EvaluationException {
+                PartTarget partTarget = input.getLeft();
+                IAspectProperties properties = input.getMiddle();
+                int amount = input.getRight();
+                int entityIndex = properties.getValue(Player.PROPERTY_ENTITYINDEX).getRawValue();
+
+                PartPos center = partTarget.getCenter();
+                PartPos target = partTarget.getTarget();
+                INetwork network = NetworkHelpers.getNetwork(center.getPos().getWorld(), center.getPos().getBlockPos());
+                IEnergyStorage energyStorage = null;
+                Entity entity = Iterables.get(target.getPos().getWorld().getEntitiesWithinAABB(Entity.class,
+                        new AxisAlignedBB(target.getPos().getBlockPos())), entityIndex, null);
+                if (entity != null && entity.hasCapability(CapabilityEnergy.ENERGY, target.getSide())) {
+                    energyStorage = entity.getCapability(CapabilityEnergy.ENERGY, target.getSide());
+                }
+                return new Energy.EnergyTarget(network.getCapability(Capabilities.NETWORK_ENERGY), energyStorage, amount);
+            }
+        };
+
+        public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, Pair<Predicate<FluidStack>, Integer>>, Fluid.FluidTarget>
+                PROP_ENTITY_FLUIDTARGET = new IAspectValuePropagator<Triple<PartTarget, IAspectProperties, Pair<Predicate<FluidStack>, Integer>>, Fluid.FluidTarget>() {
+            @Override
+            public Fluid.FluidTarget getOutput(Triple<PartTarget, IAspectProperties, Pair<Predicate<FluidStack>, Integer>> input) throws EvaluationException {
+                PartTarget partTarget = input.getLeft();
+                IAspectProperties properties = input.getMiddle();
+                int amount = input.getRight().getRight();
+                Predicate<FluidStack> fluidStackPredicate = input.getRight().getLeft();
+                int entityIndex = properties.getValue(Player.PROPERTY_ENTITYINDEX).getRawValue();
+
+                PartPos center = partTarget.getCenter();
+                PartPos target = partTarget.getTarget();
+                INetwork network = NetworkHelpers.getNetwork(center.getPos().getWorld(), center.getPos().getBlockPos());
+                IFluidHandler fluidHandler = null;
+                Entity entity = Iterables.get(target.getPos().getWorld().getEntitiesWithinAABB(Entity.class,
+                        new AxisAlignedBB(target.getPos().getBlockPos())), entityIndex, null);
+                if (entity != null && entity.hasCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, target.getSide())) {
+                    fluidHandler = entity.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, target.getSide());
+                }
+                return new Fluid.FluidTarget(partTarget, network.getCapability(Capabilities.NETWORK_FLUID), fluidHandler, amount, fluidStackPredicate, properties);
+            }
+        };
 
     }
 

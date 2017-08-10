@@ -63,6 +63,26 @@
 
 	<recipe type="shapeless">
 		<input>
+			<item>integratedtunnels:part_exporter_energy_item</item>
+			<item>integrateddynamics:logic_director</item>
+		</input>
+		<output>
+			<item>integratedtunnels:part_exporter_world_energy_item</item>
+		</output>
+	</recipe>
+
+	<recipe type="shapeless">
+		<input>
+			<item>integratedtunnels:part_importer_energy_item</item>
+			<item>integrateddynamics:logic_director</item>
+		</input>
+		<output>
+			<item>integratedtunnels:part_importer_world_energy_item</item>
+		</output>
+	</recipe>
+
+	<recipe type="shapeless">
+		<input>
 			<item>integratedtunnels:part_exporter_item_item</item>
 			<item>integrateddynamics:logic_director</item>
 		</input>
