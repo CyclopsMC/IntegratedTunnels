@@ -14,4 +14,9 @@ public abstract class PartTypeTunnelAspectsWorld<P extends IPartTypeWriter<P, S>
         super(name, new PartRenderPosition(0.1875F, 0.1875F, 0.625F, 0.625F));
     }
 
+    @Override
+    public int getConsumptionRate(S state) {
+        return state.hasVariable() ? 32 : super.getConsumptionRate(state);
+    }
+
 }
