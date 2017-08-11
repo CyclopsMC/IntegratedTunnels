@@ -120,7 +120,7 @@ public class ItemHandlerPlayerWrapper implements IItemHandler {
 
             // Use itemstack
             if (!stack.isEmpty()) {
-                EnumActionResult cancelResult = net.minecraftforge.common.ForgeHooks.onItemRightClickAction(player, hand);
+                EnumActionResult cancelResult = net.minecraftforge.common.ForgeHooks.onItemRightClick(player, hand);
                 if (cancelResult != null)  {
                     if (cancelResult == EnumActionResult.FAIL) {
                         return stack;

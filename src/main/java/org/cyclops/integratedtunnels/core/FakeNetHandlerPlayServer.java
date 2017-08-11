@@ -121,8 +121,8 @@ public class FakeNetHandlerPlayServer extends NetHandlerPlayServer {
     }
 
     @Override
-    public void disconnect(String reason) {
-        super.disconnect(reason);
+    public void disconnect(ITextComponent textComponent) {
+
     }
 
     @Override

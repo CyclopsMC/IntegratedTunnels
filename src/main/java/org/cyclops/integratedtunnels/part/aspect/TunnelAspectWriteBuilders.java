@@ -63,6 +63,9 @@ import org.cyclops.integratedtunnels.core.*;
 import org.cyclops.integratedtunnels.core.part.PartStatePositionedAddon;
 import org.cyclops.integratedtunnels.part.PartStatePlayerSimulator;
 
+import javax.annotation.Nullable;
+import java.util.function.Function;
+
 /**
  * Collection of tunnel aspect write builders and value propagators.
  * @author rubensworks

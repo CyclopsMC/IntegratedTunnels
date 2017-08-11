@@ -48,7 +48,7 @@ public class ItemHandlerWorldEntityImportWrapper implements IItemHandler {
     @Nonnull
     @Override
     public ItemStack getStackInSlot(int slot) {
-        return slot < this.entities.size() ? this.entities.get(slot).getEntityItem() : ItemStack.EMPTY;
+        return slot < this.entities.size() ? this.entities.get(slot).getItem() : ItemStack.EMPTY;
     }
 
     @Nonnull
@@ -65,14 +65,14 @@ public class ItemHandlerWorldEntityImportWrapper implements IItemHandler {
         }
 
         EntityItem entity = this.entities.get(slot);
-        ItemStack itemStack = entity.getEntityItem();
+        ItemStack itemStack = entity.getItem();
         itemStack = itemStack.copy();
         ItemStack ret = itemStack.splitStack(amount);
         if (!simulate) {
             if (itemStack.isEmpty()) {
                 entity.setDead();
             } else {
-                entity.setEntityItemStack(itemStack);
+                entity.setItem(itemStack);
             }
             if (GeneralConfig.worldInteractionEvents) {
                 world.playEvent(1000, pos, 0); // Sound
