@@ -761,391 +761,415 @@ public class TunnelAspectWriteBuilders {
                 new AspectPropertyTypeInstance<ValueTypeDouble, ValueTypeDouble.ValueDouble>(ValueTypes.DOUBLE, "aspect.aspecttypes.integratedtunnels.double.world.yaw.name", VALIDATOR_DOUBLE_ANGLE);
         public static final IAspectPropertyTypeInstance<ValueTypeDouble, ValueTypeDouble.ValueDouble> PROP_PITCH =
                 new AspectPropertyTypeInstance<ValueTypeDouble, ValueTypeDouble.ValueDouble>(ValueTypes.DOUBLE, "aspect.aspecttypes.integratedtunnels.double.world.pitch.name", VALIDATOR_DOUBLE_ANGLE);
+        public static final IAspectPropertyTypeInstance<ValueTypeInteger, ValueTypeInteger.ValueInteger> PROPERTY_ENTITYINDEX =
+                new AspectPropertyTypeInstance<ValueTypeInteger, ValueTypeInteger.ValueInteger>(ValueTypes.INTEGER, "aspect.aspecttypes.integratedtunnels.integer.entityindex.name");
 
-        public static final IAspectProperties PROPERTIES_FLUID_UPDATE = new AspectProperties(ImmutableList.<IAspectPropertyTypeInstance>of(
-                Fluid.PROP_CHECK_NBT,
-                PROP_BLOCK_UPDATE,
-                PROP_IGNORE_REPLACABLE
-        ));
-        public static final IAspectProperties PROPERTIES_FLUID = new AspectProperties(ImmutableList.<IAspectPropertyTypeInstance>of(
-                Fluid.PROP_CHECK_NBT
-        ));
-        public static final IAspectProperties PROPERTIES_BLOCK_PLACE = new AspectProperties(ImmutableList.<IAspectPropertyTypeInstance>of(
-                Item.PROP_CHECK_DAMAGE,
-                Item.PROP_CHECK_NBT,
-                PROP_BLOCK_UPDATE,
-                PROP_HAND_LEFT,
-                PROP_IGNORE_REPLACABLE
-        ));
-        public static final IAspectProperties PROPERTIES_BLOCK_PICK_UP = new AspectProperties(ImmutableList.<IAspectPropertyTypeInstance>of(
-                Item.PROP_CHECK_DAMAGE,
-                Item.PROP_CHECK_NBT,
-                PROP_BLOCK_UPDATE,
-                PROP_HAND_LEFT,
-                PROP_SILK_TOUCH,
-                PROP_IGNORE_REPLACABLE,
-                PROP_BREAK_ON_NO_DROPS
-        ));
-        public static final IAspectProperties PROPERTIES_ENTITYITEM_PICK_UP_NORATE = new AspectProperties(ImmutableList.<IAspectPropertyTypeInstance>of(
-                Item.PROP_CHECK_DAMAGE,
-                Item.PROP_CHECK_NBT,
-                PROP_IGNORE_PICK_UP_DELAY
-        ));
-        public static final IAspectProperties PROPERTIES_ENTITYITEM_PLACE_NORATE = new AspectProperties(ImmutableList.<IAspectPropertyTypeInstance>of(
-                Item.PROP_CHECK_DAMAGE,
-                Item.PROP_CHECK_NBT,
-                PROP_DISPENSE,
-                PROP_OFFSET_X,
-                PROP_OFFSET_Y,
-                PROP_OFFSET_Z,
-                PROP_LIFESPAN,
-                PROP_DELAY_BEFORE_PICKUP,
-                PROP_VELOCITY,
-                PROP_YAW,
-                PROP_PITCH
-        ));
-        static {
-            PROPERTIES_FLUID_UPDATE.setValue(Fluid.PROP_CHECK_NBT, ValueTypeBoolean.ValueBoolean.of(true));
-            PROPERTIES_FLUID_UPDATE.setValue(PROP_BLOCK_UPDATE, ValueTypeBoolean.ValueBoolean.of(false));
-            PROPERTIES_FLUID_UPDATE.setValue(PROP_IGNORE_REPLACABLE, ValueTypeBoolean.ValueBoolean.of(false));
+        public static final class Energy {
 
-            PROPERTIES_FLUID.setValue(Fluid.PROP_CHECK_NBT, ValueTypeBoolean.ValueBoolean.of(true));
-
-            PROPERTIES_BLOCK_PLACE.setValue(Item.PROP_CHECK_DAMAGE, ValueTypeBoolean.ValueBoolean.of(true));
-            PROPERTIES_BLOCK_PLACE.setValue(Item.PROP_CHECK_NBT, ValueTypeBoolean.ValueBoolean.of(true));
-            PROPERTIES_BLOCK_PLACE.setValue(PROP_BLOCK_UPDATE, ValueTypeBoolean.ValueBoolean.of(false));
-            PROPERTIES_BLOCK_PLACE.setValue(PROP_HAND_LEFT, ValueTypeBoolean.ValueBoolean.of(true));
-            PROPERTIES_BLOCK_PLACE.setValue(PROP_IGNORE_REPLACABLE, ValueTypeBoolean.ValueBoolean.of(false));
-
-            PROPERTIES_BLOCK_PICK_UP.setValue(Item.PROP_CHECK_DAMAGE, ValueTypeBoolean.ValueBoolean.of(true));
-            PROPERTIES_BLOCK_PICK_UP.setValue(Item.PROP_CHECK_NBT, ValueTypeBoolean.ValueBoolean.of(true));
-            PROPERTIES_BLOCK_PICK_UP.setValue(PROP_BLOCK_UPDATE, ValueTypeBoolean.ValueBoolean.of(false));
-            PROPERTIES_BLOCK_PICK_UP.setValue(PROP_HAND_LEFT, ValueTypeBoolean.ValueBoolean.of(true));
-            PROPERTIES_BLOCK_PICK_UP.setValue(PROP_SILK_TOUCH, ValueTypeBoolean.ValueBoolean.of(false));
-            PROPERTIES_BLOCK_PICK_UP.setValue(PROP_IGNORE_REPLACABLE, ValueTypeBoolean.ValueBoolean.of(false));
-            PROPERTIES_BLOCK_PICK_UP.setValue(PROP_BREAK_ON_NO_DROPS, ValueTypeBoolean.ValueBoolean.of(true));
-
-            PROPERTIES_ENTITYITEM_PICK_UP_NORATE.setValue(Item.PROP_CHECK_DAMAGE, ValueTypeBoolean.ValueBoolean.of(true));
-            PROPERTIES_ENTITYITEM_PICK_UP_NORATE.setValue(Item.PROP_CHECK_NBT, ValueTypeBoolean.ValueBoolean.of(true));
-            PROPERTIES_ENTITYITEM_PICK_UP_NORATE.setValue(PROP_IGNORE_PICK_UP_DELAY, ValueTypeBoolean.ValueBoolean.of(true));
-
-            PROPERTIES_ENTITYITEM_PLACE_NORATE.setValue(Item.PROP_CHECK_DAMAGE, ValueTypeBoolean.ValueBoolean.of(true));
-            PROPERTIES_ENTITYITEM_PLACE_NORATE.setValue(Item.PROP_CHECK_NBT, ValueTypeBoolean.ValueBoolean.of(true));
-            PROPERTIES_ENTITYITEM_PLACE_NORATE.setValue(PROP_DISPENSE, ValueTypeBoolean.ValueBoolean.of(false));
-            PROPERTIES_ENTITYITEM_PLACE_NORATE.setValue(PROP_OFFSET_X, ValueTypeDouble.ValueDouble.of(0.5D));
-            PROPERTIES_ENTITYITEM_PLACE_NORATE.setValue(PROP_OFFSET_Y, ValueTypeDouble.ValueDouble.of(0.5D));
-            PROPERTIES_ENTITYITEM_PLACE_NORATE.setValue(PROP_OFFSET_Z, ValueTypeDouble.ValueDouble.of(0.5D));
-            PROPERTIES_ENTITYITEM_PLACE_NORATE.setValue(PROP_LIFESPAN, ValueTypeInteger.ValueInteger.of(6000));
-            PROPERTIES_ENTITYITEM_PLACE_NORATE.setValue(PROP_DELAY_BEFORE_PICKUP, ValueTypeInteger.ValueInteger.of(10));
-            PROPERTIES_ENTITYITEM_PLACE_NORATE.setValue(PROP_VELOCITY, ValueTypeDouble.ValueDouble.of(0.1D));
-            PROPERTIES_ENTITYITEM_PLACE_NORATE.setValue(PROP_YAW, ValueTypeDouble.ValueDouble.of(0D));
-            PROPERTIES_ENTITYITEM_PLACE_NORATE.setValue(PROP_PITCH, ValueTypeDouble.ValueDouble.of(0D));
-        }
-        public static final IAspectProperties PROPERTIES_ENTITYITEM_PICK_UP = PROPERTIES_ENTITYITEM_PICK_UP_NORATE.clone();
-        public static final IAspectProperties PROPERTIES_ENTITYITEM_PLACE = PROPERTIES_ENTITYITEM_PLACE_NORATE.clone();
-        static {
-            PROPERTIES_ENTITYITEM_PICK_UP.setValue(Item.PROP_RATE, ValueTypeInteger.ValueInteger.of(64));
-
-            PROPERTIES_ENTITYITEM_PLACE.setValue(Item.PROP_RATE, ValueTypeInteger.ValueInteger.of(64));
-        }
-        public static final IAspectProperties PROPERTIES_ITEM_RATESLOT = Item.PROPERTIES_RATESLOT.clone();
-        public static final IAspectProperties PROPERTIES_ITEM_SLOT = Item.PROPERTIES_SLOT.clone();
-        public static final IAspectProperties PROPERTIES_ITEM_RATESLOTCHECKS = Item.PROPERTIES_RATESLOTCHECKS.clone();
-        static {
-            PROPERTIES_ITEM_RATESLOT.setValue(Player.PROPERTY_ENTITYINDEX, ValueTypeInteger.ValueInteger.of(0));
-
-            PROPERTIES_ITEM_SLOT.setValue(Player.PROPERTY_ENTITYINDEX, ValueTypeInteger.ValueInteger.of(0));
-
-            PROPERTIES_ITEM_RATESLOTCHECKS.setValue(Player.PROPERTY_ENTITYINDEX, ValueTypeInteger.ValueInteger.of(0));
-        }
-        public static final IAspectProperties PROPERTIES_FLUID_RATE = Fluid.PROPERTIES_RATE.clone();
-        public static final IAspectProperties PROPERTIES_FLUID_RATECHECKS = Fluid.PROPERTIES_RATECHECKS.clone();
-        static {
-            PROPERTIES_FLUID_RATE.setValue(Player.PROPERTY_ENTITYINDEX, ValueTypeInteger.ValueInteger.of(0));
-
-            PROPERTIES_FLUID_RATECHECKS.setValue(Player.PROPERTY_ENTITYINDEX, ValueTypeInteger.ValueInteger.of(0));
-        }
-        public static final IAspectProperties PROPERTIES_ENERGY = Energy.PROPERTIES.clone();
-        static {
-            PROPERTIES_ENERGY.setValue(Player.PROPERTY_ENTITYINDEX, ValueTypeInteger.ValueInteger.of(0));
-        }
-        public static final IAspectProperties PROPERTIES_ENTITY = new AspectProperties(ImmutableList.<IAspectPropertyTypeInstance>of(
-                Player.PROPERTY_ENTITYINDEX
-        ));
-        static {
-            PROPERTIES_ENTITY.setValue(Player.PROPERTY_ENTITYINDEX, ValueTypeInteger.ValueInteger.of(0));
-        }
-
-        public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, Boolean>, Fluid.FluidTarget>
-                PROP_BOOLEAN_FLUIDTARGET = new IAspectValuePropagator<Triple<PartTarget, IAspectProperties, Boolean>, Fluid.FluidTarget>() {
-            @Override
-            public Fluid.FluidTarget getOutput(Triple<PartTarget, IAspectProperties, Boolean> input) {
-                return Fluid.FluidTarget.of(input.getLeft(), input.getMiddle(), net.minecraftforge.fluids.Fluid.BUCKET_VOLUME,
-                        input.getRight() ? TunnelFluidHelpers.MATCH_ALL : TunnelFluidHelpers.MATCH_NONE);
+            public static final IAspectProperties PROPERTIES = TunnelAspectWriteBuilders.Energy.PROPERTIES.clone();
+            static {
+                PROPERTIES.setValue(World.PROPERTY_ENTITYINDEX, ValueTypeInteger.ValueInteger.of(0));
             }
-        };
-        public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, FluidStack>, Fluid.FluidTarget>
-                PROP_FLUIDSTACK_FLUIDTARGET = new IAspectValuePropagator<Triple<PartTarget, IAspectProperties, FluidStack>, Fluid.FluidTarget>() {
-            @Override
-            public Fluid.FluidTarget getOutput(Triple<PartTarget, IAspectProperties, FluidStack> input) {
-                IAspectProperties properties = input.getMiddle();
-                boolean checkNbt = properties.getValue(Fluid.PROP_CHECK_NBT).getRawValue();
-                return Fluid.FluidTarget.of(input.getLeft(), input.getMiddle(), net.minecraftforge.fluids.Fluid.BUCKET_VOLUME,
-                        TunnelFluidHelpers.matchFluidStack(input.getRight(), false, checkNbt));
+            public static final IAspectProperties PROPERTIES_ENTITY = new AspectProperties(ImmutableList.<IAspectPropertyTypeInstance>of(
+                    World.PROPERTY_ENTITYINDEX
+            ));
+            static {
+                PROPERTIES_ENTITY.setValue(World.PROPERTY_ENTITYINDEX, ValueTypeInteger.ValueInteger.of(0));
             }
-        };
-        public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, ValueTypeList.ValueList>, Fluid.FluidTarget>
-                PROP_FLUIDSTACKLIST_FLUIDTARGET = new IAspectValuePropagator<Triple<PartTarget, IAspectProperties, ValueTypeList.ValueList>, Fluid.FluidTarget>() {
-            @Override
-            public Fluid.FluidTarget getOutput(Triple<PartTarget, IAspectProperties, ValueTypeList.ValueList> input) throws EvaluationException {
-                ValueTypeList.ValueList list = input.getRight();
-                if (list.getRawValue().getValueType() != ValueTypes.OBJECT_FLUIDSTACK) {
-                    throw new EvaluationException(new L10NHelpers.UnlocalizedString(L10NValues.VALUETYPE_ERROR_INVALIDLISTVALUETYPE,
-                            ValueTypes.OBJECT_FLUIDSTACK, list.getRawValue().getValueType()).localize());
-                }
-                IAspectProperties properties = input.getMiddle();
-                boolean checkNbt = properties.getValue(Fluid.PROP_CHECK_NBT).getRawValue();
-                return Fluid.FluidTarget.of(input.getLeft(), input.getMiddle(), net.minecraftforge.fluids.Fluid.BUCKET_VOLUME,
-                        TunnelFluidHelpers.matchFluidStacks(list.getRawValue(), false, checkNbt));
-            }
-        };
-        public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, ValueTypeOperator.ValueOperator>, Fluid.FluidTarget>
-                PROP_FLUIDSTACKPREDICATE_FLUIDTARGET = new IAspectValuePropagator<Triple<PartTarget, IAspectProperties, ValueTypeOperator.ValueOperator>, Fluid.FluidTarget>() {
-            @Override
-            public Fluid.FluidTarget getOutput(Triple<PartTarget, IAspectProperties, ValueTypeOperator.ValueOperator> input) throws EvaluationException {
-                IOperator predicate = input.getRight().getRawValue();
-                if (predicate.getInputTypes().length == 1 && ValueHelpers.correspondsTo(predicate.getInputTypes()[0], ValueTypes.OBJECT_FLUIDSTACK)) {
-                    return Fluid.FluidTarget.of(input.getLeft(), input.getMiddle(), net.minecraftforge.fluids.Fluid.BUCKET_VOLUME,
-                            TunnelFluidHelpers.matchPredicate(input.getLeft(), predicate));
-                } else {
-                    String current = ValueTypeOperator.getSignature(predicate);
-                    String expected = ValueTypeOperator.getSignature(new IValueType[]{ValueTypes.OBJECT_FLUIDSTACK}, ValueTypes.BOOLEAN);
-                    throw new EvaluationException(new L10NHelpers.UnlocalizedString(L10NValues.ASPECT_ERROR_INVALIDTYPE,
-                            expected, current).localize());
-                }
-            }
-        };
 
-        public static final IAspectValuePropagator<Fluid.FluidTarget, Void>
-                PROP_FLUIDSTACK_EXPORT = new IAspectValuePropagator<Fluid.FluidTarget, Void>() {
-            @Override
-            public Void getOutput(Fluid.FluidTarget input) {
-                PartPos target = input.getPartTarget().getTarget();
-                IFluidNetwork fluidNetwork = input.getFluidNetwork();
-                final DimPos pos = target.getPos();
-                if (pos.isLoaded() && input.getFluidNetwork() != null) {
-                    TunnelFluidHelpers.placeFluids(fluidNetwork, pos.getWorld(), pos.getBlockPos(),
-                            input.getFluidStackMatcher(), input.getProperties().getValue(PROP_BLOCK_UPDATE).getRawValue(),
-                            input.getProperties().getValue(PROP_IGNORE_REPLACABLE).getRawValue());
-                }
-                return null;
-
-            }
-        };
-
-        public static final IAspectValuePropagator<Fluid.FluidTarget, Void>
-                PROP_FLUIDSTACK_IMPORT = new IAspectValuePropagator<Fluid.FluidTarget, Void>() {
-            @Override
-            public Void getOutput(Fluid.FluidTarget input) {
-                PartPos target = input.getPartTarget().getTarget();
-                IFluidNetwork fluidNetwork = input.getFluidNetwork();
-                final DimPos pos = target.getPos();
-                if (pos.isLoaded() && input.getFluidNetwork() != null) {
-                    TunnelFluidHelpers.pickUpFluids(target.getPos().getWorld(), target.getPos().getBlockPos(),
-                            target.getSide(), fluidNetwork, input.getFluidStackMatcher());
-                }
-                return null;
-            }
-        };
-
-        public static <T> IAspectValuePropagator<Triple<PartTarget, IAspectProperties, T>, Triple<PartTarget, IAspectProperties, T>>
-            ignoreStackSize() {
-            return new IAspectValuePropagator<Triple<PartTarget, IAspectProperties, T>, Triple<PartTarget, IAspectProperties, T>>() {
+            public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, Integer>, TunnelAspectWriteBuilders.Energy.EnergyTarget>
+                    PROP_ENTITY_ENERGYTARGET = new IAspectValuePropagator<Triple<PartTarget, IAspectProperties, Integer>, TunnelAspectWriteBuilders.Energy.EnergyTarget>() {
                 @Override
-                public Triple<PartTarget, IAspectProperties, T> getOutput(Triple<PartTarget, IAspectProperties, T> input) {
-                    IAspectProperties aspectProperties = input.getMiddle().clone();
-                    aspectProperties.setValue(Item.PROP_CHECK_STACKSIZE, ValueTypeBoolean.ValueBoolean.of(false));
-                    aspectProperties.setValue(Item.PROP_RATE, ValueTypeInteger.ValueInteger.of(1));
-                    return Triple.of(input.getLeft(), aspectProperties, input.getRight());
+                public TunnelAspectWriteBuilders.Energy.EnergyTarget getOutput(Triple<PartTarget, IAspectProperties, Integer> input) throws EvaluationException {
+                    PartTarget partTarget = input.getLeft();
+                    IAspectProperties properties = input.getMiddle();
+                    int amount = input.getRight();
+                    int entityIndex = properties.getValue(World.PROPERTY_ENTITYINDEX).getRawValue();
+
+                    PartPos center = partTarget.getCenter();
+                    PartPos target = partTarget.getTarget();
+                    INetwork network = NetworkHelpers.getNetwork(center.getPos().getWorld(), center.getPos().getBlockPos());
+                    IEnergyStorage energyStorage = null;
+                    Entity entity = Iterables.get(target.getPos().getWorld().getEntitiesWithinAABB(Entity.class,
+                            new AxisAlignedBB(target.getPos().getBlockPos())), entityIndex, null);
+                    if (entity != null && entity.hasCapability(CapabilityEnergy.ENERGY, target.getSide())) {
+                        energyStorage = entity.getCapability(CapabilityEnergy.ENERGY, target.getSide());
+                    }
+                    return new TunnelAspectWriteBuilders.Energy.EnergyTarget(network.getCapability(Capabilities.NETWORK_ENERGY), energyStorage, amount);
                 }
             };
+
         }
-        public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, Boolean>, Item.ItemTarget>
-                PROP_BOOLEAN_ITEMTARGET = new IAspectValuePropagator<Triple<PartTarget, IAspectProperties, Boolean>, Item.ItemTarget>() {
-            @Override
-            public Item.ItemTarget getOutput(Triple<PartTarget, IAspectProperties, Boolean> input) {
-                return Item.ItemTarget.of(input.getLeft(), input.getMiddle(), 1,
-                        input.getRight() ? TunnelItemHelpers.MATCH_BLOCK : TunnelItemHelpers.MATCH_NONE,
-                        input.getRight() ? 1 : 0);
+
+        public static final class Item {
+
+            public static final IAspectProperties PROPERTIES_ENTITYITEM_PICK_UP_NORATE = new AspectProperties(ImmutableList.<IAspectPropertyTypeInstance>of(
+                    TunnelAspectWriteBuilders.Item.PROP_CHECK_DAMAGE,
+                    TunnelAspectWriteBuilders.Item.PROP_CHECK_NBT,
+                    PROP_IGNORE_PICK_UP_DELAY
+            ));
+            public static final IAspectProperties PROPERTIES_ENTITYITEM_PLACE_NORATE = new AspectProperties(ImmutableList.<IAspectPropertyTypeInstance>of(
+                    TunnelAspectWriteBuilders.Item.PROP_CHECK_DAMAGE,
+                    TunnelAspectWriteBuilders.Item.PROP_CHECK_NBT,
+                    PROP_DISPENSE,
+                    PROP_OFFSET_X,
+                    PROP_OFFSET_Y,
+                    PROP_OFFSET_Z,
+                    PROP_LIFESPAN,
+                    PROP_DELAY_BEFORE_PICKUP,
+                    PROP_VELOCITY,
+                    PROP_YAW,
+                    PROP_PITCH
+            ));
+            static {
+                PROPERTIES_ENTITYITEM_PICK_UP_NORATE.setValue(TunnelAspectWriteBuilders.Item.PROP_CHECK_DAMAGE, ValueTypeBoolean.ValueBoolean.of(true));
+                PROPERTIES_ENTITYITEM_PICK_UP_NORATE.setValue(TunnelAspectWriteBuilders.Item.PROP_CHECK_NBT, ValueTypeBoolean.ValueBoolean.of(true));
+                PROPERTIES_ENTITYITEM_PICK_UP_NORATE.setValue(PROP_IGNORE_PICK_UP_DELAY, ValueTypeBoolean.ValueBoolean.of(true));
+
+                PROPERTIES_ENTITYITEM_PLACE_NORATE.setValue(TunnelAspectWriteBuilders.Item.PROP_CHECK_DAMAGE, ValueTypeBoolean.ValueBoolean.of(true));
+                PROPERTIES_ENTITYITEM_PLACE_NORATE.setValue(TunnelAspectWriteBuilders.Item.PROP_CHECK_NBT, ValueTypeBoolean.ValueBoolean.of(true));
+                PROPERTIES_ENTITYITEM_PLACE_NORATE.setValue(PROP_DISPENSE, ValueTypeBoolean.ValueBoolean.of(false));
+                PROPERTIES_ENTITYITEM_PLACE_NORATE.setValue(PROP_OFFSET_X, ValueTypeDouble.ValueDouble.of(0.5D));
+                PROPERTIES_ENTITYITEM_PLACE_NORATE.setValue(PROP_OFFSET_Y, ValueTypeDouble.ValueDouble.of(0.5D));
+                PROPERTIES_ENTITYITEM_PLACE_NORATE.setValue(PROP_OFFSET_Z, ValueTypeDouble.ValueDouble.of(0.5D));
+                PROPERTIES_ENTITYITEM_PLACE_NORATE.setValue(PROP_LIFESPAN, ValueTypeInteger.ValueInteger.of(6000));
+                PROPERTIES_ENTITYITEM_PLACE_NORATE.setValue(PROP_DELAY_BEFORE_PICKUP, ValueTypeInteger.ValueInteger.of(10));
+                PROPERTIES_ENTITYITEM_PLACE_NORATE.setValue(PROP_VELOCITY, ValueTypeDouble.ValueDouble.of(0.1D));
+                PROPERTIES_ENTITYITEM_PLACE_NORATE.setValue(PROP_YAW, ValueTypeDouble.ValueDouble.of(0D));
+                PROPERTIES_ENTITYITEM_PLACE_NORATE.setValue(PROP_PITCH, ValueTypeDouble.ValueDouble.of(0D));
             }
-        };
+            public static final IAspectProperties PROPERTIES_ENTITYITEM_PICK_UP = PROPERTIES_ENTITYITEM_PICK_UP_NORATE.clone();
+            public static final IAspectProperties PROPERTIES_ENTITYITEM_PLACE = PROPERTIES_ENTITYITEM_PLACE_NORATE.clone();
+            static {
+                PROPERTIES_ENTITYITEM_PICK_UP.setValue(TunnelAspectWriteBuilders.Item.PROP_RATE, ValueTypeInteger.ValueInteger.of(64));
 
-        public static final IAspectValuePropagator<Item.ItemTarget, Void>
-                PROP_ITEMBLOCK_EXPORT = new IAspectValuePropagator<Item.ItemTarget, Void>() {
-            @Override
-            public Void getOutput(Item.ItemTarget input) {
-                PartPos target = input.getPartTarget().getTarget();
-                IItemNetwork itemNetwork = input.getItemNetwork();
-                if (target.getPos().isLoaded() && itemNetwork != null) {
-                    EnumHand hand = input.getProperties().getValue(PROP_HAND_LEFT).getRawValue()
-                            ? EnumHand.MAIN_HAND : EnumHand.OFF_HAND;
-                    boolean blockUpdate = input.getProperties().getValue(PROP_BLOCK_UPDATE).getRawValue();
-                    boolean ignoreReplacable = input.getProperties().getValue(PROP_IGNORE_REPLACABLE).getRawValue();
-                    TunnelItemHelpers.placeItems(input.getConnectionHash(), itemNetwork,
-                            input.getInventoryStateNetwork(), input.getItemNetworkSlotless(),
-                            target.getPos().getWorld(), target.getPos().getBlockPos(), target.getSide(),
-                            input.getItemStackMatcher(), hand, blockUpdate, ignoreReplacable);
-                }
-                return null;
-
+                PROPERTIES_ENTITYITEM_PLACE.setValue(TunnelAspectWriteBuilders.Item.PROP_RATE, ValueTypeInteger.ValueInteger.of(64));
             }
-        };
+            public static final IAspectProperties PROPERTIES_RATESLOT = TunnelAspectWriteBuilders.Item.PROPERTIES_RATESLOT.clone();
+            public static final IAspectProperties PROPERTIES_SLOT = TunnelAspectWriteBuilders.Item.PROPERTIES_SLOT.clone();
+            public static final IAspectProperties PROPERTIES_RATESLOTCHECKS = TunnelAspectWriteBuilders.Item.PROPERTIES_RATESLOTCHECKS.clone();
+            static {
+                PROPERTIES_RATESLOT.setValue(World.PROPERTY_ENTITYINDEX, ValueTypeInteger.ValueInteger.of(0));
 
-        public static final IAspectValuePropagator<Item.ItemTarget, Void>
-                PROP_ITEMBLOCK_IMPORT = new IAspectValuePropagator<Item.ItemTarget, Void>() {
-            @Override
-            public Void getOutput(Item.ItemTarget input) {
-                PartPos target = input.getPartTarget().getTarget();
-                IItemNetwork itemNetwork = input.getItemNetwork();
-                if (target.getPos().isLoaded() && itemNetwork != null) {
-                    EnumHand hand = input.getProperties().getValue(PROP_HAND_LEFT).getRawValue()
-                            ? EnumHand.MAIN_HAND : EnumHand.OFF_HAND;
-                    boolean blockUpdate = input.getProperties().getValue(PROP_BLOCK_UPDATE).getRawValue();
-                    boolean ignoreReplacable = input.getProperties().getValue(PROP_IGNORE_REPLACABLE).getRawValue();
-                    int fortune = 0;
-                    boolean silkTouch = input.getProperties().getValue(PROP_SILK_TOUCH).getRawValue();
-                    boolean breakOnNoDrops = input.getProperties().getValue(PROP_BREAK_ON_NO_DROPS).getRawValue();
-                    TunnelItemHelpers.pickUpItems(input.getConnectionHash(),
-                            target.getPos().getWorld(), target.getPos().getBlockPos(), target.getSide(),
-                            itemNetwork, input.getInventoryStateNetwork(), input.getItemNetworkSlotless(),
-                            input.getItemStackMatcher(), hand, blockUpdate, ignoreReplacable,
-                            fortune, silkTouch, breakOnNoDrops);
-                }
-                return null;
+                PROPERTIES_SLOT.setValue(World.PROPERTY_ENTITYINDEX, ValueTypeInteger.ValueInteger.of(0));
 
+                PROPERTIES_RATESLOTCHECKS.setValue(World.PROPERTY_ENTITYINDEX, ValueTypeInteger.ValueInteger.of(0));
             }
-        };
 
-        public static IAspectValuePropagator<Triple<PartTarget, IAspectProperties, Triple<ItemStackPredicate, Integer, Integer>>, Item.ItemTarget>
-        newPropEntityItemItemTarget(final boolean doImport) {
-            return new IAspectValuePropagator<Triple<PartTarget, IAspectProperties, Triple<ItemStackPredicate, Integer, Integer>>, Item.ItemTarget>() {
+            public static <T> IAspectValuePropagator<Triple<PartTarget, IAspectProperties, T>, Triple<PartTarget, IAspectProperties, T>>
+            ignoreStackSize() {
+                return new IAspectValuePropagator<Triple<PartTarget, IAspectProperties, T>, Triple<PartTarget, IAspectProperties, T>>() {
+                    @Override
+                    public Triple<PartTarget, IAspectProperties, T> getOutput(Triple<PartTarget, IAspectProperties, T> input) {
+                        IAspectProperties aspectProperties = input.getMiddle().clone();
+                        aspectProperties.setValue(TunnelAspectWriteBuilders.Item.PROP_CHECK_STACKSIZE, ValueTypeBoolean.ValueBoolean.of(false));
+                        aspectProperties.setValue(TunnelAspectWriteBuilders.Item.PROP_RATE, ValueTypeInteger.ValueInteger.of(1));
+                        return Triple.of(input.getLeft(), aspectProperties, input.getRight());
+                    }
+                };
+            }
+            public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, Boolean>, TunnelAspectWriteBuilders.Item.ItemTarget>
+                    PROP_BOOLEAN_ITEMTARGET = new IAspectValuePropagator<Triple<PartTarget, IAspectProperties, Boolean>, TunnelAspectWriteBuilders.Item.ItemTarget>() {
                 @Override
-                public Item.ItemTarget getOutput(Triple<PartTarget, IAspectProperties, Triple<ItemStackPredicate, Integer, Integer>> input) {
+                public TunnelAspectWriteBuilders.Item.ItemTarget getOutput(Triple<PartTarget, IAspectProperties, Boolean> input) {
+                    return TunnelAspectWriteBuilders.Item.ItemTarget.of(input.getLeft(), input.getMiddle(), 1,
+                            input.getRight() ? TunnelItemHelpers.MATCH_BLOCK : TunnelItemHelpers.MATCH_NONE,
+                            input.getRight() ? 1 : 0);
+                }
+            };
+
+            public static IAspectValuePropagator<Triple<PartTarget, IAspectProperties, Triple<ItemStackPredicate, Integer, Integer>>, TunnelAspectWriteBuilders.Item.ItemTarget>
+            newPropEntityItemItemTarget(final boolean doImport) {
+                return new IAspectValuePropagator<Triple<PartTarget, IAspectProperties, Triple<ItemStackPredicate, Integer, Integer>>, TunnelAspectWriteBuilders.Item.ItemTarget>() {
+                    @Override
+                    public TunnelAspectWriteBuilders.Item.ItemTarget getOutput(Triple<PartTarget, IAspectProperties, Triple<ItemStackPredicate, Integer, Integer>> input) {
+                        PartTarget partTarget = input.getLeft();
+                        IAspectProperties properties = input.getMiddle();
+                        int amount = input.getRight().getMiddle();
+                        int transferHash = input.getRight().getRight();
+                        ItemStackPredicate itemStackMatcher = input.getRight().getLeft();
+
+                        PartPos center = partTarget.getCenter();
+                        PartPos target = partTarget.getTarget();
+                        INetwork network = NetworkHelpers.getNetwork(center.getPos().getWorld(), center.getPos().getBlockPos());
+                        IItemHandler itemHandler;
+                        if (doImport) {
+                            boolean ignorePickupDelay = properties.getValue(PROP_IGNORE_PICK_UP_DELAY).getRawValue();
+                            itemHandler = new ItemHandlerWorldEntityImportWrapper((WorldServer) target.getPos().getWorld(),
+                                    target.getPos().getBlockPos(), target.getSide(), ignorePickupDelay
+                            );
+                        } else {
+                            double offsetX = properties.getValue(PROP_OFFSET_X).getRawValue();
+                            double offsetY = properties.getValue(PROP_OFFSET_Y).getRawValue();
+                            double offsetZ = properties.getValue(PROP_OFFSET_Z).getRawValue();
+                            int lifespan = properties.getValue(PROP_LIFESPAN).getRawValue();
+                            int delayBeforePickup = properties.getValue(PROP_DELAY_BEFORE_PICKUP).getRawValue();
+                            EnumFacing facing = center.getSide();
+                            double velocity = properties.getValue(PROP_VELOCITY).getRawValue();
+                            double yaw = properties.getValue(PROP_YAW).getRawValue();
+                            double pitch = properties.getValue(PROP_PITCH).getRawValue();
+                            boolean dispense = properties.getValue(PROP_DISPENSE).getRawValue();
+                            itemHandler = new ItemHandlerWorldEntityExportWrapper(
+                                    (WorldServer) target.getPos().getWorld(),
+                                    target.getPos().getBlockPos(), offsetX, offsetY, offsetZ,
+                                    lifespan, delayBeforePickup, facing, velocity, yaw, pitch,
+                                    dispense, network.getCapability(Capabilities.SLOTLESS_ITEMHANDLER)
+                            );
+                        }
+                        int slot = properties.getValue(TunnelAspectWriteBuilders.Item.PROP_SLOT).getRawValue();
+                        return new TunnelAspectWriteBuilders.Item.ItemTarget(network, itemHandler, null, null, target.hashCode(), slot, amount,
+                                itemStackMatcher, transferHash, partTarget, properties);
+                    }
+                };
+            }
+
+            public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, Triple<ItemStackPredicate, Integer, Integer>>, TunnelAspectWriteBuilders.Item.ItemTarget>
+                    PROP_ENTITYITEM_ITEMTARGET_IMPORT = newPropEntityItemItemTarget(true);
+            public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, Triple<ItemStackPredicate, Integer, Integer>>, TunnelAspectWriteBuilders.Item.ItemTarget>
+                    PROP_ENTITYITEM_ITEMTARGET_EXPORT = newPropEntityItemItemTarget(false);
+
+            public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, Triple<ItemStackPredicate, Integer, Integer>>, TunnelAspectWriteBuilders.Item.ItemTarget>
+                    PROP_ENTITY_ITEMTARGET = new IAspectValuePropagator<Triple<PartTarget, IAspectProperties, Triple<ItemStackPredicate, Integer, Integer>>, TunnelAspectWriteBuilders.Item.ItemTarget>() {
+                @Override
+                public TunnelAspectWriteBuilders.Item.ItemTarget getOutput(Triple<PartTarget, IAspectProperties, Triple<ItemStackPredicate, Integer, Integer>> input) throws EvaluationException {
                     PartTarget partTarget = input.getLeft();
                     IAspectProperties properties = input.getMiddle();
                     int amount = input.getRight().getMiddle();
                     int transferHash = input.getRight().getRight();
                     ItemStackPredicate itemStackMatcher = input.getRight().getLeft();
+                    int entityIndex = properties.getValue(World.PROPERTY_ENTITYINDEX).getRawValue();
 
                     PartPos center = partTarget.getCenter();
                     PartPos target = partTarget.getTarget();
                     INetwork network = NetworkHelpers.getNetwork(center.getPos().getWorld(), center.getPos().getBlockPos());
-                    IItemHandler itemHandler;
-                    if (doImport) {
-                        boolean ignorePickupDelay = properties.getValue(PROP_IGNORE_PICK_UP_DELAY).getRawValue();
-                        itemHandler = new ItemHandlerWorldEntityImportWrapper((WorldServer) target.getPos().getWorld(),
-                                target.getPos().getBlockPos(), target.getSide(), ignorePickupDelay
-                        );
-                    } else {
-                        double offsetX = properties.getValue(PROP_OFFSET_X).getRawValue();
-                        double offsetY = properties.getValue(PROP_OFFSET_Y).getRawValue();
-                        double offsetZ = properties.getValue(PROP_OFFSET_Z).getRawValue();
-                        int lifespan = properties.getValue(PROP_LIFESPAN).getRawValue();
-                        int delayBeforePickup = properties.getValue(PROP_DELAY_BEFORE_PICKUP).getRawValue();
-                        EnumFacing facing = center.getSide();
-                        double velocity = properties.getValue(PROP_VELOCITY).getRawValue();
-                        double yaw = properties.getValue(PROP_YAW).getRawValue();
-                        double pitch = properties.getValue(PROP_PITCH).getRawValue();
-                        boolean dispense = properties.getValue(PROP_DISPENSE).getRawValue();
-                        itemHandler = new ItemHandlerWorldEntityExportWrapper(
-                                (WorldServer) target.getPos().getWorld(),
-                                target.getPos().getBlockPos(), offsetX, offsetY, offsetZ,
-                                lifespan, delayBeforePickup, facing, velocity, yaw, pitch,
-                                dispense, network.getCapability(Capabilities.SLOTLESS_ITEMHANDLER)
-                        );
+                    IItemHandler itemHandler = null;
+                    Entity entity = Iterables.get(target.getPos().getWorld().getEntitiesWithinAABB(Entity.class,
+                            new AxisAlignedBB(target.getPos().getBlockPos())), entityIndex, null);
+                    if (entity != null && entity.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, target.getSide())) {
+                        itemHandler = entity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, target.getSide());
                     }
-                    int slot = properties.getValue(Item.PROP_SLOT).getRawValue();
-                    return new Item.ItemTarget(network, itemHandler, null, null, target.hashCode(), slot, amount,
+                    int slot = properties.getValue(TunnelAspectWriteBuilders.Item.PROP_SLOT).getRawValue();
+                    return new TunnelAspectWriteBuilders.Item.ItemTarget(network, itemHandler, null, null, target.hashCode(), slot, amount,
                             itemStackMatcher, transferHash, partTarget, properties);
                 }
             };
+
         }
 
-        public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, Triple<ItemStackPredicate, Integer, Integer>>, Item.ItemTarget>
-                PROP_ENTITYITEM_ITEMTARGET_IMPORT = newPropEntityItemItemTarget(true);
-        public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, Triple<ItemStackPredicate, Integer, Integer>>, Item.ItemTarget>
-                PROP_ENTITYITEM_ITEMTARGET_EXPORT = newPropEntityItemItemTarget(false);
+        public static final class Fluid {
 
-        public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, Triple<ItemStackPredicate, Integer, Integer>>, Item.ItemTarget>
-                PROP_ENTITY_ITEMTARGET = new IAspectValuePropagator<Triple<PartTarget, IAspectProperties, Triple<ItemStackPredicate, Integer, Integer>>, Item.ItemTarget>() {
-            @Override
-            public Item.ItemTarget getOutput(Triple<PartTarget, IAspectProperties, Triple<ItemStackPredicate, Integer, Integer>> input) throws EvaluationException {
-                PartTarget partTarget = input.getLeft();
-                IAspectProperties properties = input.getMiddle();
-                int amount = input.getRight().getMiddle();
-                int transferHash = input.getRight().getRight();
-                ItemStackPredicate itemStackMatcher = input.getRight().getLeft();
-                int entityIndex = properties.getValue(Player.PROPERTY_ENTITYINDEX).getRawValue();
+            public static final IAspectProperties PROPERTIES_FLUID_UPDATE = new AspectProperties(ImmutableList.<IAspectPropertyTypeInstance>of(
+                    TunnelAspectWriteBuilders.Fluid.PROP_CHECK_NBT,
+                    PROP_BLOCK_UPDATE,
+                    PROP_IGNORE_REPLACABLE
+            ));
+            public static final IAspectProperties PROPERTIES_FLUID = new AspectProperties(ImmutableList.<IAspectPropertyTypeInstance>of(
+                    TunnelAspectWriteBuilders.Fluid.PROP_CHECK_NBT
+            ));
+            public static final IAspectProperties PROPERTIES_RATE = TunnelAspectWriteBuilders.Fluid.PROPERTIES_RATE.clone();
+            public static final IAspectProperties PROPERTIES_RATECHECKS = TunnelAspectWriteBuilders.Fluid.PROPERTIES_RATECHECKS.clone();
 
-                PartPos center = partTarget.getCenter();
-                PartPos target = partTarget.getTarget();
-                INetwork network = NetworkHelpers.getNetwork(center.getPos().getWorld(), center.getPos().getBlockPos());
-                IItemHandler itemHandler = null;
-                Entity entity = Iterables.get(target.getPos().getWorld().getEntitiesWithinAABB(Entity.class,
-                        new AxisAlignedBB(target.getPos().getBlockPos())), entityIndex, null);
-                if (entity != null && entity.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, target.getSide())) {
-                    itemHandler = entity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, target.getSide());
-                }
-                int slot = properties.getValue(Item.PROP_SLOT).getRawValue();
-                return new Item.ItemTarget(network, itemHandler, null, null, target.hashCode(), slot, amount,
-                        itemStackMatcher, transferHash, partTarget, properties);
+            static {
+                PROPERTIES_FLUID_UPDATE.setValue(TunnelAspectWriteBuilders.Fluid.PROP_CHECK_NBT, ValueTypeBoolean.ValueBoolean.of(true));
+                PROPERTIES_FLUID_UPDATE.setValue(PROP_BLOCK_UPDATE, ValueTypeBoolean.ValueBoolean.of(false));
+                PROPERTIES_FLUID_UPDATE.setValue(PROP_IGNORE_REPLACABLE, ValueTypeBoolean.ValueBoolean.of(false));
+
+                PROPERTIES_FLUID.setValue(TunnelAspectWriteBuilders.Fluid.PROP_CHECK_NBT, ValueTypeBoolean.ValueBoolean.of(true));
+
+                PROPERTIES_RATE.setValue(World.PROPERTY_ENTITYINDEX, ValueTypeInteger.ValueInteger.of(0));
+
+                PROPERTIES_RATECHECKS.setValue(World.PROPERTY_ENTITYINDEX, ValueTypeInteger.ValueInteger.of(0));
             }
-        };
 
-        public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, Integer>, Energy.EnergyTarget>
-                PROP_ENTITY_ENERGYTARGET = new IAspectValuePropagator<Triple<PartTarget, IAspectProperties, Integer>, Energy.EnergyTarget>() {
-            @Override
-            public Energy.EnergyTarget getOutput(Triple<PartTarget, IAspectProperties, Integer> input) throws EvaluationException {
-                PartTarget partTarget = input.getLeft();
-                IAspectProperties properties = input.getMiddle();
-                int amount = input.getRight();
-                int entityIndex = properties.getValue(Player.PROPERTY_ENTITYINDEX).getRawValue();
-
-                PartPos center = partTarget.getCenter();
-                PartPos target = partTarget.getTarget();
-                INetwork network = NetworkHelpers.getNetwork(center.getPos().getWorld(), center.getPos().getBlockPos());
-                IEnergyStorage energyStorage = null;
-                Entity entity = Iterables.get(target.getPos().getWorld().getEntitiesWithinAABB(Entity.class,
-                        new AxisAlignedBB(target.getPos().getBlockPos())), entityIndex, null);
-                if (entity != null && entity.hasCapability(CapabilityEnergy.ENERGY, target.getSide())) {
-                    energyStorage = entity.getCapability(CapabilityEnergy.ENERGY, target.getSide());
+            public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, Boolean>, TunnelAspectWriteBuilders.Fluid.FluidTarget>
+                    PROP_BOOLEAN_FLUIDTARGET = new IAspectValuePropagator<Triple<PartTarget, IAspectProperties, Boolean>, TunnelAspectWriteBuilders.Fluid.FluidTarget>() {
+                @Override
+                public TunnelAspectWriteBuilders.Fluid.FluidTarget getOutput(Triple<PartTarget, IAspectProperties, Boolean> input) {
+                    return TunnelAspectWriteBuilders.Fluid.FluidTarget.of(input.getLeft(), input.getMiddle(), net.minecraftforge.fluids.Fluid.BUCKET_VOLUME,
+                            input.getRight() ? TunnelFluidHelpers.MATCH_ALL : TunnelFluidHelpers.MATCH_NONE);
                 }
-                return new Energy.EnergyTarget(network.getCapability(Capabilities.NETWORK_ENERGY), energyStorage, amount);
-            }
-        };
-
-        public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, Pair<Predicate<FluidStack>, Integer>>, Fluid.FluidTarget>
-                PROP_ENTITY_FLUIDTARGET = new IAspectValuePropagator<Triple<PartTarget, IAspectProperties, Pair<Predicate<FluidStack>, Integer>>, Fluid.FluidTarget>() {
-            @Override
-            public Fluid.FluidTarget getOutput(Triple<PartTarget, IAspectProperties, Pair<Predicate<FluidStack>, Integer>> input) throws EvaluationException {
-                PartTarget partTarget = input.getLeft();
-                IAspectProperties properties = input.getMiddle();
-                int amount = input.getRight().getRight();
-                Predicate<FluidStack> fluidStackPredicate = input.getRight().getLeft();
-                int entityIndex = properties.getValue(Player.PROPERTY_ENTITYINDEX).getRawValue();
-
-                PartPos center = partTarget.getCenter();
-                PartPos target = partTarget.getTarget();
-                INetwork network = NetworkHelpers.getNetwork(center.getPos().getWorld(), center.getPos().getBlockPos());
-                IFluidHandler fluidHandler = null;
-                Entity entity = Iterables.get(target.getPos().getWorld().getEntitiesWithinAABB(Entity.class,
-                        new AxisAlignedBB(target.getPos().getBlockPos())), entityIndex, null);
-                if (entity != null && entity.hasCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, target.getSide())) {
-                    fluidHandler = entity.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, target.getSide());
+            };
+            public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, FluidStack>, TunnelAspectWriteBuilders.Fluid.FluidTarget>
+                    PROP_FLUIDSTACK_FLUIDTARGET = new IAspectValuePropagator<Triple<PartTarget, IAspectProperties, FluidStack>, TunnelAspectWriteBuilders.Fluid.FluidTarget>() {
+                @Override
+                public TunnelAspectWriteBuilders.Fluid.FluidTarget getOutput(Triple<PartTarget, IAspectProperties, FluidStack> input) {
+                    IAspectProperties properties = input.getMiddle();
+                    boolean checkNbt = properties.getValue(TunnelAspectWriteBuilders.Fluid.PROP_CHECK_NBT).getRawValue();
+                    return TunnelAspectWriteBuilders.Fluid.FluidTarget.of(input.getLeft(), input.getMiddle(), net.minecraftforge.fluids.Fluid.BUCKET_VOLUME,
+                            TunnelFluidHelpers.matchFluidStack(input.getRight(), false, checkNbt));
                 }
-                return new Fluid.FluidTarget(partTarget, network.getCapability(Capabilities.NETWORK_FLUID), fluidHandler, amount, fluidStackPredicate, properties);
+            };
+            public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, ValueTypeList.ValueList>, TunnelAspectWriteBuilders.Fluid.FluidTarget>
+                    PROP_FLUIDSTACKLIST_FLUIDTARGET = new IAspectValuePropagator<Triple<PartTarget, IAspectProperties, ValueTypeList.ValueList>, TunnelAspectWriteBuilders.Fluid.FluidTarget>() {
+                @Override
+                public TunnelAspectWriteBuilders.Fluid.FluidTarget getOutput(Triple<PartTarget, IAspectProperties, ValueTypeList.ValueList> input) throws EvaluationException {
+                    ValueTypeList.ValueList list = input.getRight();
+                    if (list.getRawValue().getValueType() != ValueTypes.OBJECT_FLUIDSTACK) {
+                        throw new EvaluationException(new L10NHelpers.UnlocalizedString(L10NValues.VALUETYPE_ERROR_INVALIDLISTVALUETYPE,
+                                ValueTypes.OBJECT_FLUIDSTACK, list.getRawValue().getValueType()).localize());
+                    }
+                    IAspectProperties properties = input.getMiddle();
+                    boolean checkNbt = properties.getValue(TunnelAspectWriteBuilders.Fluid.PROP_CHECK_NBT).getRawValue();
+                    return TunnelAspectWriteBuilders.Fluid.FluidTarget.of(input.getLeft(), input.getMiddle(), net.minecraftforge.fluids.Fluid.BUCKET_VOLUME,
+                            TunnelFluidHelpers.matchFluidStacks(list.getRawValue(), false, checkNbt));
+                }
+            };
+            public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, ValueTypeOperator.ValueOperator>, TunnelAspectWriteBuilders.Fluid.FluidTarget>
+                    PROP_FLUIDSTACKPREDICATE_FLUIDTARGET = new IAspectValuePropagator<Triple<PartTarget, IAspectProperties, ValueTypeOperator.ValueOperator>, TunnelAspectWriteBuilders.Fluid.FluidTarget>() {
+                @Override
+                public TunnelAspectWriteBuilders.Fluid.FluidTarget getOutput(Triple<PartTarget, IAspectProperties, ValueTypeOperator.ValueOperator> input) throws EvaluationException {
+                    IOperator predicate = input.getRight().getRawValue();
+                    if (predicate.getInputTypes().length == 1 && ValueHelpers.correspondsTo(predicate.getInputTypes()[0], ValueTypes.OBJECT_FLUIDSTACK)) {
+                        return TunnelAspectWriteBuilders.Fluid.FluidTarget.of(input.getLeft(), input.getMiddle(), net.minecraftforge.fluids.Fluid.BUCKET_VOLUME,
+                                TunnelFluidHelpers.matchPredicate(input.getLeft(), predicate));
+                    } else {
+                        String current = ValueTypeOperator.getSignature(predicate);
+                        String expected = ValueTypeOperator.getSignature(new IValueType[]{ValueTypes.OBJECT_FLUIDSTACK}, ValueTypes.BOOLEAN);
+                        throw new EvaluationException(new L10NHelpers.UnlocalizedString(L10NValues.ASPECT_ERROR_INVALIDTYPE,
+                                expected, current).localize());
+                    }
+                }
+            };
+
+            public static final IAspectValuePropagator<TunnelAspectWriteBuilders.Fluid.FluidTarget, Void>
+                    PROP_FLUIDSTACK_EXPORT = new IAspectValuePropagator<TunnelAspectWriteBuilders.Fluid.FluidTarget, Void>() {
+                @Override
+                public Void getOutput(TunnelAspectWriteBuilders.Fluid.FluidTarget input) {
+                    PartPos target = input.getPartTarget().getTarget();
+                    IFluidNetwork fluidNetwork = input.getFluidNetwork();
+                    final DimPos pos = target.getPos();
+                    if (pos.isLoaded() && input.getFluidNetwork() != null) {
+                        TunnelFluidHelpers.placeFluids(fluidNetwork, pos.getWorld(), pos.getBlockPos(),
+                                input.getFluidStackMatcher(), input.getProperties().getValue(PROP_BLOCK_UPDATE).getRawValue(),
+                                input.getProperties().getValue(PROP_IGNORE_REPLACABLE).getRawValue());
+                    }
+                    return null;
+
+                }
+            };
+
+            public static final IAspectValuePropagator<TunnelAspectWriteBuilders.Fluid.FluidTarget, Void>
+                    PROP_FLUIDSTACK_IMPORT = new IAspectValuePropagator<TunnelAspectWriteBuilders.Fluid.FluidTarget, Void>() {
+                @Override
+                public Void getOutput(TunnelAspectWriteBuilders.Fluid.FluidTarget input) {
+                    PartPos target = input.getPartTarget().getTarget();
+                    IFluidNetwork fluidNetwork = input.getFluidNetwork();
+                    final DimPos pos = target.getPos();
+                    if (pos.isLoaded() && input.getFluidNetwork() != null) {
+                        TunnelFluidHelpers.pickUpFluids(target.getPos().getWorld(), target.getPos().getBlockPos(),
+                                target.getSide(), fluidNetwork, input.getFluidStackMatcher());
+                    }
+                    return null;
+                }
+            };
+
+            public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, Pair<Predicate<FluidStack>, Integer>>, TunnelAspectWriteBuilders.Fluid.FluidTarget>
+                    PROP_ENTITY_FLUIDTARGET = new IAspectValuePropagator<Triple<PartTarget, IAspectProperties, Pair<Predicate<FluidStack>, Integer>>, TunnelAspectWriteBuilders.Fluid.FluidTarget>() {
+                @Override
+                public TunnelAspectWriteBuilders.Fluid.FluidTarget getOutput(Triple<PartTarget, IAspectProperties, Pair<Predicate<FluidStack>, Integer>> input) throws EvaluationException {
+                    PartTarget partTarget = input.getLeft();
+                    IAspectProperties properties = input.getMiddle();
+                    int amount = input.getRight().getRight();
+                    Predicate<FluidStack> fluidStackPredicate = input.getRight().getLeft();
+                    int entityIndex = properties.getValue(World.PROPERTY_ENTITYINDEX).getRawValue();
+
+                    PartPos center = partTarget.getCenter();
+                    PartPos target = partTarget.getTarget();
+                    INetwork network = NetworkHelpers.getNetwork(center.getPos().getWorld(), center.getPos().getBlockPos());
+                    IFluidHandler fluidHandler = null;
+                    Entity entity = Iterables.get(target.getPos().getWorld().getEntitiesWithinAABB(Entity.class,
+                            new AxisAlignedBB(target.getPos().getBlockPos())), entityIndex, null);
+                    if (entity != null && entity.hasCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, target.getSide())) {
+                        fluidHandler = entity.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, target.getSide());
+                    }
+                    return new TunnelAspectWriteBuilders.Fluid.FluidTarget(partTarget, network.getCapability(Capabilities.NETWORK_FLUID), fluidHandler, amount, fluidStackPredicate, properties);
+                }
+            };
+
+        }
+
+        public static final class Block {
+
+            public static final IAspectProperties PROPERTIES_PLACE = new AspectProperties(ImmutableList.<IAspectPropertyTypeInstance>of(
+                    TunnelAspectWriteBuilders.Item.PROP_CHECK_DAMAGE,
+                    TunnelAspectWriteBuilders.Item.PROP_CHECK_NBT,
+                    PROP_BLOCK_UPDATE,
+                    PROP_HAND_LEFT,
+                    PROP_IGNORE_REPLACABLE
+            ));
+            public static final IAspectProperties PROPERTIES_PICK_UP = new AspectProperties(ImmutableList.<IAspectPropertyTypeInstance>of(
+                    TunnelAspectWriteBuilders.Item.PROP_CHECK_DAMAGE,
+                    TunnelAspectWriteBuilders.Item.PROP_CHECK_NBT,
+                    PROP_BLOCK_UPDATE,
+                    PROP_HAND_LEFT,
+                    PROP_SILK_TOUCH,
+                    PROP_IGNORE_REPLACABLE,
+                    PROP_BREAK_ON_NO_DROPS
+            ));
+
+            static {
+                PROPERTIES_PLACE.setValue(TunnelAspectWriteBuilders.Item.PROP_CHECK_DAMAGE, ValueTypeBoolean.ValueBoolean.of(true));
+                PROPERTIES_PLACE.setValue(TunnelAspectWriteBuilders.Item.PROP_CHECK_NBT, ValueTypeBoolean.ValueBoolean.of(true));
+                PROPERTIES_PLACE.setValue(PROP_BLOCK_UPDATE, ValueTypeBoolean.ValueBoolean.of(false));
+                PROPERTIES_PLACE.setValue(PROP_HAND_LEFT, ValueTypeBoolean.ValueBoolean.of(true));
+                PROPERTIES_PLACE.setValue(PROP_IGNORE_REPLACABLE, ValueTypeBoolean.ValueBoolean.of(false));
+
+                PROPERTIES_PICK_UP.setValue(TunnelAspectWriteBuilders.Item.PROP_CHECK_DAMAGE, ValueTypeBoolean.ValueBoolean.of(true));
+                PROPERTIES_PICK_UP.setValue(TunnelAspectWriteBuilders.Item.PROP_CHECK_NBT, ValueTypeBoolean.ValueBoolean.of(true));
+                PROPERTIES_PICK_UP.setValue(PROP_BLOCK_UPDATE, ValueTypeBoolean.ValueBoolean.of(false));
+                PROPERTIES_PICK_UP.setValue(PROP_HAND_LEFT, ValueTypeBoolean.ValueBoolean.of(true));
+                PROPERTIES_PICK_UP.setValue(PROP_SILK_TOUCH, ValueTypeBoolean.ValueBoolean.of(false));
+                PROPERTIES_PICK_UP.setValue(PROP_IGNORE_REPLACABLE, ValueTypeBoolean.ValueBoolean.of(false));
+                PROPERTIES_PICK_UP.setValue(PROP_BREAK_ON_NO_DROPS, ValueTypeBoolean.ValueBoolean.of(true));
             }
-        };
+
+            public static final IAspectValuePropagator<TunnelAspectWriteBuilders.Item.ItemTarget, Void>
+                    PROP_ITEMBLOCK_EXPORT = new IAspectValuePropagator<TunnelAspectWriteBuilders.Item.ItemTarget, Void>() {
+                @Override
+                public Void getOutput(TunnelAspectWriteBuilders.Item.ItemTarget input) {
+                    PartPos target = input.getPartTarget().getTarget();
+                    IItemNetwork itemNetwork = input.getItemNetwork();
+                    if (target.getPos().isLoaded() && itemNetwork != null) {
+                        EnumHand hand = input.getProperties().getValue(PROP_HAND_LEFT).getRawValue()
+                                ? EnumHand.MAIN_HAND : EnumHand.OFF_HAND;
+                        boolean blockUpdate = input.getProperties().getValue(PROP_BLOCK_UPDATE).getRawValue();
+                        boolean ignoreReplacable = input.getProperties().getValue(PROP_IGNORE_REPLACABLE).getRawValue();
+                        TunnelItemHelpers.placeItems(input.getConnectionHash(), itemNetwork,
+                                input.getInventoryStateNetwork(), input.getItemNetworkSlotless(),
+                                target.getPos().getWorld(), target.getPos().getBlockPos(), target.getSide(),
+                                input.getItemStackMatcher(), hand, blockUpdate, ignoreReplacable);
+                    }
+                    return null;
+
+                }
+            };
+
+            public static final IAspectValuePropagator<TunnelAspectWriteBuilders.Item.ItemTarget, Void>
+                    PROP_ITEMBLOCK_IMPORT = new IAspectValuePropagator<TunnelAspectWriteBuilders.Item.ItemTarget, Void>() {
+                @Override
+                public Void getOutput(TunnelAspectWriteBuilders.Item.ItemTarget input) {
+                    PartPos target = input.getPartTarget().getTarget();
+                    IItemNetwork itemNetwork = input.getItemNetwork();
+                    if (target.getPos().isLoaded() && itemNetwork != null) {
+                        EnumHand hand = input.getProperties().getValue(PROP_HAND_LEFT).getRawValue()
+                                ? EnumHand.MAIN_HAND : EnumHand.OFF_HAND;
+                        boolean blockUpdate = input.getProperties().getValue(PROP_BLOCK_UPDATE).getRawValue();
+                        boolean ignoreReplacable = input.getProperties().getValue(PROP_IGNORE_REPLACABLE).getRawValue();
+                        int fortune = 0;
+                        boolean silkTouch = input.getProperties().getValue(PROP_SILK_TOUCH).getRawValue();
+                        boolean breakOnNoDrops = input.getProperties().getValue(PROP_BREAK_ON_NO_DROPS).getRawValue();
+                        TunnelItemHelpers.pickUpItems(input.getConnectionHash(),
+                                target.getPos().getWorld(), target.getPos().getBlockPos(), target.getSide(),
+                                itemNetwork, input.getInventoryStateNetwork(), input.getItemNetworkSlotless(),
+                                input.getItemStackMatcher(), hand, blockUpdate, ignoreReplacable,
+                                fortune, silkTouch, breakOnNoDrops);
+                    }
+                    return null;
+
+                }
+            };
+
+        }
 
     }
 
@@ -1172,8 +1196,6 @@ public class TunnelAspectWriteBuilders {
 
         public static final IAspectPropertyTypeInstance<ValueTypeBoolean, ValueTypeBoolean.ValueBoolean> PROP_RIGHT_CLICK =
                 new AspectPropertyTypeInstance<ValueTypeBoolean, ValueTypeBoolean.ValueBoolean>(ValueTypes.BOOLEAN, "aspect.aspecttypes.integratedtunnels.boolean.player.rightclick.name");
-        public static final IAspectPropertyTypeInstance<ValueTypeInteger, ValueTypeInteger.ValueInteger> PROPERTY_ENTITYINDEX =
-                new AspectPropertyTypeInstance<ValueTypeInteger, ValueTypeInteger.ValueInteger>(ValueTypes.INTEGER, "aspect.aspecttypes.integratedtunnels.integer.entityindex.name");
         public static final IAspectPropertyTypeInstance<ValueTypeBoolean, ValueTypeBoolean.ValueBoolean> PROP_CONTINUOUS_CLICK =
                 new AspectPropertyTypeInstance<ValueTypeBoolean, ValueTypeBoolean.ValueBoolean>(ValueTypes.BOOLEAN, "aspect.aspecttypes.integratedtunnels.boolean.player.continuousclick.name");
 
@@ -1181,7 +1203,7 @@ public class TunnelAspectWriteBuilders {
                 PROP_RIGHT_CLICK,
                 World.PROP_HAND_LEFT,
                 PROP_CONTINUOUS_CLICK,
-                PROPERTY_ENTITYINDEX,
+                World.PROPERTY_ENTITYINDEX,
                 World.PROP_OFFSET_X,
                 World.PROP_OFFSET_Y,
                 World.PROP_OFFSET_Z
@@ -1191,7 +1213,7 @@ public class TunnelAspectWriteBuilders {
                 World.PROP_HAND_LEFT,
                 PROP_CONTINUOUS_CLICK,
                 Item.PROP_RATE,
-                PROPERTY_ENTITYINDEX,
+                World.PROPERTY_ENTITYINDEX,
                 World.PROP_OFFSET_X,
                 World.PROP_OFFSET_Y,
                 World.PROP_OFFSET_Z
@@ -1200,7 +1222,7 @@ public class TunnelAspectWriteBuilders {
                 PROP_RIGHT_CLICK,
                 World.PROP_HAND_LEFT,
                 PROP_CONTINUOUS_CLICK,
-                PROPERTY_ENTITYINDEX,
+                World.PROPERTY_ENTITYINDEX,
                 World.PROP_OFFSET_X,
                 World.PROP_OFFSET_Y,
                 World.PROP_OFFSET_Z
@@ -1213,7 +1235,7 @@ public class TunnelAspectWriteBuilders {
                 Item.PROP_CHECK_DAMAGE,
                 Item.PROP_CHECK_NBT,
                 Item.PROP_RATE,
-                PROPERTY_ENTITYINDEX,
+                World.PROPERTY_ENTITYINDEX,
                 World.PROP_OFFSET_X,
                 World.PROP_OFFSET_Y,
                 World.PROP_OFFSET_Z
@@ -1222,7 +1244,7 @@ public class TunnelAspectWriteBuilders {
             PROPERTIES_CLICK_EMPTY.setValue(PROP_RIGHT_CLICK, ValueTypeBoolean.ValueBoolean.of(true));
             PROPERTIES_CLICK_EMPTY.setValue(World.PROP_HAND_LEFT, ValueTypeBoolean.ValueBoolean.of(true));
             PROPERTIES_CLICK_EMPTY.setValue(PROP_CONTINUOUS_CLICK, ValueTypeBoolean.ValueBoolean.of(true));
-            PROPERTIES_CLICK_EMPTY.setValue(PROPERTY_ENTITYINDEX, ValueTypeInteger.ValueInteger.of(-1));
+            PROPERTIES_CLICK_EMPTY.setValue(World.PROPERTY_ENTITYINDEX, ValueTypeInteger.ValueInteger.of(-1));
             PROPERTIES_CLICK_EMPTY.setValue(World.PROP_OFFSET_X, ValueTypeDouble.ValueDouble.of(0.5D));
             PROPERTIES_CLICK_EMPTY.setValue(World.PROP_OFFSET_Y, ValueTypeDouble.ValueDouble.of(0.5D));
             PROPERTIES_CLICK_EMPTY.setValue(World.PROP_OFFSET_Z, ValueTypeDouble.ValueDouble.of(0.5D));
@@ -1231,7 +1253,7 @@ public class TunnelAspectWriteBuilders {
             PROPERTIES_CLICK_SIMPLE.setValue(World.PROP_HAND_LEFT, ValueTypeBoolean.ValueBoolean.of(true));
             PROPERTIES_CLICK_SIMPLE.setValue(PROP_CONTINUOUS_CLICK, ValueTypeBoolean.ValueBoolean.of(true));
             PROPERTIES_CLICK_SIMPLE.setValue(Item.PROP_RATE, ValueTypeInteger.ValueInteger.of(1));
-            PROPERTIES_CLICK_SIMPLE.setValue(PROPERTY_ENTITYINDEX, ValueTypeInteger.ValueInteger.of(-1));
+            PROPERTIES_CLICK_SIMPLE.setValue(World.PROPERTY_ENTITYINDEX, ValueTypeInteger.ValueInteger.of(-1));
             PROPERTIES_CLICK_SIMPLE.setValue(World.PROP_OFFSET_X, ValueTypeDouble.ValueDouble.of(0.5D));
             PROPERTIES_CLICK_SIMPLE.setValue(World.PROP_OFFSET_Y, ValueTypeDouble.ValueDouble.of(0.5D));
             PROPERTIES_CLICK_SIMPLE.setValue(World.PROP_OFFSET_Z, ValueTypeDouble.ValueDouble.of(0.5D));
@@ -1239,7 +1261,7 @@ public class TunnelAspectWriteBuilders {
             PROPERTIES_CLICK_NORATE.setValue(PROP_RIGHT_CLICK, ValueTypeBoolean.ValueBoolean.of(true));
             PROPERTIES_CLICK_NORATE.setValue(World.PROP_HAND_LEFT, ValueTypeBoolean.ValueBoolean.of(true));
             PROPERTIES_CLICK_NORATE.setValue(PROP_CONTINUOUS_CLICK, ValueTypeBoolean.ValueBoolean.of(true));
-            PROPERTIES_CLICK_NORATE.setValue(PROPERTY_ENTITYINDEX, ValueTypeInteger.ValueInteger.of(-1));
+            PROPERTIES_CLICK_NORATE.setValue(World.PROPERTY_ENTITYINDEX, ValueTypeInteger.ValueInteger.of(-1));
             PROPERTIES_CLICK_NORATE.setValue(World.PROP_OFFSET_X, ValueTypeDouble.ValueDouble.of(0.5D));
             PROPERTIES_CLICK_NORATE.setValue(World.PROP_OFFSET_Y, ValueTypeDouble.ValueDouble.of(0.5D));
             PROPERTIES_CLICK_NORATE.setValue(World.PROP_OFFSET_Z, ValueTypeDouble.ValueDouble.of(0.5D));
@@ -1251,7 +1273,7 @@ public class TunnelAspectWriteBuilders {
             PROPERTIES_CLICK.setValue(Item.PROP_CHECK_DAMAGE, ValueTypeBoolean.ValueBoolean.of(true));
             PROPERTIES_CLICK.setValue(Item.PROP_CHECK_NBT, ValueTypeBoolean.ValueBoolean.of(true));
             PROPERTIES_CLICK.setValue(Item.PROP_RATE, ValueTypeInteger.ValueInteger.of(1));
-            PROPERTIES_CLICK.setValue(PROPERTY_ENTITYINDEX, ValueTypeInteger.ValueInteger.of(-1));
+            PROPERTIES_CLICK.setValue(World.PROPERTY_ENTITYINDEX, ValueTypeInteger.ValueInteger.of(-1));
             PROPERTIES_CLICK.setValue(World.PROP_OFFSET_X, ValueTypeDouble.ValueDouble.of(0.5D));
             PROPERTIES_CLICK.setValue(World.PROP_OFFSET_Y, ValueTypeDouble.ValueDouble.of(0.5D));
             PROPERTIES_CLICK.setValue(World.PROP_OFFSET_Z, ValueTypeDouble.ValueDouble.of(0.5D));
@@ -1267,7 +1289,7 @@ public class TunnelAspectWriteBuilders {
                         ? EnumHand.MAIN_HAND : EnumHand.OFF_HAND;
                 boolean rightClick = properties.getValue(PROP_RIGHT_CLICK).getRawValue();
                 boolean continuousClick = properties.getValue(PROP_CONTINUOUS_CLICK).getRawValue();
-                int entityIndex = properties.getValue(PROPERTY_ENTITYINDEX).getRawValue();
+                int entityIndex = properties.getValue(World.PROPERTY_ENTITYINDEX).getRawValue();
                 double offsetX = properties.getValue(World.PROP_OFFSET_X).getRawValue();
                 double offsetY = properties.getValue(World.PROP_OFFSET_Y).getRawValue();
                 double offsetZ = properties.getValue(World.PROP_OFFSET_Z).getRawValue();
@@ -1299,7 +1321,7 @@ public class TunnelAspectWriteBuilders {
                         ? EnumHand.MAIN_HAND : EnumHand.OFF_HAND;
                 boolean rightClick = input.getMiddle().getValue(PROP_RIGHT_CLICK).getRawValue();
                 boolean continuousClick = properties.getValue(PROP_CONTINUOUS_CLICK).getRawValue();
-                int entityIndex = properties.getValue(PROPERTY_ENTITYINDEX).getRawValue();
+                int entityIndex = properties.getValue(World.PROPERTY_ENTITYINDEX).getRawValue();
                 double offsetX = properties.getValue(World.PROP_OFFSET_X).getRawValue();
                 double offsetY = properties.getValue(World.PROP_OFFSET_Y).getRawValue();
                 double offsetZ = properties.getValue(World.PROP_OFFSET_Z).getRawValue();
