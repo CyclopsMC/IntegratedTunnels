@@ -98,6 +98,8 @@ aspect.aspecttypes.integratedtunnels.integer.entityindex.name=Entity Index
 aspect.aspecttypes.integratedtunnels.integer.entityindex.info=The n-th entity that will be picked. -1 will always pick a random entity.
 aspect.aspecttypes.integratedtunnels.boolean.player.continuousclick.name=Continuous Click
 aspect.aspecttypes.integratedtunnels.boolean.player.continuousclick.info=If a continuous click must be simulated, otherwise each click takes one tick.
+aspect.aspecttypes.integratedtunnels.boolean.blacklist.name=Blacklist
+aspect.aspecttypes.integratedtunnels.boolean.blacklist.info=If everything except for items in the given list must be handled.
 
 # Aspects
 

@@ -1,7 +1,5 @@
 package org.cyclops.integratedtunnels.core;
 
-import com.google.common.base.Function;
-import com.google.common.base.Predicate;
 import com.google.common.collect.Lists;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockLiquid;
@@ -37,24 +35,16 @@ import org.cyclops.integratedtunnels.GeneralConfig;
 
 import javax.annotation.Nullable;
 import java.util.List;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 /**
  * @author rubensworks
  */
 public class TunnelFluidHelpers {
 
-    public static final Predicate<FluidStack> MATCH_ALL = new Predicate<FluidStack>() {
-        @Override
-        public boolean apply(@Nullable FluidStack input) {
-            return true;
-        }
-    };
-    public static final Predicate<FluidStack> MATCH_NONE = new Predicate<FluidStack>() {
-        @Override
-        public boolean apply(@Nullable FluidStack input) {
-            return false;
-        }
-    };
+    public static final Predicate<FluidStack> MATCH_ALL = input -> true;
+    public static final Predicate<FluidStack> MATCH_NONE = input -> false;
 
     /**
      * Move all fluids matching the predicate from source to target.
@@ -93,7 +83,7 @@ public class TunnelFluidHelpers {
             if (contents != null) {
                 FluidStack toMove = contents.copy();
                 toMove.amount = maxAmount;
-                if (fluidStackMatcher.apply(toMove)) {
+                if (fluidStackMatcher.test(toMove)) {
                     checkFluids.add(toMove);
                 }
             }
@@ -119,47 +109,36 @@ public class TunnelFluidHelpers {
     }
 
     public static Predicate<FluidStack> matchFluidStack(final FluidStack fluidStack, final boolean checkAmount, final boolean checkNbt) {
-        return new Predicate<FluidStack>() {
-            @Override
-            public boolean apply(@Nullable FluidStack input) {
-                return areFluidStackEqual(input, fluidStack, true, checkAmount, checkNbt);
-            }
-        };
+        return input -> areFluidStackEqual(input, fluidStack, true, checkAmount, checkNbt);
     }
 
     public static Predicate<FluidStack> matchFluidStacks(final IValueTypeListProxy<ValueObjectTypeFluidStack, ValueObjectTypeFluidStack.ValueFluidStack> fluidStacks,
                                                        final boolean checkAmount, final boolean checkNbt) {
-        return new Predicate<FluidStack>() {
-            @Override
-            public boolean apply(@Nullable FluidStack input) {
-                for (ValueObjectTypeFluidStack.ValueFluidStack fluidStack : fluidStacks) {
-                    if (fluidStack.getRawValue().isPresent()
-                            && areFluidStackEqual(input, fluidStack.getRawValue().get(), true, checkAmount, checkNbt)) {
-                        return true;
-                    }
+        return input -> {
+            for (ValueObjectTypeFluidStack.ValueFluidStack fluidStack : fluidStacks) {
+                if (fluidStack.getRawValue().isPresent()
+                        && areFluidStackEqual(input, fluidStack.getRawValue().get(), true, checkAmount, checkNbt)) {
+                    return true;
                 }
-                return false;
             }
+            return false;
         };
     }
 
     public static Predicate<FluidStack> matchPredicate(final PartTarget partTarget, final IOperator predicate) {
-        return new Predicate<FluidStack>() {
-            @Override
-            public boolean apply(@Nullable FluidStack input) {
-                ValueObjectTypeFluidStack.ValueFluidStack valueFluidStack = ValueObjectTypeFluidStack.ValueFluidStack.of(input);
-                try {
-                    IValue result = ValueHelpers.evaluateOperator(predicate, valueFluidStack);
-                    return ((ValueTypeBoolean.ValueBoolean) result).getRawValue();
-                } catch (EvaluationException e) {
-                    PartHelpers.PartStateHolder<?, ?> partData = PartHelpers.getPart(partTarget.getCenter());
-                    if (partData != null) {
-                        IPartStateWriter partState = (IPartStateWriter) partData.getState();
-                        partState.addError(partState.getActiveAspect(), new L10NHelpers.UnlocalizedString(e.getMessage()));
-                        partState.setDeactivated(true);
-                    }
-                    return false;
+        return input -> {
+            ValueObjectTypeFluidStack.ValueFluidStack valueFluidStack = ValueObjectTypeFluidStack.ValueFluidStack.of(input);
+            try {
+                IValue result = ValueHelpers.evaluateOperator(predicate, valueFluidStack);
+                return ((ValueTypeBoolean.ValueBoolean) result).getRawValue();
+            } catch (EvaluationException e) {
+                PartHelpers.PartStateHolder<?, ?> partData = PartHelpers.getPart(partTarget.getCenter());
+                if (partData != null) {
+                    IPartStateWriter partState = (IPartStateWriter) partData.getState();
+                    partState.addError(partState.getActiveAspect(), new L10NHelpers.UnlocalizedString(e.getMessage()));
+                    partState.setDeactivated(true);
                 }
+                return false;
             }
         };
     }

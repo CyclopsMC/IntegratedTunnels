@@ -46,19 +46,19 @@ public class TunnelItemHelpers {
 
     public static final ItemStackPredicate MATCH_ALL = new ItemStackPredicate(ItemStack.EMPTY, ItemMatch.ANY) {
         @Override
-        public boolean apply(@Nullable ItemStack input) {
+        public boolean test(@Nullable ItemStack input) {
             return true;
         }
     };
     public static final ItemStackPredicate MATCH_NONE = new ItemStackPredicate(ItemStack.EMPTY, ItemMatch.EXACT) {
         @Override
-        public boolean apply(@Nullable ItemStack input) {
+        public boolean test(@Nullable ItemStack input) {
             return false;
         }
     };
     public static final ItemStackPredicate MATCH_BLOCK = new ItemStackPredicate() {
         @Override
-        public boolean apply(@Nullable ItemStack input) {
+        public boolean test(@Nullable ItemStack input) {
             return !input.isEmpty();
         }
     };
@@ -108,7 +108,7 @@ public class TunnelItemHelpers {
             } else {
                 extracted = source.extractItem(sourceSlot, amount, simulate);
             }
-            if (!extracted.isEmpty() && (!simulate || appliedMatcher || itemStackMatcher.apply(extracted))) {
+            if (!extracted.isEmpty() && (!simulate || appliedMatcher || itemStackMatcher.test(extracted))) {
                 ItemStack remaining = !loopTargetSlots ? target.insertItem(targetSlot, extracted, simulate) : targetSlotless.insertItem(extracted, simulate);
                 if (remaining.isEmpty()) {
                     return extracted;
@@ -122,7 +122,7 @@ public class TunnelItemHelpers {
                             IntegratedTunnels.clog(Level.WARN, "Just lost stack " + remaining + " while transfering items, report this to the Integrated Tunnels issue tracker with some details about your setup!");
                         }
                     }
-                    return extracted.getCount() > 0 && (simulate || itemStackMatcher.apply(extracted)) ? extracted : ItemStack.EMPTY;
+                    return extracted.getCount() > 0 && (simulate || itemStackMatcher.test(extracted)) ? extracted : ItemStack.EMPTY;
                 }
             }
         } else if (loopSourceSlots) {
@@ -293,24 +293,24 @@ public class TunnelItemHelpers {
         if (checkStackSize) matchFlags = matchFlags | ItemMatch.STACKSIZE;
         return new ItemStackPredicate(itemStack, matchFlags) {
             @Override
-            public boolean apply(@Nullable ItemStack input) {
+            public boolean test(@Nullable ItemStack input) {
                 return areItemStackEqual(input, itemStack, checkStackSize, true, checkDamage, checkNbt);
             }
         };
     }
 
     public static ItemStackPredicate matchItemStacks(final IValueTypeListProxy<ValueObjectTypeItemStack, ValueObjectTypeItemStack.ValueItemStack> itemStacks,
-                                                       final boolean checkStackSize, final boolean checkDamage, final boolean checkNbt) {
+                                                       final boolean checkStackSize, final boolean checkDamage, final boolean checkNbt, final boolean blacklist) {
         return new ItemStackPredicate() {
             @Override
-            public boolean apply(@Nullable ItemStack input) {
+            public boolean test(@Nullable ItemStack input) {
                 for (ValueObjectTypeItemStack.ValueItemStack itemStack : itemStacks) {
                     if (!itemStack.getRawValue().isEmpty()
                             && areItemStackEqual(input, itemStack.getRawValue(), checkStackSize, true, checkDamage, checkNbt)) {
-                        return true;
+                        return !blacklist;
                     }
                 }
-                return false;
+                return blacklist;
             }
         };
     }
@@ -318,7 +318,7 @@ public class TunnelItemHelpers {
     public static ItemStackPredicate matchPredicate(final PartTarget partTarget, final IOperator predicate) {
         return new ItemStackPredicate() {
             @Override
-            public boolean apply(@Nullable ItemStack input) {
+            public boolean test(@Nullable ItemStack input) {
                 ValueObjectTypeItemStack.ValueItemStack valueItemStack = ValueObjectTypeItemStack.ValueItemStack.of(input);
                 try {
                     IValue result = ValueHelpers.evaluateOperator(predicate, valueItemStack);

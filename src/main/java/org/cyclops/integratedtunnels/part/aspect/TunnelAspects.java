@@ -69,7 +69,7 @@ public class TunnelAspects {
                             .appendKind("export").buildWrite();
             public static final IAspectWrite<ValueTypeList.ValueList, ValueTypeList> LIST_EXPORT =
                     TunnelAspectWriteBuilders.Item.BUILDER_LIST
-                            .withProperties(TunnelAspectWriteBuilders.Item.PROPERTIES_RATESLOTCHECKS)
+                            .withProperties(TunnelAspectWriteBuilders.Item.PROPERTIES_RATESLOTCHECKSLIST)
                             .handle(TunnelAspectWriteBuilders.Item.PROP_ITEMSTACKLIST_ITEMPREDICATE)
                             .handle(TunnelAspectWriteBuilders.Item.PROP_ITEMTARGET)
                             .handle(TunnelAspectWriteBuilders.Item.PROP_EXPORT)
@@ -105,7 +105,7 @@ public class TunnelAspects {
                             .appendKind("import").buildWrite();
             public static final IAspectWrite<ValueTypeList.ValueList, ValueTypeList> LIST_IMPORT =
                     TunnelAspectWriteBuilders.Item.BUILDER_LIST
-                            .withProperties(TunnelAspectWriteBuilders.Item.PROPERTIES_RATESLOTCHECKS)
+                            .withProperties(TunnelAspectWriteBuilders.Item.PROPERTIES_RATESLOTCHECKSLIST)
                             .handle(TunnelAspectWriteBuilders.Item.PROP_ITEMSTACKLIST_ITEMPREDICATE)
                             .handle(TunnelAspectWriteBuilders.Item.PROP_ITEMTARGET)
                             .handle(TunnelAspectWriteBuilders.Item.PROP_IMPORT)
@@ -145,7 +145,7 @@ public class TunnelAspects {
                             .appendKind("export").buildWrite();
             public static final IAspectWrite<ValueTypeList.ValueList, ValueTypeList> LIST_EXPORT =
                     TunnelAspectWriteBuilders.Fluid.BUILDER_LIST
-                            .withProperties(TunnelAspectWriteBuilders.Fluid.PROPERTIES_RATECHECKS)
+                            .withProperties(TunnelAspectWriteBuilders.Fluid.PROPERTIES_RATECHECKSLIST)
                             .handle(TunnelAspectWriteBuilders.Fluid.PROP_FLUIDSTACKLIST_FLUIDPREDICATE)
                             .handle(TunnelAspectWriteBuilders.Fluid.PROP_FLUIDTARGET)
                             .handle(TunnelAspectWriteBuilders.Fluid.PROP_EXPORT)
@@ -181,7 +181,7 @@ public class TunnelAspects {
                             .appendKind("import").buildWrite();
             public static final IAspectWrite<ValueTypeList.ValueList, ValueTypeList> LIST_IMPORT =
                     TunnelAspectWriteBuilders.Fluid.BUILDER_LIST
-                            .withProperties(TunnelAspectWriteBuilders.Fluid.PROPERTIES_RATECHECKS)
+                            .withProperties(TunnelAspectWriteBuilders.Fluid.PROPERTIES_RATECHECKSLIST)
                             .handle(TunnelAspectWriteBuilders.Fluid.PROP_FLUIDSTACKLIST_FLUIDPREDICATE)
                             .handle(TunnelAspectWriteBuilders.Fluid.PROP_FLUIDTARGET)
                             .handle(TunnelAspectWriteBuilders.Fluid.PROP_IMPORT)
@@ -212,7 +212,7 @@ public class TunnelAspects {
                                 .appendKind("fluid").appendKind("export").buildWrite();
                 public static final IAspectWrite<ValueTypeList.ValueList, ValueTypeList> FLUID_LIST_EXPORT =
                         TunnelAspectWriteBuilders.World.BUILDER_LIST
-                                .withProperties(TunnelAspectWriteBuilders.World.Fluid.PROPERTIES_FLUID_UPDATE)
+                                .withProperties(TunnelAspectWriteBuilders.World.Fluid.PROPERTIES_FLUIDLIST_UPDATE)
                                 .handle(TunnelAspectWriteBuilders.World.Fluid.PROP_FLUIDSTACKLIST_FLUIDTARGET)
                                 .handle(TunnelAspectWriteBuilders.World.Fluid.PROP_FLUIDSTACK_EXPORT)
                                 .appendKind("fluid").appendKind("export").buildWrite();
@@ -237,7 +237,7 @@ public class TunnelAspects {
                                 .appendKind("fluid").appendKind("import").buildWrite();
                 public static final IAspectWrite<ValueTypeList.ValueList, ValueTypeList> FLUID_LIST_IMPORT =
                         TunnelAspectWriteBuilders.World.BUILDER_LIST
-                                .withProperties(TunnelAspectWriteBuilders.World.Fluid.PROPERTIES_FLUID)
+                                .withProperties(TunnelAspectWriteBuilders.World.Fluid.PROPERTIES_FLUIDLIST)
                                 .handle(TunnelAspectWriteBuilders.World.Fluid.PROP_FLUIDSTACKLIST_FLUIDTARGET)
                                 .handle(TunnelAspectWriteBuilders.World.Fluid.PROP_FLUIDSTACK_IMPORT)
                                 .appendKind("fluid").appendKind("import").buildWrite();
@@ -264,7 +264,7 @@ public class TunnelAspects {
                                 .appendKind("block").appendKind("export").buildWrite();
                 public static final IAspectWrite<ValueTypeList.ValueList, ValueTypeList> BLOCK_LISTITEMSTACK_EXPORT =
                         TunnelAspectWriteBuilders.World.BUILDER_LIST
-                                .withProperties(TunnelAspectWriteBuilders.World.Block.PROPERTIES_PLACE)
+                                .withProperties(TunnelAspectWriteBuilders.World.Block.PROPERTIES_PLACELIST)
                                 .handle(TunnelAspectWriteBuilders.World.Item.<ValueTypeList.ValueList>ignoreStackSize())
                                 .handle(TunnelAspectWriteBuilders.Item.PROP_ITEMSTACKLIST_ITEMPREDICATE)
                                 .handle(TunnelAspectWriteBuilders.Item.PROP_ITEMTARGET)
@@ -295,7 +295,7 @@ public class TunnelAspects {
                                 .appendKind("block").appendKind("import").buildWrite();
                 public static final IAspectWrite<ValueTypeList.ValueList, ValueTypeList> BLOCK_LISTITEMSTACK_IMPORT =
                         TunnelAspectWriteBuilders.World.BUILDER_LIST
-                                .withProperties(TunnelAspectWriteBuilders.World.Block.PROPERTIES_PICK_UP)
+                                .withProperties(TunnelAspectWriteBuilders.World.Block.PROPERTIES_PICK_UPLIST)
                                 .handle(TunnelAspectWriteBuilders.World.Item.<ValueTypeList.ValueList>ignoreStackSize())
                                 .handle(TunnelAspectWriteBuilders.Item.PROP_ITEMSTACKLIST_ITEMPREDICATE)
                                 .handle(TunnelAspectWriteBuilders.Item.PROP_ITEMTARGET)
@@ -333,7 +333,7 @@ public class TunnelAspects {
                                 .appendKind("entityitem").appendKind("import").buildWrite();
                 public static final IAspectWrite<ValueTypeList.ValueList, ValueTypeList> ENTITYITEM_LISTITEMSTACK_IMPORT =
                         TunnelAspectWriteBuilders.World.BUILDER_LIST
-                                .withProperties(TunnelAspectWriteBuilders.World.Item.PROPERTIES_ENTITYITEM_PICK_UP)
+                                .withProperties(TunnelAspectWriteBuilders.World.Item.PROPERTIES_ENTITYITEM_PICK_UPLIST)
                                 .handle(TunnelAspectWriteBuilders.Item.PROP_ITEMSTACKLIST_ITEMPREDICATE)
                                 .handle(TunnelAspectWriteBuilders.World.Item.PROP_ENTITYITEM_ITEMTARGET_IMPORT)
                                 .handle(TunnelAspectWriteBuilders.Item.PROP_IMPORT)
@@ -369,7 +369,7 @@ public class TunnelAspects {
                                 .appendKind("entityitem").appendKind("export").buildWrite();
                 public static final IAspectWrite<ValueTypeList.ValueList, ValueTypeList> ENTITYITEM_LISTITEMSTACK_EXPORT =
                         TunnelAspectWriteBuilders.World.BUILDER_LIST
-                                .withProperties(TunnelAspectWriteBuilders.World.Item.PROPERTIES_ENTITYITEM_PLACE)
+                                .withProperties(TunnelAspectWriteBuilders.World.Item.PROPERTIES_ENTITYITEM_PLACELIST)
                                 .handle(TunnelAspectWriteBuilders.Item.PROP_ITEMSTACKLIST_ITEMPREDICATE)
                                 .handle(TunnelAspectWriteBuilders.World.Item.PROP_ENTITYITEM_ITEMTARGET_EXPORT)
                                 .handle(TunnelAspectWriteBuilders.Item.PROP_EXPORT)
@@ -405,7 +405,7 @@ public class TunnelAspects {
                                 .appendKind("entity").appendKind("item").appendKind("import").buildWrite();
                 public static final IAspectWrite<ValueTypeList.ValueList, ValueTypeList> ENTITY_ITEM_LISTITEMSTACK_IMPORT =
                         TunnelAspectWriteBuilders.World.BUILDER_LIST
-                                .withProperties(TunnelAspectWriteBuilders.World.Item.PROPERTIES_RATESLOTCHECKS)
+                                .withProperties(TunnelAspectWriteBuilders.World.Item.PROPERTIES_RATESLOTCHECKSLIST)
                                 .handle(TunnelAspectWriteBuilders.Item.PROP_ITEMSTACKLIST_ITEMPREDICATE)
                                 .handle(TunnelAspectWriteBuilders.World.Item.PROP_ENTITY_ITEMTARGET)
                                 .handle(TunnelAspectWriteBuilders.Item.PROP_IMPORT)
@@ -441,7 +441,7 @@ public class TunnelAspects {
                                 .appendKind("entity").appendKind("item").appendKind("export").buildWrite();
                 public static final IAspectWrite<ValueTypeList.ValueList, ValueTypeList> ENTITY_ITEM_LISTITEMSTACK_EXPORT =
                         TunnelAspectWriteBuilders.World.BUILDER_LIST
-                                .withProperties(TunnelAspectWriteBuilders.World.Item.PROPERTIES_RATESLOTCHECKS)
+                                .withProperties(TunnelAspectWriteBuilders.World.Item.PROPERTIES_RATESLOTCHECKSLIST)
                                 .handle(TunnelAspectWriteBuilders.Item.PROP_ITEMSTACKLIST_ITEMPREDICATE)
                                 .handle(TunnelAspectWriteBuilders.World.Item.PROP_ENTITY_ITEMTARGET)
                                 .handle(TunnelAspectWriteBuilders.Item.PROP_EXPORT)
@@ -477,7 +477,7 @@ public class TunnelAspects {
                                 .appendKind("entity").appendKind("fluid").appendKind("import").buildWrite();
                 public static final IAspectWrite<ValueTypeList.ValueList, ValueTypeList> ENTITY_FLUID_LISTFLUIDSTACK_IMPORT =
                         TunnelAspectWriteBuilders.World.BUILDER_LIST
-                                .withProperties(TunnelAspectWriteBuilders.World.Fluid.PROPERTIES_RATECHECKS)
+                                .withProperties(TunnelAspectWriteBuilders.World.Fluid.PROPERTIES_RATECHECKSLIST)
                                 .handle(TunnelAspectWriteBuilders.Fluid.PROP_FLUIDSTACKLIST_FLUIDPREDICATE)
                                 .handle(TunnelAspectWriteBuilders.World.Fluid.PROP_ENTITY_FLUIDTARGET)
                                 .handle(TunnelAspectWriteBuilders.Fluid.PROP_IMPORT)
@@ -513,7 +513,7 @@ public class TunnelAspects {
                                 .appendKind("entity").appendKind("fluid").appendKind("export").buildWrite();
                 public static final IAspectWrite<ValueTypeList.ValueList, ValueTypeList> ENTITY_FLUID_LISTFLUIDSTACK_EXPORT =
                         TunnelAspectWriteBuilders.World.BUILDER_LIST
-                                .withProperties(TunnelAspectWriteBuilders.World.Fluid.PROPERTIES_RATECHECKS)
+                                .withProperties(TunnelAspectWriteBuilders.World.Fluid.PROPERTIES_RATECHECKSLIST)
                                 .handle(TunnelAspectWriteBuilders.Fluid.PROP_FLUIDSTACKLIST_FLUIDPREDICATE)
                                 .handle(TunnelAspectWriteBuilders.World.Fluid.PROP_ENTITY_FLUIDTARGET)
                                 .handle(TunnelAspectWriteBuilders.Fluid.PROP_EXPORT)
@@ -586,7 +586,7 @@ public class TunnelAspects {
                                 .appendKind("click").buildWrite();
                 public static final IAspectWrite<ValueTypeList.ValueList, ValueTypeList> CLICK_ITEM_LISTITEMSTACK =
                         TunnelAspectWriteBuilders.Player.BUILDER_LIST
-                                .withProperties(TunnelAspectWriteBuilders.Player.PROPERTIES_CLICK)
+                                .withProperties(TunnelAspectWriteBuilders.Player.PROPERTIES_CLICKLIST)
                                 .handle(TunnelAspectWriteBuilders.Item.PROP_ITEMSTACKLIST_ITEMPREDICATE)
                                 .handle(TunnelAspectWriteBuilders.Player.PROP_ITEMTARGET_CLICK)
                                 .handle(TunnelAspectWriteBuilders.Item.PROP_EXPORT)

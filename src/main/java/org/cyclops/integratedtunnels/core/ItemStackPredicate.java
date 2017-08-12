@@ -1,9 +1,9 @@
 package org.cyclops.integratedtunnels.core;
 
-import com.google.common.base.Predicate;
 import net.minecraft.item.ItemStack;
 
 import javax.annotation.Nonnull;
+import java.util.function.Predicate;
 
 /**
  * A predicate for matching ItemStacks.
