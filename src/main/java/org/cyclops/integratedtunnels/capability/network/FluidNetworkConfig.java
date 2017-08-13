@@ -13,7 +13,7 @@ import org.cyclops.integratedtunnels.core.network.FluidNetwork;
  * @author rubensworks
  *
  */
-public class FluidNetworkConfig extends CapabilityConfig {
+public class FluidNetworkConfig extends CapabilityConfig<IFluidNetwork> {
 
     /**
      * The unique instance.
