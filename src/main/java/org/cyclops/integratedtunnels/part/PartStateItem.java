@@ -39,6 +39,6 @@ public class PartStateItem<P extends IPartTypeWriter> extends PartStatePositione
 
     @Override
     public int getSlotLimit(int slot) {
-        return getPositionedAddonsNetwork().getSlotLimit(slot);
+        return getPositionedAddonsNetwork() != null ? getPositionedAddonsNetwork().getSlotLimit(slot) : 0;
     }
 }
