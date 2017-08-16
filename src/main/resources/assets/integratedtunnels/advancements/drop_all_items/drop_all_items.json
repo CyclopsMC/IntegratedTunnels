@@ -1,0 +1,29 @@
+{
+  "display": {
+    "icon": {
+      "item": "integrateddynamics:variable",
+      "nbt": "{\"aspectName\":\"aspect.aspects.integratedtunnels.write.boolean.world.entityitem.export.name\",\"partId\":1,\"_type\":\"aspect\",\"_id\":1}"
+    },
+    "title": {
+      "translate": "advancement.integratedtunnels.drop_all_items"
+    },
+    "description": {
+      "translate": "advancement.integratedtunnels.drop_all_items.desc"
+    },
+    "frame": "challenge"
+  },
+  "parent": "integratedtunnels:world_importer_exporter/exporter_item",
+  "criteria": {
+    "criteria_0": {
+      "trigger": "integrateddynamics:part_writer_aspect",
+      "conditions": {
+        "parttype": "exporter_world_item",
+        "aspect": "aspect.aspects.integratedtunnels.write.boolean.world.entityitem.export.name",
+        "variable": {
+          "valuetype": "valuetype.valuetypes.integrateddynamics.boolean.name",
+          "value": "true"
+        }
+      }
+    }
+  }
+}

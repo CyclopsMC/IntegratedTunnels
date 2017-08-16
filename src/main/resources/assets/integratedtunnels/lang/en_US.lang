@@ -21,6 +21,26 @@ advancement.integratedtunnels.import_items_list=List-based Item Importing
 advancement.integratedtunnels.import_items_list.desc=Import all items from a list into an inventory using an Item Importer
 advancement.integratedtunnels.export_enchantable_items=Export Enchantable Items
 advancement.integratedtunnels.export_enchantable_items.desc=Use the Enchantable Operator to export all enchantable items into an inventory using an Item Exporter
+advancement.integratedtunnels.exporter_world_item=Advanced Item World Exporting
+advancement.integratedtunnels.exporter_world_item.desc=Craft a World Item Exporter
+advancement.integratedtunnels.importer_world_item=Advanced Item World Importing
+advancement.integratedtunnels.importer_world_item.desc=Craft a World Item Importer
+advancement.integratedtunnels.exporter_world_block=Advanced Block World Exporting
+advancement.integratedtunnels.exporter_world_block.desc=Craft a World Block Exporter
+advancement.integratedtunnels.importer_world_block=Advanced Block World Importing
+advancement.integratedtunnels.importer_world_block.desc=Craft a World Block Importer
+advancement.integratedtunnels.drop_all_items=Omni Item Dropping
+advancement.integratedtunnels.drop_all_items.desc=Drop all items using a World Item Exporter
+advancement.integratedtunnels.pickup_items_limit=Limited Item Pickup
+advancement.integratedtunnels.pickup_items_limit.desc=Pick up 5 items at a time using a World Item Importer
+advancement.integratedtunnels.break_stone=Break Stone
+advancement.integratedtunnels.break_stone.desc=Break Stone blocks using a World Block Importer
+advancement.integratedtunnels.place_logwood=Place Logs
+advancement.integratedtunnels.place_logwood.desc=Place any log using a World Block Exporter by using the 'logWood' ore dictionary list
+advancement.integratedtunnels.player_simulator=Player Simulation
+advancement.integratedtunnels.player_simulator.desc=Craft a Player Simulator
+advancement.integratedtunnels.click_sword=Click with a Diamond Sword
+advancement.integratedtunnels.click_sword.desc=Click with a Diamond Sword using a Player Simulator
 
 # Part types
 parttype.parttypes.integratedtunnels.interface_energy.name=Energy Interface
@@ -346,3 +366,24 @@ info_book.integratedtunnels.tutorials.import_items_list.text1=Import all items a
 
 info_book.integratedtunnels.tutorials.export_enchantable_items=Export Enchantable Items
 info_book.integratedtunnels.tutorials.export_enchantable_items.text1=Export all enchantable items to the target inventory. This can be done using a certain &lOperator&r.
+
+info_book.integratedtunnels.tutorials.world_item_importer_exporter=World Item Importer Exporter
+info_book.integratedtunnels.tutorials.world_item_importer_exporter.text1=Simular to &oItem Importers&r and &oItem Exporters&r, &lWorld Item Importers&r and &lWorld Item Exporters&r can respectively pick up items from the world into your item network and place items into the world from your item network. Furthermore, these can also be used to interact with dropped items that have inventories, such as &oShulker Boxes&r.
+
+info_book.integratedtunnels.tutorials.drop_all_items=Drop All Items
+info_book.integratedtunnels.tutorials.drop_all_items.text1=Place an empty &lVariable Card&r inside a &lWorld Item Exporter&r to drop all items from the network on the ground.
+
+info_book.integratedtunnels.tutorials.pickup_items_limit=Pick up Items with Limit
+info_book.integratedtunnels.tutorials.pickup_items_limit.text1=Write a constant number &65&0 to a &lVariable Card&r, and place it inside a &lWorld Item Importer&r to pick up 5 items at a time from the target space.
+
+info_book.integratedtunnels.tutorials.world_block_importer_exporter=World Block Importer Exporter
+info_book.integratedtunnels.tutorials.world_block_importer_exporter.text1=Instead of dropping items in the world or picking them up, you can also break and place blocks using the &lWorld Block Importer&r and &lWorld Block Exporter&r. Various aspect properties allow you to change properties such as whether or not the blocks should be silk touched when breaking.
+
+info_book.integratedtunnels.tutorials.break_stone=Break Only Stone Blocks
+info_book.integratedtunnels.tutorials.break_stone.text1=Make a &lVariable Card&r containing a reference to the &8Stone&0 item value. Place this inside a &lWorld Block Importer&r to break only Stone blocks. Also have a look at the various aspect properties to see if you can manage to silk touch the Stone to avoid receiving just Cobblestone.
+
+info_book.integratedtunnels.tutorials.place_logwood=Place Logs
+info_book.integratedtunnels.tutorials.place_logwood.text1=Try creating a system using the &lWorld Block Exporter&r that only places wooden logs. Do this using the &lOredictionary Values&r operator to retrieve a list of all &ologWood&r oredictionary items.
+
+info_book.integratedtunnels.tutorials.click_sword=Click with Sword
+info_book.integratedtunnels.tutorials.click_sword.text1=All this clicking and such can be quite boring, why not let a &lPlayer Simulator&r do it for you? Start by crafting one, and insert a &lVariable Card&r containing a &oDiamond Sword&r to let it attack autonomously using &oDiamond Swords&r from your item network.

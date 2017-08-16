@@ -23,7 +23,17 @@
       "integratedtunnels:part_exporter_energy_item",
       "integratedtunnels:part_importer_item_item",
       "integratedtunnels:part_importer_fluid_item",
-      "integratedtunnels:part_importer_energy_item"
+      "integratedtunnels:part_importer_energy_item",
+      "integratedtunnels:part_exporter_world_item_item",
+      "integratedtunnels:part_exporter_world_fluid_item",
+      "integratedtunnels:part_exporter_world_energy_item",
+      "integratedtunnels:part_exporter_world_block_item",
+      "integratedtunnels:part_importer_world_item_item",
+      "integratedtunnels:part_importer_world_fluid_item",
+      "integratedtunnels:part_importer_world_energy_item",
+      "integratedtunnels:part_importer_world_block_item",
+      "integratedtunnels:part_player_simulator_item"
+
     ]
   },
   "criteria": {

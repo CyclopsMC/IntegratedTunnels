@@ -1,0 +1,37 @@
+{
+  "display": {
+    "icon": {
+      "item": "integrateddynamics:variable",
+      "nbt": "{\"aspectName\":\"aspect.aspects.integratedtunnels.write.list.world.block.export.name\",\"partId\":1,\"_type\":\"aspect\",\"_id\":1}"
+    },
+    "title": {
+      "translate": "advancement.integratedtunnels.place_logwood"
+    },
+    "description": {
+      "translate": "advancement.integratedtunnels.place_logwood.desc"
+    },
+    "frame": "challenge"
+  },
+  "parent": "integratedtunnels:world_importer_exporter/exporter_item",
+  "criteria": {
+    "criteria_0": {
+      "trigger": "integrateddynamics:part_writer_aspect",
+      "conditions": {
+        "parttype": "exporter_world_block",
+        "aspect": "aspect.aspects.integratedtunnels.write.list.world.block.export.name",
+        "variable": {
+          "type": "operator",
+          "operator": "operator.operators.integrateddynamics.string.oredict.name",
+          "input": {
+            "0": {
+              "valuetype": "valuetype.valuetypes.integrateddynamics.string.name",
+              "value": {
+                "item": "logWood"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

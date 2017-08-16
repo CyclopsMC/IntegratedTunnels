@@ -1,0 +1,26 @@
+{
+  "display": {
+    "icon": {
+      "item": "integratedtunnels:part_importer_world_item_item"
+    },
+    "title": {
+      "translate": "advancement.integratedtunnels.importer_world_item"
+    },
+    "description": {
+      "translate": "advancement.integratedtunnels.importer_world_item.desc"
+    }
+  },
+  "parent": "integratedtunnels:importer_exporter/importer_item",
+  "criteria": {
+    "criteria_0": {
+      "trigger": "cyclopscore:item_crafted",
+      "conditions": {
+        "items": [
+          {
+            "item": "integratedtunnels:part_importer_world_item_item"
+          }
+        ]
+      }
+    }
+  }
+}
