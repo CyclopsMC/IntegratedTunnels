@@ -54,4 +54,53 @@
         <appendix type="crafting_recipe">integratedtunnels:part_importer_energy_item</appendix>
         <appendix_list factory="integrateddynamics:part_aspects">importer_energy</appendix_list>
     </section>
+
+    <section name="info_book.integratedtunnels.world">
+        <section name="info_book.integratedtunnels.world.item">
+            <tag>integratedtunnels:part_exporter_world_item_item</tag>
+            <tag>integratedtunnels:part_importer_world_item_item</tag>
+            <paragraph>info_book.integratedtunnels.world.item.text1</paragraph>
+            <appendix type="crafting_recipe">integratedtunnels:part_exporter_world_item_item</appendix>
+            <appendix_list factory="integrateddynamics:part_aspects">exporter_world_item</appendix_list>
+            <appendix type="crafting_recipe">integratedtunnels:part_importer_world_item_item</appendix>
+            <appendix_list factory="integrateddynamics:part_aspects">importer_world_item</appendix_list>
+        </section>
+
+        <section name="info_book.integratedtunnels.world.fluid">
+            <tag>integratedtunnels:part_exporter_world_fluid_item</tag>
+            <tag>integratedtunnels:part_importer_world_fluid_item</tag>
+            <paragraph>info_book.integratedtunnels.world.fluid.text1</paragraph>
+            <appendix type="crafting_recipe">integratedtunnels:part_exporter_world_fluid_item</appendix>
+            <appendix_list factory="integrateddynamics:part_aspects">exporter_world_fluid</appendix_list>
+            <appendix type="crafting_recipe">integratedtunnels:part_importer_world_fluid_item</appendix>
+            <appendix_list factory="integrateddynamics:part_aspects">importer_world_fluid</appendix_list>
+        </section>
+
+        <section name="info_book.integratedtunnels.world.energy">
+            <tag>integratedtunnels:part_exporter_world_energy_item</tag>
+            <tag>integratedtunnels:part_importer_world_energy_item</tag>
+            <paragraph>info_book.integratedtunnels.world.energy.text1</paragraph>
+            <appendix type="crafting_recipe">integratedtunnels:part_exporter_world_energy_item</appendix>
+            <appendix_list factory="integrateddynamics:part_aspects">exporter_world_energy</appendix_list>
+            <appendix type="crafting_recipe">integratedtunnels:part_importer_world_energy_item</appendix>
+            <appendix_list factory="integrateddynamics:part_aspects">importer_world_energy</appendix_list>
+        </section>
+
+        <section name="info_book.integratedtunnels.world.block">
+            <tag>integratedtunnels:part_exporter_world_block_item</tag>
+            <tag>integratedtunnels:part_importer_world_block_item</tag>
+            <paragraph>info_book.integratedtunnels.world.block.text1</paragraph>
+            <appendix type="crafting_recipe">integratedtunnels:part_exporter_world_block_item</appendix>
+            <appendix_list factory="integrateddynamics:part_aspects">exporter_world_block</appendix_list>
+            <appendix type="crafting_recipe">integratedtunnels:part_importer_world_block_item</appendix>
+            <appendix_list factory="integrateddynamics:part_aspects">importer_world_block</appendix_list>
+        </section>
+    </section>
+
+    <section name="info_book.integratedtunnels.player">
+        <tag>integratedtunnels:part_player_simulator_item</tag>
+        <paragraph>info_book.integratedtunnels.player.text1</paragraph>
+        <appendix type="crafting_recipe">integratedtunnels:part_player_simulator_item</appendix>
+        <appendix_list factory="integrateddynamics:part_aspects">player_simulator</appendix_list>
+    </section>
 </section>

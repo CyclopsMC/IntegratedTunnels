@@ -344,6 +344,23 @@ info_book.integratedtunnels.fluid.text1=Move energy over the network. Import ene
 info_book.integratedtunnels.energy=Energy
 info_book.integratedtunnels.energy.text1=Move energy over the network. Import energy into the network using &lEnergy Importers&r into &lEnergy Interfaces&r. Export energy from the network using &lEnergy Exporters&r from &lEnergy Interfaces&r.
 
+info_book.integratedtunnels.world=World Interaction
+
+info_book.integratedtunnels.world.item=Items
+info_book.integratedtunnels.world.item.text1=&lItem World Importers&r and &lItem World Exporters&r can be used to place items in the world, pick them up, and interact with entities that have an inventory, such as dropped Shulker Boxes and Donkeys. Various aspect properties exists to change things like dispensing, throw-velocity, pickup delay, pitch and yaw.
+
+info_book.integratedtunnels.world.fluid=Fluids
+info_book.integratedtunnels.world.fluid.text1=With &lFluid World Importers&r and &lFluid World Exporters&r, you can place fluid source blocks, pick them up and interact with entities that are a tank, such as dropped tank items. Various aspect properties exists to change things like whether or not a block update should be caused.
+
+info_book.integratedtunnels.world.energy=Energy
+info_book.integratedtunnels.world.energy.text1=The &lEnergy World Importers&r and &lFluid World Exporters&r help you interact with entities that have an energy buffer, such as dropped batteries.
+
+info_book.integratedtunnels.world.block=Block
+info_book.integratedtunnels.world.block.text1=The &lBlock World Importers&r and &lBlock World Exporters&r allow you to place blocks and break them. Various aspect properties such as silk touching are available.
+
+info_book.integratedtunnels.player=Player Simulation
+info_book.integratedtunnels.player.text1=Any experienced Minecrafter knows that the less you have to click, the better. With the &lPlayer Simulator&r, you can automate away a large part of this tedious clicking. It allows you to automate clicking with any hand and item. Advanced properties allow you to change things like click positions and so on.
+
 info_book.integratedtunnels.section.tutorials=Tunnel Tutorials
 
 info_book.integratedtunnels.tutorials.introduction=Introduction
