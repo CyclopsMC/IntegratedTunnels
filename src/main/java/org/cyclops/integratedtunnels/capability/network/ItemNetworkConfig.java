@@ -13,7 +13,7 @@ import org.cyclops.integratedtunnels.core.network.ItemNetwork;
  * @author rubensworks
  *
  */
-public class ItemNetworkConfig extends CapabilityConfig {
+public class ItemNetworkConfig extends CapabilityConfig<IItemNetwork> {
 
     /**
      * The unique instance.
