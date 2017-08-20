@@ -184,7 +184,7 @@ public class ItemHandlerBlockWrapper implements IItemHandler {
                 } else {
                     IBlockState blockState = itemBlock.getBlock().getStateForPlacement(world, pos, side.getOpposite(),
                             0, 0, 0, itemStack.getMetadata(), player, hand);
-                    if (itemBlock.canPlaceBlockOnSide(world, pos, side.getOpposite(), player, itemStack)
+                    if (world.mayPlace(itemBlock.getBlock(), pos, false, side.getOpposite(), null)
                             && (simulate || itemBlock
                             .placeBlockAt(itemStack, player, world, pos, side.getOpposite(), 0, 0, 0, blockState))) {
                         if (!simulate) {
