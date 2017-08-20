@@ -1204,27 +1204,29 @@ public class TunnelAspectWriteBuilders {
 
         public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, Boolean>, Void>
                 PROP_CLICK_EMPTY = input -> {
-            PartTarget partTarget = input.getLeft();
-            IAspectProperties properties = input.getMiddle();
-            EnumHand hand = properties.getValue(World.PROP_HAND_LEFT).getRawValue()
-                    ? EnumHand.MAIN_HAND : EnumHand.OFF_HAND;
-            boolean rightClick = properties.getValue(PROP_RIGHT_CLICK).getRawValue();
-            boolean continuousClick = properties.getValue(PROP_CONTINUOUS_CLICK).getRawValue();
-            int entityIndex = properties.getValue(World.PROPERTY_ENTITYINDEX).getRawValue();
-            double offsetX = properties.getValue(World.PROP_OFFSET_X).getRawValue();
-            double offsetY = properties.getValue(World.PROP_OFFSET_Y).getRawValue();
-            double offsetZ = properties.getValue(World.PROP_OFFSET_Z).getRawValue();
+            if (input.getRight()) {
+                PartTarget partTarget = input.getLeft();
+                IAspectProperties properties = input.getMiddle();
+                EnumHand hand = properties.getValue(World.PROP_HAND_LEFT).getRawValue()
+                        ? EnumHand.MAIN_HAND : EnumHand.OFF_HAND;
+                boolean rightClick = properties.getValue(PROP_RIGHT_CLICK).getRawValue();
+                boolean continuousClick = properties.getValue(PROP_CONTINUOUS_CLICK).getRawValue();
+                int entityIndex = properties.getValue(World.PROPERTY_ENTITYINDEX).getRawValue();
+                double offsetX = properties.getValue(World.PROP_OFFSET_X).getRawValue();
+                double offsetY = properties.getValue(World.PROP_OFFSET_Y).getRawValue();
+                double offsetZ = properties.getValue(World.PROP_OFFSET_Z).getRawValue();
 
-            PartPos center = partTarget.getCenter();
-            PartPos target = partTarget.getTarget();
-            INetwork network = NetworkHelpers.getNetwork(center.getPos().getWorld(), center.getPos().getBlockPos());
-            PartStatePlayerSimulator partState = (PartStatePlayerSimulator) PartHelpers.getPart(center).getState();
+                PartPos center = partTarget.getCenter();
+                PartPos target = partTarget.getTarget();
+                INetwork network = NetworkHelpers.getNetwork(center.getPos().getWorld(), center.getPos().getBlockPos());
+                PartStatePlayerSimulator partState = (PartStatePlayerSimulator) PartHelpers.getPart(center).getState();
 
-            IItemHandler itemHandler = new ItemHandlerPlayerWrapper(partState.getPlayer(),
-                    (WorldServer) target.getPos().getWorld(), target.getPos().getBlockPos(),
-                    offsetX, offsetY, offsetZ, target.getSide(), hand,
-                    rightClick, false, continuousClick, entityIndex, network.getCapability(Capabilities.SLOTLESS_ITEMHANDLER));
-            itemHandler.insertItem(0, ItemStack.EMPTY, false);
+                IItemHandler itemHandler = new ItemHandlerPlayerWrapper(partState.getPlayer(),
+                        (WorldServer) target.getPos().getWorld(), target.getPos().getBlockPos(),
+                        offsetX, offsetY, offsetZ, target.getSide(), hand,
+                        rightClick, false, continuousClick, entityIndex, network.getCapability(Capabilities.SLOTLESS_ITEMHANDLER));
+                itemHandler.insertItem(0, ItemStack.EMPTY, false);
+            }
             return null;
         };
 
