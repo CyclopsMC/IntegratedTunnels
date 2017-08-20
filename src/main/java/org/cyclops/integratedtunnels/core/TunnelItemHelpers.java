@@ -415,7 +415,7 @@ public class TunnelItemHelpers {
         final boolean isDestNonSolid = !destMaterial.isSolid();
         final boolean isDestReplaceable = destBlockState.getBlock().isReplaceable(world, pos);
         if (!world.isAirBlock(pos)
-                && (!isDestNonSolid || !(ignoreReplacable && isDestReplaceable) || destMaterial.isLiquid())) {
+                && (!isDestNonSolid || !(ignoreReplacable && isDestReplaceable))) {
             return null;
         }
 
