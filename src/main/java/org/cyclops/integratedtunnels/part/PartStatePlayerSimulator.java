@@ -32,4 +32,9 @@ public class PartStatePlayerSimulator extends PartStateWriterBase<PartTypePlayer
             ItemHandlerPlayerWrapper.cancelDestroyingBlock(player);
         }
     }
+
+    @Override
+    protected int getDefaultUpdateInterval() {
+        return 10;
+    }
 }
