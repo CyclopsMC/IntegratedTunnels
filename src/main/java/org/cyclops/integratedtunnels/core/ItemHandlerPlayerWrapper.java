@@ -191,6 +191,7 @@ public class ItemHandlerPlayerWrapper implements IItemHandler {
                     player.interactionManager.onBlockClicked(pos, side);
                 } else if (durabilityRemaining >= 9) {
                     player.interactionManager.tryHarvestBlock(pos);
+                    cancelDestroyingBlock(player);
                 } else {
                     player.interactionManager.updateBlockRemoving();
                 }
