@@ -157,7 +157,7 @@
 
     <section name="info_book.integratedtunnels.tutorials.break_stone">
         <paragraph>info_book.integratedtunnels.tutorials.break_stone.text1</paragraph>
-        <appendix type="integrateddynamics:aspect">aspect.aspects.integratedtunnels.write.itemstack.world.block.import.name</appendix>
+        <appendix type="integrateddynamics:aspect">aspect.aspects.integratedtunnels.write.block.world.block.block.import.name</appendix>
         <appendix type="advancement_rewards" id="integratedtunnels:break_stone">
             <advancements>
                 <advancement id="integratedtunnels:break_stone/break_stone" />
@@ -171,7 +171,7 @@
     <section name="info_book.integratedtunnels.tutorials.place_logwood">
         <paragraph>info_book.integratedtunnels.tutorials.place_logwood.text1</paragraph>
         <appendix type="integrateddynamics:operator">operator.operators.integrateddynamics.string.oredict.name</appendix>
-        <appendix type="integrateddynamics:aspect">aspect.aspects.integratedtunnels.write.list.world.block.export.name</appendix>
+        <appendix type="integrateddynamics:aspect">aspect.aspects.integratedtunnels.write.list.world.item.block.export.name</appendix>
         <appendix type="advancement_rewards" id="integratedtunnels:place_logwood">
             <advancements>
                 <advancement id="integratedtunnels:place_logwood/place_logwood" />

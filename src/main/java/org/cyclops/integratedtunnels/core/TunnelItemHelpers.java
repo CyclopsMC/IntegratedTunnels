@@ -19,6 +19,7 @@ import org.apache.logging.log4j.Level;
 import org.cyclops.commoncapabilities.api.capability.inventorystate.IInventoryState;
 import org.cyclops.commoncapabilities.api.capability.itemhandler.ISlotlessItemHandler;
 import org.cyclops.commoncapabilities.api.capability.itemhandler.ItemMatch;
+import org.cyclops.cyclopscore.helper.BlockHelpers;
 import org.cyclops.cyclopscore.helper.L10NHelpers;
 import org.cyclops.cyclopscore.helper.MinecraftHelpers;
 import org.cyclops.integrateddynamics.api.evaluate.EvaluationException;
@@ -28,6 +29,7 @@ import org.cyclops.integrateddynamics.api.evaluate.variable.IValueTypeListProxy;
 import org.cyclops.integrateddynamics.api.part.PartTarget;
 import org.cyclops.integrateddynamics.api.part.write.IPartStateWriter;
 import org.cyclops.integrateddynamics.core.evaluate.variable.ValueHelpers;
+import org.cyclops.integrateddynamics.core.evaluate.variable.ValueObjectTypeBlock;
 import org.cyclops.integrateddynamics.core.evaluate.variable.ValueObjectTypeItemStack;
 import org.cyclops.integrateddynamics.core.evaluate.variable.ValueTypeBoolean;
 import org.cyclops.integrateddynamics.core.helper.PartHelpers;
@@ -315,13 +317,51 @@ public class TunnelItemHelpers {
         };
     }
 
-    public static ItemStackPredicate matchPredicate(final PartTarget partTarget, final IOperator predicate) {
+    public static ItemStackPredicate matchPredicateItem(final PartTarget partTarget, final IOperator predicate) {
         return new ItemStackPredicate() {
             @Override
             public boolean test(@Nullable ItemStack input) {
                 ValueObjectTypeItemStack.ValueItemStack valueItemStack = ValueObjectTypeItemStack.ValueItemStack.of(input);
                 try {
                     IValue result = ValueHelpers.evaluateOperator(predicate, valueItemStack);
+                    return ((ValueTypeBoolean.ValueBoolean) result).getRawValue();
+                } catch (EvaluationException e) {
+                    PartHelpers.PartStateHolder<?, ?> partData = PartHelpers.getPart(partTarget.getCenter());
+                    if (partData != null) {
+                        IPartStateWriter partState = (IPartStateWriter) partData.getState();
+                        partState.addError(partState.getActiveAspect(), new L10NHelpers.UnlocalizedString(e.getMessage()));
+                        partState.setDeactivated(true);
+                    }
+                    return false;
+                }
+            }
+        };
+    }
+
+    public static ItemStackPredicate matchBlocks(final IValueTypeListProxy<ValueObjectTypeBlock, ValueObjectTypeBlock.ValueBlock> blocks,
+                                                     final boolean checkStackSize, final boolean checkDamage, final boolean checkNbt, final boolean blacklist) {
+        return new ItemStackPredicate() {
+            @Override
+            public boolean test(@Nullable ItemStack input) {
+                for (ValueObjectTypeBlock.ValueBlock block : blocks) {
+                    if (!block.getRawValue().isPresent()
+                            && areItemStackEqual(input, BlockHelpers.getItemStackFromBlockState(block.getRawValue().get()), checkStackSize, true, checkDamage, checkNbt)) {
+                        return !blacklist;
+                    }
+                }
+                return blacklist;
+            }
+        };
+    }
+
+    public static ItemStackPredicate matchPredicateBlock(final PartTarget partTarget, final IOperator predicate) {
+        return new ItemStackPredicate() {
+            @Override
+            public boolean test(@Nullable ItemStack input) {
+                ValueObjectTypeBlock.ValueBlock valueBlock = ValueObjectTypeBlock.ValueBlock.of(
+                        input.getItem() instanceof ItemBlock ? BlockHelpers.getBlockStateFromItemStack(input) : null);
+                try {
+                    IValue result = ValueHelpers.evaluateOperator(predicate, valueBlock);
                     return ((ValueTypeBoolean.ValueBoolean) result).getRawValue();
                 } catch (EvaluationException e) {
                     PartHelpers.PartStateHolder<?, ?> partData = PartHelpers.getPart(partTarget.getCenter());

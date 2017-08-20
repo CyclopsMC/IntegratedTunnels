@@ -23,6 +23,7 @@ import org.apache.commons.lang3.tuple.Triple;
 import org.cyclops.commoncapabilities.api.capability.inventorystate.IInventoryState;
 import org.cyclops.commoncapabilities.api.capability.itemhandler.ISlotlessItemHandler;
 import org.cyclops.cyclopscore.datastructure.DimPos;
+import org.cyclops.cyclopscore.helper.BlockHelpers;
 import org.cyclops.cyclopscore.helper.L10NHelpers;
 import org.cyclops.cyclopscore.helper.TileHelpers;
 import org.cyclops.integrateddynamics.api.evaluate.EvaluationException;
@@ -284,13 +285,54 @@ public class TunnelAspectWriteBuilders {
             IOperator predicate = input.getRight().getRawValue();
             if (predicate.getInputTypes().length == 1 && ValueHelpers.correspondsTo(predicate.getInputTypes()[0], ValueTypes.OBJECT_ITEMSTACK)) {
                 IAspectProperties properties = input.getMiddle();
-                ItemStackPredicate itemStackMatcher = TunnelItemHelpers.matchPredicate(input.getLeft(), predicate);
+                ItemStackPredicate itemStackMatcher = TunnelItemHelpers.matchPredicateItem(input.getLeft(), predicate);
                 int amount = properties.getValue(PROP_RATE).getRawValue();
                 int transferHash = predicate.hashCode();
                 return Triple.of(input.getLeft(), input.getMiddle(), Triple.of(itemStackMatcher, amount, transferHash));
             } else {
                 String current = ValueTypeOperator.getSignature(predicate);
                 String expected = ValueTypeOperator.getSignature(new IValueType[]{ValueTypes.OBJECT_ITEMSTACK}, ValueTypes.BOOLEAN);
+                throw new EvaluationException(new L10NHelpers.UnlocalizedString(L10NValues.ASPECT_ERROR_INVALIDTYPE,
+                        expected, current).localize());
+            }
+        };
+        public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, IBlockState>, Triple<PartTarget, IAspectProperties, Triple<ItemStackPredicate, Integer, Integer>>>
+                PROP_BLOCK_ITEMPREDICATE = input -> {
+            IAspectProperties properties = input.getMiddle();
+
+            ItemStack itemStack = BlockHelpers.getItemStackFromBlockState(input.getRight());
+            ItemStackPredicate itemStackMatcher = TunnelItemHelpers.matchItemStack(itemStack, false, true, false);
+            int amount = properties.getValue(PROP_RATE).getRawValue();
+            int transferHash = TunnelItemHelpers.getItemStackHashCode(itemStack);
+            return Triple.of(input.getLeft(), input.getMiddle(), Triple.of(itemStackMatcher, amount, transferHash));
+        };
+        public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, ValueTypeList.ValueList>, Triple<PartTarget, IAspectProperties, Triple<ItemStackPredicate, Integer, Integer>>>
+                PROP_BLOCKLIST_ITEMPREDICATE = input -> {
+            ValueTypeList.ValueList list = input.getRight();
+            if (list.getRawValue().getValueType() != ValueTypes.OBJECT_BLOCK) {
+                throw new EvaluationException(new L10NHelpers.UnlocalizedString(L10NValues.VALUETYPE_ERROR_INVALIDLISTVALUETYPE,
+                        ValueTypes.OBJECT_BLOCK, list.getRawValue().getValueType()).localize());
+            }
+            IAspectProperties properties = input.getMiddle();
+            boolean blacklist = properties.getValue(PROP_BLACKLIST).getRawValue();
+
+            ItemStackPredicate itemStackMatcher = TunnelItemHelpers.matchBlocks(list.getRawValue(), false, true, false, blacklist);
+            int amount = properties.getValue(PROP_RATE).getRawValue();
+            int transferHash = list.getRawValue().hashCode();
+            return Triple.of(input.getLeft(), input.getMiddle(), Triple.of(itemStackMatcher, amount, transferHash));
+        };
+        public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, ValueTypeOperator.ValueOperator>, Triple<PartTarget, IAspectProperties, Triple<ItemStackPredicate, Integer, Integer>>>
+                PROP_BLOCKPREDICATE_ITEMPREDICATE = input -> {
+            IOperator predicate = input.getRight().getRawValue();
+            if (predicate.getInputTypes().length == 1 && ValueHelpers.correspondsTo(predicate.getInputTypes()[0], ValueTypes.OBJECT_BLOCK)) {
+                IAspectProperties properties = input.getMiddle();
+                ItemStackPredicate itemStackMatcher = TunnelItemHelpers.matchPredicateBlock(input.getLeft(), predicate);
+                int amount = properties.getValue(PROP_RATE).getRawValue();
+                int transferHash = predicate.hashCode();
+                return Triple.of(input.getLeft(), input.getMiddle(), Triple.of(itemStackMatcher, amount, transferHash));
+            } else {
+                String current = ValueTypeOperator.getSignature(predicate);
+                String expected = ValueTypeOperator.getSignature(new IValueType[]{ValueTypes.OBJECT_BLOCK}, ValueTypes.BOOLEAN);
                 throw new EvaluationException(new L10NHelpers.UnlocalizedString(L10NValues.ASPECT_ERROR_INVALIDTYPE,
                         expected, current).localize());
             }
@@ -1008,14 +1050,14 @@ public class TunnelAspectWriteBuilders {
 
         public static final class Block {
 
-            public static final IAspectProperties PROPERTIES_PLACE = new AspectProperties(ImmutableList.<IAspectPropertyTypeInstance>of(
+            public static final IAspectProperties PROPERTIES_ITEM_PLACE = new AspectProperties(ImmutableList.<IAspectPropertyTypeInstance>of(
                     TunnelAspectWriteBuilders.Item.PROP_CHECK_DAMAGE,
                     TunnelAspectWriteBuilders.Item.PROP_CHECK_NBT,
                     PROP_BLOCK_UPDATE,
                     PROP_HAND_LEFT,
                     PROP_IGNORE_REPLACABLE
             ));
-            public static final IAspectProperties PROPERTIES_PICK_UP = new AspectProperties(ImmutableList.<IAspectPropertyTypeInstance>of(
+            public static final IAspectProperties PROPERTIES_ITEM_PICK_UP = new AspectProperties(ImmutableList.<IAspectPropertyTypeInstance>of(
                     TunnelAspectWriteBuilders.Item.PROP_CHECK_DAMAGE,
                     TunnelAspectWriteBuilders.Item.PROP_CHECK_NBT,
                     PROP_BLOCK_UPDATE,
@@ -1024,28 +1066,56 @@ public class TunnelAspectWriteBuilders {
                     PROP_IGNORE_REPLACABLE,
                     PROP_BREAK_ON_NO_DROPS
             ));
+            public static final IAspectProperties PROPERTIES_BLOCK_PLACE = new AspectProperties(ImmutableList.<IAspectPropertyTypeInstance>of(
+                    PROP_BLOCK_UPDATE,
+                    PROP_HAND_LEFT,
+                    PROP_IGNORE_REPLACABLE
+            ));
+            public static final IAspectProperties PROPERTIES_BLOCK_PICK_UP = new AspectProperties(ImmutableList.<IAspectPropertyTypeInstance>of(
+                    PROP_BLOCK_UPDATE,
+                    PROP_HAND_LEFT,
+                    PROP_SILK_TOUCH,
+                    PROP_IGNORE_REPLACABLE,
+                    PROP_BREAK_ON_NO_DROPS
+            ));
 
             static {
-                PROPERTIES_PLACE.setValue(TunnelAspectWriteBuilders.Item.PROP_CHECK_DAMAGE, ValueTypeBoolean.ValueBoolean.of(true));
-                PROPERTIES_PLACE.setValue(TunnelAspectWriteBuilders.Item.PROP_CHECK_NBT, ValueTypeBoolean.ValueBoolean.of(true));
-                PROPERTIES_PLACE.setValue(PROP_BLOCK_UPDATE, ValueTypeBoolean.ValueBoolean.of(false));
-                PROPERTIES_PLACE.setValue(PROP_HAND_LEFT, ValueTypeBoolean.ValueBoolean.of(true));
-                PROPERTIES_PLACE.setValue(PROP_IGNORE_REPLACABLE, ValueTypeBoolean.ValueBoolean.of(false));
+                PROPERTIES_ITEM_PLACE.setValue(TunnelAspectWriteBuilders.Item.PROP_CHECK_DAMAGE, ValueTypeBoolean.ValueBoolean.of(true));
+                PROPERTIES_ITEM_PLACE.setValue(TunnelAspectWriteBuilders.Item.PROP_CHECK_NBT, ValueTypeBoolean.ValueBoolean.of(true));
+                PROPERTIES_ITEM_PLACE.setValue(PROP_BLOCK_UPDATE, ValueTypeBoolean.ValueBoolean.of(false));
+                PROPERTIES_ITEM_PLACE.setValue(PROP_HAND_LEFT, ValueTypeBoolean.ValueBoolean.of(true));
+                PROPERTIES_ITEM_PLACE.setValue(PROP_IGNORE_REPLACABLE, ValueTypeBoolean.ValueBoolean.of(false));
 
-                PROPERTIES_PICK_UP.setValue(TunnelAspectWriteBuilders.Item.PROP_CHECK_DAMAGE, ValueTypeBoolean.ValueBoolean.of(true));
-                PROPERTIES_PICK_UP.setValue(TunnelAspectWriteBuilders.Item.PROP_CHECK_NBT, ValueTypeBoolean.ValueBoolean.of(true));
-                PROPERTIES_PICK_UP.setValue(PROP_BLOCK_UPDATE, ValueTypeBoolean.ValueBoolean.of(false));
-                PROPERTIES_PICK_UP.setValue(PROP_HAND_LEFT, ValueTypeBoolean.ValueBoolean.of(true));
-                PROPERTIES_PICK_UP.setValue(PROP_SILK_TOUCH, ValueTypeBoolean.ValueBoolean.of(false));
-                PROPERTIES_PICK_UP.setValue(PROP_IGNORE_REPLACABLE, ValueTypeBoolean.ValueBoolean.of(false));
-                PROPERTIES_PICK_UP.setValue(PROP_BREAK_ON_NO_DROPS, ValueTypeBoolean.ValueBoolean.of(true));
+                PROPERTIES_ITEM_PICK_UP.setValue(TunnelAspectWriteBuilders.Item.PROP_CHECK_DAMAGE, ValueTypeBoolean.ValueBoolean.of(true));
+                PROPERTIES_ITEM_PICK_UP.setValue(TunnelAspectWriteBuilders.Item.PROP_CHECK_NBT, ValueTypeBoolean.ValueBoolean.of(true));
+                PROPERTIES_ITEM_PICK_UP.setValue(PROP_BLOCK_UPDATE, ValueTypeBoolean.ValueBoolean.of(false));
+                PROPERTIES_ITEM_PICK_UP.setValue(PROP_HAND_LEFT, ValueTypeBoolean.ValueBoolean.of(true));
+                PROPERTIES_ITEM_PICK_UP.setValue(PROP_SILK_TOUCH, ValueTypeBoolean.ValueBoolean.of(false));
+                PROPERTIES_ITEM_PICK_UP.setValue(PROP_IGNORE_REPLACABLE, ValueTypeBoolean.ValueBoolean.of(false));
+                PROPERTIES_ITEM_PICK_UP.setValue(PROP_BREAK_ON_NO_DROPS, ValueTypeBoolean.ValueBoolean.of(true));
+                
+                PROPERTIES_BLOCK_PLACE.setValue(PROP_BLOCK_UPDATE, ValueTypeBoolean.ValueBoolean.of(false));
+                PROPERTIES_BLOCK_PLACE.setValue(PROP_HAND_LEFT, ValueTypeBoolean.ValueBoolean.of(true));
+                PROPERTIES_BLOCK_PLACE.setValue(PROP_IGNORE_REPLACABLE, ValueTypeBoolean.ValueBoolean.of(false));
+                
+                PROPERTIES_BLOCK_PICK_UP.setValue(PROP_BLOCK_UPDATE, ValueTypeBoolean.ValueBoolean.of(false));
+                PROPERTIES_BLOCK_PICK_UP.setValue(PROP_HAND_LEFT, ValueTypeBoolean.ValueBoolean.of(true));
+                PROPERTIES_BLOCK_PICK_UP.setValue(PROP_SILK_TOUCH, ValueTypeBoolean.ValueBoolean.of(false));
+                PROPERTIES_BLOCK_PICK_UP.setValue(PROP_IGNORE_REPLACABLE, ValueTypeBoolean.ValueBoolean.of(false));
+                PROPERTIES_BLOCK_PICK_UP.setValue(PROP_BREAK_ON_NO_DROPS, ValueTypeBoolean.ValueBoolean.of(true));
             }
-            public static final IAspectProperties PROPERTIES_PLACELIST = PROPERTIES_PLACE.clone();
-            public static final IAspectProperties PROPERTIES_PICK_UPLIST = PROPERTIES_PICK_UP.clone();
+            public static final IAspectProperties PROPERTIES_ITEM_PLACELIST = PROPERTIES_ITEM_PLACE.clone();
+            public static final IAspectProperties PROPERTIES_ITEM_PICK_UPLIST = PROPERTIES_ITEM_PICK_UP.clone();
+            public static final IAspectProperties PROPERTIES_BLOCK_PLACELIST = PROPERTIES_BLOCK_PLACE.clone();
+            public static final IAspectProperties PROPERTIES_BLOCK_PICK_UPLIST = PROPERTIES_BLOCK_PICK_UP.clone();
             static {
-                PROPERTIES_PLACELIST.setValue(PROP_BLACKLIST, ValueTypeBoolean.ValueBoolean.of(false));
+                PROPERTIES_ITEM_PLACELIST.setValue(PROP_BLACKLIST, ValueTypeBoolean.ValueBoolean.of(false));
 
-                PROPERTIES_PICK_UPLIST.setValue(PROP_BLACKLIST, ValueTypeBoolean.ValueBoolean.of(false));
+                PROPERTIES_ITEM_PICK_UPLIST.setValue(PROP_BLACKLIST, ValueTypeBoolean.ValueBoolean.of(false));
+
+                PROPERTIES_BLOCK_PLACELIST.setValue(PROP_BLACKLIST, ValueTypeBoolean.ValueBoolean.of(false));
+
+                PROPERTIES_BLOCK_PICK_UPLIST.setValue(PROP_BLACKLIST, ValueTypeBoolean.ValueBoolean.of(false));
             }
 
             public static final IAspectValuePropagator<TunnelAspectWriteBuilders.Item.ItemTarget, Void>

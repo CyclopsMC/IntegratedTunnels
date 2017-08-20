@@ -2,7 +2,7 @@
   "display": {
     "icon": {
       "item": "integrateddynamics:variable",
-      "nbt": "{\"aspectName\":\"aspect.aspects.integratedtunnels.write.list.world.block.export.name\",\"partId\":1,\"_type\":\"aspect\",\"_id\":1}"
+      "nbt": "{\"aspectName\":\"aspect.aspects.integratedtunnels.write.list.world.item.block.export.name\",\"partId\":1,\"_type\":\"aspect\",\"_id\":1}"
     },
     "title": {
       "translate": "advancement.integratedtunnels.place_logwood"
@@ -18,7 +18,7 @@
       "trigger": "integrateddynamics:part_writer_aspect",
       "conditions": {
         "parttype": "exporter_world_block",
-        "aspect": "aspect.aspects.integratedtunnels.write.list.world.block.export.name",
+        "aspect": "aspect.aspects.integratedtunnels.write.list.world.item.block.export.name",
         "variable": {
           "type": "operator",
           "operator": "operator.operators.integrateddynamics.string.oredict.name",
