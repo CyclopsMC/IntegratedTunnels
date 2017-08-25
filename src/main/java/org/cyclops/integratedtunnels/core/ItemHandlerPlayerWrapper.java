@@ -154,7 +154,7 @@ public class ItemHandlerPlayerWrapper implements IItemHandler {
                 BlockPos targetPos = pos;
                 int reachDistance = MathHelper.clamp((int) player.interactionManager.getBlockReachDistance(), 0, 10);
                 int i = 0;
-                while (i-- < reachDistance && world.isAirBlock(targetPos)) {
+                while (i++ < reachDistance && world.isAirBlock(targetPos)) {
                     targetPos = targetPos.offset(side.getOpposite());
                 }
 
