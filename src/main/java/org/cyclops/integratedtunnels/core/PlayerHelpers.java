@@ -31,6 +31,9 @@ public class PlayerHelpers {
         BlockPos playerPos = side == EnumFacing.UP || side == EnumFacing.DOWN ? pos.offset(side, 2) : pos;
         player.setActiveHand(hand);
         player.setPosition(playerPos.getX(), playerPos.getY(), playerPos.getZ());
+        player.prevPosX = player.posX;
+        player.prevPosY = player.posY;
+        player.prevPosZ = player.posZ;
         player.rotationYaw = side.getOpposite().getHorizontalAngle();
         player.rotationPitch = side == EnumFacing.UP ? 90F : (side == EnumFacing.DOWN ? -90F : 0F);
         player.setSneaking(sneaking);
