@@ -236,7 +236,6 @@ public class ItemHandlerPlayerWrapper implements IItemHandler {
             if (!itemStack.isEmpty()) {
                 ItemStack remaining = this.playerReturnHandler.insertItem(itemStack, false);
                 ItemStackHelpers.spawnItemStackToPlayer(world, pos, remaining, player);
-                it.remove();
             }
         }
     }
