@@ -1,0 +1,7 @@
+As always, don't forget to backup your world before updating!
+Requires CyclopsCore version 0.10.14 or higher.
+
+Fixes:
+* Fix infinite loop when using an item on a block with a Player Simulator, #49
+* Fix Player Simulator not being able to use Fishing Rods, Closes #49
+  Note: fishing rod entities are invisible, but they are there! (To be fixed soon...)
