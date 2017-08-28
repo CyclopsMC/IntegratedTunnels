@@ -39,7 +39,9 @@ public class ItemNetwork extends PositionedAddonsNetwork implements IItemNetwork
         IItemHandler itemHandler = CACHE_ITEMHANDLER.getIfPresent(pos.getPartPos());
         if (itemHandler == null) {
             itemHandler = TileHelpers.getCapability(pos.getPartPos().getPos(), pos.getPartPos().getSide(), CapabilityItemHandler.ITEM_HANDLER_CAPABILITY);
-            CACHE_ITEMHANDLER.put(pos.getPartPos(), itemHandler);
+            if (itemHandler != null) {
+                CACHE_ITEMHANDLER.put(pos.getPartPos(), itemHandler);
+            }
         }
         return itemHandler;
     }
