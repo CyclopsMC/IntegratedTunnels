@@ -8,6 +8,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.energy.CapabilityEnergy;
@@ -1341,6 +1342,12 @@ public class TunnelAspectWriteBuilders {
                 INetwork network = NetworkHelpers.getNetwork(pos.getWorld(), pos.getBlockPos());
                 if (network != null && network.hasCapability(networkCapability.apply(null))) {
                     ((PartStatePositionedAddon<?, N>) state).setPositionedAddonsNetwork(network.getCapability(networkCapability.apply(null)));
+
+                    // Notify target neighbour
+                    DimPos originPos = target.getCenter().getPos();
+                    DimPos targetPos = target.getTarget().getPos();
+                    targetPos.getWorld().neighborChanged(targetPos.getBlockPos(),
+                            targetPos.getWorld().getBlockState(targetPos.getBlockPos()).getBlock(), originPos.getBlockPos());
                 }
             }
         };
@@ -1356,6 +1363,12 @@ public class TunnelAspectWriteBuilders {
                 INetwork network = NetworkHelpers.getNetwork(pos.getWorld(), pos.getBlockPos());
                 if (network != null && network.hasCapability(networkCapability.apply(null))) {
                     ((PartStatePositionedAddon<?, N>) state).setPositionedAddonsNetwork(network.getCapability(networkCapability.apply(null)));
+
+                    // Notify target neighbour
+                    DimPos originPos = target.getCenter().getPos();
+                    DimPos targetPos = target.getTarget().getPos();
+                    targetPos.getWorld().neighborChanged(targetPos.getBlockPos(),
+                            targetPos.getWorld().getBlockState(targetPos.getBlockPos()).getBlock(), originPos.getBlockPos());
                 }
             }
         };
