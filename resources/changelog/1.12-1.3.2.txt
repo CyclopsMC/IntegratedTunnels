@@ -1,0 +1,8 @@
+As always, don't forget to backup your world before updating!
+Requires CyclopsCore version 0.10.16 or higher.
+
+Fixes:
+* Fix random inactivated parts by handling not found networks as PartStateExceptions, which are then catched by the network.
+* Fix crash when interfaces inventory tiles are incorrectly being removed, Closes #53
+* Correctly notify target neighbours when (de)activating tunnels, Closes #54
+
