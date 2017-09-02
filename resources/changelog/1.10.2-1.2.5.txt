@@ -1,0 +1,7 @@
+As always, don't forget to backup your world before updating!
+Requires CyclopsCore version 0.10.6 or higher.
+
+Fixes:
+* Handle not found networks as PartStateExceptions, which are catched by the network
+  This fixes randomly inactivated parts
+* Fix crash when interfaces inventory tiles are incorrectly being removed, Closes #53
