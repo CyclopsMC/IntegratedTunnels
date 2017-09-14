@@ -12,6 +12,7 @@
   "credits": "rubensworks (aka kroeserr)",
   "parent": "",
   "screenshots": [],
-  "dependencies": []
+  "dependencies": [],
+  "requiredMods": [ "forge", "cyclopscore", "integrateddynamics" ]
 }
 ]
