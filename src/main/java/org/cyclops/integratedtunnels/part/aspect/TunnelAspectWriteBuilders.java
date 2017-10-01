@@ -127,7 +127,7 @@ public class TunnelAspectWriteBuilders {
                 INetwork network = NetworkHelpers.getNetwork(center.getPos().getWorld(), center.getPos().getBlockPos());
                 if (network == null) {
                     IntegratedDynamics.clog(Level.ERROR, "Could not get the energy network as no network was found.");
-                    throw new PartStateException(center.getPos());
+                    throw new PartStateException(center.getPos(), center.getSide());
                 }
                 IEnergyStorage energyStorage = EnergyHelpers.getEnergyStorage(target);
                 return new EnergyTarget(network.getCapability(Capabilities.NETWORK_ENERGY), energyStorage, input.getRight());
@@ -370,7 +370,7 @@ public class TunnelAspectWriteBuilders {
                 INetwork network = NetworkHelpers.getNetwork(center.getPos().getWorld(), center.getPos().getBlockPos());
                 if (network == null) {
                     IntegratedDynamics.clog(Level.ERROR, "Could not get the item network as no network was found.");
-                    throw new PartStateException(center.getPos());
+                    throw new PartStateException(center.getPos(), center.getSide());
                 }
                 IItemHandler itemHandler = TileHelpers.getCapability(target.getPos(), target.getSide(), CapabilityItemHandler.ITEM_HANDLER_CAPABILITY);
                 int slot = properties.getValue(PROP_SLOT).getRawValue();
@@ -609,7 +609,7 @@ public class TunnelAspectWriteBuilders {
                 INetwork network = NetworkHelpers.getNetwork(center.getPos().getWorld(), center.getPos().getBlockPos());
                 if (network == null) {
                     IntegratedDynamics.clog(Level.ERROR, "Could not get the fluid network as no network was found.");
-                    throw new PartStateException(center.getPos());
+                    throw new PartStateException(center.getPos(), center.getSide());
                 }
                 IFluidHandler fluidHandler = TileHelpers.getCapability(target.getPos(), target.getSide(), CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY);
                 return new FluidTarget(network.getCapability(FluidNetworkConfig.CAPABILITY), fluidHandler,

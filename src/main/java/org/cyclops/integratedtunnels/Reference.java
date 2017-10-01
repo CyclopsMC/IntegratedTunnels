@@ -35,9 +35,9 @@ public class Reference {
     public static final String MOD_FORGE_VERSION_MIN = "12.18.2.2122";
     public static final String MOD_CYCLOPSCORE = "cyclopscore";
     public static final String MOD_CYCLOPSCORE_VERSION = "@CYCLOPSCORE_VERSION@";
-    public static final String MOD_CYCLOPSCORE_VERSION_MIN = "0.10.6";
+    public static final String MOD_CYCLOPSCORE_VERSION_MIN = "0.10.8";
     public static final String MOD_INTEGRATEDDYNAMICS = "integrateddynamics";
-    public static final String MOD_INTEGRATEDDYNAMICS_VERSION_MIN = "0.7.0";
+    public static final String MOD_INTEGRATEDDYNAMICS_VERSION_MIN = "0.7.13";
     public static final String MOD_TESLA = "tesla";
     
     // Dependencies
