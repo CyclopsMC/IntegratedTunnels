@@ -27,19 +27,19 @@ public class TunnelNetworkCapabilityConstructors {
     public void onNetworkLoad(AttachCapabilitiesEventNetwork event) {
         ItemNetwork itemNetwork = new ItemNetwork();
         event.addCapability(new ResourceLocation(Reference.MOD_ID, "itemNetwork"),
-                new DefaultCapabilityProvider<IItemNetwork>(ItemNetworkConfig.CAPABILITY, itemNetwork));
+                new DefaultCapabilityProvider<IItemNetwork>(() -> ItemNetworkConfig.CAPABILITY, itemNetwork));
         event.addCapability(new ResourceLocation(Reference.MOD_ID, "itemStorageNetwork"),
-                new DefaultCapabilityProvider<IItemHandler>(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, itemNetwork));
+                new DefaultCapabilityProvider<IItemHandler>(() -> CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, itemNetwork));
         event.addCapability(new ResourceLocation(Reference.MOD_ID, "inventoryStateItemNetwork"),
-                new DefaultCapabilityProvider<IInventoryState>(Capabilities.INVENTORY_STATE, itemNetwork));
+                new DefaultCapabilityProvider<IInventoryState>(() -> Capabilities.INVENTORY_STATE, itemNetwork));
         event.addCapability(new ResourceLocation(Reference.MOD_ID, "itemStorageSlotlessNetwork"),
-                new DefaultCapabilityProvider<ISlotlessItemHandler>(Capabilities.SLOTLESS_ITEMHANDLER, itemNetwork));
+                new DefaultCapabilityProvider<ISlotlessItemHandler>(() -> Capabilities.SLOTLESS_ITEMHANDLER, itemNetwork));
 
         FluidNetwork fluidNetwork = new FluidNetwork();
         event.addCapability(new ResourceLocation(Reference.MOD_ID, "fluidNetwork"),
-                new DefaultCapabilityProvider<IFluidNetwork>(FluidNetworkConfig.CAPABILITY, fluidNetwork));
+                new DefaultCapabilityProvider<IFluidNetwork>(() -> FluidNetworkConfig.CAPABILITY, fluidNetwork));
         event.addCapability(new ResourceLocation(Reference.MOD_ID, "fluidStorageNetwork"),
-                new DefaultCapabilityProvider<IFluidHandler>(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, fluidNetwork));
+                new DefaultCapabilityProvider<IFluidHandler>(() -> CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, fluidNetwork));
     }
 
 }
