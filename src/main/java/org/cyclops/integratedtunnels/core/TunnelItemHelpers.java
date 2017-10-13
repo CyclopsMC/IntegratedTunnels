@@ -254,6 +254,9 @@ public class TunnelItemHelpers {
                                                     IItemHandler sourceHandler, @Nullable IInventoryState sourceInvState, int sourceSlot, @Nullable ISlotlessItemHandler sourceSlotless,
                                                     IItemHandler targetHandler, @Nullable IInventoryState targetInvState, int targetSlot, @Nullable ISlotlessItemHandler targetSlotless,
                                                     int amount, ItemStackPredicate itemStackMatcher) {
+        if (amount <= 0) {
+            return ItemStack.EMPTY;
+        }
         Integer cachedState = getCachedState(connectionHash);
 
         boolean calculatedStates = false;
