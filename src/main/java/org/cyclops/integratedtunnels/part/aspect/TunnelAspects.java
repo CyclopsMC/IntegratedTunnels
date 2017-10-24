@@ -60,6 +60,13 @@ public class TunnelAspects {
                             .handle(TunnelAspectWriteBuilders.Item.PROP_ITEMTARGET)
                             .handle(TunnelAspectWriteBuilders.Item.PROP_EXPORT)
                             .appendKind("export").buildWrite();
+            public static final IAspectWrite<ValueTypeInteger.ValueInteger, ValueTypeInteger> INTEGER_SLOT_EXPORT =
+                    TunnelAspectWriteBuilders.Item.BUILDER_INTEGER
+                            .withProperties(TunnelAspectWriteBuilders.Item.PROPERTIES_RATE)
+                            .handle(TunnelAspectWriteBuilders.Item.PROP_INTEGER_SLOT_ITEMPREDICATE)
+                            .handle(TunnelAspectWriteBuilders.Item.PROP_ITEMTARGET)
+                            .handle(TunnelAspectWriteBuilders.Item.PROP_EXPORT)
+                            .appendKind("slot").appendKind("export").buildWrite();
             public static final IAspectWrite<ValueObjectTypeItemStack.ValueItemStack, ValueObjectTypeItemStack> ITEMSTACK_EXPORT =
                     TunnelAspectWriteBuilders.Item.BUILDER_ITEMSTACK
                             .withProperties(TunnelAspectWriteBuilders.Item.PROPERTIES_RATESLOTCHECKS)
@@ -96,6 +103,13 @@ public class TunnelAspects {
                             .handle(TunnelAspectWriteBuilders.Item.PROP_ITEMTARGET)
                             .handle(TunnelAspectWriteBuilders.Item.PROP_IMPORT)
                             .appendKind("import").buildWrite();
+            public static final IAspectWrite<ValueTypeInteger.ValueInteger, ValueTypeInteger> INTEGER_SLOT_IMPORT =
+                    TunnelAspectWriteBuilders.Item.BUILDER_INTEGER
+                            .withProperties(TunnelAspectWriteBuilders.Item.PROPERTIES_RATE)
+                            .handle(TunnelAspectWriteBuilders.Item.PROP_INTEGER_SLOT_ITEMPREDICATE)
+                            .handle(TunnelAspectWriteBuilders.Item.PROP_ITEMTARGET)
+                            .handle(TunnelAspectWriteBuilders.Item.PROP_IMPORT)
+                            .appendKind("slot").appendKind("import").buildWrite();
             public static final IAspectWrite<ValueObjectTypeItemStack.ValueItemStack, ValueObjectTypeItemStack> ITEMSTACK_IMPORT =
                     TunnelAspectWriteBuilders.Item.BUILDER_ITEMSTACK
                             .withProperties(TunnelAspectWriteBuilders.Item.PROPERTIES_RATESLOTCHECKS)

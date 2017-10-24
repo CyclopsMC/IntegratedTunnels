@@ -17,6 +17,7 @@ public class PartTypeExporterItem extends PartTypeTunnelAspects<PartTypeExporter
         AspectRegistry.getInstance().register(this, Lists.<IAspect>newArrayList(
                 TunnelAspects.Write.Item.BOOLEAN_EXPORT,
                 TunnelAspects.Write.Item.INTEGER_EXPORT,
+                TunnelAspects.Write.Item.INTEGER_SLOT_EXPORT,
                 TunnelAspects.Write.Item.ITEMSTACK_EXPORT,
                 TunnelAspects.Write.Item.LIST_EXPORT,
                 TunnelAspects.Write.Item.PREDICATE_EXPORT

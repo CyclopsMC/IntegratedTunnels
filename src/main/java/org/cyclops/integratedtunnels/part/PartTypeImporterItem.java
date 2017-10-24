@@ -17,6 +17,7 @@ public class PartTypeImporterItem extends PartTypeTunnelAspects<PartTypeImporter
         AspectRegistry.getInstance().register(this, Lists.<IAspect>newArrayList(
                 TunnelAspects.Write.Item.BOOLEAN_IMPORT,
                 TunnelAspects.Write.Item.INTEGER_IMPORT,
+                TunnelAspects.Write.Item.INTEGER_SLOT_IMPORT,
                 TunnelAspects.Write.Item.ITEMSTACK_IMPORT,
                 TunnelAspects.Write.Item.LIST_IMPORT,
                 TunnelAspects.Write.Item.PREDICATE_IMPORT
