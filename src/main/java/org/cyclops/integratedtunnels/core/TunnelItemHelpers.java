@@ -207,7 +207,7 @@ public class TunnelItemHelpers {
         }
         int hash = itemHandler.hashCode();
         for (int i = 0; i < itemHandler.getSlots(); i++) {
-            hash += getItemStackHashCode(itemHandler.getStackInSlot(i)) + i;
+            hash += getItemStackHashCode(itemHandler.getStackInSlot(i)) << (i % 100);
         }
         return hash;
     }
