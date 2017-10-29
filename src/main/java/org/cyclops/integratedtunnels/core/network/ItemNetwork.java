@@ -72,9 +72,9 @@ public class ItemNetwork extends PositionedAddonsNetwork implements IItemNetwork
     }
 
     @Override
-    public boolean addPosition(PartPos pos, int priority) {
+    public boolean addPosition(PartPos pos, int priority, int channel) {
         IItemHandler itemHandler = TileHelpers.getCapability(pos.getPos(), pos.getSide(), CapabilityItemHandler.ITEM_HANDLER_CAPABILITY);
-        return itemHandler != null && super.addPosition(pos, priority);
+        return itemHandler != null && super.addPosition(pos, priority, channel);
     }
 
     @Override

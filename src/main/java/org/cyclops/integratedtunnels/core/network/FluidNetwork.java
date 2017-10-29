@@ -30,9 +30,9 @@ public class FluidNetwork extends PositionedAddonsNetwork implements IFluidNetwo
     }
 
     @Override
-    public boolean addPosition(PartPos pos, int priority) {
+    public boolean addPosition(PartPos pos, int priority, int channel) {
         IFluidHandler fluidHandler = TileHelpers.getCapability(pos.getPos(), pos.getSide(), CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY);
-        return fluidHandler != null && super.addPosition(pos, priority);
+        return fluidHandler != null && super.addPosition(pos, priority, channel);
     }
 
     @Override

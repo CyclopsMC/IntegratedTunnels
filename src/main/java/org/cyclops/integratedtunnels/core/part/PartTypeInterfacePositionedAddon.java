@@ -32,7 +32,7 @@ public abstract class PartTypeInterfacePositionedAddon<N extends IPositionedAddo
     @Override
     public void afterNetworkReAlive(INetwork network, IPartNetwork partNetwork, PartTarget target, S state) {
         super.afterNetworkReAlive(network, partNetwork, target, state);
-        addTargetToNetwork(network, target.getTarget(), state.getPriority(), state);
+        addTargetToNetwork(network, target.getTarget(), state.getPriority(), state.getChannel(), state);
     }
 
     @Override
@@ -44,7 +44,7 @@ public abstract class PartTypeInterfacePositionedAddon<N extends IPositionedAddo
     @Override
     public void onNetworkAddition(INetwork network, IPartNetwork partNetwork, PartTarget target, S state) {
         super.onNetworkAddition(network, partNetwork, target, state);
-        addTargetToNetwork(network, target.getTarget(), state.getPriority(), state);
+        addTargetToNetwork(network, target.getTarget(), state.getPriority(), state.getChannel(), state);
     }
 
     @Override
@@ -52,29 +52,29 @@ public abstract class PartTypeInterfacePositionedAddon<N extends IPositionedAddo
         super.onBlockNeighborChange(network, partNetwork, target, state, world, neighborBlock);
         if (network != null) {
             removeTargetFromNetwork(network, target.getTarget(), state);
-            addTargetToNetwork(network, target.getTarget(), state.getPriority(), state);
+            addTargetToNetwork(network, target.getTarget(), state.getPriority(), state.getChannel(), state);
         }
     }
 
     @Override
-    public void setPriority(INetwork network, IPartNetwork partNetwork, PartTarget target, S state, int priority) {
+    public void setPriorityAndChannel(INetwork network, IPartNetwork partNetwork, PartTarget target, S state, int priority, int channel) {
         // We need to do this because the energy network is not automagically aware of the priority changes,
         // so we have to re-add it.
         removeTargetFromNetwork(network, target.getTarget(), state);
-        super.setPriority(network, partNetwork, target, state, priority);
-        addTargetToNetwork(network, target.getTarget(), priority, state);
+        super.setPriorityAndChannel(network, partNetwork, target, state, priority, channel);
+        addTargetToNetwork(network, target.getTarget(), priority, channel, state);
     }
 
     protected T getTargetCapabilityInstance(PartPos pos) {
         return TileHelpers.getCapability(pos.getPos(), pos.getSide(), getTargetCapability());
     }
 
-    protected void addTargetToNetwork(INetwork network, PartPos pos, int priority, S state) {
+    protected void addTargetToNetwork(INetwork network, PartPos pos, int priority, int channel, S state) {
         if (network.hasCapability(getNetworkCapability())) {
             T capability = getTargetCapabilityInstance(pos);
             if (isTargetCapabilityValid(capability)) {
                 N networkCapability = network.getCapability(getNetworkCapability());
-                networkCapability.addPosition(pos, priority);
+                networkCapability.addPosition(pos, priority, channel);
             }
             state.setPositionedAddonsNetwork(network.getCapability(getNetworkCapability()));
             state.setPos(pos);

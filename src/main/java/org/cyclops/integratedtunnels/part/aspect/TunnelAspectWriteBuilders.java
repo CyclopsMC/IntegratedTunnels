@@ -1,5 +1,6 @@
 package org.cyclops.integratedtunnels.part.aspect;
 
+import com.google.common.base.Predicates;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import net.minecraft.block.state.IBlockState;
@@ -77,6 +78,11 @@ public class TunnelAspectWriteBuilders {
 
     public static final IAspectPropertyTypeInstance<ValueTypeBoolean, ValueTypeBoolean.ValueBoolean> PROP_BLACKLIST =
             new AspectPropertyTypeInstance<>(ValueTypes.BOOLEAN, "aspect.aspecttypes.integratedtunnels.boolean.blacklist.name");
+    public static final IAspectPropertyTypeInstance<ValueTypeInteger, ValueTypeInteger.ValueInteger> PROP_CHANNEL =
+            new AspectPropertyTypeInstance<>(ValueTypes.INTEGER, "aspect.aspecttypes.integrateddynamics.integer.channel.name");
+    public static final IAspectProperties PROPERTIES_CHANNEL = new AspectProperties(ImmutableList.<IAspectPropertyTypeInstance>of(
+            PROP_CHANNEL
+    ));
 
     public static final class Energy {
 
@@ -88,11 +94,11 @@ public class TunnelAspectWriteBuilders {
         public static final AspectBuilder<ValueTypeBoolean.ValueBoolean, ValueTypeBoolean, Triple<PartTarget, IAspectProperties, Boolean>>
                 BUILDER_BOOLEAN = AspectWriteBuilders.BUILDER_BOOLEAN.byMod(IntegratedTunnels._instance)
                 .appendActivator(ACTIVATOR).appendDeactivator(DEACTIVATOR)
-                .appendKind("energy").handle(AspectWriteBuilders.PROP_GET_BOOLEAN);
+                .appendKind("energy").handle(AspectWriteBuilders.PROP_GET_BOOLEAN).withProperties(PROPERTIES_CHANNEL);
         public static final AspectBuilder<ValueTypeInteger.ValueInteger, ValueTypeInteger, Triple<PartTarget, IAspectProperties, Integer>>
                 BUILDER_INTEGER = AspectWriteBuilders.BUILDER_INTEGER.byMod(IntegratedTunnels._instance)
                 .appendActivator(ACTIVATOR).appendDeactivator(DEACTIVATOR)
-                .appendKind("energy").handle(AspectWriteBuilders.PROP_GET_INTEGER);
+                .appendKind("energy").handle(AspectWriteBuilders.PROP_GET_INTEGER).withProperties(PROPERTIES_CHANNEL);
 
         public static final Predicate<ValueTypeInteger.ValueInteger> VALIDATOR_INTEGER_MAXRATE =
                 input -> input.getRawValue() <= org.cyclops.integrateddynamics.GeneralConfig.energyRateLimit;
@@ -101,6 +107,7 @@ public class TunnelAspectWriteBuilders {
                 new AspectPropertyTypeInstance<>(ValueTypes.INTEGER, "aspect.aspecttypes.integratedtunnels.integer.energy.rate.name",
                         AspectReadBuilders.VALIDATOR_INTEGER_POSITIVE.and(VALIDATOR_INTEGER_MAXRATE));
         public static final IAspectProperties PROPERTIES = new AspectProperties(ImmutableList.<IAspectPropertyTypeInstance>of(
+                PROP_CHANNEL,
                 PROP_RATE
         ));
         static {
@@ -115,37 +122,37 @@ public class TunnelAspectWriteBuilders {
             PartPos target = input.getLeft().getTarget();
             INetwork network = getNetworkChecked(center);
             IEnergyStorage energyStorage = EnergyHelpers.getEnergyStorage(target);
-            return new EnergyTarget(network.getCapability(Capabilities.NETWORK_ENERGY), energyStorage, input.getRight());
+            int channel = input.getMiddle().getValue(PROP_CHANNEL).getRawValue();
+            return new EnergyTarget(network.getCapability(Capabilities.NETWORK_ENERGY).getChannel(channel), energyStorage, input.getRight());
         };
         public static final IAspectValuePropagator<EnergyTarget, Void>
                 PROP_EXPORT = input -> {
-            if (input.getEnergyNetwork() != null && input.getEnergyStorage() != null && input.getAmount() != 0) {
-                TunnelEnergyHelpers.moveEnergy(input.getEnergyNetwork(), input.getEnergyStorage(), input.getAmount());
+            if (input.getEnergyChannel() != null && input.getEnergyStorage() != null && input.getAmount() != 0) {
+                TunnelEnergyHelpers.moveEnergy(input.getEnergyChannel(), input.getEnergyStorage(), input.getAmount());
             }
             return null;
         };
         public static final IAspectValuePropagator<EnergyTarget, Void>
                 PROP_IMPORT = input -> {
-            if (input.getEnergyNetwork() != null && input.getEnergyStorage() != null && input.getAmount() != 0) {
-                TunnelEnergyHelpers.moveEnergy(input.getEnergyStorage(), input.getEnergyNetwork(), input.getAmount());
+            if (input.getEnergyChannel() != null && input.getEnergyStorage() != null && input.getAmount() != 0) {
+                TunnelEnergyHelpers.moveEnergy(input.getEnergyStorage(), input.getEnergyChannel(), input.getAmount());
             }
             return null;
         };
 
         public static class EnergyTarget {
 
-            private final IEnergyNetwork energyNetwork;
-            private final IEnergyStorage energyStorage;
+            private final IEnergyStorage energyChannel, energyStorage;
             private final int amount;
 
-            public EnergyTarget(IEnergyNetwork energyNetwork, IEnergyStorage energyStorage, int amount) {
-                this.energyNetwork = energyNetwork;
+            public EnergyTarget(IEnergyStorage energyChannel, IEnergyStorage energyStorage, int amount) {
+                this.energyChannel = energyChannel;
                 this.energyStorage = energyStorage;
                 this.amount = amount;
             }
 
-            public IEnergyNetwork getEnergyNetwork() {
-                return energyNetwork;
+            public IEnergyStorage getEnergyChannel() {
+                return energyChannel;
             }
 
             public IEnergyStorage getEnergyStorage() {
@@ -801,6 +808,7 @@ public class TunnelAspectWriteBuilders {
                 IAspectProperties properties = input.getMiddle();
                 int amount = input.getRight();
                 int entityIndex = properties.getValue(World.PROPERTY_ENTITYINDEX).getRawValue();
+                int channel = properties.getValue(PROP_CHANNEL).getRawValue();
 
                 PartPos center = partTarget.getCenter();
                 PartPos target = partTarget.getTarget();
@@ -811,7 +819,7 @@ public class TunnelAspectWriteBuilders {
                 if (entity != null && entity.hasCapability(CapabilityEnergy.ENERGY, target.getSide())) {
                     energyStorage = entity.getCapability(CapabilityEnergy.ENERGY, target.getSide());
                 }
-                return new TunnelAspectWriteBuilders.Energy.EnergyTarget(network.getCapability(Capabilities.NETWORK_ENERGY), energyStorage, amount);
+                return new TunnelAspectWriteBuilders.Energy.EnergyTarget(network.getCapability(Capabilities.NETWORK_ENERGY).getChannel(channel), energyStorage, amount);
             };
 
         }
