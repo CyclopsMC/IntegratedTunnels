@@ -839,13 +839,12 @@ public class TunnelAspectWriteBuilders {
         public static final class Item {
 
             public static final IAspectProperties PROPERTIES_ENTITYITEM_PICK_UP_NORATE = new AspectProperties(ImmutableList.<IAspectPropertyTypeInstance>of(
+                    TunnelAspectWriteBuilders.Item.PROP_CHECK_STACKSIZE,
                     TunnelAspectWriteBuilders.Item.PROP_CHECK_DAMAGE,
                     TunnelAspectWriteBuilders.Item.PROP_CHECK_NBT,
                     PROP_IGNORE_PICK_UP_DELAY
             ));
-            public static final IAspectProperties PROPERTIES_ENTITYITEM_PLACE_NORATE = new AspectProperties(ImmutableList.<IAspectPropertyTypeInstance>of(
-                    TunnelAspectWriteBuilders.Item.PROP_CHECK_DAMAGE,
-                    TunnelAspectWriteBuilders.Item.PROP_CHECK_NBT,
+            public static final IAspectProperties PROPERTIES_ENTITYITEM_PLACE_NORATE_NOCHECKS = new AspectProperties(ImmutableList.<IAspectPropertyTypeInstance>of(
                     PROP_DISPENSE,
                     PROP_OFFSET_X,
                     PROP_OFFSET_Y,
@@ -857,28 +856,53 @@ public class TunnelAspectWriteBuilders {
                     PROP_PITCH
             ));
             static {
+                PROPERTIES_ENTITYITEM_PICK_UP_NORATE.setValue(TunnelAspectWriteBuilders.Item.PROP_CHECK_STACKSIZE, ValueTypeBoolean.ValueBoolean.of(false));
                 PROPERTIES_ENTITYITEM_PICK_UP_NORATE.setValue(TunnelAspectWriteBuilders.Item.PROP_CHECK_DAMAGE, ValueTypeBoolean.ValueBoolean.of(true));
                 PROPERTIES_ENTITYITEM_PICK_UP_NORATE.setValue(TunnelAspectWriteBuilders.Item.PROP_CHECK_NBT, ValueTypeBoolean.ValueBoolean.of(true));
                 PROPERTIES_ENTITYITEM_PICK_UP_NORATE.setValue(PROP_IGNORE_PICK_UP_DELAY, ValueTypeBoolean.ValueBoolean.of(true));
 
-                PROPERTIES_ENTITYITEM_PLACE_NORATE.setValue(TunnelAspectWriteBuilders.Item.PROP_CHECK_DAMAGE, ValueTypeBoolean.ValueBoolean.of(true));
-                PROPERTIES_ENTITYITEM_PLACE_NORATE.setValue(TunnelAspectWriteBuilders.Item.PROP_CHECK_NBT, ValueTypeBoolean.ValueBoolean.of(true));
-                PROPERTIES_ENTITYITEM_PLACE_NORATE.setValue(PROP_DISPENSE, ValueTypeBoolean.ValueBoolean.of(false));
-                PROPERTIES_ENTITYITEM_PLACE_NORATE.setValue(PROP_OFFSET_X, ValueTypeDouble.ValueDouble.of(0.5D));
-                PROPERTIES_ENTITYITEM_PLACE_NORATE.setValue(PROP_OFFSET_Y, ValueTypeDouble.ValueDouble.of(0.5D));
-                PROPERTIES_ENTITYITEM_PLACE_NORATE.setValue(PROP_OFFSET_Z, ValueTypeDouble.ValueDouble.of(0.5D));
-                PROPERTIES_ENTITYITEM_PLACE_NORATE.setValue(PROP_LIFESPAN, ValueTypeInteger.ValueInteger.of(6000));
-                PROPERTIES_ENTITYITEM_PLACE_NORATE.setValue(PROP_DELAY_BEFORE_PICKUP, ValueTypeInteger.ValueInteger.of(10));
-                PROPERTIES_ENTITYITEM_PLACE_NORATE.setValue(PROP_VELOCITY, ValueTypeDouble.ValueDouble.of(0.1D));
-                PROPERTIES_ENTITYITEM_PLACE_NORATE.setValue(PROP_YAW, ValueTypeDouble.ValueDouble.of(0D));
-                PROPERTIES_ENTITYITEM_PLACE_NORATE.setValue(PROP_PITCH, ValueTypeDouble.ValueDouble.of(0D));
+                PROPERTIES_ENTITYITEM_PLACE_NORATE_NOCHECKS.setValue(PROP_DISPENSE, ValueTypeBoolean.ValueBoolean.of(false));
+                PROPERTIES_ENTITYITEM_PLACE_NORATE_NOCHECKS.setValue(PROP_OFFSET_X, ValueTypeDouble.ValueDouble.of(0.5D));
+                PROPERTIES_ENTITYITEM_PLACE_NORATE_NOCHECKS.setValue(PROP_OFFSET_Y, ValueTypeDouble.ValueDouble.of(0.5D));
+                PROPERTIES_ENTITYITEM_PLACE_NORATE_NOCHECKS.setValue(PROP_OFFSET_Z, ValueTypeDouble.ValueDouble.of(0.5D));
+                PROPERTIES_ENTITYITEM_PLACE_NORATE_NOCHECKS.setValue(PROP_LIFESPAN, ValueTypeInteger.ValueInteger.of(6000));
+                PROPERTIES_ENTITYITEM_PLACE_NORATE_NOCHECKS.setValue(PROP_DELAY_BEFORE_PICKUP, ValueTypeInteger.ValueInteger.of(10));
+                PROPERTIES_ENTITYITEM_PLACE_NORATE_NOCHECKS.setValue(PROP_VELOCITY, ValueTypeDouble.ValueDouble.of(0.1D));
+                PROPERTIES_ENTITYITEM_PLACE_NORATE_NOCHECKS.setValue(PROP_YAW, ValueTypeDouble.ValueDouble.of(0D));
+                PROPERTIES_ENTITYITEM_PLACE_NORATE_NOCHECKS.setValue(PROP_PITCH, ValueTypeDouble.ValueDouble.of(0D));
             }
             public static final IAspectProperties PROPERTIES_ENTITYITEM_PICK_UP = PROPERTIES_ENTITYITEM_PICK_UP_NORATE.clone();
-            public static final IAspectProperties PROPERTIES_ENTITYITEM_PLACE = PROPERTIES_ENTITYITEM_PLACE_NORATE.clone();
+            public static final IAspectProperties PROPERTIES_ENTITYITEM_PLACE_NORATE = PROPERTIES_ENTITYITEM_PLACE_NORATE_NOCHECKS.clone();
+            public static final IAspectProperties PROPERTIES_ENTITYITEM_PLACE_NOCHECKS = PROPERTIES_ENTITYITEM_PLACE_NORATE_NOCHECKS.clone();
+            public static final IAspectProperties PROPERTIES_ENTITYITEM_PLACE = PROPERTIES_ENTITYITEM_PLACE_NORATE_NOCHECKS.clone();
+            public static final IAspectProperties PROPERTIES_ENTITYITEM_PICK_UP_NOCHECKS = new AspectProperties(ImmutableList.<IAspectPropertyTypeInstance>of(
+                    PROP_IGNORE_PICK_UP_DELAY,
+                    TunnelAspectWriteBuilders.Item.PROP_RATE
+            ));
+            public static final IAspectProperties PROPERTIES_ENTITYITEM_PICK_UP_NORATE_NOCHECKS = new AspectProperties(ImmutableList.<IAspectPropertyTypeInstance>of(
+                    PROP_IGNORE_PICK_UP_DELAY
+            ));
             static {
                 PROPERTIES_ENTITYITEM_PICK_UP.setValue(TunnelAspectWriteBuilders.Item.PROP_RATE, ValueTypeInteger.ValueInteger.of(64));
+                PROPERTIES_ENTITYITEM_PICK_UP.setValue(TunnelAspectWriteBuilders.Item.PROP_CHECK_STACKSIZE, ValueTypeBoolean.ValueBoolean.of(false));
+                PROPERTIES_ENTITYITEM_PICK_UP.setValue(TunnelAspectWriteBuilders.Item.PROP_CHECK_DAMAGE, ValueTypeBoolean.ValueBoolean.of(true));
+                PROPERTIES_ENTITYITEM_PICK_UP.setValue(TunnelAspectWriteBuilders.Item.PROP_CHECK_NBT, ValueTypeBoolean.ValueBoolean.of(true));
+
+                PROPERTIES_ENTITYITEM_PICK_UP_NOCHECKS.setValue(PROP_IGNORE_PICK_UP_DELAY, ValueTypeBoolean.ValueBoolean.of(true));
+                PROPERTIES_ENTITYITEM_PICK_UP_NOCHECKS.setValue(TunnelAspectWriteBuilders.Item.PROP_RATE, ValueTypeInteger.ValueInteger.of(64));
+
+                PROPERTIES_ENTITYITEM_PICK_UP_NORATE_NOCHECKS.setValue(PROP_IGNORE_PICK_UP_DELAY, ValueTypeBoolean.ValueBoolean.of(true));
 
                 PROPERTIES_ENTITYITEM_PLACE.setValue(TunnelAspectWriteBuilders.Item.PROP_RATE, ValueTypeInteger.ValueInteger.of(64));
+                PROPERTIES_ENTITYITEM_PLACE.setValue(TunnelAspectWriteBuilders.Item.PROP_CHECK_STACKSIZE, ValueTypeBoolean.ValueBoolean.of(false));
+                PROPERTIES_ENTITYITEM_PLACE.setValue(TunnelAspectWriteBuilders.Item.PROP_CHECK_DAMAGE, ValueTypeBoolean.ValueBoolean.of(true));
+                PROPERTIES_ENTITYITEM_PLACE.setValue(TunnelAspectWriteBuilders.Item.PROP_CHECK_NBT, ValueTypeBoolean.ValueBoolean.of(true));
+
+                PROPERTIES_ENTITYITEM_PLACE_NORATE.setValue(TunnelAspectWriteBuilders.Item.PROP_CHECK_STACKSIZE, ValueTypeBoolean.ValueBoolean.of(false));
+                PROPERTIES_ENTITYITEM_PLACE_NORATE.setValue(TunnelAspectWriteBuilders.Item.PROP_CHECK_DAMAGE, ValueTypeBoolean.ValueBoolean.of(true));
+                PROPERTIES_ENTITYITEM_PLACE_NORATE.setValue(TunnelAspectWriteBuilders.Item.PROP_CHECK_NBT, ValueTypeBoolean.ValueBoolean.of(true));
+
+                PROPERTIES_ENTITYITEM_PLACE_NOCHECKS.setValue(TunnelAspectWriteBuilders.Item.PROP_RATE, ValueTypeInteger.ValueInteger.of(64));
             }
             public static final IAspectProperties PROPERTIES_ENTITYITEM_PICK_UPLIST = PROPERTIES_ENTITYITEM_PICK_UP.clone();
             public static final IAspectProperties PROPERTIES_ENTITYITEM_PLACELIST = PROPERTIES_ENTITYITEM_PLACE.clone();
@@ -1022,8 +1046,10 @@ public class TunnelAspectWriteBuilders {
                 PROPERTIES_FLUIDLIST_UPDATE.setValue(PROP_BLOCK_UPDATE, ValueTypeBoolean.ValueBoolean.of(false));
                 PROPERTIES_FLUIDLIST_UPDATE.setValue(PROP_IGNORE_REPLACABLE, ValueTypeBoolean.ValueBoolean.of(false));
 
-                PROPERTIES_FLUID.setValue(PROP_BLACKLIST, ValueTypeBoolean.ValueBoolean.of(false));
                 PROPERTIES_FLUID.setValue(TunnelAspectWriteBuilders.Fluid.PROP_CHECK_NBT, ValueTypeBoolean.ValueBoolean.of(true));
+
+                PROPERTIES_FLUIDLIST.setValue(PROP_BLACKLIST, ValueTypeBoolean.ValueBoolean.of(false));
+                PROPERTIES_FLUIDLIST.setValue(TunnelAspectWriteBuilders.Fluid.PROP_CHECK_NBT, ValueTypeBoolean.ValueBoolean.of(true));
 
                 PROPERTIES_RATE.setValue(World.PROPERTY_ENTITYINDEX, ValueTypeInteger.ValueInteger.of(0));
 
@@ -1122,12 +1148,24 @@ public class TunnelAspectWriteBuilders {
 
         public static final class Block {
 
+            public static final IAspectProperties PROPERTIES_ITEM_PLACE_NOCHECKS = new AspectProperties(ImmutableList.<IAspectPropertyTypeInstance>of(
+                    PROP_BLOCK_UPDATE,
+                    PROP_HAND_LEFT,
+                    PROP_IGNORE_REPLACABLE
+            ));
             public static final IAspectProperties PROPERTIES_ITEM_PLACE = new AspectProperties(ImmutableList.<IAspectPropertyTypeInstance>of(
                     TunnelAspectWriteBuilders.Item.PROP_CHECK_DAMAGE,
                     TunnelAspectWriteBuilders.Item.PROP_CHECK_NBT,
                     PROP_BLOCK_UPDATE,
                     PROP_HAND_LEFT,
                     PROP_IGNORE_REPLACABLE
+            ));
+            public static final IAspectProperties PROPERTIES_ITEM_PICK_UP_NOCHECKS = new AspectProperties(ImmutableList.<IAspectPropertyTypeInstance>of(
+                    PROP_BLOCK_UPDATE,
+                    PROP_HAND_LEFT,
+                    PROP_SILK_TOUCH,
+                    PROP_IGNORE_REPLACABLE,
+                    PROP_BREAK_ON_NO_DROPS
             ));
             public static final IAspectProperties PROPERTIES_ITEM_PICK_UP = new AspectProperties(ImmutableList.<IAspectPropertyTypeInstance>of(
                     TunnelAspectWriteBuilders.Item.PROP_CHECK_DAMAGE,
@@ -1152,11 +1190,21 @@ public class TunnelAspectWriteBuilders {
             ));
 
             static {
+                PROPERTIES_ITEM_PLACE_NOCHECKS.setValue(PROP_BLOCK_UPDATE, ValueTypeBoolean.ValueBoolean.of(false));
+                PROPERTIES_ITEM_PLACE_NOCHECKS.setValue(PROP_HAND_LEFT, ValueTypeBoolean.ValueBoolean.of(true));
+                PROPERTIES_ITEM_PLACE_NOCHECKS.setValue(PROP_IGNORE_REPLACABLE, ValueTypeBoolean.ValueBoolean.of(false));
+
                 PROPERTIES_ITEM_PLACE.setValue(TunnelAspectWriteBuilders.Item.PROP_CHECK_DAMAGE, ValueTypeBoolean.ValueBoolean.of(true));
                 PROPERTIES_ITEM_PLACE.setValue(TunnelAspectWriteBuilders.Item.PROP_CHECK_NBT, ValueTypeBoolean.ValueBoolean.of(true));
                 PROPERTIES_ITEM_PLACE.setValue(PROP_BLOCK_UPDATE, ValueTypeBoolean.ValueBoolean.of(false));
                 PROPERTIES_ITEM_PLACE.setValue(PROP_HAND_LEFT, ValueTypeBoolean.ValueBoolean.of(true));
                 PROPERTIES_ITEM_PLACE.setValue(PROP_IGNORE_REPLACABLE, ValueTypeBoolean.ValueBoolean.of(false));
+
+                PROPERTIES_ITEM_PICK_UP_NOCHECKS.setValue(PROP_BLOCK_UPDATE, ValueTypeBoolean.ValueBoolean.of(false));
+                PROPERTIES_ITEM_PICK_UP_NOCHECKS.setValue(PROP_HAND_LEFT, ValueTypeBoolean.ValueBoolean.of(true));
+                PROPERTIES_ITEM_PICK_UP_NOCHECKS.setValue(PROP_SILK_TOUCH, ValueTypeBoolean.ValueBoolean.of(false));
+                PROPERTIES_ITEM_PICK_UP_NOCHECKS.setValue(PROP_IGNORE_REPLACABLE, ValueTypeBoolean.ValueBoolean.of(false));
+                PROPERTIES_ITEM_PICK_UP_NOCHECKS.setValue(PROP_BREAK_ON_NO_DROPS, ValueTypeBoolean.ValueBoolean.of(true));
 
                 PROPERTIES_ITEM_PICK_UP.setValue(TunnelAspectWriteBuilders.Item.PROP_CHECK_DAMAGE, ValueTypeBoolean.ValueBoolean.of(true));
                 PROPERTIES_ITEM_PICK_UP.setValue(TunnelAspectWriteBuilders.Item.PROP_CHECK_NBT, ValueTypeBoolean.ValueBoolean.of(true));
