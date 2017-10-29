@@ -11,9 +11,11 @@ import org.cyclops.commoncapabilities.api.capability.itemhandler.ISlotlessItemHa
 import org.cyclops.cyclopscore.modcompat.capabilities.DefaultCapabilityProvider;
 import org.cyclops.integrateddynamics.Reference;
 import org.cyclops.integrateddynamics.api.network.AttachCapabilitiesEventNetwork;
+import org.cyclops.integrateddynamics.api.network.IChanneledNetwork;
 import org.cyclops.integratedtunnels.Capabilities;
 import org.cyclops.integratedtunnels.api.network.IFluidNetwork;
 import org.cyclops.integratedtunnels.api.network.IItemNetwork;
+import org.cyclops.integratedtunnels.api.network.IItemNetwork.IItemChannel;
 import org.cyclops.integratedtunnels.core.network.FluidNetwork;
 import org.cyclops.integratedtunnels.core.network.ItemNetwork;
 
@@ -26,20 +28,22 @@ public class TunnelNetworkCapabilityConstructors {
     @SubscribeEvent
     public void onNetworkLoad(AttachCapabilitiesEventNetwork event) {
         ItemNetwork itemNetwork = new ItemNetwork();
+        IItemChannel itemChannel = itemNetwork.getChannel(IChanneledNetwork.DEFAULT_CHANNEL);
         event.addCapability(new ResourceLocation(Reference.MOD_ID, "itemNetwork"),
                 new DefaultCapabilityProvider<IItemNetwork>(() -> ItemNetworkConfig.CAPABILITY, itemNetwork));
         event.addCapability(new ResourceLocation(Reference.MOD_ID, "itemStorageNetwork"),
-                new DefaultCapabilityProvider<IItemHandler>(() -> CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, itemNetwork));
+                new DefaultCapabilityProvider<IItemHandler>(() -> CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, itemChannel));
         event.addCapability(new ResourceLocation(Reference.MOD_ID, "inventoryStateItemNetwork"),
                 new DefaultCapabilityProvider<IInventoryState>(() -> Capabilities.INVENTORY_STATE, itemNetwork));
         event.addCapability(new ResourceLocation(Reference.MOD_ID, "itemStorageSlotlessNetwork"),
-                new DefaultCapabilityProvider<ISlotlessItemHandler>(() -> Capabilities.SLOTLESS_ITEMHANDLER, itemNetwork));
+                new DefaultCapabilityProvider<ISlotlessItemHandler>(() -> Capabilities.SLOTLESS_ITEMHANDLER, itemChannel));
 
         FluidNetwork fluidNetwork = new FluidNetwork();
+        IFluidHandler fluidChannel = fluidNetwork.getChannel(IChanneledNetwork.DEFAULT_CHANNEL);
         event.addCapability(new ResourceLocation(Reference.MOD_ID, "fluidNetwork"),
                 new DefaultCapabilityProvider<IFluidNetwork>(() -> FluidNetworkConfig.CAPABILITY, fluidNetwork));
         event.addCapability(new ResourceLocation(Reference.MOD_ID, "fluidStorageNetwork"),
-                new DefaultCapabilityProvider<IFluidHandler>(() -> CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, fluidNetwork));
+                new DefaultCapabilityProvider<IFluidHandler>(() -> CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, fluidChannel));
     }
 
 }

@@ -46,7 +46,7 @@ public class PartTypeInterfaceFluid extends PartTypeInterfacePositionedAddon<IFl
         public IFluidTankProperties[] getTankProperties() {
             disablePosition();
             IFluidTankProperties[] ret = getPositionedAddonsNetwork() != null
-                    ? getPositionedAddonsNetwork().getTankProperties() : new IFluidTankProperties[0];
+                    ? getPositionedAddonsNetwork().getChannel(getChannel()).getTankProperties() : new IFluidTankProperties[0];
             enablePosition();
             return ret;
         }
@@ -55,7 +55,7 @@ public class PartTypeInterfaceFluid extends PartTypeInterfacePositionedAddon<IFl
         public int fill(FluidStack resource, boolean doFill) {
             disablePosition();
             int ret = getPositionedAddonsNetwork() != null
-                    ? getPositionedAddonsNetwork().fill(resource, doFill) : 0;
+                    ? getPositionedAddonsNetwork().getChannel(getChannel()).fill(resource, doFill) : 0;
             enablePosition();
             return ret;
         }
@@ -65,7 +65,7 @@ public class PartTypeInterfaceFluid extends PartTypeInterfacePositionedAddon<IFl
         public FluidStack drain(FluidStack resource, boolean doDrain) {
             disablePosition();
             FluidStack ret = getPositionedAddonsNetwork() != null
-                    ? getPositionedAddonsNetwork().drain(resource, doDrain) : null;
+                    ? getPositionedAddonsNetwork().getChannel(getChannel()).drain(resource, doDrain) : null;
             enablePosition();
             return ret;
         }
@@ -75,7 +75,7 @@ public class PartTypeInterfaceFluid extends PartTypeInterfacePositionedAddon<IFl
         public FluidStack drain(int maxDrain, boolean doDrain) {
             disablePosition();
             FluidStack ret = getPositionedAddonsNetwork() != null
-                    ? getPositionedAddonsNetwork().drain(maxDrain, doDrain) : null;
+                    ? getPositionedAddonsNetwork().getChannel(getChannel()).drain(maxDrain, doDrain) : null;
             enablePosition();
             return ret;
         }

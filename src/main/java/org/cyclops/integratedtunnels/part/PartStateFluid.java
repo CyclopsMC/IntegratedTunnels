@@ -23,7 +23,7 @@ public class PartStateFluid<P extends IPartTypeWriter> extends PartStatePosition
 
     @Override
     public IFluidTankProperties[] getTankProperties() {
-        return getPositionedAddonsNetwork() != null ? getPositionedAddonsNetwork().getTankProperties() : new IFluidTankProperties[0];
+        return getPositionedAddonsNetwork() != null ? getPositionedAddonsNetwork().getChannel(getChannel()).getTankProperties() : new IFluidTankProperties[0];
     }
 
     protected FluidStack rateLimitFluid(FluidStack fluidStack) {
@@ -35,18 +35,18 @@ public class PartStateFluid<P extends IPartTypeWriter> extends PartStatePosition
 
     @Override
     public int fill(FluidStack resource, boolean doFill) {
-        return canReceive() && getPositionedAddonsNetwork() != null ? getPositionedAddonsNetwork().fill(rateLimitFluid(resource), doFill) : 0;
+        return canReceive() && getPositionedAddonsNetwork() != null ? getPositionedAddonsNetwork().getChannel(getChannel()).fill(rateLimitFluid(resource), doFill) : 0;
     }
 
     @Nullable
     @Override
     public FluidStack drain(FluidStack resource, boolean doDrain) {
-        return canExtract() && getPositionedAddonsNetwork() != null ? getPositionedAddonsNetwork().drain(rateLimitFluid(resource), doDrain) : null;
+        return canExtract() && getPositionedAddonsNetwork() != null ? getPositionedAddonsNetwork().getChannel(getChannel()).drain(rateLimitFluid(resource), doDrain) : null;
     }
 
     @Nullable
     @Override
     public FluidStack drain(int maxDrain, boolean doDrain) {
-        return canExtract() && getPositionedAddonsNetwork() != null ? getPositionedAddonsNetwork().drain(Math.min(maxDrain, GeneralConfig.fluidRateLimit), doDrain) : null;
+        return canExtract() && getPositionedAddonsNetwork() != null ? getPositionedAddonsNetwork().getChannel(getChannel()).drain(Math.min(maxDrain, GeneralConfig.fluidRateLimit), doDrain) : null;
     }
 }
