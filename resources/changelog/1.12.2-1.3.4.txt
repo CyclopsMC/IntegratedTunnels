@@ -1,0 +1,13 @@
+As always, don't forget to backup your world before updating!
+Requires CyclopsCore version 0.10.22 or higher.
+
+Additions:
+* Add item import/export aspects with a slot input, Closes #64
+
+Changes:
+* Compress PNGs
+* Remove useless properties on some world parts, Closes #57
+
+Fixes:
+* Reduce chance on inventory state cache collisions, #59
+  This should resolve issues where item transfer sometimes acts slow.
