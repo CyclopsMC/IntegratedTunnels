@@ -1,15 +1,21 @@
 package org.cyclops.integratedtunnels.core.part;
 
 import net.minecraft.block.Block;
+import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.common.capabilities.Capability;
+
+import org.cyclops.cyclopscore.helper.L10NHelpers;
 import org.cyclops.cyclopscore.helper.TileHelpers;
 import org.cyclops.integrateddynamics.api.network.INetwork;
 import org.cyclops.integrateddynamics.api.network.IPartNetwork;
 import org.cyclops.integrateddynamics.api.network.IPositionedAddonsNetwork;
+import org.cyclops.integrateddynamics.api.part.IPartContainer;
 import org.cyclops.integrateddynamics.api.part.IPartType;
 import org.cyclops.integrateddynamics.api.part.PartPos;
 import org.cyclops.integrateddynamics.api.part.PartTarget;
+import org.cyclops.integrateddynamics.core.client.gui.container.GuiPartSettings;
 import org.cyclops.integrateddynamics.core.part.PartStateBase;
 
 import javax.annotation.Nullable;
@@ -21,6 +27,22 @@ import javax.annotation.Nullable;
 public abstract class PartTypeInterfacePositionedAddon<N extends IPositionedAddonsNetwork, T, P extends IPartType<P, S>, S extends PartTypeInterfacePositionedAddon.State<P, N, T>> extends PartTypeTunnel<P, S> {
     public PartTypeInterfacePositionedAddon(String name) {
         super(name);
+    }
+
+    public static class GuiInterfaceSettings extends GuiPartSettings {
+        public GuiInterfaceSettings(EntityPlayer player, PartTarget target, IPartContainer partContainer, IPartType partType) {
+            super(player, target, partContainer, partType);
+        }
+
+        @Override
+        protected String getChannelText() {
+            return L10NHelpers.localize("gui.integratedtunnels.partsettings.channel");
+        }
+    }
+
+    @Override
+    public Class<? extends GuiScreen> getGui() {
+        return GuiInterfaceSettings.class;
     }
 
     protected abstract Capability<N> getNetworkCapability();
