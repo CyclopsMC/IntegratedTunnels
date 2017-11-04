@@ -44,7 +44,8 @@ import org.cyclops.integratedtunnels.part.aspect.TunnelAspects;
         useMetadata = true,
         version = Reference.MOD_VERSION,
         dependencies = Reference.MOD_DEPENDENCIES,
-        guiFactory = "org.cyclops.integratedtunnels.GuiConfigOverview$ExtendedConfigGuiFactory"
+        guiFactory = "org.cyclops.integratedtunnels.GuiConfigOverview$ExtendedConfigGuiFactory",
+        certificateFingerprint = Reference.MOD_FINGERPRINT
 )
 public class IntegratedTunnels extends ModBaseVersionable {
     
