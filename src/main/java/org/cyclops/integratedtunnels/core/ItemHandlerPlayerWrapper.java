@@ -50,7 +50,7 @@ public class ItemHandlerPlayerWrapper implements IItemHandler {
     private final int entityIndex;
     private final ISlotlessItemHandler playerReturnHandler;
 
-    public ItemHandlerPlayerWrapper(ExtendedFakePlayer player, WorldServer world, BlockPos pos,
+    public ItemHandlerPlayerWrapper(@Nullable ExtendedFakePlayer player, WorldServer world, BlockPos pos,
                                     double offsetX, double offsetY, double offsetZ, EnumFacing side, EnumHand hand,
                                     boolean rightClick, boolean sneaking, boolean continuousClick, int entityIndex,
                                     ISlotlessItemHandler playerReturnHandler) {
@@ -86,6 +86,9 @@ public class ItemHandlerPlayerWrapper implements IItemHandler {
         if (simulate) {
             // We can ALWAYS click with items, so consume the whole item when simulating.
             return ItemStack.EMPTY;
+        }
+        if (player == null) {
+            return stack;
         }
 
         PlayerHelpers.setPlayerState(player, hand, pos, side, sneaking);

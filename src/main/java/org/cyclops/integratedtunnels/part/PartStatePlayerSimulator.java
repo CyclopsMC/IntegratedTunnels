@@ -7,6 +7,8 @@ import org.cyclops.integrateddynamics.core.part.write.PartStateWriterBase;
 import org.cyclops.integratedtunnels.core.ExtendedFakePlayer;
 import org.cyclops.integratedtunnels.core.ItemHandlerPlayerWrapper;
 
+import javax.annotation.Nullable;
+
 /**
  * A part state for holding a temporary player inventory.
  * @author rubensworks
@@ -19,7 +21,7 @@ public class PartStatePlayerSimulator extends PartStateWriterBase<PartTypePlayer
         super(inventorySize);
     }
 
-    public ExtendedFakePlayer getPlayer() {
+    public @Nullable ExtendedFakePlayer getPlayer() {
         return player;
     }
 
