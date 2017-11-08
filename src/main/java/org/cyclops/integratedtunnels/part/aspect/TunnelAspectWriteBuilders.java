@@ -113,11 +113,7 @@ public class TunnelAspectWriteBuilders {
                 PROP_ENERGYTARGET = input -> {
             PartPos center = input.getLeft().getCenter();
             PartPos target = input.getLeft().getTarget();
-            INetwork network = NetworkHelpers.getNetwork(center.getPos().getWorld(), center.getPos().getBlockPos());
-            if (network == null) {
-                IntegratedDynamics.clog(Level.ERROR, "Could not get the energy network as no network was found.");
-                throw new PartStateException(center.getPos(), center.getSide());
-            }
+            INetwork network = getNetworkChecked(center);
             IEnergyStorage energyStorage = EnergyHelpers.getEnergyStorage(target);
             return new EnergyTarget(network.getCapability(Capabilities.NETWORK_ENERGY), energyStorage, input.getRight());
         };
@@ -447,11 +443,7 @@ public class TunnelAspectWriteBuilders {
                                         ItemStackPredicate itemStackMatcher, int transferHash, int slot) {
                 PartPos center = partTarget.getCenter();
                 PartPos target = partTarget.getTarget();
-                INetwork network = NetworkHelpers.getNetwork(center.getPos().getWorld(), center.getPos().getBlockPos());
-                if (network == null) {
-                    IntegratedDynamics.clog(Level.ERROR, "Could not get the item network as no network was found.");
-                    throw new PartStateException(center.getPos(), center.getSide());
-                }
+                INetwork network = getNetworkChecked(center);
                 IItemHandler itemHandler = TileHelpers.getCapability(target.getPos(), target.getSide(), CapabilityItemHandler.ITEM_HANDLER_CAPABILITY);
                 return new ItemTarget(
                         network, itemHandler,
@@ -689,11 +681,7 @@ public class TunnelAspectWriteBuilders {
                                          Predicate<FluidStack> fluidStackMatcher) {
                 PartPos center = partTarget.getCenter();
                 PartPos target = partTarget.getTarget();
-                INetwork network = NetworkHelpers.getNetwork(center.getPos().getWorld(), center.getPos().getBlockPos());
-                if (network == null) {
-                    IntegratedDynamics.clog(Level.ERROR, "Could not get the fluid network as no network was found.");
-                    throw new PartStateException(center.getPos(), center.getSide());
-                }
+                INetwork network = getNetworkChecked(center);
                 IFluidHandler fluidHandler = FluidUtil.getFluidHandler(target.getPos().getWorld(), target.getPos().getBlockPos(), target.getSide());
                 return new FluidTarget(partTarget, network.getCapability(FluidNetworkConfig.CAPABILITY), fluidHandler,
                         amount, fluidStackMatcher, properties);
@@ -824,7 +812,7 @@ public class TunnelAspectWriteBuilders {
 
                 PartPos center = partTarget.getCenter();
                 PartPos target = partTarget.getTarget();
-                INetwork network = NetworkHelpers.getNetwork(center.getPos().getWorld(), center.getPos().getBlockPos());
+                INetwork network = getNetworkChecked(center);
                 IEnergyStorage energyStorage = null;
                 Entity entity = Iterables.get(target.getPos().getWorld().getEntitiesWithinAABB(Entity.class,
                         new AxisAlignedBB(target.getPos().getBlockPos())), entityIndex, null);
@@ -951,7 +939,7 @@ public class TunnelAspectWriteBuilders {
 
                     PartPos center = partTarget.getCenter();
                     PartPos target = partTarget.getTarget();
-                    INetwork network = NetworkHelpers.getNetwork(center.getPos().getWorld(), center.getPos().getBlockPos());
+                    INetwork network = getNetworkChecked(center);
                     IItemHandler itemHandler;
                     if (doImport) {
                         boolean ignorePickupDelay = properties.getValue(PROP_IGNORE_PICK_UP_DELAY).getRawValue();
@@ -998,7 +986,7 @@ public class TunnelAspectWriteBuilders {
 
                 PartPos center = partTarget.getCenter();
                 PartPos target = partTarget.getTarget();
-                INetwork network = NetworkHelpers.getNetwork(center.getPos().getWorld(), center.getPos().getBlockPos());
+                INetwork network = getNetworkChecked(center);
                 IItemHandler itemHandler = null;
                 Entity entity = Iterables.get(target.getPos().getWorld().getEntitiesWithinAABB(Entity.class,
                         new AxisAlignedBB(target.getPos().getBlockPos())), entityIndex, null);
@@ -1134,7 +1122,7 @@ public class TunnelAspectWriteBuilders {
 
                 PartPos center = partTarget.getCenter();
                 PartPos target = partTarget.getTarget();
-                INetwork network = NetworkHelpers.getNetwork(center.getPos().getWorld(), center.getPos().getBlockPos());
+                INetwork network = getNetworkChecked(center);
                 IFluidHandler fluidHandler = null;
                 Entity entity = Iterables.get(target.getPos().getWorld().getEntitiesWithinAABB(Entity.class,
                         new AxisAlignedBB(target.getPos().getBlockPos())), entityIndex, null);
@@ -1408,7 +1396,7 @@ public class TunnelAspectWriteBuilders {
 
                 PartPos center = partTarget.getCenter();
                 PartPos target = partTarget.getTarget();
-                INetwork network = NetworkHelpers.getNetwork(center.getPos().getWorld(), center.getPos().getBlockPos());
+                INetwork network = getNetworkChecked(center);
                 PartStatePlayerSimulator partState = (PartStatePlayerSimulator) PartHelpers.getPart(center).getState();
 
                 IItemHandler itemHandler = new ItemHandlerPlayerWrapper(partState.getPlayer(),
@@ -1438,7 +1426,7 @@ public class TunnelAspectWriteBuilders {
 
             PartPos center = partTarget.getCenter();
             PartPos target = partTarget.getTarget();
-            INetwork network = NetworkHelpers.getNetwork(center.getPos().getWorld(), center.getPos().getBlockPos());
+            INetwork network = getNetworkChecked(center);
             PartStatePlayerSimulator partState = (PartStatePlayerSimulator) PartHelpers.getPart(center).getState();
 
             IItemHandler itemHandler = new ItemHandlerPlayerWrapper(partState.getPlayer(),
@@ -1491,6 +1479,15 @@ public class TunnelAspectWriteBuilders {
                 }
             }
         };
+    }
+
+    public static INetwork getNetworkChecked(PartPos pos) throws PartStateException {
+        INetwork network = NetworkHelpers.getNetwork(pos.getPos().getWorld(), pos.getPos().getBlockPos());
+        if (network == null) {
+            IntegratedDynamics.clog(Level.ERROR, "Could not get the energy network as no network was found.");
+            throw new PartStateException(pos.getPos(), pos.getSide());
+        }
+        return network;
     }
 
 }
