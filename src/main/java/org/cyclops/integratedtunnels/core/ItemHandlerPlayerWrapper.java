@@ -93,6 +93,7 @@ public class ItemHandlerPlayerWrapper implements IItemHandler {
 
         PlayerHelpers.setPlayerState(player, hand, pos, side, sneaking);
         PlayerHelpers.setHeldItemSilent(player, hand, stack);
+
         if (!continuousClick) {
             cancelDestroyingBlock(player);
         }
@@ -145,6 +146,11 @@ public class ItemHandlerPlayerWrapper implements IItemHandler {
                         PlayerHelpers.setHeldItemSilent(player, hand, actionresult.getResult());
                     }
                     if (actionresult.getType() == EnumActionResult.SUCCESS) {
+                        // If the hand was activated, simulate the activated hand for a number of ticks, and deactivate.
+                        if (player.isHandActive()) {
+                            player.updateActiveHandSimulated();
+                            player.stopActiveHand();
+                        }
                         returnPlayerInventory(player);
                         return ItemStack.EMPTY;
                     }

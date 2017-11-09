@@ -29,7 +29,6 @@ public class PlayerHelpers {
 
     public static void setPlayerState(EntityPlayer player, EnumHand hand, BlockPos pos, EnumFacing side, boolean sneaking) {
         BlockPos playerPos = side == EnumFacing.UP || side == EnumFacing.DOWN ? pos.offset(side, 2) : pos;
-        player.setActiveHand(hand);
         player.setPosition(playerPos.getX(), playerPos.getY(), playerPos.getZ());
         player.prevPosX = player.posX;
         player.prevPosY = player.posY;
