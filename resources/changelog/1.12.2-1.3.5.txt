@@ -1,0 +1,10 @@
+As always, don't forget to backup your world before updating!
+Requires CyclopsCore version 0.10.22 or higher.
+
+Changes:
+* Sign jars
+
+Fixes:
+* Fix Player Simulator not properly handling activatable items, Closes #68
+* Fix Player Simulator crash when network ticks before world, Closes #70
+* Fix random Player Simulator crash, #70
