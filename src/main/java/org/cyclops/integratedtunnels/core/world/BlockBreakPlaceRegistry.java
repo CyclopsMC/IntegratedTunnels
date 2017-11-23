@@ -1,6 +1,5 @@
 package org.cyclops.integratedtunnels.core.world;
 
-import com.google.common.base.Supplier;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
@@ -17,7 +16,6 @@ import org.cyclops.integratedtunnels.api.world.IBlockPlaceHandlerRegistry;
 import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Set;
 
 /**
  * Implementation of {@link IBlockPlaceHandlerRegistry}.
@@ -27,12 +25,7 @@ public class BlockBreakPlaceRegistry implements IBlockPlaceHandlerRegistry {
 
     private static BlockBreakPlaceRegistry INSTANCE = new BlockBreakPlaceRegistry();
 
-    private final Multimap<Item, IBlockPlaceHandler> handlers = Multimaps.newSetMultimap(Maps.<Item, Collection<IBlockPlaceHandler>>newIdentityHashMap(), new Supplier<Set<IBlockPlaceHandler>>() {
-        @Override
-        public Set<IBlockPlaceHandler> get() {
-            return Sets.newIdentityHashSet();
-        }
-    });
+    private final Multimap<Item, IBlockPlaceHandler> handlers = Multimaps.newSetMultimap(Maps.<Item, Collection<IBlockPlaceHandler>>newIdentityHashMap(), Sets::newIdentityHashSet);
 
     private BlockBreakPlaceRegistry() {
 
