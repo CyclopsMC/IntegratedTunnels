@@ -57,13 +57,7 @@ public class TunnelFluidHelpers {
      */
     @Nullable
     public static FluidStack moveFluids(IFluidHandler source, final IFluidHandler target, int maxAmount, boolean doTransfer, Predicate<FluidStack> fluidStackMatcher) {
-        return moveFluids(source, new Function<FluidStack, IFluidHandler>() {
-            @Nullable
-            @Override
-            public IFluidHandler apply(@Nullable FluidStack input) {
-                return target;
-            }
-        }, maxAmount, doTransfer, fluidStackMatcher);
+        return moveFluids(source, input -> target, maxAmount, doTransfer, fluidStackMatcher);
     }
 
     /**
@@ -177,27 +171,23 @@ public class TunnelFluidHelpers {
             return null;
         }
 
-        FluidStack moved = TunnelFluidHelpers.moveFluids(source, new Function<FluidStack, IFluidHandler>() {
-            @Nullable
-            @Override
-            public IFluidHandler apply(FluidStack input) {
-                net.minecraftforge.fluids.Fluid fluid = input.getFluid();
-                if (world.provider.doesWaterVaporize() && fluid.doesVaporize(input)) {
-                    return null;
-                }
-
-                Block block = fluid.getBlock();
-                IFluidHandler handler;
-                if (block instanceof IFluidBlock) {
-                    handler = new FluidBlockWrapper((IFluidBlock) block, world, pos);
-                } else if (block instanceof BlockLiquid) {
-                    handler = new BlockLiquidWrapper((BlockLiquid) block, world, pos);
-                } else {
-                    handler = new BlockWrapper(block, world, pos);
-                }
-
-                return handler;
+        FluidStack moved = TunnelFluidHelpers.moveFluids(source, input -> {
+            net.minecraftforge.fluids.Fluid fluid = input.getFluid();
+            if (world.provider.doesWaterVaporize() && fluid.doesVaporize(input)) {
+                return null;
             }
+
+            Block block = fluid.getBlock();
+            IFluidHandler handler;
+            if (block instanceof IFluidBlock) {
+                handler = new FluidBlockWrapper((IFluidBlock) block, world, pos);
+            } else if (block instanceof BlockLiquid) {
+                handler = new BlockLiquidWrapper((BlockLiquid) block, world, pos);
+            } else {
+                handler = new BlockWrapper(block, world, pos);
+            }
+
+            return handler;
         }, Fluid.BUCKET_VOLUME, true, fluidStackMatcher);
 
         if (moved != null) {
