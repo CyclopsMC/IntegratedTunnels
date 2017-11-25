@@ -202,6 +202,9 @@ public class ItemNetwork extends PositionedAddonsNetwork implements IItemNetwork
             ISlotlessItemHandler itemHandler = getSlotlessItemHandler(partPos);
             if (itemHandler != null) {
                 disablePosition(partPos.getPartPos());
+                if (!simulate) {
+                    matchStack = matchStack.copy();
+                }
                 ItemStack extracted = itemHandler.extractItem(matchStack, matchFlags, simulate);
                 enablePosition(partPos.getPartPos());
                 if (!extracted.isEmpty()) {
