@@ -102,6 +102,7 @@ public class TunnelItemHelpers {
                 } else {
                     ItemStack itemStack = itemStackMatcher.getItemStack();
                     if (!itemStack.isEmpty() && itemStack.getCount() != amount) {
+                        itemStack = itemStack.copy();
                         itemStack.setCount(amount);
                     }
                     extracted = sourceSlotless.extractItem(itemStack, itemStackMatcher.getMatchFlags(), simulate);
@@ -296,7 +297,7 @@ public class TunnelItemHelpers {
         if (checkDamage)    matchFlags = matchFlags | ItemMatch.DAMAGE;
         if (checkNbt)       matchFlags = matchFlags | ItemMatch.NBT;
         if (checkStackSize) matchFlags = matchFlags | ItemMatch.STACKSIZE;
-        return new ItemStackPredicate(itemStack, matchFlags) {
+        return new ItemStackPredicate(itemStack.copy(), matchFlags) {
             @Override
             public boolean test(@Nullable ItemStack input) {
                 return areItemStackEqual(input, itemStack, checkStackSize, true, checkDamage, checkNbt);
