@@ -20,6 +20,7 @@ import org.cyclops.commoncapabilities.api.capability.inventorystate.IInventorySt
 import org.cyclops.commoncapabilities.api.capability.itemhandler.ISlotlessItemHandler;
 import org.cyclops.commoncapabilities.api.capability.itemhandler.ItemMatch;
 import org.cyclops.cyclopscore.helper.BlockHelpers;
+import org.cyclops.cyclopscore.helper.ItemStackHelpers;
 import org.cyclops.cyclopscore.helper.L10NHelpers;
 import org.cyclops.cyclopscore.helper.MinecraftHelpers;
 import org.cyclops.integrateddynamics.api.evaluate.EvaluationException;
@@ -188,14 +189,6 @@ public class TunnelItemHelpers {
         CACHE_INV_CHECKS.invalidate(posHash);
     }
 
-    public static int getItemStackHashCode(ItemStack itemStack) {
-        if (itemStack == null) {
-            return 0;
-        }
-        return Objects.hashCode(itemStack.getCount(), itemStack.getMetadata(),
-                Item.getIdFromItem(itemStack.getItem()), itemStack.hasTagCompound() ? itemStack.getTagCompound() : 0);
-    }
-
     /**
      * Calculate an inventory state.
      * @param itemHandler The item handler.
@@ -208,7 +201,7 @@ public class TunnelItemHelpers {
         }
         int hash = itemHandler.hashCode();
         for (int i = 0; i < itemHandler.getSlots(); i++) {
-            hash += getItemStackHashCode(itemHandler.getStackInSlot(i)) << (i % 100);
+            hash += ItemStackHelpers.getItemStackHashCode(itemHandler.getStackInSlot(i)) << (i % 100);
         }
         return hash;
     }

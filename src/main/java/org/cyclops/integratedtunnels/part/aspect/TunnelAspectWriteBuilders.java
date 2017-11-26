@@ -25,6 +25,7 @@ import org.cyclops.commoncapabilities.api.capability.inventorystate.IInventorySt
 import org.cyclops.commoncapabilities.api.capability.itemhandler.ISlotlessItemHandler;
 import org.cyclops.cyclopscore.datastructure.DimPos;
 import org.cyclops.cyclopscore.helper.BlockHelpers;
+import org.cyclops.cyclopscore.helper.ItemStackHelpers;
 import org.cyclops.cyclopscore.helper.L10NHelpers;
 import org.cyclops.cyclopscore.helper.TileHelpers;
 import org.cyclops.integrateddynamics.IntegratedDynamics;
@@ -279,7 +280,7 @@ public class TunnelAspectWriteBuilders {
 
             ItemStackPredicate itemStackMatcher = TunnelItemHelpers.matchItemStack(input.getRight(), checkStackSize, checkDamage, checkNbt);
             int amount = properties.getValue(PROP_RATE).getRawValue();
-            int transferHash = TunnelItemHelpers.getItemStackHashCode(input.getRight());
+            int transferHash = ItemStackHelpers.getItemStackHashCode(input.getRight());
             int slot = properties.getValue(PROP_SLOT).getRawValue();
             return Triple.of(input.getLeft(), input.getMiddle(), ItemInformation.of(itemStackMatcher, amount, transferHash, slot));
         };
@@ -326,7 +327,7 @@ public class TunnelAspectWriteBuilders {
             ItemStack itemStack = BlockHelpers.getItemStackFromBlockState(input.getRight());
             ItemStackPredicate itemStackMatcher = TunnelItemHelpers.matchItemStack(itemStack, false, true, false);
             int amount = properties.getValue(PROP_RATE).getRawValue();
-            int transferHash = TunnelItemHelpers.getItemStackHashCode(itemStack);
+            int transferHash = ItemStackHelpers.getItemStackHashCode(itemStack);
             int slot = properties.getValue(PROP_SLOT).getRawValue();
             return Triple.of(input.getLeft(), input.getMiddle(), ItemInformation.of(itemStackMatcher, amount, transferHash, slot));
         };
