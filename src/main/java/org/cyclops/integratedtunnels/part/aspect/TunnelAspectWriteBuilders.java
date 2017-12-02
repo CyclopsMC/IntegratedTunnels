@@ -66,7 +66,6 @@ import org.cyclops.integratedtunnels.core.*;
 import org.cyclops.integratedtunnels.core.part.PartStatePositionedAddon;
 import org.cyclops.integratedtunnels.part.PartStatePlayerSimulator;
 
-import javax.annotation.Nullable;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -995,6 +994,10 @@ public class TunnelAspectWriteBuilders {
 
         public static final class Fluid {
 
+            public static final IAspectProperties PROPERTIES_UPDATE = new AspectProperties(ImmutableList.<IAspectPropertyTypeInstance>of(
+                    PROP_BLOCK_UPDATE,
+                    PROP_IGNORE_REPLACABLE
+            ));
             public static final IAspectProperties PROPERTIES_FLUID_UPDATE = new AspectProperties(ImmutableList.<IAspectPropertyTypeInstance>of(
                     TunnelAspectWriteBuilders.Fluid.PROP_CHECK_NBT,
                     PROP_BLOCK_UPDATE,
@@ -1018,6 +1021,9 @@ public class TunnelAspectWriteBuilders {
             public static final IAspectProperties PROPERTIES_RATECHECKSLIST = TunnelAspectWriteBuilders.Fluid.PROPERTIES_RATECHECKSLIST.clone();
 
             static {
+                PROPERTIES_UPDATE.setValue(PROP_BLOCK_UPDATE, ValueTypeBoolean.ValueBoolean.of(false));
+                PROPERTIES_UPDATE.setValue(PROP_IGNORE_REPLACABLE, ValueTypeBoolean.ValueBoolean.of(false));
+
                 PROPERTIES_FLUID_UPDATE.setValue(TunnelAspectWriteBuilders.Fluid.PROP_CHECK_NBT, ValueTypeBoolean.ValueBoolean.of(true));
                 PROPERTIES_FLUID_UPDATE.setValue(PROP_BLOCK_UPDATE, ValueTypeBoolean.ValueBoolean.of(false));
                 PROPERTIES_FLUID_UPDATE.setValue(PROP_IGNORE_REPLACABLE, ValueTypeBoolean.ValueBoolean.of(false));
