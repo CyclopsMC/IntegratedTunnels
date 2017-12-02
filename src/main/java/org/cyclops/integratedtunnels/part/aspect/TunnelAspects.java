@@ -214,6 +214,7 @@ public class TunnelAspects {
 
                 public static final IAspectWrite<ValueTypeBoolean.ValueBoolean, ValueTypeBoolean> FLUID_BOOLEAN_EXPORT =
                         TunnelAspectWriteBuilders.World.BUILDER_BOOLEAN
+                                .withProperties(TunnelAspectWriteBuilders.World.Fluid.PROPERTIES_UPDATE)
                                 .handle(TunnelAspectWriteBuilders.World.Fluid.PROP_BOOLEAN_FLUIDTARGET)
                                 .handle(TunnelAspectWriteBuilders.World.Fluid.PROP_FLUIDSTACK_EXPORT)
                                 .appendKind("fluid").appendKind("export").buildWrite();
@@ -231,6 +232,7 @@ public class TunnelAspects {
                                 .appendKind("fluid").appendKind("export").buildWrite();
                 public static final IAspectWrite<ValueTypeOperator.ValueOperator, ValueTypeOperator> FLUID_PREDICATE_EXPORT =
                         TunnelAspectWriteBuilders.World.BUILDER_OPERATOR
+                                .withProperties(TunnelAspectWriteBuilders.World.Fluid.PROPERTIES_UPDATE)
                                 .handle(TunnelAspectWriteBuilders.World.Fluid.PROP_FLUIDSTACKPREDICATE_FLUIDTARGET)
                                 .handle(TunnelAspectWriteBuilders.World.Fluid.PROP_FLUIDSTACK_EXPORT)
                                 .appendKind("fluid").appendKind("export").buildWrite();
