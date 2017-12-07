@@ -1,12 +1,14 @@
 ## Integrated Tunnels
 
 [![Build Status](https://travis-ci.org/CyclopsMC/IntegratedTunnels.svg?branch=master-1.11)](https://travis-ci.org/CyclopsMC/IntegratedTunnels)
-[![Download](https://api.bintray.com/packages/cyclopsmc/dev/IntegratedTunnels/images/download.svg) ](https://bintray.com/cyclopsmc/dev/IntegratedTunnels/_latestVersion)
+[![Download](https://img.shields.io/maven-metadata/v/http/cyclopsmc.jfrog.io/cyclopsmc/libs-release/org/cyclops/integratedtunnels/IntegratedTunnels/maven-metadata.xml.svg) ](https://cyclopsmc.jfrog.io/cyclopsmc/libs-release/org/cyclops/integratedtunnels/IntegratedTunnels/)
 [![CurseForge](http://cf.way2muchnoise.eu/full_251389_downloads.svg)](http://minecraft.curseforge.com/projects/251389)
 
 Transfer other stuff over Integrated Dynamics networks
 
 All stable releases (including deobfuscated builds) can be found on [CurseForge](http://minecraft.curseforge.com/mc-mods/251389/files).
+
+[Development builds](https://cyclopsmc.jfrog.io/cyclopsmc/libs-release/org/cyclops/integratedtunnels/IntegratedTunnels/) are hosted by [JFrog Artifactory](https://www.jfrog.com/artifactory/).
 
 ### Contributing
 * Before submitting a pull request containing a new feature, please discuss this first with one of the lead developers.
