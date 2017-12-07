@@ -355,7 +355,7 @@ info_book.integratedtunnels.item=Items
 info_book.integratedtunnels.item.text1=Move items over the network. Import items into the network using &lItem Importers&r into &lItem Interfaces&r. Export items from the network using &lItem Exporters&r from &lItem Interfaces&r.
 
 info_book.integratedtunnels.fluid=Fluids
-info_book.integratedtunnels.fluid.text1=Move energy over the network. Import energy into the network using &lEnergy Importers&r into &lEnergy Interfaces&r. Export energy from the network using &lEnergy Exporters&r from &lEnergy Interfaces&r.
+info_book.integratedtunnels.fluid.text1=Move fluids over the network. Import fluids into the network using &lFluid Importers&r into &lFluidInterfaces&r. Export fluids from the network using &lFluid Exporters&r from &lFluid Interfaces&r.
 
 info_book.integratedtunnels.energy=Energy
 info_book.integratedtunnels.energy.text1=Move energy over the network. Import energy into the network using &lEnergy Importers&r into &lEnergy Interfaces&r. Export energy from the network using &lEnergy Exporters&r from &lEnergy Interfaces&r.
