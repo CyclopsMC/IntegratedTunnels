@@ -305,7 +305,9 @@ public class TunnelAspectWriteBuilders {
         public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, ValueTypeOperator.ValueOperator>, Triple<PartTarget, IAspectProperties, ItemInformation>>
                 PROP_ITEMSTACKPREDICATE_ITEMPREDICATE = input -> {
             IOperator predicate = input.getRight().getRawValue();
-            if (predicate.getInputTypes().length == 1 && ValueHelpers.correspondsTo(predicate.getInputTypes()[0], ValueTypes.OBJECT_ITEMSTACK)) {
+            if (predicate.getInputTypes().length == 1
+                    && ValueHelpers.correspondsTo(predicate.getInputTypes()[0], ValueTypes.OBJECT_ITEMSTACK)
+                    && ValueHelpers.correspondsTo(predicate.getOutputType(), ValueTypes.BOOLEAN)) {
                 IAspectProperties properties = input.getMiddle();
                 ItemStackPredicate itemStackMatcher = TunnelItemHelpers.matchPredicateItem(input.getLeft(), predicate);
                 int amount = properties.getValue(PROP_RATE).getRawValue();
@@ -349,7 +351,9 @@ public class TunnelAspectWriteBuilders {
         public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, ValueTypeOperator.ValueOperator>, Triple<PartTarget, IAspectProperties, ItemInformation>>
                 PROP_BLOCKPREDICATE_ITEMPREDICATE = input -> {
             IOperator predicate = input.getRight().getRawValue();
-            if (predicate.getInputTypes().length == 1 && ValueHelpers.correspondsTo(predicate.getInputTypes()[0], ValueTypes.OBJECT_BLOCK)) {
+            if (predicate.getInputTypes().length == 1
+                    && ValueHelpers.correspondsTo(predicate.getInputTypes()[0], ValueTypes.OBJECT_BLOCK)
+                    && ValueHelpers.correspondsTo(predicate.getOutputType(), ValueTypes.BOOLEAN)) {
                 IAspectProperties properties = input.getMiddle();
                 ItemStackPredicate itemStackMatcher = TunnelItemHelpers.matchPredicateBlock(input.getLeft(), predicate);
                 int amount = properties.getValue(PROP_RATE).getRawValue();
@@ -629,7 +633,9 @@ public class TunnelAspectWriteBuilders {
         public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, ValueTypeOperator.ValueOperator>, Triple<PartTarget, IAspectProperties, Pair<Predicate<FluidStack>, Integer>>>
                 PROP_FLUIDSTACKPREDICATE_FLUIDPREDICATE = input -> {
             IOperator predicate = input.getRight().getRawValue();
-            if (predicate.getInputTypes().length == 1 && ValueHelpers.correspondsTo(predicate.getInputTypes()[0], ValueTypes.OBJECT_FLUIDSTACK)) {
+            if (predicate.getInputTypes().length == 1
+                    && ValueHelpers.correspondsTo(predicate.getInputTypes()[0], ValueTypes.OBJECT_FLUIDSTACK)
+                    && ValueHelpers.correspondsTo(predicate.getOutputType(), ValueTypes.BOOLEAN)) {
                 IAspectProperties properties = input.getMiddle();
                 int rate = properties.getValue(PROP_RATE).getRawValue();
                 return Triple.of(input.getLeft(), input.getMiddle(),
@@ -1074,7 +1080,9 @@ public class TunnelAspectWriteBuilders {
             public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, ValueTypeOperator.ValueOperator>, TunnelAspectWriteBuilders.Fluid.FluidTarget>
                     PROP_FLUIDSTACKPREDICATE_FLUIDTARGET = input -> {
                 IOperator predicate = input.getRight().getRawValue();
-                if (predicate.getInputTypes().length == 1 && ValueHelpers.correspondsTo(predicate.getInputTypes()[0], ValueTypes.OBJECT_FLUIDSTACK)) {
+                if (predicate.getInputTypes().length == 1
+                        && ValueHelpers.correspondsTo(predicate.getInputTypes()[0], ValueTypes.OBJECT_FLUIDSTACK)
+                        && ValueHelpers.correspondsTo(predicate.getOutputType(), ValueTypes.BOOLEAN)) {
                     return TunnelAspectWriteBuilders.Fluid.FluidTarget.of(input.getLeft(), input.getMiddle(), net.minecraftforge.fluids.Fluid.BUCKET_VOLUME,
                             TunnelFluidHelpers.matchPredicate(input.getLeft(), predicate));
                 } else {
