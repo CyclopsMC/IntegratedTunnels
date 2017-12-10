@@ -1,12 +1,10 @@
 package org.cyclops.integratedtunnels.core;
 
-import com.google.common.base.Objects;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.Lists;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
@@ -89,6 +87,9 @@ public class TunnelItemHelpers {
     public static ItemStack moveItemsSingle(IItemHandler source, int sourceSlot, @Nullable ISlotlessItemHandler sourceSlotless,
                                             IItemHandler target, int targetSlot, @Nullable ISlotlessItemHandler targetSlotless,
                                             int amount, ItemStackPredicate itemStackMatcher, boolean simulate) {
+        if (sourceSlot >= source.getSlots() || targetSlot >= target.getSlots()) {
+            return ItemStack.EMPTY;
+        }
         boolean loopSourceSlots = sourceSlot < 0;
         boolean loopTargetSlots = targetSlot < 0;
 
