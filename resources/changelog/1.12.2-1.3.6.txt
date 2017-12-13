@@ -1,0 +1,11 @@
+As always, don't forget to backup your world before updating!
+Requires CyclopsCore version 0.10.24 or higher.
+
+Fixes:
+* Add additional checks for predicate-based tunnels, Closes #79
+* Add safety check for item slot targets out of valid ranges, Closes #89
+* Fix incorrect fluid tunnel description in book, Closes #76
+* Add block update and ignore replaceable properties to fluid exporter aspects, Closes #84
+  This fixes a crash when using the fluid exporter boolean aspect.
+* Fix Player Simulator voiding items on Click Item, Closes #81
+  This fix was suggested by @awebneck, but applied at a different location.
