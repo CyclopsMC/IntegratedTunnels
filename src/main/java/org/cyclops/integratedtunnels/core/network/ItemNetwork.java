@@ -72,85 +72,9 @@ public class ItemNetwork extends PositionedAddonsNetwork implements IItemNetwork
     }
 
     @Override
-    public boolean addPosition(PartPos pos, int priority) {
+    public boolean addPosition(PartPos pos, int priority, int channel) {
         IItemHandler itemHandler = TileHelpers.getCapability(pos.getPos(), pos.getSide(), CapabilityItemHandler.ITEM_HANDLER_CAPABILITY);
-        return itemHandler != null && super.addPosition(pos, priority);
-    }
-
-    @Override
-    public int getSlots() {
-        int slots = 0;
-        for(PrioritizedPartPos partPos : getPositions()) {
-            IItemHandler itemHandler = getItemHandler(partPos);
-            if (itemHandler != null) {
-                disablePosition(partPos.getPartPos());
-                slots += itemHandler.getSlots();
-                enablePosition(partPos.getPartPos());
-            }
-        }
-        return slots;
-    }
-
-    protected Triple<IItemHandler, Integer, PrioritizedPartPos> getItemHandlerForSlot(int slot) {
-        for(PrioritizedPartPos partPos : getPositions()) {
-            IItemHandler itemHandler = getItemHandler(partPos);
-            if (itemHandler != null) {
-                int slots = itemHandler.getSlots();
-                if (slot < slots) {
-                    return Triple.of(itemHandler, slot, partPos);
-                }
-                slot -= slots;
-            }
-        }
-        return null;
-    }
-
-    @Override
-    public ItemStack getStackInSlot(int slot) {
-        Triple<IItemHandler, Integer, PrioritizedPartPos> slottedHandler = getItemHandlerForSlot(slot);
-        if (slottedHandler != null) {
-            disablePosition(slottedHandler.getRight().getPartPos());
-            ItemStack ret = slottedHandler.getLeft().getStackInSlot(slottedHandler.getMiddle());
-            enablePosition(slottedHandler.getRight().getPartPos());
-            return ret;
-        }
-        return ItemStack.EMPTY;
-    }
-
-    @Override
-    public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
-        Triple<IItemHandler, Integer, PrioritizedPartPos> slottedHandler = getItemHandlerForSlot(slot);
-        if (slottedHandler != null) {
-            disablePosition(slottedHandler.getRight().getPartPos());
-            ItemStack ret = slottedHandler.getLeft().insertItem(slottedHandler.getMiddle(), stack, simulate);
-            enablePosition(slottedHandler.getRight().getPartPos());
-            return ret;
-        }
-        return stack;
-    }
-
-    @Override
-    public ItemStack extractItem(int slot, int amount, boolean simulate) {
-        Triple<IItemHandler, Integer, PrioritizedPartPos> slottedHandler = getItemHandlerForSlot(slot);
-        if (slottedHandler != null) {
-            disablePosition(slottedHandler.getRight().getPartPos());
-            ItemStack ret = slottedHandler.getLeft().extractItem(slottedHandler.getMiddle(), amount, simulate);
-            enablePosition(slottedHandler.getRight().getPartPos());
-            return ret;
-        }
-        return ItemStack.EMPTY;
-    }
-
-    @Override
-    public int getSlotLimit(int slot) {
-        Triple<IItemHandler, Integer, PrioritizedPartPos> slottedHandler = getItemHandlerForSlot(slot);
-        if (slottedHandler != null) {
-            disablePosition(slottedHandler.getRight().getPartPos());
-            int ret = slottedHandler.getLeft().getSlotLimit(slottedHandler.getMiddle());
-            enablePosition(slottedHandler.getRight().getPartPos());
-            return ret;
-        }
-        return 0;
+        return itemHandler != null && super.addPosition(pos, priority, channel);
     }
 
     @Override
@@ -167,48 +91,7 @@ public class ItemNetwork extends PositionedAddonsNetwork implements IItemNetwork
     }
 
     @Override
-    public ItemStack insertItem(ItemStack stack, boolean simulate) {
-        for(PrioritizedPartPos partPos : getPositions()) {
-            ISlotlessItemHandler itemHandler = getSlotlessItemHandler(partPos);
-            if (itemHandler != null) {
-                disablePosition(partPos.getPartPos());
-                stack = itemHandler.insertItem(stack, simulate);
-                enablePosition(partPos.getPartPos());
-                if (stack.isEmpty()) return ItemStack.EMPTY;
-            }
-        }
-        return stack;
-    }
-
-    @Override
-    public ItemStack extractItem(int amount, boolean simulate) {
-        for(PrioritizedPartPos partPos : getPositions()) {
-            ISlotlessItemHandler itemHandler = getSlotlessItemHandler(partPos);
-            if (itemHandler != null) {
-                disablePosition(partPos.getPartPos());
-                ItemStack extracted = itemHandler.extractItem(amount, simulate);
-                enablePosition(partPos.getPartPos());
-                if (!extracted.isEmpty()) {
-                    return extracted;
-                }
-            }
-        }
-        return ItemStack.EMPTY;
-    }
-
-    @Override
-    public ItemStack extractItem(ItemStack matchStack, int matchFlags, boolean simulate) {
-        for(PrioritizedPartPos partPos : getPositions()) {
-            ISlotlessItemHandler itemHandler = getSlotlessItemHandler(partPos);
-            if (itemHandler != null) {
-                disablePosition(partPos.getPartPos());
-                ItemStack extracted = itemHandler.extractItem(matchStack, matchFlags, simulate);
-                enablePosition(partPos.getPartPos());
-                if (!extracted.isEmpty()) {
-                    return extracted;
-                }
-            }
-        }
-        return ItemStack.EMPTY;
+    public IItemChannel getChannel(int channel) {
+        return new ItemChannel(this, channel);
     }
 }

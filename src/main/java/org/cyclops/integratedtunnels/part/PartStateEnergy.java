@@ -20,22 +20,22 @@ public class PartStateEnergy<P extends IPartTypeWriter> extends PartStatePositio
     @Override
     public int receiveEnergy(int maxReceive, boolean simulate) {
         maxReceive = Math.min(maxReceive, GeneralConfig.energyRateLimit);
-        return this.canReceive() && getPositionedAddonsNetwork() != null ? getPositionedAddonsNetwork().receiveEnergy(maxReceive, simulate) : 0;
+        return this.canReceive() && getPositionedAddonsNetwork() != null ? getPositionedAddonsNetwork().getChannel(getChannel()).receiveEnergy(maxReceive, simulate) : 0;
     }
 
     @Override
     public int extractEnergy(int maxExtract, boolean simulate) {
         maxExtract = Math.min(maxExtract, GeneralConfig.energyRateLimit);
-        return this.canExtract() && getPositionedAddonsNetwork() != null ? getPositionedAddonsNetwork().extractEnergy(maxExtract, simulate) : 0;
+        return this.canExtract() && getPositionedAddonsNetwork() != null ? getPositionedAddonsNetwork().getChannel(getChannel()).extractEnergy(maxExtract, simulate) : 0;
     }
 
     @Override
     public int getEnergyStored() {
-        return getPositionedAddonsNetwork() != null ? getPositionedAddonsNetwork().getEnergyStored() : 0;
+        return getPositionedAddonsNetwork() != null ? getPositionedAddonsNetwork().getChannel(getChannel()).getEnergyStored() : 0;
     }
 
     @Override
     public int getMaxEnergyStored() {
-        return getPositionedAddonsNetwork() != null ? getPositionedAddonsNetwork().getMaxEnergyStored() : 0;
+        return getPositionedAddonsNetwork() != null ? getPositionedAddonsNetwork().getChannel(getChannel()).getMaxEnergyStored() : 0;
     }
 }

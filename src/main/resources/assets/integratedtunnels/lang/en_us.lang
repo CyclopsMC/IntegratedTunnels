@@ -2,6 +2,9 @@
 itemGroup.integratedtunnels=Integrated Tunnels
 general.integratedtunnels.description=Transfer other stuff over Integrated Dynamics networks.
 
+# Gui
+gui.integratedtunnels.partsettings.channel=Interface Channel
+
 # Achievements
 advancement.integratedtunnels.interface_item=Item Interfacing
 advancement.integratedtunnels.interface_item.desc=Craft an Item Interface

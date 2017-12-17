@@ -49,7 +49,7 @@ public class PartTypeInterfaceEnergy extends PartTypeInterfacePositionedAddon<IE
         public int receiveEnergy(int maxReceive, boolean simulate) {
             disablePosition();
             int ret = getPositionedAddonsNetwork() != null
-                    ? getPositionedAddonsNetwork().receiveEnergy(maxReceive, simulate) : 0;
+                    ? getPositionedAddonsNetwork().getChannel(getChannel()).receiveEnergy(maxReceive, simulate) : 0;
             enablePosition();
             return ret;
         }
@@ -58,7 +58,7 @@ public class PartTypeInterfaceEnergy extends PartTypeInterfacePositionedAddon<IE
         public int extractEnergy(int maxExtract, boolean simulate) {
             disablePosition();
             int ret = getPositionedAddonsNetwork() != null
-                    ? getPositionedAddonsNetwork().extractEnergy(maxExtract, simulate) : 0;
+                    ? getPositionedAddonsNetwork().getChannel(getChannel()).extractEnergy(maxExtract, simulate) : 0;
             enablePosition();
             return ret;
         }
@@ -67,7 +67,7 @@ public class PartTypeInterfaceEnergy extends PartTypeInterfacePositionedAddon<IE
         public int getEnergyStored() {
             disablePosition();
             int ret = getPositionedAddonsNetwork() != null
-                    ? getPositionedAddonsNetwork().getEnergyStored() : 0;
+                    ? getPositionedAddonsNetwork().getChannel(getChannel()).getEnergyStored() : 0;
             enablePosition();
             return ret;
         }
@@ -76,7 +76,7 @@ public class PartTypeInterfaceEnergy extends PartTypeInterfacePositionedAddon<IE
         public int getMaxEnergyStored() {
             disablePosition();
             int ret = getPositionedAddonsNetwork() != null
-                    ? getPositionedAddonsNetwork().getMaxEnergyStored() : 0;
+                    ? getPositionedAddonsNetwork().getChannel(getChannel()).getMaxEnergyStored() : 0;
             enablePosition();
             return ret;
         }
@@ -85,7 +85,7 @@ public class PartTypeInterfaceEnergy extends PartTypeInterfacePositionedAddon<IE
         public boolean canExtract() {
             disablePosition();
             boolean ret = getPositionedAddonsNetwork() != null
-                    && getPositionedAddonsNetwork().canExtract();
+                    && getPositionedAddonsNetwork().getChannel(getChannel()).canExtract();
             enablePosition();
             return ret;
         }
@@ -94,7 +94,7 @@ public class PartTypeInterfaceEnergy extends PartTypeInterfacePositionedAddon<IE
         public boolean canReceive() {
             disablePosition();
             boolean ret = getPositionedAddonsNetwork() != null
-                    && getPositionedAddonsNetwork().canReceive();
+                    && getPositionedAddonsNetwork().getChannel(getChannel()).canReceive();
             enablePosition();
             return ret;
         }

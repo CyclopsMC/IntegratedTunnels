@@ -45,7 +45,7 @@ public class PartTypeInterfaceItem extends PartTypeInterfacePositionedAddon<IIte
         public int getSlots() {
             disablePosition();
             int ret = getPositionedAddonsNetwork() != null
-                    ? getPositionedAddonsNetwork().getSlots() : 0;
+                    ? getPositionedAddonsNetwork().getChannel(getChannel()).getSlots() : 0;
             enablePosition();
             return ret;
         }
@@ -54,7 +54,7 @@ public class PartTypeInterfaceItem extends PartTypeInterfacePositionedAddon<IIte
         public ItemStack getStackInSlot(int slot) {
             disablePosition();
             ItemStack ret = getPositionedAddonsNetwork() != null
-                    ? getPositionedAddonsNetwork().getStackInSlot(slot) : null;
+                    ? getPositionedAddonsNetwork().getChannel(getChannel()).getStackInSlot(slot) : null;
             enablePosition();
             return ret;
         }
@@ -63,7 +63,7 @@ public class PartTypeInterfaceItem extends PartTypeInterfacePositionedAddon<IIte
         public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
             disablePosition();
             ItemStack ret = getPositionedAddonsNetwork() != null
-                    ? getPositionedAddonsNetwork().insertItem(slot, stack, simulate) : stack;
+                    ? getPositionedAddonsNetwork().getChannel(getChannel()).insertItem(slot, stack, simulate) : stack;
             enablePosition();
             return ret;
         }
@@ -72,7 +72,7 @@ public class PartTypeInterfaceItem extends PartTypeInterfacePositionedAddon<IIte
         public ItemStack extractItem(int slot, int amount, boolean simulate) {
             disablePosition();
             ItemStack ret = getPositionedAddonsNetwork() != null
-                    ? getPositionedAddonsNetwork().extractItem(slot, amount, simulate) : null;
+                    ? getPositionedAddonsNetwork().getChannel(getChannel()).extractItem(slot, amount, simulate) : null;
             enablePosition();
             return ret;
         }
@@ -81,7 +81,7 @@ public class PartTypeInterfaceItem extends PartTypeInterfacePositionedAddon<IIte
         public int getSlotLimit(int slot) {
             disablePosition();
             int ret = getPositionedAddonsNetwork() != null
-                    ? getPositionedAddonsNetwork().getSlotLimit(slot) : 0;
+                    ? getPositionedAddonsNetwork().getChannel(getChannel()).getSlotLimit(slot) : 0;
             enablePosition();
             return ret;
         }
@@ -90,7 +90,7 @@ public class PartTypeInterfaceItem extends PartTypeInterfacePositionedAddon<IIte
         public ItemStack insertItem(ItemStack stack, boolean simulate) {
             disablePosition();
             ItemStack ret = getPositionedAddonsNetwork() != null
-                    ? getPositionedAddonsNetwork().insertItem(stack, simulate) : stack;
+                    ? getPositionedAddonsNetwork().getChannel(getChannel()).insertItem(stack, simulate) : stack;
             enablePosition();
             return ret;
         }
@@ -99,7 +99,7 @@ public class PartTypeInterfaceItem extends PartTypeInterfacePositionedAddon<IIte
         public ItemStack extractItem(int amount, boolean simulate) {
             disablePosition();
             ItemStack ret = getPositionedAddonsNetwork() != null
-                    ? getPositionedAddonsNetwork().extractItem(amount, simulate) : null;
+                    ? getPositionedAddonsNetwork().getChannel(getChannel()).extractItem(amount, simulate) : null;
             enablePosition();
             return ret;
         }
@@ -108,7 +108,7 @@ public class PartTypeInterfaceItem extends PartTypeInterfacePositionedAddon<IIte
         public ItemStack extractItem(ItemStack matchStack, int matchFlags, boolean simulate) {
             disablePosition();
             ItemStack ret = getPositionedAddonsNetwork() != null
-                    ? getPositionedAddonsNetwork().extractItem(matchStack, matchFlags, simulate) : null;
+                    ? getPositionedAddonsNetwork().getChannel(getChannel()).extractItem(matchStack, matchFlags, simulate) : null;
             enablePosition();
             return ret;
         }
