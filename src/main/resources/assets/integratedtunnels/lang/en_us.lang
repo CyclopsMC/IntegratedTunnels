@@ -123,6 +123,8 @@ aspect.aspecttypes.integratedtunnels.boolean.player.continuousclick.name=Continu
 aspect.aspecttypes.integratedtunnels.boolean.player.continuousclick.info=If a continuous click must be simulated, otherwise each click takes one tick.
 aspect.aspecttypes.integratedtunnels.boolean.blacklist.name=Blacklist
 aspect.aspecttypes.integratedtunnels.boolean.blacklist.info=If everything except for items in the given list must be handled.
+aspect.aspecttypes.integratedtunnels.boolean.player.sneak.name=Sneak
+aspect.aspecttypes.integratedtunnels.boolean.player.sneak.info=If player sneaking (holding shift) must be simulated.
 
 # Aspects
 

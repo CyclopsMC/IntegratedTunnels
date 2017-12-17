@@ -1389,12 +1389,15 @@ public class TunnelAspectWriteBuilders {
                 new AspectPropertyTypeInstance<>(ValueTypes.BOOLEAN, "aspect.aspecttypes.integratedtunnels.boolean.player.rightclick.name");
         public static final IAspectPropertyTypeInstance<ValueTypeBoolean, ValueTypeBoolean.ValueBoolean> PROP_CONTINUOUS_CLICK =
                 new AspectPropertyTypeInstance<>(ValueTypes.BOOLEAN, "aspect.aspecttypes.integratedtunnels.boolean.player.continuousclick.name");
+        public static final IAspectPropertyTypeInstance<ValueTypeBoolean, ValueTypeBoolean.ValueBoolean> PROP_SNEAK =
+                new AspectPropertyTypeInstance<>(ValueTypes.BOOLEAN, "aspect.aspecttypes.integratedtunnels.boolean.player.sneak.name");
 
         public static final IAspectProperties PROPERTIES_CLICK_EMPTY = new AspectProperties(ImmutableList.<IAspectPropertyTypeInstance>of(
                 PROP_CHANNEL,
                 PROP_RIGHT_CLICK,
                 World.PROP_HAND_LEFT,
                 PROP_CONTINUOUS_CLICK,
+                PROP_SNEAK,
                 World.PROPERTY_ENTITYINDEX,
                 World.PROP_OFFSET_X,
                 World.PROP_OFFSET_Y,
@@ -1405,6 +1408,7 @@ public class TunnelAspectWriteBuilders {
                 PROP_RIGHT_CLICK,
                 World.PROP_HAND_LEFT,
                 PROP_CONTINUOUS_CLICK,
+                PROP_SNEAK,
                 Item.PROP_RATE,
                 World.PROPERTY_ENTITYINDEX,
                 World.PROP_OFFSET_X,
@@ -1416,6 +1420,7 @@ public class TunnelAspectWriteBuilders {
                 PROP_RIGHT_CLICK,
                 World.PROP_HAND_LEFT,
                 PROP_CONTINUOUS_CLICK,
+                PROP_SNEAK,
                 World.PROPERTY_ENTITYINDEX,
                 World.PROP_OFFSET_X,
                 World.PROP_OFFSET_Y,
@@ -1426,6 +1431,7 @@ public class TunnelAspectWriteBuilders {
                 PROP_RIGHT_CLICK,
                 World.PROP_HAND_LEFT,
                 PROP_CONTINUOUS_CLICK,
+                PROP_SNEAK,
                 Item.PROP_CHECK_STACKSIZE,
                 Item.PROP_CHECK_DAMAGE,
                 Item.PROP_CHECK_NBT,
@@ -1440,6 +1446,7 @@ public class TunnelAspectWriteBuilders {
             PROPERTIES_CLICK_EMPTY.setValue(PROP_RIGHT_CLICK, ValueTypeBoolean.ValueBoolean.of(true));
             PROPERTIES_CLICK_EMPTY.setValue(World.PROP_HAND_LEFT, ValueTypeBoolean.ValueBoolean.of(true));
             PROPERTIES_CLICK_EMPTY.setValue(PROP_CONTINUOUS_CLICK, ValueTypeBoolean.ValueBoolean.of(true));
+            PROPERTIES_CLICK_EMPTY.setValue(PROP_SNEAK, ValueTypeBoolean.ValueBoolean.of(false));
             PROPERTIES_CLICK_EMPTY.setValue(World.PROPERTY_ENTITYINDEX, ValueTypeInteger.ValueInteger.of(-1));
             PROPERTIES_CLICK_EMPTY.setValue(World.PROP_OFFSET_X, ValueTypeDouble.ValueDouble.of(0.5D));
             PROPERTIES_CLICK_EMPTY.setValue(World.PROP_OFFSET_Y, ValueTypeDouble.ValueDouble.of(0.5D));
@@ -1449,6 +1456,7 @@ public class TunnelAspectWriteBuilders {
             PROPERTIES_CLICK_SIMPLE.setValue(PROP_RIGHT_CLICK, ValueTypeBoolean.ValueBoolean.of(true));
             PROPERTIES_CLICK_SIMPLE.setValue(World.PROP_HAND_LEFT, ValueTypeBoolean.ValueBoolean.of(true));
             PROPERTIES_CLICK_SIMPLE.setValue(PROP_CONTINUOUS_CLICK, ValueTypeBoolean.ValueBoolean.of(true));
+            PROPERTIES_CLICK_SIMPLE.setValue(PROP_SNEAK, ValueTypeBoolean.ValueBoolean.of(false));
             PROPERTIES_CLICK_SIMPLE.setValue(Item.PROP_RATE, ValueTypeInteger.ValueInteger.of(1));
             PROPERTIES_CLICK_SIMPLE.setValue(World.PROPERTY_ENTITYINDEX, ValueTypeInteger.ValueInteger.of(-1));
             PROPERTIES_CLICK_SIMPLE.setValue(World.PROP_OFFSET_X, ValueTypeDouble.ValueDouble.of(0.5D));
@@ -1459,6 +1467,7 @@ public class TunnelAspectWriteBuilders {
             PROPERTIES_CLICK_NORATE.setValue(PROP_RIGHT_CLICK, ValueTypeBoolean.ValueBoolean.of(true));
             PROPERTIES_CLICK_NORATE.setValue(World.PROP_HAND_LEFT, ValueTypeBoolean.ValueBoolean.of(true));
             PROPERTIES_CLICK_NORATE.setValue(PROP_CONTINUOUS_CLICK, ValueTypeBoolean.ValueBoolean.of(true));
+            PROPERTIES_CLICK_NORATE.setValue(PROP_SNEAK, ValueTypeBoolean.ValueBoolean.of(false));
             PROPERTIES_CLICK_NORATE.setValue(World.PROPERTY_ENTITYINDEX, ValueTypeInteger.ValueInteger.of(-1));
             PROPERTIES_CLICK_NORATE.setValue(World.PROP_OFFSET_X, ValueTypeDouble.ValueDouble.of(0.5D));
             PROPERTIES_CLICK_NORATE.setValue(World.PROP_OFFSET_Y, ValueTypeDouble.ValueDouble.of(0.5D));
@@ -1468,6 +1477,7 @@ public class TunnelAspectWriteBuilders {
             PROPERTIES_CLICK.setValue(PROP_RIGHT_CLICK, ValueTypeBoolean.ValueBoolean.of(true));
             PROPERTIES_CLICK.setValue(World.PROP_HAND_LEFT, ValueTypeBoolean.ValueBoolean.of(true));
             PROPERTIES_CLICK.setValue(PROP_CONTINUOUS_CLICK, ValueTypeBoolean.ValueBoolean.of(true));
+            PROPERTIES_CLICK.setValue(PROP_SNEAK, ValueTypeBoolean.ValueBoolean.of(false));
             PROPERTIES_CLICK.setValue(Item.PROP_CHECK_STACKSIZE, ValueTypeBoolean.ValueBoolean.of(false));
             PROPERTIES_CLICK.setValue(Item.PROP_CHECK_DAMAGE, ValueTypeBoolean.ValueBoolean.of(true));
             PROPERTIES_CLICK.setValue(Item.PROP_CHECK_NBT, ValueTypeBoolean.ValueBoolean.of(true));
@@ -1492,6 +1502,7 @@ public class TunnelAspectWriteBuilders {
                         ? EnumHand.MAIN_HAND : EnumHand.OFF_HAND;
                 boolean rightClick = properties.getValue(PROP_RIGHT_CLICK).getRawValue();
                 boolean continuousClick = properties.getValue(PROP_CONTINUOUS_CLICK).getRawValue();
+                boolean sneak = properties.getValue(PROP_SNEAK).getRawValue();
                 int entityIndex = properties.getValue(World.PROPERTY_ENTITYINDEX).getRawValue();
                 double offsetX = properties.getValue(World.PROP_OFFSET_X).getRawValue();
                 double offsetY = properties.getValue(World.PROP_OFFSET_Y).getRawValue();
@@ -1506,7 +1517,7 @@ public class TunnelAspectWriteBuilders {
                 IItemHandler itemHandler = new ItemHandlerPlayerWrapper(partState.getPlayer(),
                         (WorldServer) target.getPos().getWorld(), target.getPos().getBlockPos(),
                         offsetX, offsetY, offsetZ, target.getSide(), hand,
-                        rightClick, false, continuousClick, entityIndex, network.getCapability(ItemNetworkConfig.CAPABILITY).getChannel(channel));
+                        rightClick, sneak, continuousClick, entityIndex, network.getCapability(ItemNetworkConfig.CAPABILITY).getChannel(channel));
                 itemHandler.insertItem(0, ItemStack.EMPTY, false);
             }
             return null;
@@ -1523,6 +1534,7 @@ public class TunnelAspectWriteBuilders {
                     ? EnumHand.MAIN_HAND : EnumHand.OFF_HAND;
             boolean rightClick = input.getMiddle().getValue(PROP_RIGHT_CLICK).getRawValue();
             boolean continuousClick = properties.getValue(PROP_CONTINUOUS_CLICK).getRawValue();
+            boolean sneak = properties.getValue(PROP_SNEAK).getRawValue();
             int entityIndex = properties.getValue(World.PROPERTY_ENTITYINDEX).getRawValue();
             double offsetX = properties.getValue(World.PROP_OFFSET_X).getRawValue();
             double offsetY = properties.getValue(World.PROP_OFFSET_Y).getRawValue();
@@ -1537,7 +1549,7 @@ public class TunnelAspectWriteBuilders {
             IItemHandler itemHandler = new ItemHandlerPlayerWrapper(partState.getPlayer(),
                     (WorldServer) target.getPos().getWorld(), target.getPos().getBlockPos(),
                     offsetX, offsetY, offsetZ, target.getSide(), hand,
-                    rightClick, false, continuousClick, entityIndex, network.getCapability(ItemNetworkConfig.CAPABILITY).getChannel(channel));
+                    rightClick, sneak, continuousClick, entityIndex, network.getCapability(ItemNetworkConfig.CAPABILITY).getChannel(channel));
             return new Item.ItemTarget(network, itemHandler, null, null, target.hashCode(), 0, amount,
                     itemStackMatcher, transferHash, partTarget, properties);
         };
