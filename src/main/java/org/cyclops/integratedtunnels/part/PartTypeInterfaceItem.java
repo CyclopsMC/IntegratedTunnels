@@ -115,13 +115,13 @@ public class PartTypeInterfaceItem extends PartTypeInterfacePositionedAddon<IIte
 
         @Override
         public boolean hasCapability(Capability<?> capability) {
-            return (getExposeCapabilities() && getPositionedAddonsNetwork() != null && capability == Capabilities.SLOTLESS_ITEMHANDLER)
+            return (isExposeCapabilities() && getPositionedAddonsNetwork() != null && capability == Capabilities.SLOTLESS_ITEMHANDLER)
                     || super.hasCapability(capability);
         }
 
         @Override
         public <T> T getCapability(Capability<T> capability) {
-            if (getExposeCapabilities() && getPositionedAddonsNetwork() != null && capability == Capabilities.SLOTLESS_ITEMHANDLER) {
+            if (isExposeCapabilities() && getPositionedAddonsNetwork() != null && capability == Capabilities.SLOTLESS_ITEMHANDLER) {
                 return (T) this;
             }
             return super.getCapability(capability);
