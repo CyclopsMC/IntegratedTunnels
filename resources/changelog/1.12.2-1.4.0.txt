@@ -1,0 +1,6 @@
+As always, don't forget to backup your world before updating!
+Requires CyclopsCore version 0.11.0 or higher.
+
+Additions:
+* Add energy, fluid and item channels
+* Add option to shift click in Player Simulator, Closes #73
