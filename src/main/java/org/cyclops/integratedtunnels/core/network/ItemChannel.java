@@ -20,8 +20,7 @@ public class ItemChannel implements IItemChannel {
 
     @Override
     public ItemStack insertItem(ItemStack stack, boolean simulate) {
-        for(PrioritizedPartPos partPos : network.getPositions()) {
-            if(!IChanneledNetwork.channelsMatch(partPos.getChannel(), channel)) continue;
+        for(PrioritizedPartPos partPos : network.getPositions(this.channel)) {
             ISlotlessItemHandler itemHandler = network.getSlotlessItemHandler(partPos);
             if (itemHandler != null) {
                 network.disablePosition(partPos.getPartPos());
@@ -35,8 +34,7 @@ public class ItemChannel implements IItemChannel {
 
     @Override
     public ItemStack extractItem(int amount, boolean simulate) {
-        for(PrioritizedPartPos partPos : network.getPositions()) {
-            if(!IChanneledNetwork.channelsMatch(partPos.getChannel(), channel)) continue;
+        for(PrioritizedPartPos partPos : network.getPositions(this.channel)) {
             ISlotlessItemHandler itemHandler = network.getSlotlessItemHandler(partPos);
             if (itemHandler != null) {
                 network.disablePosition(partPos.getPartPos());
@@ -52,8 +50,7 @@ public class ItemChannel implements IItemChannel {
 
     @Override
     public ItemStack extractItem(ItemStack matchStack, int matchFlags, boolean simulate) {
-        for(PrioritizedPartPos partPos : network.getPositions()) {
-            if(!IChanneledNetwork.channelsMatch(partPos.getChannel(), channel)) continue;
+        for(PrioritizedPartPos partPos : network.getPositions(this.channel)) {
             ISlotlessItemHandler itemHandler = network.getSlotlessItemHandler(partPos);
             if (itemHandler != null) {
                 network.disablePosition(partPos.getPartPos());
@@ -70,8 +67,7 @@ public class ItemChannel implements IItemChannel {
     @Override
     public int getSlots() {
         int slots = 0;
-        for(PrioritizedPartPos partPos : network.getPositions()) {
-            if(!IChanneledNetwork.channelsMatch(partPos.getChannel(), channel)) continue;
+        for(PrioritizedPartPos partPos : network.getPositions(this.channel)) {
             IItemHandler itemHandler = network.getItemHandler(partPos);
             if (itemHandler != null) {
                 network.disablePosition(partPos.getPartPos());
@@ -83,8 +79,7 @@ public class ItemChannel implements IItemChannel {
     }
 
     protected Triple<IItemHandler, Integer, PrioritizedPartPos> getItemHandlerForSlot(int slot) {
-        for(PrioritizedPartPos partPos : network.getPositions()) {
-            if(!IChanneledNetwork.channelsMatch(partPos.getChannel(), channel)) continue;
+        for(PrioritizedPartPos partPos : network.getPositions(this.channel)) {
             IItemHandler itemHandler = network.getItemHandler(partPos);
             if (itemHandler != null) {
                 int slots = itemHandler.getSlots();

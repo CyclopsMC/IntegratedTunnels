@@ -27,8 +27,7 @@ public class FluidChannel implements IFluidHandler {
     @Override
     public IFluidTankProperties[] getTankProperties() {
         List<IFluidTankProperties> properties = Lists.newArrayList();
-        for(PrioritizedPartPos partPos : network.getPositions()) {
-        	if(!IChanneledNetwork.channelsMatch(partPos.getChannel(), channel)) continue;
+        for(PrioritizedPartPos partPos : network.getPositions(this.channel)) {
             IFluidHandler fluidHandler = network.getFluidHandler(partPos);
             if (fluidHandler != null) {
             	network.disablePosition(partPos.getPartPos());
@@ -44,8 +43,7 @@ public class FluidChannel implements IFluidHandler {
         int amount = FluidHelpers.getAmount(resource);
         amount = Math.min(amount, GeneralConfig.fluidRateLimit);
         int toFill = amount;
-        for(PrioritizedPartPos partPos : network.getPositions()) {
-        	if(!IChanneledNetwork.channelsMatch(partPos.getChannel(), channel)) continue;
+        for(PrioritizedPartPos partPos : network.getPositions(this.channel)) {
             IFluidHandler fluidHandler = network.getFluidHandler(partPos);
             if (fluidHandler != null) {
             	network.disablePosition(partPos.getPartPos());
@@ -66,8 +64,7 @@ public class FluidChannel implements IFluidHandler {
         int maxDrain = FluidHelpers.getAmount(resource);
         maxDrain = Math.min(maxDrain, GeneralConfig.fluidRateLimit);
         FluidStack fluid = null;
-        for(PrioritizedPartPos partPos : network.getPositions()) {
-        	if(!IChanneledNetwork.channelsMatch(partPos.getChannel(), channel)) continue;
+        for(PrioritizedPartPos partPos : network.getPositions(this.channel)) {
             IFluidHandler fluidHandler = network.getFluidHandler(partPos);
             if (fluidHandler != null) {
             	network.disablePosition(partPos.getPartPos());
@@ -92,8 +89,7 @@ public class FluidChannel implements IFluidHandler {
         maxDrain = Math.min(maxDrain, GeneralConfig.fluidRateLimit);
         int toDrain = maxDrain;
         FluidStack fluid = null;
-        for(PrioritizedPartPos partPos : network.getPositions()) {
-        	if(!IChanneledNetwork.channelsMatch(partPos.getChannel(), channel)) continue;
+        for(PrioritizedPartPos partPos : network.getPositions(this.channel)) {
             IFluidHandler fluidHandler = network.getFluidHandler(partPos);
             if (fluidHandler != null) {
             	network.disablePosition(partPos.getPartPos());
