@@ -14,8 +14,10 @@ dependencies {
     // Add something like 'integrateddynamics_version_local=0.1.0-DEV' to your gradle.properties if you want to use a custom local Integrated Dynamics version.
     if(project.hasProperty("integrateddynamics_version_local")) {
         compile "org.cyclops.integrateddynamics:IntegratedDynamics:${project.integrateddynamics_version_local}:deobf"
+        runtime "com.google.re2j:re2j:1.1"
     } else {
         compile "org.cyclops.integrateddynamics:IntegratedDynamics:${config.integrateddynamics_version}:deobf"
+        runtime "com.google.re2j:re2j:1.1"
     }
     // Add something like 'cyclopscore_version_local=0.1.0-DEV' to your gradle.properties if you want to use a custom local CyclopsCore version.
     if(project.hasProperty("cyclopscore_version_local")) {
