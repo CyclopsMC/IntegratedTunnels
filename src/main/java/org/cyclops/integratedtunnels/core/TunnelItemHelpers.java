@@ -31,6 +31,8 @@ import org.cyclops.integrateddynamics.core.evaluate.variable.ValueHelpers;
 import org.cyclops.integrateddynamics.core.evaluate.variable.ValueObjectTypeBlock;
 import org.cyclops.integrateddynamics.core.evaluate.variable.ValueObjectTypeItemStack;
 import org.cyclops.integrateddynamics.core.evaluate.variable.ValueTypeBoolean;
+import org.cyclops.integrateddynamics.core.evaluate.variable.ValueTypes;
+import org.cyclops.integrateddynamics.core.helper.L10NValues;
 import org.cyclops.integrateddynamics.core.helper.PartHelpers;
 import org.cyclops.integratedtunnels.GeneralConfig;
 import org.cyclops.integratedtunnels.IntegratedTunnels;
@@ -315,6 +317,16 @@ public class TunnelItemHelpers {
         };
     }
 
+    protected static void validatePredicateOutput(IOperator predicate, IValue result) throws EvaluationException {
+        if (!(result instanceof ValueTypeBoolean.ValueBoolean)) {
+            L10NHelpers.UnlocalizedString error = new L10NHelpers.UnlocalizedString(
+                    L10NValues.OPERATOR_ERROR_WRONGPREDICATE,
+                    predicate.getLocalizedNameFull(),
+                    result.getType(), ValueTypes.BOOLEAN);
+            throw new EvaluationException(error.localize());
+        }
+    }
+
     public static ItemStackPredicate matchPredicateItem(final PartTarget partTarget, final IOperator predicate) {
         return new ItemStackPredicate() {
             @Override
@@ -322,6 +334,7 @@ public class TunnelItemHelpers {
                 ValueObjectTypeItemStack.ValueItemStack valueItemStack = ValueObjectTypeItemStack.ValueItemStack.of(input);
                 try {
                     IValue result = ValueHelpers.evaluateOperator(predicate, valueItemStack);
+                    validatePredicateOutput(predicate, result);
                     return ((ValueTypeBoolean.ValueBoolean) result).getRawValue();
                 } catch (EvaluationException e) {
                     PartHelpers.PartStateHolder<?, ?> partData = PartHelpers.getPart(partTarget.getCenter());
@@ -360,6 +373,7 @@ public class TunnelItemHelpers {
                         input.getItem() instanceof ItemBlock ? BlockHelpers.getBlockStateFromItemStack(input) : null);
                 try {
                     IValue result = ValueHelpers.evaluateOperator(predicate, valueBlock);
+                    validatePredicateOutput(predicate, result);
                     return ((ValueTypeBoolean.ValueBoolean) result).getRawValue();
                 } catch (EvaluationException e) {
                     PartHelpers.PartStateHolder<?, ?> partData = PartHelpers.getPart(partTarget.getCenter());
