@@ -73,8 +73,7 @@ public abstract class PartTypeInterfacePositionedAddon<N extends IPositionedAddo
     public void onBlockNeighborChange(@Nullable INetwork network, @Nullable IPartNetwork partNetwork, PartTarget target, S state, IBlockAccess world, Block neighborBlock) {
         super.onBlockNeighborChange(network, partNetwork, target, state, world, neighborBlock);
         if (network != null) {
-            removeTargetFromNetwork(network, target.getTarget(), state);
-            addTargetToNetwork(network, target.getTarget(), state.getPriority(), state.getChannel(), state);
+            updateTargetInNetwork(network, target.getTarget(), state.getPriority(), state.getChannel(), state);
         }
     }
 
@@ -94,12 +93,14 @@ public abstract class PartTypeInterfacePositionedAddon<N extends IPositionedAddo
     protected void addTargetToNetwork(INetwork network, PartPos pos, int priority, int channel, S state) {
         if (network.hasCapability(getNetworkCapability())) {
             T capability = getTargetCapabilityInstance(pos);
-            if (isTargetCapabilityValid(capability)) {
+            boolean validTargetCapability = isTargetCapabilityValid(capability);
+            if (validTargetCapability) {
                 N networkCapability = network.getCapability(getNetworkCapability());
                 networkCapability.addPosition(pos, priority, channel);
             }
             state.setPositionedAddonsNetwork(network.getCapability(getNetworkCapability()));
             state.setPos(pos);
+            state.setValidTargetCapability(validTargetCapability);
         }
     }
 
@@ -110,12 +111,27 @@ public abstract class PartTypeInterfacePositionedAddon<N extends IPositionedAddo
         }
         state.setPositionedAddonsNetwork(null);
         state.setPos(null);
+        state.setValidTargetCapability(false);
+    }
+
+    protected void updateTargetInNetwork(INetwork network, PartPos pos, int priority, int channel, S state) {
+        if (network.hasCapability(getNetworkCapability())) {
+            T capability = getTargetCapabilityInstance(pos);
+            boolean validTargetCapability = isTargetCapabilityValid(capability);
+            boolean wasValidTargetCapability = state.isValidTargetCapability();
+            // Only trigger a change if the capability presence has changed.
+            if (validTargetCapability != wasValidTargetCapability) {
+                removeTargetFromNetwork(network, pos, state);
+                addTargetToNetwork(network, pos, priority, channel, state);
+            }
+        }
     }
 
     public static abstract class State<P extends IPartType, N extends IPositionedAddonsNetwork, T> extends PartStateBase<P> {
 
         private N positionedAddonsNetwork = null;
         private PartPos pos = null;
+        private boolean validTargetCapability = false;
 
         protected abstract Capability<T> getTargetCapability();
 
@@ -125,6 +141,14 @@ public abstract class PartTypeInterfacePositionedAddon<N extends IPositionedAddo
 
         public void setPositionedAddonsNetwork(N positionedAddonsNetwork) {
             this.positionedAddonsNetwork = positionedAddonsNetwork;
+        }
+
+        public boolean isValidTargetCapability() {
+            return validTargetCapability;
+        }
+
+        public void setValidTargetCapability(boolean validTargetCapability) {
+            this.validTargetCapability = validTargetCapability;
         }
 
         public PartPos getPos() {
