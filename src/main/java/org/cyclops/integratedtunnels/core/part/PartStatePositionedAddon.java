@@ -8,7 +8,7 @@ import org.cyclops.integrateddynamics.core.part.write.PartStateWriterBase;
  * A part state for handling addon import and export.
  * @author rubensworks
  */
-public class PartStatePositionedAddon<P extends IPartTypeWriter, T extends IPositionedAddonsNetwork> extends PartStateWriterBase<P> {
+public class PartStatePositionedAddon<P extends IPartTypeWriter, T extends IPositionedAddonsNetwork> extends PartStateRoundRobin<P> {
 
     private final boolean canReceive;
     private final boolean canExtract;

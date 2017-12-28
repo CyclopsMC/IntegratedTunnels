@@ -1,11 +1,13 @@
 package org.cyclops.integratedtunnels.core.network;
 
+import java.util.Iterator;
 import java.util.List;
 
 import javax.annotation.Nullable;
 
 import org.cyclops.cyclopscore.helper.FluidHelpers;
 import org.cyclops.integrateddynamics.api.network.IChanneledNetwork;
+import org.cyclops.integrateddynamics.api.network.IPositionedAddonsNetwork;
 import org.cyclops.integrateddynamics.api.network.IPositionedAddonsNetwork.PrioritizedPartPos;
 import org.cyclops.integratedtunnels.GeneralConfig;
 
@@ -43,7 +45,9 @@ public class FluidChannel implements IFluidHandler {
         int amount = FluidHelpers.getAmount(resource);
         amount = Math.min(amount, GeneralConfig.fluidRateLimit);
         int toFill = amount;
-        for(PrioritizedPartPos partPos : network.getPositions(this.channel)) {
+        IPositionedAddonsNetwork.PositionsIterator it = network.getPositionIterator(this.channel);
+        while (it.hasNext() && toFill > 0) {
+            PrioritizedPartPos partPos = it.next();
             IFluidHandler fluidHandler = network.getFluidHandler(partPos);
             if (fluidHandler != null) {
             	network.disablePosition(partPos.getPartPos());
@@ -53,6 +57,9 @@ public class FluidChannel implements IFluidHandler {
                     break;
                 }
             }
+        }
+        if (doFill) {
+            network.setPositionIterator(it, this.channel);
         }
         return amount - toFill;
     }
@@ -64,7 +71,9 @@ public class FluidChannel implements IFluidHandler {
         int maxDrain = FluidHelpers.getAmount(resource);
         maxDrain = Math.min(maxDrain, GeneralConfig.fluidRateLimit);
         FluidStack fluid = null;
-        for(PrioritizedPartPos partPos : network.getPositions(this.channel)) {
+        IPositionedAddonsNetwork.PositionsIterator it = network.getPositionIterator(this.channel);
+        while (it.hasNext() && resource.amount > 0) {
+            PrioritizedPartPos partPos = it.next();
             IFluidHandler fluidHandler = network.getFluidHandler(partPos);
             if (fluidHandler != null) {
             	network.disablePosition(partPos.getPartPos());
@@ -79,6 +88,9 @@ public class FluidChannel implements IFluidHandler {
                 }
             }
         }
+        if (doDrain) {
+            network.setPositionIterator(it, this.channel);
+        }
         int drained = maxDrain - resource.amount;
         return drained <= 0 ? null : new FluidStack(fluid, drained);
     }
@@ -89,7 +101,9 @@ public class FluidChannel implements IFluidHandler {
         maxDrain = Math.min(maxDrain, GeneralConfig.fluidRateLimit);
         int toDrain = maxDrain;
         FluidStack fluid = null;
-        for(PrioritizedPartPos partPos : network.getPositions(this.channel)) {
+        IPositionedAddonsNetwork.PositionsIterator it = network.getPositionIterator(this.channel);
+        while (it.hasNext() && toDrain > 0) {
+            PrioritizedPartPos partPos = it.next();
             IFluidHandler fluidHandler = network.getFluidHandler(partPos);
             if (fluidHandler != null) {
             	network.disablePosition(partPos.getPartPos());
@@ -103,6 +117,9 @@ public class FluidChannel implements IFluidHandler {
                     break;
                 }
             }
+        }
+        if (doDrain) {
+            network.setPositionIterator(it, this.channel);
         }
         int drained = maxDrain - toDrain;
         return drained <= 0 ? null : new FluidStack(fluid, drained);
