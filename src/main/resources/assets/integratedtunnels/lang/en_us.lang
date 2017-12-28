@@ -125,6 +125,8 @@ aspect.aspecttypes.integratedtunnels.boolean.blacklist.name=Blacklist
 aspect.aspecttypes.integratedtunnels.boolean.blacklist.info=If everything except for items in the given list must be handled.
 aspect.aspecttypes.integratedtunnels.boolean.player.sneak.name=Sneak
 aspect.aspecttypes.integratedtunnels.boolean.player.sneak.info=If player sneaking (holding shift) must be simulated.
+aspect.aspecttypes.integratedtunnels.boolean.roundrobin.name=Round-Robin
+aspect.aspecttypes.integratedtunnels.boolean.roundrobin.info=If interfaces should be iterated in circular order, ignoring priorities.
 
 # Aspects
 
