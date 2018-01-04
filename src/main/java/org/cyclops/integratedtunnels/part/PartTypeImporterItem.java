@@ -20,7 +20,8 @@ public class PartTypeImporterItem extends PartTypeTunnelAspects<PartTypeImporter
                 TunnelAspects.Write.Item.INTEGER_SLOT_IMPORT,
                 TunnelAspects.Write.Item.ITEMSTACK_IMPORT,
                 TunnelAspects.Write.Item.LIST_IMPORT,
-                TunnelAspects.Write.Item.PREDICATE_IMPORT
+                TunnelAspects.Write.Item.PREDICATE_IMPORT,
+                TunnelAspects.Write.Item.NBT_IMPORT
         ));
     }
 

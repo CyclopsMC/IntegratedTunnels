@@ -20,12 +20,14 @@ public class PartTypeImporterWorldItem extends PartTypeTunnelAspectsWorld<PartTy
                 TunnelAspects.Write.World.ENTITYITEM_ITEMSTACK_IMPORT,
                 TunnelAspects.Write.World.ENTITYITEM_LISTITEMSTACK_IMPORT,
                 TunnelAspects.Write.World.ENTITYITEM_PREDICATEITEMSTACK_IMPORT,
+                TunnelAspects.Write.World.ENTITYITEM_NBT_IMPORT,
 
                 TunnelAspects.Write.World.ENTITY_ITEM_BOOLEAN_IMPORT,
                 TunnelAspects.Write.World.ENTITY_ITEM_INTEGER_IMPORT,
                 TunnelAspects.Write.World.ENTITY_ITEM_ITEMSTACK_IMPORT,
                 TunnelAspects.Write.World.ENTITY_ITEM_LISTITEMSTACK_IMPORT,
-                TunnelAspects.Write.World.ENTITY_ITEM_PREDICATEITEMSTACK_IMPORT
+                TunnelAspects.Write.World.ENTITY_ITEM_PREDICATEITEMSTACK_IMPORT,
+                TunnelAspects.Write.World.ENTITY_ITEM_NBT_IMPORT
         ));
     }
 

@@ -19,7 +19,8 @@ public class PartTypeExporterFluid extends PartTypeTunnelAspects<PartTypeExporte
                 TunnelAspects.Write.Fluid.INTEGER_EXPORT,
                 TunnelAspects.Write.Fluid.FLUIDSTACK_EXPORT,
                 TunnelAspects.Write.Fluid.LIST_EXPORT,
-                TunnelAspects.Write.Fluid.PREDICATE_EXPORT
+                TunnelAspects.Write.Fluid.PREDICATE_EXPORT,
+                TunnelAspects.Write.Fluid.NBT_EXPORT
         ));
     }
 

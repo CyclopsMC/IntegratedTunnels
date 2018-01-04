@@ -19,6 +19,7 @@ public class PartTypeExporterWorldBlock extends PartTypeTunnelAspectsWorld<PartT
                 TunnelAspects.Write.World.BLOCK_ITEMSTACK_EXPORT,
                 TunnelAspects.Write.World.BLOCK_LISTITEMSTACK_EXPORT,
                 TunnelAspects.Write.World.BLOCK_PREDICATEITEMSTACK_EXPORT,
+                TunnelAspects.Write.World.BLOCK_NBTITEMSTACK_EXPORT,
                 TunnelAspects.Write.World.BLOCK_BLOCK_EXPORT,
                 TunnelAspects.Write.World.BLOCK_LISTBLOCK_EXPORT,
                 TunnelAspects.Write.World.BLOCK_PREDICATEBLOCK_EXPORT

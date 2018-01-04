@@ -19,7 +19,8 @@ public class PartTypeImporterFluid extends PartTypeTunnelAspects<PartTypeImporte
                 TunnelAspects.Write.Fluid.INTEGER_IMPORT,
                 TunnelAspects.Write.Fluid.FLUIDSTACK_IMPORT,
                 TunnelAspects.Write.Fluid.LIST_IMPORT,
-                TunnelAspects.Write.Fluid.PREDICATE_IMPORT
+                TunnelAspects.Write.Fluid.PREDICATE_IMPORT,
+                TunnelAspects.Write.Fluid.NBT_IMPORT
         ));
     }
 

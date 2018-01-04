@@ -5,6 +5,7 @@ import com.google.common.collect.Iterables;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.AxisAlignedBB;
@@ -221,6 +222,10 @@ public class TunnelAspectWriteBuilders {
                 BUILDER_OPERATOR = AspectWriteBuilders.BUILDER_OPERATOR.byMod(IntegratedTunnels._instance)
                 .appendActivator(ACTIVATOR).appendDeactivator(DEACTIVATOR)
                 .appendKind("item").withProperties(PROPERTIES_CHANNEL);
+        public static final AspectBuilder<ValueTypeNbt.ValueNbt, ValueTypeNbt, Triple<PartTarget, IAspectProperties, NBTTagCompound>>
+                BUILDER_NBT = AspectWriteBuilders.BUILDER_NBT.byMod(IntegratedTunnels._instance)
+                .appendActivator(ACTIVATOR).appendDeactivator(DEACTIVATOR)
+                .appendKind("item").handle(AspectWriteBuilders.PROP_GET_NBT).withProperties(PROPERTIES_CHANNEL);
 
         public static final IAspectPropertyTypeInstance<ValueTypeInteger, ValueTypeInteger.ValueInteger> PROP_RATE =
                 new AspectPropertyTypeInstance<>(ValueTypes.INTEGER, "aspect.aspecttypes.integratedtunnels.integer.item.rate.name",
@@ -233,6 +238,14 @@ public class TunnelAspectWriteBuilders {
                 new AspectPropertyTypeInstance<>(ValueTypes.BOOLEAN, "aspect.aspecttypes.integratedtunnels.boolean.item.checkdamage.name");
         public static final IAspectPropertyTypeInstance<ValueTypeBoolean, ValueTypeBoolean.ValueBoolean> PROP_CHECK_NBT =
                 new AspectPropertyTypeInstance<>(ValueTypes.BOOLEAN, "aspect.aspecttypes.integratedtunnels.boolean.item.checknbt.name");
+        public static final IAspectPropertyTypeInstance<ValueTypeBoolean, ValueTypeBoolean.ValueBoolean> PROP_NBT_SUBSET =
+                new AspectPropertyTypeInstance<>(ValueTypes.BOOLEAN, "aspect.aspecttypes.integratedtunnels.boolean.item.nbtsubset.name");
+        public static final IAspectPropertyTypeInstance<ValueTypeBoolean, ValueTypeBoolean.ValueBoolean> PROP_NBT_SUPERSET =
+                new AspectPropertyTypeInstance<>(ValueTypes.BOOLEAN, "aspect.aspecttypes.integratedtunnels.boolean.item.nbtsuperset.name");
+        public static final IAspectPropertyTypeInstance<ValueTypeBoolean, ValueTypeBoolean.ValueBoolean> PROP_NBT_REQUIRE=
+                new AspectPropertyTypeInstance<>(ValueTypes.BOOLEAN, "aspect.aspecttypes.integratedtunnels.boolean.item.nbtrequire.name");
+        public static final IAspectPropertyTypeInstance<ValueTypeBoolean, ValueTypeBoolean.ValueBoolean> PROP_NBT_RECURSIVE=
+                new AspectPropertyTypeInstance<>(ValueTypes.BOOLEAN, "aspect.aspecttypes.integratedtunnels.boolean.item.nbtrecursive.name");
         public static final IAspectProperties PROPERTIES_RATESLOT = new AspectProperties(ImmutableList.<IAspectPropertyTypeInstance>of(
                 PROP_CHANNEL,
                 PROP_ROUNDROBIN,
@@ -268,6 +281,15 @@ public class TunnelAspectWriteBuilders {
                 PROP_CHECK_DAMAGE,
                 PROP_CHECK_NBT
         ));
+        public static final IAspectProperties PROPERTIES_NBT = new AspectProperties(ImmutableList.<IAspectPropertyTypeInstance>of(
+                PROP_CHANNEL,
+                PROP_RATE,
+                PROP_SLOT,
+                PROP_NBT_SUBSET,
+                PROP_NBT_SUPERSET,
+                PROP_NBT_REQUIRE,
+                PROP_NBT_RECURSIVE
+        ));
         static {
             PROPERTIES_RATESLOT.setValue(PROP_CHANNEL, ValueTypeInteger.ValueInteger.of(IChanneledNetwork.DEFAULT_CHANNEL));
             PROPERTIES_RATESLOT.setValue(PROP_ROUNDROBIN, ValueTypeBoolean.ValueBoolean.of(false));
@@ -298,6 +320,14 @@ public class TunnelAspectWriteBuilders {
             PROPERTIES_RATESLOTCHECKSLIST.setValue(PROP_CHECK_STACKSIZE, ValueTypeBoolean.ValueBoolean.of(false));
             PROPERTIES_RATESLOTCHECKSLIST.setValue(PROP_CHECK_DAMAGE, ValueTypeBoolean.ValueBoolean.of(true));
             PROPERTIES_RATESLOTCHECKSLIST.setValue(PROP_CHECK_NBT, ValueTypeBoolean.ValueBoolean.of(true));
+
+            PROPERTIES_NBT.setValue(PROP_CHANNEL, ValueTypeInteger.ValueInteger.of(IChanneledNetwork.DEFAULT_CHANNEL));
+            PROPERTIES_NBT.setValue(PROP_RATE, ValueTypeInteger.ValueInteger.of(64));
+            PROPERTIES_NBT.setValue(PROP_SLOT, ValueTypeInteger.ValueInteger.of(-1));
+            PROPERTIES_NBT.setValue(PROP_NBT_SUBSET, ValueTypeBoolean.ValueBoolean.of(true));
+            PROPERTIES_NBT.setValue(PROP_NBT_SUPERSET, ValueTypeBoolean.ValueBoolean.of(true));
+            PROPERTIES_NBT.setValue(PROP_NBT_REQUIRE, ValueTypeBoolean.ValueBoolean.of(true));
+            PROPERTIES_NBT.setValue(PROP_NBT_RECURSIVE, ValueTypeBoolean.ValueBoolean.of(true));
         }
 
         public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, Boolean>, Triple<PartTarget, IAspectProperties, ItemInformation>>
@@ -375,6 +405,20 @@ public class TunnelAspectWriteBuilders {
                 throw new EvaluationException(new L10NHelpers.UnlocalizedString(L10NValues.ASPECT_ERROR_INVALIDTYPE,
                         expected, current).localize());
             }
+        };
+        public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, NBTTagCompound>, Triple<PartTarget, IAspectProperties, ItemInformation>>
+                PROP_NBT_ITEMPREDICATE = input -> {
+            NBTTagCompound tag = input.getRight();
+            IAspectProperties properties = input.getMiddle();
+            int amount = properties.getValue(PROP_RATE).getRawValue();
+            int transferHash = tag.toString().hashCode();
+            int slot = properties.getValue(PROP_SLOT).getRawValue();
+            boolean subset = properties.getValue(PROP_NBT_SUBSET).getRawValue();
+            boolean superset = properties.getValue(PROP_NBT_SUPERSET).getRawValue();
+            boolean requireNbt = properties.getValue(PROP_NBT_REQUIRE).getRawValue();
+            boolean recursive = properties.getValue(PROP_NBT_RECURSIVE).getRawValue();
+            ItemStackPredicate itemStackMatcher = TunnelItemHelpers.matchNbt(tag, subset, superset, requireNbt, recursive);
+            return Triple.of(input.getLeft(), input.getMiddle(), ItemInformation.of(itemStackMatcher, amount, transferHash, slot));
         };
         public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, IBlockState>, Triple<PartTarget, IAspectProperties, ItemInformation>>
                 PROP_BLOCK_ITEMPREDICATE = input -> {
@@ -610,6 +654,10 @@ public class TunnelAspectWriteBuilders {
                 BUILDER_OPERATOR = AspectWriteBuilders.BUILDER_OPERATOR.byMod(IntegratedTunnels._instance)
                 .appendActivator(ACTIVATOR).appendDeactivator(DEACTIVATOR)
                 .appendKind("fluid").withProperties(PROPERTIES_CHANNEL);
+        public static final AspectBuilder<ValueTypeNbt.ValueNbt, ValueTypeNbt, Triple<PartTarget, IAspectProperties, NBTTagCompound>>
+                BUILDER_NBT = AspectWriteBuilders.BUILDER_NBT.byMod(IntegratedTunnels._instance)
+                .appendActivator(ACTIVATOR).appendDeactivator(DEACTIVATOR)
+                .appendKind("fluid").handle(AspectWriteBuilders.PROP_GET_NBT).withProperties(PROPERTIES_CHANNEL);
 
         public static final Predicate<ValueTypeInteger.ValueInteger> VALIDATOR_INTEGER_MAXRATE =
                 input -> input.getRawValue() <= GeneralConfig.fluidRateLimit;
@@ -621,6 +669,14 @@ public class TunnelAspectWriteBuilders {
                 new AspectPropertyTypeInstance<>(ValueTypes.BOOLEAN, "aspect.aspecttypes.integratedtunnels.boolean.fluid.checkamount.name");
         public static final IAspectPropertyTypeInstance<ValueTypeBoolean, ValueTypeBoolean.ValueBoolean> PROP_CHECK_NBT =
                 new AspectPropertyTypeInstance<>(ValueTypes.BOOLEAN, "aspect.aspecttypes.integratedtunnels.boolean.fluid.checknbt.name");
+        public static final IAspectPropertyTypeInstance<ValueTypeBoolean, ValueTypeBoolean.ValueBoolean> PROP_NBT_SUBSET =
+                new AspectPropertyTypeInstance<>(ValueTypes.BOOLEAN, "aspect.aspecttypes.integratedtunnels.boolean.fluid.nbtsubset.name");
+        public static final IAspectPropertyTypeInstance<ValueTypeBoolean, ValueTypeBoolean.ValueBoolean> PROP_NBT_SUPERSET =
+                new AspectPropertyTypeInstance<>(ValueTypes.BOOLEAN, "aspect.aspecttypes.integratedtunnels.boolean.fluid.nbtsuperset.name");
+        public static final IAspectPropertyTypeInstance<ValueTypeBoolean, ValueTypeBoolean.ValueBoolean> PROP_NBT_REQUIRE=
+                new AspectPropertyTypeInstance<>(ValueTypes.BOOLEAN, "aspect.aspecttypes.integratedtunnels.boolean.fluid.nbtrequire.name");
+        public static final IAspectPropertyTypeInstance<ValueTypeBoolean, ValueTypeBoolean.ValueBoolean> PROP_NBT_RECURSIVE=
+                new AspectPropertyTypeInstance<>(ValueTypes.BOOLEAN, "aspect.aspecttypes.integratedtunnels.boolean.fluid.nbtrecursive.name");
 
         public static final IAspectProperties PROPERTIES_RATE = new AspectProperties(ImmutableList.<IAspectPropertyTypeInstance>of(
                 PROP_CHANNEL,
@@ -642,6 +698,14 @@ public class TunnelAspectWriteBuilders {
                 PROP_CHECK_AMOUNT,
                 PROP_CHECK_NBT
         ));
+        public static final IAspectProperties PROPERTIES_NBT = new AspectProperties(ImmutableList.<IAspectPropertyTypeInstance>of(
+                PROP_CHANNEL,
+                PROP_RATE,
+                PROP_NBT_SUBSET,
+                PROP_NBT_SUPERSET,
+                PROP_NBT_REQUIRE,
+                PROP_NBT_RECURSIVE
+        ));
         static {
             PROPERTIES_RATE.setValue(PROP_CHANNEL, ValueTypeInteger.ValueInteger.of(IChanneledNetwork.DEFAULT_CHANNEL));
             PROPERTIES_RATE.setValue(PROP_ROUNDROBIN, ValueTypeBoolean.ValueBoolean.of(false));
@@ -659,6 +723,13 @@ public class TunnelAspectWriteBuilders {
             PROPERTIES_RATECHECKSLIST.setValue(PROP_RATE, ValueTypeInteger.ValueInteger.of(1000));
             PROPERTIES_RATECHECKSLIST.setValue(PROP_CHECK_NBT, ValueTypeBoolean.ValueBoolean.of(true));
             PROPERTIES_RATECHECKSLIST.setValue(PROP_CHECK_AMOUNT, ValueTypeBoolean.ValueBoolean.of(false));
+
+            PROPERTIES_NBT.setValue(PROP_CHANNEL, ValueTypeInteger.ValueInteger.of(IChanneledNetwork.DEFAULT_CHANNEL));
+            PROPERTIES_NBT.setValue(PROP_RATE, ValueTypeInteger.ValueInteger.of(1000));
+            PROPERTIES_NBT.setValue(PROP_NBT_SUBSET, ValueTypeBoolean.ValueBoolean.of(true));
+            PROPERTIES_NBT.setValue(PROP_NBT_SUPERSET, ValueTypeBoolean.ValueBoolean.of(true));
+            PROPERTIES_NBT.setValue(PROP_NBT_REQUIRE, ValueTypeBoolean.ValueBoolean.of(true));
+            PROPERTIES_NBT.setValue(PROP_NBT_RECURSIVE, ValueTypeBoolean.ValueBoolean.of(true));
         }
 
         public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, Boolean>, Triple<PartTarget, IAspectProperties, Integer>>
@@ -710,6 +781,18 @@ public class TunnelAspectWriteBuilders {
                 throw new EvaluationException(new L10NHelpers.UnlocalizedString(L10NValues.ASPECT_ERROR_INVALIDTYPE,
                         expected, current).localize());
             }
+        };
+        public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, NBTTagCompound>, Triple<PartTarget, IAspectProperties, Pair<Predicate<FluidStack>, Integer>>>
+                PROP_NBT_FLUIDPREDICATE = input -> {
+            IAspectProperties properties = input.getMiddle();
+            NBTTagCompound tag = input.getRight();
+            int rate = properties.getValue(PROP_RATE).getRawValue();
+            boolean subset = properties.getValue(PROP_NBT_SUBSET).getRawValue();
+            boolean superset = properties.getValue(PROP_NBT_SUPERSET).getRawValue();
+            boolean requireNbt = properties.getValue(PROP_NBT_REQUIRE).getRawValue();
+            boolean recursive = properties.getValue(PROP_NBT_RECURSIVE).getRawValue();
+            Predicate<FluidStack> fluidStackMatcher = TunnelFluidHelpers.matchNbt(tag, subset, superset, requireNbt, recursive);
+            return Triple.of(input.getLeft(), input.getMiddle(), Pair.of(fluidStackMatcher, rate));
         };
         public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, Pair<Predicate<FluidStack>, Integer>>, FluidTarget>
                 PROP_FLUIDTARGET = input -> FluidTarget.of(input.getLeft(), input.getMiddle(),
@@ -818,6 +901,9 @@ public class TunnelAspectWriteBuilders {
         public static final AspectBuilder<ValueTypeOperator.ValueOperator, ValueTypeOperator, Triple<PartTarget, IAspectProperties, ValueTypeOperator.ValueOperator>>
                 BUILDER_OPERATOR = AspectWriteBuilders.BUILDER_OPERATOR.byMod(IntegratedTunnels._instance)
                 .appendKind("world").withProperties(PROPERTIES_CHANNEL);
+        public static final AspectBuilder<ValueTypeNbt.ValueNbt, ValueTypeNbt, Triple<PartTarget, IAspectProperties, NBTTagCompound>>
+                BUILDER_NBT = AspectWriteBuilders.BUILDER_NBT.byMod(IntegratedTunnels._instance)
+                .appendKind("world").handle(AspectWriteBuilders.PROP_GET_NBT).withProperties(PROPERTIES_CHANNEL);
 
         public static final Predicate<ValueTypeDouble.ValueDouble> VALIDATOR_DOUBLE_ANGLE =
                 input -> input.getRawValue() >= -180D && input.getRawValue() <= 180F;
@@ -943,6 +1029,7 @@ public class TunnelAspectWriteBuilders {
             public static final IAspectProperties PROPERTIES_ENTITYITEM_PICK_UP = PROPERTIES_ENTITYITEM_PICK_UP_NORATE.clone();
             public static final IAspectProperties PROPERTIES_ENTITYITEM_PLACE_NORATE = PROPERTIES_ENTITYITEM_PLACE_NORATE_NOCHECKS.clone();
             public static final IAspectProperties PROPERTIES_ENTITYITEM_PLACE_NOCHECKS = PROPERTIES_ENTITYITEM_PLACE_NORATE_NOCHECKS.clone();
+            public static final IAspectProperties PROPERTIES_ENTITYITEM_PLACE_NBT = PROPERTIES_ENTITYITEM_PLACE_NORATE_NOCHECKS.clone();
             public static final IAspectProperties PROPERTIES_ENTITYITEM_PLACE = PROPERTIES_ENTITYITEM_PLACE_NORATE_NOCHECKS.clone();
             public static final IAspectProperties PROPERTIES_ENTITYITEM_PICK_UP_NOCHECKS = new AspectProperties(ImmutableList.<IAspectPropertyTypeInstance>of(
                     PROP_CHANNEL,
@@ -954,6 +1041,11 @@ public class TunnelAspectWriteBuilders {
                     PROP_CHANNEL,
                     PROP_ROUNDROBIN,
                     PROP_IGNORE_PICK_UP_DELAY
+            ));
+            public static final IAspectProperties PROPERTIES_ENTITYITEM_PICK_UP_NBT = new AspectProperties(ImmutableList.<IAspectPropertyTypeInstance>of(
+                    PROP_CHANNEL,
+                    PROP_IGNORE_PICK_UP_DELAY,
+                    TunnelAspectWriteBuilders.Item.PROP_RATE
             ));
             static {
                 PROPERTIES_ENTITYITEM_PICK_UP.setValue(TunnelAspectWriteBuilders.Item.PROP_RATE, ValueTypeInteger.ValueInteger.of(64));
@@ -970,6 +1062,15 @@ public class TunnelAspectWriteBuilders {
                 PROPERTIES_ENTITYITEM_PICK_UP_NORATE_NOCHECKS.setValue(PROP_ROUNDROBIN, ValueTypeBoolean.ValueBoolean.of(false));
                 PROPERTIES_ENTITYITEM_PICK_UP_NORATE_NOCHECKS.setValue(PROP_IGNORE_PICK_UP_DELAY, ValueTypeBoolean.ValueBoolean.of(true));
 
+                PROPERTIES_ENTITYITEM_PICK_UP_NBT.setValue(PROP_CHANNEL, ValueTypeInteger.ValueInteger.of(IChanneledNetwork.DEFAULT_CHANNEL));
+                PROPERTIES_ENTITYITEM_PICK_UP_NBT.setValue(PROP_IGNORE_PICK_UP_DELAY, ValueTypeBoolean.ValueBoolean.of(true));
+                PROPERTIES_ENTITYITEM_PICK_UP_NBT.setValue(TunnelAspectWriteBuilders.Item.PROP_RATE, ValueTypeInteger.ValueInteger.of(64));
+                PROPERTIES_ENTITYITEM_PICK_UP_NBT.setValue(TunnelAspectWriteBuilders.Item.PROP_NBT_SUBSET, ValueTypeBoolean.ValueBoolean.of(true));
+                PROPERTIES_ENTITYITEM_PICK_UP_NBT.setValue(TunnelAspectWriteBuilders.Item.PROP_NBT_SUPERSET, ValueTypeBoolean.ValueBoolean.of(true));
+                PROPERTIES_ENTITYITEM_PICK_UP_NBT.setValue(TunnelAspectWriteBuilders.Item.PROP_NBT_REQUIRE, ValueTypeBoolean.ValueBoolean.of(true));
+                PROPERTIES_ENTITYITEM_PICK_UP_NBT.setValue(TunnelAspectWriteBuilders.Item.PROP_NBT_RECURSIVE, ValueTypeBoolean.ValueBoolean.of(true));
+
+                PROPERTIES_ENTITYITEM_PLACE.setValue(PROP_CHANNEL, ValueTypeInteger.ValueInteger.of(IChanneledNetwork.DEFAULT_CHANNEL));
                 PROPERTIES_ENTITYITEM_PLACE.setValue(TunnelAspectWriteBuilders.Item.PROP_RATE, ValueTypeInteger.ValueInteger.of(64));
                 PROPERTIES_ENTITYITEM_PLACE.setValue(TunnelAspectWriteBuilders.Item.PROP_CHECK_STACKSIZE, ValueTypeBoolean.ValueBoolean.of(false));
                 PROPERTIES_ENTITYITEM_PLACE.setValue(TunnelAspectWriteBuilders.Item.PROP_CHECK_DAMAGE, ValueTypeBoolean.ValueBoolean.of(true));
@@ -980,6 +1081,12 @@ public class TunnelAspectWriteBuilders {
                 PROPERTIES_ENTITYITEM_PLACE_NORATE.setValue(TunnelAspectWriteBuilders.Item.PROP_CHECK_NBT, ValueTypeBoolean.ValueBoolean.of(true));
 
                 PROPERTIES_ENTITYITEM_PLACE_NOCHECKS.setValue(TunnelAspectWriteBuilders.Item.PROP_RATE, ValueTypeInteger.ValueInteger.of(64));
+
+                PROPERTIES_ENTITYITEM_PLACE_NBT.setValue(TunnelAspectWriteBuilders.Item.PROP_RATE, ValueTypeInteger.ValueInteger.of(64));
+                PROPERTIES_ENTITYITEM_PLACE_NBT.setValue(TunnelAspectWriteBuilders.Item.PROP_NBT_SUBSET, ValueTypeBoolean.ValueBoolean.of(true));
+                PROPERTIES_ENTITYITEM_PLACE_NBT.setValue(TunnelAspectWriteBuilders.Item.PROP_NBT_SUPERSET, ValueTypeBoolean.ValueBoolean.of(true));
+                PROPERTIES_ENTITYITEM_PLACE_NBT.setValue(TunnelAspectWriteBuilders.Item.PROP_NBT_REQUIRE, ValueTypeBoolean.ValueBoolean.of(true));
+                PROPERTIES_ENTITYITEM_PLACE_NBT.setValue(TunnelAspectWriteBuilders.Item.PROP_NBT_RECURSIVE, ValueTypeBoolean.ValueBoolean.of(true));
             }
             public static final IAspectProperties PROPERTIES_ENTITYITEM_PICK_UPLIST = PROPERTIES_ENTITYITEM_PICK_UP.clone();
             public static final IAspectProperties PROPERTIES_ENTITYITEM_PLACELIST = PROPERTIES_ENTITYITEM_PLACE.clone();
@@ -991,12 +1098,15 @@ public class TunnelAspectWriteBuilders {
             public static final IAspectProperties PROPERTIES_RATESLOT = TunnelAspectWriteBuilders.Item.PROPERTIES_RATESLOT.clone();
             public static final IAspectProperties PROPERTIES_SLOT = TunnelAspectWriteBuilders.Item.PROPERTIES_SLOT.clone();
             public static final IAspectProperties PROPERTIES_RATESLOTCHECKS = TunnelAspectWriteBuilders.Item.PROPERTIES_RATESLOTCHECKS.clone();
+            public static final IAspectProperties PROPERTIES_NBT = TunnelAspectWriteBuilders.Item.PROPERTIES_NBT.clone();
             static {
                 PROPERTIES_RATESLOT.setValue(World.PROPERTY_ENTITYINDEX, ValueTypeInteger.ValueInteger.of(0));
 
                 PROPERTIES_SLOT.setValue(World.PROPERTY_ENTITYINDEX, ValueTypeInteger.ValueInteger.of(0));
 
                 PROPERTIES_RATESLOTCHECKS.setValue(World.PROPERTY_ENTITYINDEX, ValueTypeInteger.ValueInteger.of(0));
+
+                PROPERTIES_NBT.setValue(World.PROPERTY_ENTITYINDEX, ValueTypeInteger.ValueInteger.of(0));
             }
             public static final IAspectProperties PROPERTIES_RATESLOTCHECKSLIST = PROPERTIES_RATESLOTCHECKS.clone();
             static {
@@ -1054,9 +1164,8 @@ public class TunnelAspectWriteBuilders {
                                 dispense, network.getCapability(ItemNetworkConfig.CAPABILITY).getChannel(channel)
                         );
                     }
-                    int slot = properties.getValue(TunnelAspectWriteBuilders.Item.PROP_SLOT).getRawValue();
                     PartStateRoundRobin<?> partState = (PartStateRoundRobin<?>) PartHelpers.getPart(center).getState();
-                    return new TunnelAspectWriteBuilders.Item.ItemTarget(network, itemHandler, null, null, target.hashCode(), slot, amount,
+                    return new TunnelAspectWriteBuilders.Item.ItemTarget(network, itemHandler, null, null, target.hashCode(), -1, amount,
                             itemStackMatcher, transferHash, partTarget, properties, partState);
                 };
             }
@@ -1084,9 +1193,8 @@ public class TunnelAspectWriteBuilders {
                 if (entity != null && entity.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, target.getSide())) {
                     itemHandler = entity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, target.getSide());
                 }
-                int slot = properties.getValue(TunnelAspectWriteBuilders.Item.PROP_SLOT).getRawValue();
                 PartStateRoundRobin<?> partState = (PartStateRoundRobin<?>) PartHelpers.getPart(center).getState();
-                return new TunnelAspectWriteBuilders.Item.ItemTarget(network, itemHandler, null, null, target.hashCode(), slot, amount,
+                return new TunnelAspectWriteBuilders.Item.ItemTarget(network, itemHandler, null, null, target.hashCode(), -1, amount,
                         itemStackMatcher, transferHash, partTarget, properties, partState);
             };
 
@@ -1126,6 +1234,22 @@ public class TunnelAspectWriteBuilders {
                     PROP_BLACKLIST,
                     TunnelAspectWriteBuilders.Fluid.PROP_CHECK_NBT
             ));
+            public static final IAspectProperties PROPERTIES_NBT_UPDATE = new AspectProperties(ImmutableList.<IAspectPropertyTypeInstance>of(
+                    PROP_CHANNEL,
+                    PROP_BLOCK_UPDATE,
+                    PROP_IGNORE_REPLACABLE,
+                    TunnelAspectWriteBuilders.Fluid.PROP_NBT_SUBSET,
+                    TunnelAspectWriteBuilders.Fluid.PROP_NBT_SUPERSET,
+                    TunnelAspectWriteBuilders.Fluid.PROP_NBT_REQUIRE,
+                    TunnelAspectWriteBuilders.Fluid.PROP_NBT_RECURSIVE
+            ));
+            public static final IAspectProperties PROPERTIES_NBT = new AspectProperties(ImmutableList.<IAspectPropertyTypeInstance>of(
+                    PROP_CHANNEL,
+                    TunnelAspectWriteBuilders.Fluid.PROP_NBT_SUBSET,
+                    TunnelAspectWriteBuilders.Fluid.PROP_NBT_SUPERSET,
+                    TunnelAspectWriteBuilders.Fluid.PROP_NBT_REQUIRE,
+                    TunnelAspectWriteBuilders.Fluid.PROP_NBT_RECURSIVE
+            ));
             public static final IAspectProperties PROPERTIES_RATE = TunnelAspectWriteBuilders.Fluid.PROPERTIES_RATE.clone();
             public static final IAspectProperties PROPERTIES_RATECHECKS = TunnelAspectWriteBuilders.Fluid.PROPERTIES_RATECHECKS.clone();
             public static final IAspectProperties PROPERTIES_RATECHECKSLIST = TunnelAspectWriteBuilders.Fluid.PROPERTIES_RATECHECKSLIST.clone();
@@ -1163,6 +1287,20 @@ public class TunnelAspectWriteBuilders {
                 PROPERTIES_RATECHECKS.setValue(World.PROPERTY_ENTITYINDEX, ValueTypeInteger.ValueInteger.of(0));
 
                 PROPERTIES_RATECHECKSLIST.setValue(World.PROPERTY_ENTITYINDEX, ValueTypeInteger.ValueInteger.of(0));
+
+                PROPERTIES_NBT_UPDATE.setValue(PROP_CHANNEL, ValueTypeInteger.ValueInteger.of(IChanneledNetwork.DEFAULT_CHANNEL));
+                PROPERTIES_NBT_UPDATE.setValue(PROP_BLOCK_UPDATE, ValueTypeBoolean.ValueBoolean.of(false));
+                PROPERTIES_NBT_UPDATE.setValue(PROP_IGNORE_REPLACABLE, ValueTypeBoolean.ValueBoolean.of(false));
+                PROPERTIES_NBT_UPDATE.setValue(TunnelAspectWriteBuilders.Fluid.PROP_NBT_SUBSET, ValueTypeBoolean.ValueBoolean.of(true));
+                PROPERTIES_NBT_UPDATE.setValue(TunnelAspectWriteBuilders.Fluid.PROP_NBT_SUPERSET, ValueTypeBoolean.ValueBoolean.of(true));
+                PROPERTIES_NBT_UPDATE.setValue(TunnelAspectWriteBuilders.Fluid.PROP_NBT_REQUIRE, ValueTypeBoolean.ValueBoolean.of(true));
+                PROPERTIES_NBT_UPDATE.setValue(TunnelAspectWriteBuilders.Fluid.PROP_NBT_RECURSIVE, ValueTypeBoolean.ValueBoolean.of(true));
+
+                PROPERTIES_NBT.setValue(PROP_CHANNEL, ValueTypeInteger.ValueInteger.of(IChanneledNetwork.DEFAULT_CHANNEL));
+                PROPERTIES_NBT.setValue(TunnelAspectWriteBuilders.Fluid.PROP_NBT_SUBSET, ValueTypeBoolean.ValueBoolean.of(true));
+                PROPERTIES_NBT.setValue(TunnelAspectWriteBuilders.Fluid.PROP_NBT_SUPERSET, ValueTypeBoolean.ValueBoolean.of(true));
+                PROPERTIES_NBT.setValue(TunnelAspectWriteBuilders.Fluid.PROP_NBT_REQUIRE, ValueTypeBoolean.ValueBoolean.of(true));
+                PROPERTIES_NBT.setValue(TunnelAspectWriteBuilders.Fluid.PROP_NBT_RECURSIVE, ValueTypeBoolean.ValueBoolean.of(true));
             }
 
             public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, Boolean>, TunnelAspectWriteBuilders.Fluid.FluidTarget>
@@ -1205,6 +1343,17 @@ public class TunnelAspectWriteBuilders {
                     throw new EvaluationException(new L10NHelpers.UnlocalizedString(L10NValues.ASPECT_ERROR_INVALIDTYPE,
                             expected, current).localize());
                 }
+            };
+            public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, NBTTagCompound>, TunnelAspectWriteBuilders.Fluid.FluidTarget>
+                    PROP_NBT_FLUIDTARGET = input -> {
+                IAspectProperties properties = input.getMiddle();
+                NBTTagCompound tag = input.getRight();
+                boolean subset = properties.getValue(TunnelAspectWriteBuilders.Fluid.PROP_NBT_SUBSET).getRawValue();
+                boolean superset = properties.getValue(TunnelAspectWriteBuilders.Fluid.PROP_NBT_SUPERSET).getRawValue();
+                boolean requireNbt = properties.getValue(TunnelAspectWriteBuilders.Fluid.PROP_NBT_REQUIRE).getRawValue();
+                boolean recursive = properties.getValue(TunnelAspectWriteBuilders.Fluid.PROP_NBT_RECURSIVE).getRawValue();
+                Predicate<FluidStack> fluidStackMatcher = TunnelFluidHelpers.matchNbt(tag, subset, superset, requireNbt, recursive);
+                return TunnelAspectWriteBuilders.Fluid.FluidTarget.of(input.getLeft(), input.getMiddle(), net.minecraftforge.fluids.Fluid.BUCKET_VOLUME, fluidStackMatcher);
             };
 
             public static final IAspectValuePropagator<TunnelAspectWriteBuilders.Fluid.FluidTarget, Void>
@@ -1278,6 +1427,16 @@ public class TunnelAspectWriteBuilders {
                     PROP_HAND_RIGHT,
                     PROP_IGNORE_REPLACABLE
             ));
+            public static final IAspectProperties PROPERTIES_ITEM_PLACE_NBT = new AspectProperties(ImmutableList.<IAspectPropertyTypeInstance>of(
+                    PROP_CHANNEL,
+                    PROP_BLOCK_UPDATE,
+                    PROP_HAND_RIGHT,
+                    PROP_IGNORE_REPLACABLE,
+                    TunnelAspectWriteBuilders.Item.PROP_NBT_SUBSET,
+                    TunnelAspectWriteBuilders.Item.PROP_NBT_SUPERSET,
+                    TunnelAspectWriteBuilders.Item.PROP_NBT_REQUIRE,
+                    TunnelAspectWriteBuilders.Item.PROP_NBT_RECURSIVE
+            ));
             public static final IAspectProperties PROPERTIES_ITEM_PICK_UP_NOCHECKS = new AspectProperties(ImmutableList.<IAspectPropertyTypeInstance>of(
                     PROP_CHANNEL,
                     PROP_ROUNDROBIN,
@@ -1297,6 +1456,18 @@ public class TunnelAspectWriteBuilders {
                     PROP_SILK_TOUCH,
                     PROP_IGNORE_REPLACABLE,
                     PROP_BREAK_ON_NO_DROPS
+            ));
+            public static final IAspectProperties PROPERTIES_ITEM_PICK_UP_NBT = new AspectProperties(ImmutableList.<IAspectPropertyTypeInstance>of(
+                    PROP_CHANNEL,
+                    PROP_BLOCK_UPDATE,
+                    PROP_HAND_RIGHT,
+                    PROP_SILK_TOUCH,
+                    PROP_IGNORE_REPLACABLE,
+                    PROP_BREAK_ON_NO_DROPS,
+                    TunnelAspectWriteBuilders.Item.PROP_NBT_SUBSET,
+                    TunnelAspectWriteBuilders.Item.PROP_NBT_SUPERSET,
+                    TunnelAspectWriteBuilders.Item.PROP_NBT_REQUIRE,
+                    TunnelAspectWriteBuilders.Item.PROP_NBT_RECURSIVE
             ));
             public static final IAspectProperties PROPERTIES_BLOCK_PLACE = new AspectProperties(ImmutableList.<IAspectPropertyTypeInstance>of(
                     PROP_CHANNEL,
@@ -1330,6 +1501,15 @@ public class TunnelAspectWriteBuilders {
                 PROPERTIES_ITEM_PLACE.setValue(PROP_HAND_RIGHT, ValueTypeBoolean.ValueBoolean.of(true));
                 PROPERTIES_ITEM_PLACE.setValue(PROP_IGNORE_REPLACABLE, ValueTypeBoolean.ValueBoolean.of(false));
 
+                PROPERTIES_ITEM_PLACE_NBT.setValue(PROP_CHANNEL, ValueTypeInteger.ValueInteger.of(IChanneledNetwork.DEFAULT_CHANNEL));
+                PROPERTIES_ITEM_PLACE_NBT.setValue(PROP_BLOCK_UPDATE, ValueTypeBoolean.ValueBoolean.of(false));
+                PROPERTIES_ITEM_PLACE_NBT.setValue(PROP_HAND_RIGHT, ValueTypeBoolean.ValueBoolean.of(true));
+                PROPERTIES_ITEM_PLACE_NBT.setValue(PROP_IGNORE_REPLACABLE, ValueTypeBoolean.ValueBoolean.of(false));
+                PROPERTIES_ITEM_PLACE_NBT.setValue(TunnelAspectWriteBuilders.Item.PROP_NBT_SUBSET, ValueTypeBoolean.ValueBoolean.of(true));
+                PROPERTIES_ITEM_PLACE_NBT.setValue(TunnelAspectWriteBuilders.Item.PROP_NBT_SUPERSET, ValueTypeBoolean.ValueBoolean.of(true));
+                PROPERTIES_ITEM_PLACE_NBT.setValue(TunnelAspectWriteBuilders.Item.PROP_NBT_REQUIRE, ValueTypeBoolean.ValueBoolean.of(true));
+                PROPERTIES_ITEM_PLACE_NBT.setValue(TunnelAspectWriteBuilders.Item.PROP_NBT_RECURSIVE, ValueTypeBoolean.ValueBoolean.of(true));
+
                 PROPERTIES_ITEM_PICK_UP_NOCHECKS.setValue(PROP_CHANNEL, ValueTypeInteger.ValueInteger.of(IChanneledNetwork.DEFAULT_CHANNEL));
                 PROPERTIES_ITEM_PICK_UP_NOCHECKS.setValue(PROP_ROUNDROBIN, ValueTypeBoolean.ValueBoolean.of(false));
                 PROPERTIES_ITEM_PICK_UP_NOCHECKS.setValue(PROP_BLOCK_UPDATE, ValueTypeBoolean.ValueBoolean.of(false));
@@ -1347,6 +1527,17 @@ public class TunnelAspectWriteBuilders {
                 PROPERTIES_ITEM_PICK_UP.setValue(PROP_SILK_TOUCH, ValueTypeBoolean.ValueBoolean.of(false));
                 PROPERTIES_ITEM_PICK_UP.setValue(PROP_IGNORE_REPLACABLE, ValueTypeBoolean.ValueBoolean.of(false));
                 PROPERTIES_ITEM_PICK_UP.setValue(PROP_BREAK_ON_NO_DROPS, ValueTypeBoolean.ValueBoolean.of(true));
+
+                PROPERTIES_ITEM_PICK_UP_NBT.setValue(PROP_CHANNEL, ValueTypeInteger.ValueInteger.of(IChanneledNetwork.DEFAULT_CHANNEL));
+                PROPERTIES_ITEM_PICK_UP_NBT.setValue(PROP_BLOCK_UPDATE, ValueTypeBoolean.ValueBoolean.of(false));
+                PROPERTIES_ITEM_PICK_UP_NBT.setValue(PROP_HAND_RIGHT, ValueTypeBoolean.ValueBoolean.of(true));
+                PROPERTIES_ITEM_PICK_UP_NBT.setValue(PROP_SILK_TOUCH, ValueTypeBoolean.ValueBoolean.of(false));
+                PROPERTIES_ITEM_PICK_UP_NBT.setValue(PROP_IGNORE_REPLACABLE, ValueTypeBoolean.ValueBoolean.of(false));
+                PROPERTIES_ITEM_PICK_UP_NBT.setValue(PROP_BREAK_ON_NO_DROPS, ValueTypeBoolean.ValueBoolean.of(true));
+                PROPERTIES_ITEM_PICK_UP_NBT.setValue(TunnelAspectWriteBuilders.Item.PROP_NBT_SUBSET, ValueTypeBoolean.ValueBoolean.of(true));
+                PROPERTIES_ITEM_PICK_UP_NBT.setValue(TunnelAspectWriteBuilders.Item.PROP_NBT_SUPERSET, ValueTypeBoolean.ValueBoolean.of(true));
+                PROPERTIES_ITEM_PICK_UP_NBT.setValue(TunnelAspectWriteBuilders.Item.PROP_NBT_REQUIRE, ValueTypeBoolean.ValueBoolean.of(true));
+                PROPERTIES_ITEM_PICK_UP_NBT.setValue(TunnelAspectWriteBuilders.Item.PROP_NBT_RECURSIVE, ValueTypeBoolean.ValueBoolean.of(true));
                 
                 PROPERTIES_BLOCK_PLACE.setValue(PROP_CHANNEL, ValueTypeInteger.ValueInteger.of(IChanneledNetwork.DEFAULT_CHANNEL));
                 PROPERTIES_BLOCK_PLACE.setValue(PROP_ROUNDROBIN, ValueTypeBoolean.ValueBoolean.of(false));
@@ -1440,6 +1631,9 @@ public class TunnelAspectWriteBuilders {
         public static final AspectBuilder<ValueTypeOperator.ValueOperator, ValueTypeOperator, Triple<PartTarget, IAspectProperties, ValueTypeOperator.ValueOperator>>
                 BUILDER_OPERATOR = AspectWriteBuilders.BUILDER_OPERATOR.byMod(IntegratedTunnels._instance)
                 .appendKind("player").withProperties(PROPERTIES_CHANNEL);
+        public static final AspectBuilder<ValueTypeNbt.ValueNbt, ValueTypeNbt, Triple<PartTarget, IAspectProperties, NBTTagCompound>>
+                BUILDER_NBT = AspectWriteBuilders.BUILDER_NBT.byMod(IntegratedTunnels._instance)
+                .appendKind("player").handle(AspectWriteBuilders.PROP_GET_NBT).withProperties(PROPERTIES_CHANNEL);
 
         public static final IAspectPropertyTypeInstance<ValueTypeBoolean, ValueTypeBoolean.ValueBoolean> PROP_RIGHT_CLICK =
                 new AspectPropertyTypeInstance<>(ValueTypes.BOOLEAN, "aspect.aspecttypes.integratedtunnels.boolean.player.rightclick.name");
@@ -1552,8 +1746,14 @@ public class TunnelAspectWriteBuilders {
             PROPERTIES_CLICK.setValue(World.PROP_OFFSET_Z, ValueTypeDouble.ValueDouble.of(0.5D));
         }
         public static final IAspectProperties PROPERTIES_CLICKLIST = PROPERTIES_CLICK.clone();
+        public static final IAspectProperties PROPERTIES_CLICK_NBT = PROPERTIES_CLICK_SIMPLE.clone();
         static {
             PROPERTIES_CLICKLIST.setValue(PROP_BLACKLIST, ValueTypeBoolean.ValueBoolean.of(false));
+
+            PROPERTIES_CLICK_NBT.setValue(TunnelAspectWriteBuilders.Item.PROP_NBT_SUBSET, ValueTypeBoolean.ValueBoolean.of(true));
+            PROPERTIES_CLICK_NBT.setValue(TunnelAspectWriteBuilders.Item.PROP_NBT_SUPERSET, ValueTypeBoolean.ValueBoolean.of(true));
+            PROPERTIES_CLICK_NBT.setValue(TunnelAspectWriteBuilders.Item.PROP_NBT_REQUIRE, ValueTypeBoolean.ValueBoolean.of(true));
+            PROPERTIES_CLICK_NBT.setValue(TunnelAspectWriteBuilders.Item.PROP_NBT_RECURSIVE, ValueTypeBoolean.ValueBoolean.of(true));
         }
 
         public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, Boolean>, Void>
