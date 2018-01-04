@@ -6,6 +6,7 @@ import net.minecraft.block.BlockLiquid;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvent;
@@ -30,6 +31,7 @@ import org.cyclops.integrateddynamics.api.part.write.IPartStateWriter;
 import org.cyclops.integrateddynamics.core.evaluate.variable.ValueHelpers;
 import org.cyclops.integrateddynamics.core.evaluate.variable.ValueObjectTypeFluidStack;
 import org.cyclops.integrateddynamics.core.evaluate.variable.ValueTypeBoolean;
+import org.cyclops.integrateddynamics.core.helper.NbtHelpers;
 import org.cyclops.integrateddynamics.core.helper.PartHelpers;
 import org.cyclops.integratedtunnels.GeneralConfig;
 
@@ -135,6 +137,17 @@ public class TunnelFluidHelpers {
                 }
                 return false;
             }
+        };
+    }
+
+    public static Predicate<FluidStack> matchNbt(final NBTTagCompound tag, final boolean subset, final boolean superset, final boolean requireNbt, final boolean recursive) {
+        return input -> {
+            if (input.tag == null && requireNbt) {
+                return false;
+            }
+            NBTTagCompound itemTag = input.tag != null ? input.tag : new NBTTagCompound();
+            return (!subset || NbtHelpers.nbtMatchesSubset(tag, itemTag, recursive))
+                    && (!superset || NbtHelpers.nbtMatchesSubset(itemTag, tag, recursive));
         };
     }
 

@@ -20,12 +20,14 @@ public class PartTypeExporterWorldItem extends PartTypeTunnelAspectsWorld<PartTy
                 TunnelAspects.Write.World.ENTITYITEM_ITEMSTACK_EXPORT,
                 TunnelAspects.Write.World.ENTITYITEM_LISTITEMSTACK_EXPORT,
                 TunnelAspects.Write.World.ENTITYITEM_PREDICATEITEMSTACK_EXPORT,
+                TunnelAspects.Write.World.ENTITYITEM_NBT_EXPORT,
 
                 TunnelAspects.Write.World.ENTITY_ITEM_BOOLEAN_EXPORT,
                 TunnelAspects.Write.World.ENTITY_ITEM_INTEGER_EXPORT,
                 TunnelAspects.Write.World.ENTITY_ITEM_ITEMSTACK_EXPORT,
                 TunnelAspects.Write.World.ENTITY_ITEM_LISTITEMSTACK_EXPORT,
-                TunnelAspects.Write.World.ENTITY_ITEM_PREDICATEITEMSTACK_EXPORT
+                TunnelAspects.Write.World.ENTITY_ITEM_PREDICATEITEMSTACK_EXPORT,
+                TunnelAspects.Write.World.ENTITY_ITEM_NBT_EXPORT
         ));
     }
 

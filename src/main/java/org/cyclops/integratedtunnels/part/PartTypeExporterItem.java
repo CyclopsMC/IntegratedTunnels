@@ -20,7 +20,8 @@ public class PartTypeExporterItem extends PartTypeTunnelAspects<PartTypeExporter
                 TunnelAspects.Write.Item.INTEGER_SLOT_EXPORT,
                 TunnelAspects.Write.Item.ITEMSTACK_EXPORT,
                 TunnelAspects.Write.Item.LIST_EXPORT,
-                TunnelAspects.Write.Item.PREDICATE_EXPORT
+                TunnelAspects.Write.Item.PREDICATE_EXPORT,
+                TunnelAspects.Write.Item.NBT_EXPORT
         ));
     }
 

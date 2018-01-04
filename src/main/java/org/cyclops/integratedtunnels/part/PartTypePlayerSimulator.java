@@ -23,7 +23,8 @@ public class PartTypePlayerSimulator extends PartTypeTunnelAspectsWorld<PartType
                 TunnelAspects.Write.Player.CLICK_ITEM_INTEGER,
                 TunnelAspects.Write.Player.CLICK_ITEM_ITEMSTACK,
                 TunnelAspects.Write.Player.CLICK_ITEM_LISTITEMSTACK,
-                TunnelAspects.Write.Player.CLICK_ITEM_PREDICATEITEMSTACK
+                TunnelAspects.Write.Player.CLICK_ITEM_PREDICATEITEMSTACK,
+                TunnelAspects.Write.Player.CLICK_ITEM_NBT
         ));
     }
 

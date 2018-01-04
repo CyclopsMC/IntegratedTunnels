@@ -7,6 +7,7 @@ import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
@@ -33,6 +34,7 @@ import org.cyclops.integrateddynamics.core.evaluate.variable.ValueObjectTypeItem
 import org.cyclops.integrateddynamics.core.evaluate.variable.ValueTypeBoolean;
 import org.cyclops.integrateddynamics.core.evaluate.variable.ValueTypes;
 import org.cyclops.integrateddynamics.core.helper.L10NValues;
+import org.cyclops.integrateddynamics.core.helper.NbtHelpers;
 import org.cyclops.integrateddynamics.core.helper.PartHelpers;
 import org.cyclops.integratedtunnels.GeneralConfig;
 import org.cyclops.integratedtunnels.IntegratedTunnels;
@@ -374,6 +376,20 @@ public class TunnelItemHelpers {
                     }
                     return false;
                 }
+            }
+        };
+    }
+
+    public static ItemStackPredicate matchNbt(final NBTTagCompound tag, final boolean subset, final boolean superset, final boolean requireNbt, final boolean recursive) {
+        return new ItemStackPredicate() {
+            @Override
+            public boolean test(@Nullable ItemStack input) {
+                if (!input.hasTagCompound() && requireNbt) {
+                    return false;
+                }
+                NBTTagCompound itemTag = input.hasTagCompound() ? input.getTagCompound() : new NBTTagCompound();
+                return (!subset || NbtHelpers.nbtMatchesSubset(tag, itemTag, recursive))
+                        && (!superset || NbtHelpers.nbtMatchesSubset(itemTag, tag, recursive));
             }
         };
     }
