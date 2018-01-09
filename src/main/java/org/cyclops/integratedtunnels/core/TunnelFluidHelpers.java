@@ -104,8 +104,15 @@ public class TunnelFluidHelpers {
         return null;
     }
 
-    public static Predicate<FluidStack> matchFluidStack(final FluidStack fluidStack, final boolean checkAmount, final boolean checkNbt) {
-        return input -> areFluidStackEqual(input, fluidStack, true, checkAmount, checkNbt);
+    public static Predicate<FluidStack> matchFluidStack(final FluidStack fluidStack, final boolean checkAmount,
+                                                        final boolean checkNbt, final boolean blacklist) {
+        return input -> {
+            boolean result = areFluidStackEqual(input, fluidStack, true, checkAmount, checkNbt);
+            if (blacklist) {
+                result = !result;
+            }
+            return result;
+        };
     }
 
     public static Predicate<FluidStack> matchFluidStacks(final IValueTypeListProxy<ValueObjectTypeFluidStack, ValueObjectTypeFluidStack.ValueFluidStack> fluidStacks,

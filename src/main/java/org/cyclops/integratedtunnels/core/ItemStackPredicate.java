@@ -13,14 +13,16 @@ public abstract class ItemStackPredicate implements Predicate<ItemStack> {
 
     private final ItemStack itemStack;
     private final int matchFlags;
+    private final boolean blacklist;
 
-    public ItemStackPredicate(@Nonnull ItemStack itemStack, int matchFlags) {
+    public ItemStackPredicate(@Nonnull ItemStack itemStack, int matchFlags, boolean blacklist) {
         this.itemStack = itemStack;
         this.matchFlags = matchFlags;
+        this.blacklist = blacklist;
     }
 
-    public ItemStackPredicate() {
-        this(ItemStack.EMPTY, -1);
+    public ItemStackPredicate(boolean blacklist) {
+        this(ItemStack.EMPTY, -1, blacklist);
     }
 
     @Nonnull
@@ -34,5 +36,9 @@ public abstract class ItemStackPredicate implements Predicate<ItemStack> {
 
     public boolean hasMatchFlags() {
         return getMatchFlags() >= 0;
+    }
+
+    public boolean isBlacklist() {
+        return blacklist;
     }
 }

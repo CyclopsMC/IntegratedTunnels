@@ -49,19 +49,19 @@ import java.util.concurrent.TimeUnit;
  */
 public class TunnelItemHelpers {
 
-    public static final ItemStackPredicate MATCH_ALL = new ItemStackPredicate(ItemStack.EMPTY, ItemMatch.ANY) {
+    public static final ItemStackPredicate MATCH_ALL = new ItemStackPredicate(ItemStack.EMPTY, ItemMatch.ANY, false) {
         @Override
         public boolean test(@Nullable ItemStack input) {
             return true;
         }
     };
-    public static final ItemStackPredicate MATCH_NONE = new ItemStackPredicate(ItemStack.EMPTY, ItemMatch.EXACT) {
+    public static final ItemStackPredicate MATCH_NONE = new ItemStackPredicate(ItemStack.EMPTY, ItemMatch.EXACT, false) {
         @Override
         public boolean test(@Nullable ItemStack input) {
             return false;
         }
     };
-    public static final ItemStackPredicate MATCH_BLOCK = new ItemStackPredicate() {
+    public static final ItemStackPredicate MATCH_BLOCK = new ItemStackPredicate(false) {
         @Override
         public boolean test(@Nullable ItemStack input) {
             return !input.isEmpty();
@@ -97,11 +97,13 @@ public class TunnelItemHelpers {
         boolean loopSourceSlots = sourceSlot < 0;
         boolean loopTargetSlots = targetSlot < 0;
 
-        if ((!loopSourceSlots || (sourceSlotless != null && itemStackMatcher.hasMatchFlags())) // Only use slotless source for match flags
+        if ((!loopSourceSlots || (sourceSlotless != null && itemStackMatcher.hasMatchFlags() && !itemStackMatcher.isBlacklist())) // Only use slotless source for match flags and NOT blacklist
                 && (!loopTargetSlots || targetSlotless != null)) {
             ItemStack extracted;
             boolean appliedMatcher = false;
-            if (loopSourceSlots && itemStackMatcher.hasMatchFlags()) { // In this case it is implied that sourceSlotless != null
+            // In this case it is implied that sourceSlotless != null
+            // Don't use matcher if we have a blacklist, as the flags don't support that (yet: https://github.com/CyclopsMC/CommonCapabilitiesAPI/issues/4)
+            if (loopSourceSlots && itemStackMatcher.hasMatchFlags() && !itemStackMatcher.isBlacklist()) {
                 if (itemStackMatcher.getItemStack().isEmpty()) {
                     extracted = sourceSlotless.extractItem(amount, simulate);
                     appliedMatcher = true;
@@ -290,22 +292,27 @@ public class TunnelItemHelpers {
     }
 
     public static ItemStackPredicate matchItemStack(final ItemStack itemStack, final boolean checkStackSize,
-                                                      final boolean checkDamage, final boolean checkNbt) {
+                                                    final boolean checkDamage, final boolean checkNbt,
+                                                    final boolean blacklist) {
         int matchFlags = ItemMatch.ANY;
         if (checkDamage)    matchFlags = matchFlags | ItemMatch.DAMAGE;
         if (checkNbt)       matchFlags = matchFlags | ItemMatch.NBT;
         if (checkStackSize) matchFlags = matchFlags | ItemMatch.STACKSIZE;
-        return new ItemStackPredicate(itemStack.copy(), matchFlags) {
+        return new ItemStackPredicate(itemStack.copy(), matchFlags, blacklist) {
             @Override
             public boolean test(@Nullable ItemStack input) {
-                return areItemStackEqual(input, itemStack, checkStackSize, true, checkDamage, checkNbt);
+                boolean result = areItemStackEqual(input, itemStack, checkStackSize, true, checkDamage, checkNbt);
+                if (blacklist) {
+                    result = !result;
+                }
+                return result;
             }
         };
     }
 
     public static ItemStackPredicate matchItemStacks(final IValueTypeListProxy<ValueObjectTypeItemStack, ValueObjectTypeItemStack.ValueItemStack> itemStacks,
                                                        final boolean checkStackSize, final boolean checkDamage, final boolean checkNbt, final boolean blacklist) {
-        return new ItemStackPredicate() {
+        return new ItemStackPredicate(blacklist) {
             @Override
             public boolean test(@Nullable ItemStack input) {
                 for (ValueObjectTypeItemStack.ValueItemStack itemStack : itemStacks) {
@@ -320,7 +327,7 @@ public class TunnelItemHelpers {
     }
 
     public static ItemStackPredicate matchPredicateItem(final PartTarget partTarget, final IOperator predicate) {
-        return new ItemStackPredicate() {
+        return new ItemStackPredicate(false) {
             @Override
             public boolean test(@Nullable ItemStack input) {
                 ValueObjectTypeItemStack.ValueItemStack valueItemStack = ValueObjectTypeItemStack.ValueItemStack.of(input);
@@ -343,7 +350,7 @@ public class TunnelItemHelpers {
 
     public static ItemStackPredicate matchBlocks(final IValueTypeListProxy<ValueObjectTypeBlock, ValueObjectTypeBlock.ValueBlock> blocks,
                                                      final boolean checkStackSize, final boolean checkDamage, final boolean checkNbt, final boolean blacklist) {
-        return new ItemStackPredicate() {
+        return new ItemStackPredicate(blacklist) {
             @Override
             public boolean test(@Nullable ItemStack input) {
                 for (ValueObjectTypeBlock.ValueBlock block : blocks) {
@@ -358,7 +365,7 @@ public class TunnelItemHelpers {
     }
 
     public static ItemStackPredicate matchPredicateBlock(final PartTarget partTarget, final IOperator predicate) {
-        return new ItemStackPredicate() {
+        return new ItemStackPredicate(false) {
             @Override
             public boolean test(@Nullable ItemStack input) {
                 ValueObjectTypeBlock.ValueBlock valueBlock = ValueObjectTypeBlock.ValueBlock.of(
