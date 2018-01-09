@@ -341,7 +341,7 @@ public class TunnelAspects {
                                 .appendKind("item").appendKind("block").appendKind("export").buildWrite();
                 public static final IAspectWrite<ValueObjectTypeBlock.ValueBlock, ValueObjectTypeBlock> BLOCK_BLOCK_EXPORT =
                         TunnelAspectWriteBuilders.World.BUILDER_BLOCK
-                                .withProperties(TunnelAspectWriteBuilders.World.Block.PROPERTIES_BLOCK_PLACE)
+                                .withProperties(TunnelAspectWriteBuilders.World.Block.PROPERTIES_BLOCK_PLACEBLOCK)
                                 .handle(TunnelAspectWriteBuilders.Item.PROP_BLOCK_ITEMPREDICATE)
                                 .handle(TunnelAspectWriteBuilders.Item.PROP_ITEMTARGET)
                                 .handle(TunnelAspectWriteBuilders.World.Block.PROP_ITEMBLOCK_EXPORT)
@@ -401,7 +401,7 @@ public class TunnelAspects {
                                 .appendKind("item").appendKind("block").appendKind("import").buildWrite();
                 public static final IAspectWrite<ValueObjectTypeBlock.ValueBlock, ValueObjectTypeBlock> BLOCK_BLOCK_IMPORT =
                         TunnelAspectWriteBuilders.World.BUILDER_BLOCK
-                                .withProperties(TunnelAspectWriteBuilders.World.Block.PROPERTIES_BLOCK_PICK_UP)
+                                .withProperties(TunnelAspectWriteBuilders.World.Block.PROPERTIES_BLOCK_PICK_UPBLOCK)
                                 .handle(TunnelAspectWriteBuilders.Item.PROP_BLOCK_ITEMPREDICATE)
                                 .handle(TunnelAspectWriteBuilders.Item.PROP_ITEMTARGET)
                                 .handle(TunnelAspectWriteBuilders.World.Block.PROP_ITEMBLOCK_IMPORT)
