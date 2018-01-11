@@ -24,11 +24,12 @@ public class TunnelEnergyHelpers {
      * @param source The source energy storage.
      * @param target The target energy storage.
      * @param amount The maximum amount to transfer.
+     * @param exact If only the exact amount is allowed to be transferred.
      * @return The moved energy amount.
      */
-    public static int moveEnergy(IEnergyStorage source, IEnergyStorage target, int amount) {
+    public static int moveEnergy(IEnergyStorage source, IEnergyStorage target, int amount, boolean exact) {
         int canSend = moveEnergySingle(source, target, amount, true);
-        return canSend > 0 ? moveEnergySingle(source, target, canSend, false) : 0;
+        return canSend > 0 && (!exact || canSend == amount) ? moveEnergySingle(source, target, canSend, false) : 0;
     }
 
 }

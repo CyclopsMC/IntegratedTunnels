@@ -19,26 +19,28 @@ public class TunnelAspects {
 
             public static final IAspectWrite<ValueTypeBoolean.ValueBoolean, ValueTypeBoolean> BOOLEAN_EXPORT =
                     TunnelAspectWriteBuilders.Energy.BUILDER_BOOLEAN
-                            .withProperties(TunnelAspectWriteBuilders.Energy.PROPERTIES)
+                            .withProperties(TunnelAspectWriteBuilders.Energy.PROPERTIES_RATE)
                             .handle(TunnelAspectWriteBuilders.Energy.PROP_GETRATE)
                             .handle(TunnelAspectWriteBuilders.Energy.PROP_ENERGYTARGET)
                             .handle(TunnelAspectWriteBuilders.Energy.PROP_EXPORT)
                             .appendKind("export").buildWrite();
             public static final IAspectWrite<ValueTypeInteger.ValueInteger, ValueTypeInteger> INTEGER_EXPORT =
                     TunnelAspectWriteBuilders.Energy.BUILDER_INTEGER
+                            .withProperties(TunnelAspectWriteBuilders.Energy.PROPERTIES)
                             .handle(TunnelAspectWriteBuilders.Energy.PROP_ENERGYTARGET)
                             .handle(TunnelAspectWriteBuilders.Energy.PROP_EXPORT)
                             .appendKind("export").buildWrite();
 
             public static final IAspectWrite<ValueTypeBoolean.ValueBoolean, ValueTypeBoolean> BOOLEAN_IMPORT =
                     TunnelAspectWriteBuilders.Energy.BUILDER_BOOLEAN
-                            .withProperties(TunnelAspectWriteBuilders.Energy.PROPERTIES)
+                            .withProperties(TunnelAspectWriteBuilders.Energy.PROPERTIES_RATE)
                             .handle(TunnelAspectWriteBuilders.Energy.PROP_GETRATE)
                             .handle(TunnelAspectWriteBuilders.Energy.PROP_ENERGYTARGET)
                             .handle(TunnelAspectWriteBuilders.Energy.PROP_IMPORT)
                             .appendKind("import").buildWrite();
             public static final IAspectWrite<ValueTypeInteger.ValueInteger, ValueTypeInteger> INTEGER_IMPORT =
                     TunnelAspectWriteBuilders.Energy.BUILDER_INTEGER
+                            .withProperties(TunnelAspectWriteBuilders.Energy.PROPERTIES)
                             .handle(TunnelAspectWriteBuilders.Energy.PROP_ENERGYTARGET)
                             .handle(TunnelAspectWriteBuilders.Energy.PROP_IMPORT)
                             .appendKind("import").buildWrite();
@@ -161,6 +163,7 @@ public class TunnelAspects {
                             .appendKind("export").buildWrite();
             public static final IAspectWrite<ValueTypeInteger.ValueInteger, ValueTypeInteger> INTEGER_EXPORT =
                     TunnelAspectWriteBuilders.Fluid.BUILDER_INTEGER
+                            .withProperties(TunnelAspectWriteBuilders.Fluid.PROPERTIES)
                             .handle(TunnelAspectWriteBuilders.Fluid.PROP_INTEGER_FLUIDPREDICATE)
                             .handle(TunnelAspectWriteBuilders.Fluid.PROP_FLUIDTARGET)
                             .handle(TunnelAspectWriteBuilders.Fluid.PROP_EXPORT)
@@ -204,6 +207,7 @@ public class TunnelAspects {
                             .appendKind("import").buildWrite();
             public static final IAspectWrite<ValueTypeInteger.ValueInteger, ValueTypeInteger> INTEGER_IMPORT =
                     TunnelAspectWriteBuilders.Fluid.BUILDER_INTEGER
+                            .withProperties(TunnelAspectWriteBuilders.Fluid.PROPERTIES)
                             .handle(TunnelAspectWriteBuilders.Fluid.PROP_INTEGER_FLUIDPREDICATE)
                             .handle(TunnelAspectWriteBuilders.Fluid.PROP_FLUIDTARGET)
                             .handle(TunnelAspectWriteBuilders.Fluid.PROP_IMPORT)

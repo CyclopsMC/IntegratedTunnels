@@ -248,13 +248,14 @@ public class TunnelItemHelpers {
      * @param targetSlotless The slotless target item handler.
      * @param amount The maximum item amount to transfer.
      * @param itemStackMatcher Only itemstack matching this predicate will be moved.
+     * @param exact If only the exact amount is allowed to be transferred.
      * @return The moved itemstack.
      */
     @Nonnull
     public static ItemStack moveItemsStateOptimized(int connectionHash,
                                                     IItemHandler sourceHandler, @Nullable IInventoryState sourceInvState, int sourceSlot, @Nullable ISlotlessItemHandler sourceSlotless,
                                                     IItemHandler targetHandler, @Nullable IInventoryState targetInvState, int targetSlot, @Nullable ISlotlessItemHandler targetSlotless,
-                                                    int amount, ItemStackPredicate itemStackMatcher) {
+                                                    int amount, ItemStackPredicate itemStackMatcher, boolean exact) {
         if (amount <= 0) {
             return ItemStack.EMPTY;
         }
@@ -277,7 +278,7 @@ public class TunnelItemHelpers {
             ItemStack simulatedTransfer = moveItemsSingle(sourceHandler, sourceSlot, sourceSlotless, targetHandler, targetSlot, targetSlotless, amount, itemStackMatcher, true);
 
             // If transfer failed, cache the current states and return
-            if (simulatedTransfer.isEmpty()) {
+            if (simulatedTransfer.isEmpty() || (exact && amount != simulatedTransfer.getCount())) {
                 if (!calculatedStates) {
                     currentState = calculateInventoryState(sourceHandler, sourceInvState) + calculateInventoryState(targetHandler, targetInvState);
                 }
@@ -431,6 +432,7 @@ public class TunnelItemHelpers {
      * @param hand The hand to place the block with.
      * @param blockUpdate If a block update should occur after placement.
      * @param ignoreReplacable If replacable blocks should be overriden when placing blocks.
+     * @param exact If only the exact amount is allowed to be transferred.
      * @return The placed item.
      */
     public static ItemStack placeItems(int connectionHash,
@@ -438,7 +440,7 @@ public class TunnelItemHelpers {
                                        @Nullable ISlotlessItemHandler sourceSlotless,
                                        World world, BlockPos pos, EnumFacing side,
                                        ItemStackPredicate itemStackMatcher, EnumHand hand,
-                                       boolean blockUpdate, boolean ignoreReplacable) {
+                                       boolean blockUpdate, boolean ignoreReplacable, boolean exact) {
         IBlockState destBlockState = world.getBlockState(pos);
         final Material destMaterial = destBlockState.getMaterial();
         final boolean isDestNonSolid = !destMaterial.isSolid();
@@ -451,7 +453,8 @@ public class TunnelItemHelpers {
         IItemHandler targetBlock = new ItemHandlerBlockWrapper(true, (WorldServer) world, pos, side,
                 hand, blockUpdate, 0, false, ignoreReplacable, true);
         return TunnelItemHelpers.moveItemsStateOptimized(connectionHash, sourceHandler, sourceInvState, -1,
-                sourceSlotless, targetBlock, null, 0, null, 1, itemStackMatcher);
+                sourceSlotless, targetBlock, null, 0, null, 1,
+                itemStackMatcher, exact);
     }
 
     /**
@@ -470,6 +473,7 @@ public class TunnelItemHelpers {
      * @param fortune The fortune level.
      * @param silkTouch If the block should be broken with silk touch.
      * @param breakOnNoDrops If the block should be broken if it produced no drops.
+     * @param exact If only the exact amount is allowed to be transferred.
      * @return The picked-up items.
      */
     public static List<ItemStack> pickUpItems(int connectionHash, World world, BlockPos pos, EnumFacing side,
@@ -477,7 +481,7 @@ public class TunnelItemHelpers {
                                               @Nullable ISlotlessItemHandler targetSlotless,
                                               ItemStackPredicate itemStackMatcher, EnumHand hand, boolean blockUpdate,
                                               boolean ignoreReplacable, int fortune, boolean silkTouch,
-                                              boolean breakOnNoDrops) {
+                                              boolean breakOnNoDrops, boolean exact) {
         IBlockState destBlockState = world.getBlockState(pos);
         final Material destMaterial = destBlockState.getMaterial();
         final boolean isDestReplaceable = destBlockState.getBlock().isReplaceable(world, pos);
@@ -491,7 +495,7 @@ public class TunnelItemHelpers {
         List<ItemStack> itemStacks = Lists.newArrayList();
         ItemStack itemStack;
         while (!(itemStack = TunnelItemHelpers.moveItemsStateOptimized(connectionHash, sourceBlock, null, -1, null,
-                targetHandler, targetInvState, -1, targetSlotless, Integer.MAX_VALUE, itemStackMatcher)).isEmpty()) {
+                targetHandler, targetInvState, -1, targetSlotless, Integer.MAX_VALUE, itemStackMatcher, exact)).isEmpty()) {
             itemStacks.add(itemStack);
         }
         return itemStacks;
