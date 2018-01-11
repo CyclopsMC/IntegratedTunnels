@@ -55,11 +55,12 @@ public class TunnelFluidHelpers {
      * @param maxAmount The maximum fluid amount to transfer.
      * @param doTransfer If transfer should actually happen, will simulate otherwise.
      * @param fluidStackMatcher The fluidstack match predicate.
+     * @param exact If only the exact amount is allowed to be transferred.
      * @return The moved fluidstack or null.
      */
     @Nullable
-    public static FluidStack moveFluids(IFluidHandler source, final IFluidHandler target, int maxAmount, boolean doTransfer, Predicate<FluidStack> fluidStackMatcher) {
-        return moveFluids(source, input -> target, maxAmount, doTransfer, fluidStackMatcher);
+    public static FluidStack moveFluids(IFluidHandler source, final IFluidHandler target, int maxAmount, boolean doTransfer, Predicate<FluidStack> fluidStackMatcher, boolean exact) {
+        return moveFluids(source, input -> target, maxAmount, doTransfer, fluidStackMatcher, exact);
     }
 
     /**
@@ -69,10 +70,11 @@ public class TunnelFluidHelpers {
      * @param maxAmount The maximum fluid amount to transfer.
      * @param doTransfer If transfer should actually happen, will simulate otherwise.
      * @param fluidStackMatcher The fluidstack match predicate.
+     * @param exact If only the exact amount is allowed to be transferred.
      * @return The moved fluidstack or null.
      */
     @Nullable
-    public static FluidStack moveFluids(IFluidHandler source, Function<FluidStack, IFluidHandler> targetGetter, int maxAmount, boolean doTransfer, Predicate<FluidStack> fluidStackMatcher) {
+    public static FluidStack moveFluids(IFluidHandler source, Function<FluidStack, IFluidHandler> targetGetter, int maxAmount, boolean doTransfer, Predicate<FluidStack> fluidStackMatcher, boolean exact) {
         List<FluidStack> checkFluids = Lists.newArrayList();
         for (IFluidTankProperties properties : source.getTankProperties()) {
             FluidStack contents = properties.getContents();
@@ -91,7 +93,7 @@ public class TunnelFluidHelpers {
                 IFluidHandler target = targetGetter.apply(drainable);
                 if (target != null) {
                     int fillableAmount = target.fill(drainable, false);
-                    if (fillableAmount > 0) {
+                    if (fillableAmount > 0 && (!exact || fillableAmount == maxAmount)) {
                         FluidStack drained = source.drain(new FluidStack(drainable, fillableAmount), doTransfer);
                         if (drained != null) {
                             drained.amount = target.fill(drained, doTransfer);
@@ -209,7 +211,7 @@ public class TunnelFluidHelpers {
             }
 
             return handler;
-        }, Fluid.BUCKET_VOLUME, true, fluidStackMatcher);
+        }, Fluid.BUCKET_VOLUME, true, fluidStackMatcher, true);
 
         if (moved != null) {
             if (GeneralConfig.worldInteractionEvents) {
@@ -241,7 +243,7 @@ public class TunnelFluidHelpers {
             IFluidHandler targetFluidHandler = FluidUtil.getFluidHandler(world, pos, side);
             if (targetFluidHandler != null) {
                 FluidStack pickedUp = TunnelFluidHelpers.moveFluids(targetFluidHandler, target, Fluid.BUCKET_VOLUME, true,
-                        fluidStackMatcher);
+                        fluidStackMatcher, true);
                 if (pickedUp != null && GeneralConfig.worldInteractionEvents) {
                     SoundEvent soundevent = pickedUp.getFluid().getFillSound(pickedUp);
                     world.playSound(null, pos, soundevent, SoundCategory.BLOCKS, 1.0F, 1.0F);
