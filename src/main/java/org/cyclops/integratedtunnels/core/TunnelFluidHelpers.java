@@ -124,7 +124,7 @@ public class TunnelFluidHelpers {
             ValueObjectTypeFluidStack.ValueFluidStack valueFluidStack = ValueObjectTypeFluidStack.ValueFluidStack.of(input);
             try {
                 IValue result = ValueHelpers.evaluateOperator(predicate, valueFluidStack);
-                TunnelItemHelpers.validatePredicateOutput(predicate, result);
+                ValueHelpers.validatePredicateOutput(predicate, result);
                 return ((ValueTypeBoolean.ValueBoolean) result).getRawValue();
             } catch (EvaluationException e) {
                 PartHelpers.PartStateHolder<?, ?> partData = PartHelpers.getPart(partTarget.getCenter());
