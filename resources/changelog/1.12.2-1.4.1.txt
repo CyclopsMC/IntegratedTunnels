@@ -1,0 +1,9 @@
+As always, don't forget to backup your world before updating!
+Requires CyclopsCore version 0.11.1 or higher.
+
+Changes:
+* Avoid some unnecessary network updates on block neighbour update events
+
+Fixes:
+* Validate predicate output type before casting to boolean in filters
+  Static type checking was already being done, but when currying was applied, this issue could sometimes occur, Closes #99
