@@ -1,0 +1,13 @@
+As always, don't forget to backup your world before updating!
+Requires CyclopsCore version 0.11.2 or higher.
+
+Additions:
+* Add option to iterate over interfaces in round-robin order
+* Add NBT-based item and fluid aspects
+  This allows items and fluids to be imported, exported, picked up, placed and used via advanced NBT filters
+  that allow NBT subsets and supersets to be checked.
+* Add options to only move exact amounts, instead of also lower amounts, Closes #100
+* Add blacklist property to item, fluid and block-based aspects, Closes #481
+
+Changes:
+* Changed incorrect left-hand aspect property to right-hand, #110
