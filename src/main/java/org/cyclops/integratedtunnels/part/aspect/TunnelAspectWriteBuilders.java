@@ -1968,6 +1968,8 @@ public class TunnelAspectWriteBuilders {
                     // Reset the network's iterator, to avoid influencing other parts.
                     getChanneledNetwork().setPositionIterator(null, getChannel());
                 }
+            } else {
+                getChanneledNetwork().setPositionIterator(null, getChannel());
             }
         }
     }
