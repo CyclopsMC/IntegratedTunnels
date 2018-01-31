@@ -1851,7 +1851,7 @@ public class TunnelAspectWriteBuilders {
             public <P extends IPartTypeWriter<P, S>, S extends IPartStateWriter<P>> void onActivate(P partType, PartTarget target, S state) {
                 state.addVolatileCapability(targetCapability, (T) state);
                 DimPos pos = target.getCenter().getPos();
-                INetwork network = NetworkHelpers.getNetwork(pos.getWorld(), pos.getBlockPos());
+                INetwork network = NetworkHelpers.getNetwork(pos.getWorld(), pos.getBlockPos(), target.getCenter().getSide());
                 if (network != null && network.hasCapability(networkCapability.get())) {
                     ((PartStatePositionedAddon<?, N>) state).setPositionedAddonsNetwork(network.getCapability(networkCapability.get()));
 
@@ -1872,7 +1872,7 @@ public class TunnelAspectWriteBuilders {
             public <P extends IPartTypeWriter<P, S>, S extends IPartStateWriter<P>> void onDeactivate(P partType, PartTarget target, S state) {
                 state.removeVolatileCapability(targetCapability);
                 DimPos pos = target.getCenter().getPos();
-                INetwork network = NetworkHelpers.getNetwork(pos.getWorld(), pos.getBlockPos());
+                INetwork network = NetworkHelpers.getNetwork(pos.getWorld(), pos.getBlockPos(), target.getCenter().getSide());
                 if (network != null && network.hasCapability(networkCapability.get())) {
                     ((PartStatePositionedAddon<?, N>) state).setPositionedAddonsNetwork(network.getCapability(networkCapability.get()));
 
@@ -1887,7 +1887,7 @@ public class TunnelAspectWriteBuilders {
     }
 
     public static INetwork getNetworkChecked(PartPos pos) throws PartStateException {
-        INetwork network = NetworkHelpers.getNetwork(pos.getPos().getWorld(), pos.getPos().getBlockPos());
+        INetwork network = NetworkHelpers.getNetwork(pos.getPos().getWorld(), pos.getPos().getBlockPos(), pos.getSide());
         if (network == null) {
             IntegratedDynamics.clog(Level.ERROR, "Could not get the energy network as no network was found.");
             throw new PartStateException(pos.getPos(), pos.getSide());
