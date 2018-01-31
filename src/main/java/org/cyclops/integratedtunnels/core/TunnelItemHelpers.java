@@ -387,16 +387,20 @@ public class TunnelItemHelpers {
         };
     }
 
-    public static ItemStackPredicate matchNbt(final NBTTagCompound tag, final boolean subset, final boolean superset, final boolean requireNbt, final boolean recursive) {
-        return new ItemStackPredicate() {
+    public static ItemStackPredicate matchNbt(final NBTTagCompound tag, final boolean subset, final boolean superset, final boolean requireNbt, final boolean recursive, final boolean blacklist) {
+        return new ItemStackPredicate(blacklist) {
             @Override
             public boolean test(@Nullable ItemStack input) {
                 if (!input.hasTagCompound() && requireNbt) {
-                    return false;
+                    return isBlacklist();
                 }
                 NBTTagCompound itemTag = input.hasTagCompound() ? input.getTagCompound() : new NBTTagCompound();
-                return (!subset || NbtHelpers.nbtMatchesSubset(tag, itemTag, recursive))
+                boolean ret = (!subset || NbtHelpers.nbtMatchesSubset(tag, itemTag, recursive))
                         && (!superset || NbtHelpers.nbtMatchesSubset(itemTag, tag, recursive));
+                if (blacklist) {
+                    ret = !ret;
+                }
+                return ret;
             }
         };
     }
