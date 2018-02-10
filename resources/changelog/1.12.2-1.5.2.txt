@@ -1,0 +1,5 @@
+As always, don't forget to backup your world before updating!
+Requires CyclopsCore version 0.11.4 or higher.
+
+Fixes:
+* Add missing interface settings texture, Closes #112
