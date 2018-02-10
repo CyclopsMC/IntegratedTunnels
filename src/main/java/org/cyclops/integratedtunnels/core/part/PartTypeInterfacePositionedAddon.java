@@ -2,20 +2,19 @@ package org.cyclops.integratedtunnels.core.part;
 
 import net.minecraft.block.Block;
 import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.inventory.Container;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.common.capabilities.Capability;
 
-import org.cyclops.cyclopscore.helper.L10NHelpers;
+import net.minecraftforge.common.util.Constants;
 import org.cyclops.cyclopscore.helper.TileHelpers;
 import org.cyclops.integrateddynamics.api.network.INetwork;
 import org.cyclops.integrateddynamics.api.network.IPartNetwork;
 import org.cyclops.integrateddynamics.api.network.IPositionedAddonsNetwork;
-import org.cyclops.integrateddynamics.api.part.IPartContainer;
 import org.cyclops.integrateddynamics.api.part.IPartType;
 import org.cyclops.integrateddynamics.api.part.PartPos;
 import org.cyclops.integrateddynamics.api.part.PartTarget;
-import org.cyclops.integrateddynamics.core.client.gui.container.GuiPartSettings;
 import org.cyclops.integrateddynamics.core.part.PartStateBase;
 
 import javax.annotation.Nullable;
@@ -29,20 +28,14 @@ public abstract class PartTypeInterfacePositionedAddon<N extends IPositionedAddo
         super(name);
     }
 
-    public static class GuiInterfaceSettings extends GuiPartSettings {
-        public GuiInterfaceSettings(EntityPlayer player, PartTarget target, IPartContainer partContainer, IPartType partType) {
-            super(player, target, partContainer, partType);
-        }
-
-        @Override
-        protected String getChannelText() {
-            return L10NHelpers.localize("gui.integratedtunnels.partsettings.channel");
-        }
-    }
-
     @Override
     public Class<? extends GuiScreen> getGui() {
         return GuiInterfaceSettings.class;
+    }
+
+    @Override
+    public Class<? extends Container> getContainer() {
+        return ContainerInterfaceSettings.class;
     }
 
     protected abstract Capability<N> getNetworkCapability();
@@ -54,7 +47,7 @@ public abstract class PartTypeInterfacePositionedAddon<N extends IPositionedAddo
     @Override
     public void afterNetworkReAlive(INetwork network, IPartNetwork partNetwork, PartTarget target, S state) {
         super.afterNetworkReAlive(network, partNetwork, target, state);
-        addTargetToNetwork(network, target.getTarget(), state.getPriority(), state.getChannel(), state);
+        addTargetToNetwork(network, target.getTarget(), state.getPriority(), state.getChannelInterface(), state);
     }
 
     @Override
@@ -66,14 +59,14 @@ public abstract class PartTypeInterfacePositionedAddon<N extends IPositionedAddo
     @Override
     public void onNetworkAddition(INetwork network, IPartNetwork partNetwork, PartTarget target, S state) {
         super.onNetworkAddition(network, partNetwork, target, state);
-        addTargetToNetwork(network, target.getTarget(), state.getPriority(), state.getChannel(), state);
+        addTargetToNetwork(network, target.getTarget(), state.getPriority(), state.getChannelInterface(), state);
     }
 
     @Override
     public void onBlockNeighborChange(@Nullable INetwork network, @Nullable IPartNetwork partNetwork, PartTarget target, S state, IBlockAccess world, Block neighborBlock) {
         super.onBlockNeighborChange(network, partNetwork, target, state, world, neighborBlock);
         if (network != null) {
-            updateTargetInNetwork(network, target.getTarget(), state.getPriority(), state.getChannel(), state);
+            updateTargetInNetwork(network, target.getTarget(), state.getPriority(), state.getChannelInterface(), state);
         }
     }
 
@@ -83,20 +76,20 @@ public abstract class PartTypeInterfacePositionedAddon<N extends IPositionedAddo
         // so we have to re-add it.
         removeTargetFromNetwork(network, target.getTarget(), state);
         super.setPriorityAndChannel(network, partNetwork, target, state, priority, channel);
-        addTargetToNetwork(network, target.getTarget(), priority, channel, state);
+        addTargetToNetwork(network, target.getTarget(), priority, state.getChannelInterface(), state);
     }
 
     protected T getTargetCapabilityInstance(PartPos pos) {
         return TileHelpers.getCapability(pos.getPos(), pos.getSide(), getTargetCapability());
     }
 
-    protected void addTargetToNetwork(INetwork network, PartPos pos, int priority, int channel, S state) {
+    protected void addTargetToNetwork(INetwork network, PartPos pos, int priority, int channelInterface, S state) {
         if (network.hasCapability(getNetworkCapability())) {
             T capability = getTargetCapabilityInstance(pos);
             boolean validTargetCapability = isTargetCapabilityValid(capability);
             if (validTargetCapability) {
                 N networkCapability = network.getCapability(getNetworkCapability());
-                networkCapability.addPosition(pos, priority, channel);
+                networkCapability.addPosition(pos, priority, channelInterface);
             }
             state.setPositionedAddonsNetwork(network.getCapability(getNetworkCapability()));
             state.setPos(pos);
@@ -114,7 +107,7 @@ public abstract class PartTypeInterfacePositionedAddon<N extends IPositionedAddo
         state.setValidTargetCapability(false);
     }
 
-    protected void updateTargetInNetwork(INetwork network, PartPos pos, int priority, int channel, S state) {
+    protected void updateTargetInNetwork(INetwork network, PartPos pos, int priority, int channelInterface, S state) {
         if (network.hasCapability(getNetworkCapability())) {
             T capability = getTargetCapabilityInstance(pos);
             boolean validTargetCapability = isTargetCapabilityValid(capability);
@@ -122,7 +115,7 @@ public abstract class PartTypeInterfacePositionedAddon<N extends IPositionedAddo
             // Only trigger a change if the capability presence has changed.
             if (validTargetCapability != wasValidTargetCapability) {
                 removeTargetFromNetwork(network, pos, state);
-                addTargetToNetwork(network, pos, priority, channel, state);
+                addTargetToNetwork(network, pos, priority, channelInterface, state);
             }
         }
     }
@@ -132,6 +125,33 @@ public abstract class PartTypeInterfacePositionedAddon<N extends IPositionedAddo
         private N positionedAddonsNetwork = null;
         private PartPos pos = null;
         private boolean validTargetCapability = false;
+        private int channelInterface = 0;
+
+        @Override
+        public void readFromNBT(NBTTagCompound tag) {
+            super.readFromNBT(tag);
+            // TODO: backwards compat for old channel saving, simplify in 1.13
+            if (tag.hasKey("channelInterface", Constants.NBT.TAG_INT)) {
+                this.channelInterface = tag.getInteger("channelInterface");
+            } else {
+                this.channelInterface = getChannel();
+            }
+        }
+
+        @Override
+        public void writeToNBT(NBTTagCompound tag) {
+            super.writeToNBT(tag);
+            tag.setInteger("channelInterface", channelInterface);
+        }
+
+        public void setChannelInterface(int channelInterface) {
+            this.channelInterface = channelInterface;
+            sendUpdate();
+        }
+
+        public int getChannelInterface() {
+            return channelInterface;
+        }
 
         protected abstract Capability<T> getTargetCapability();
 
@@ -189,4 +209,5 @@ public abstract class PartTypeInterfacePositionedAddon<N extends IPositionedAddo
             return super.getCapability(capability);
         }
     }
+
 }
