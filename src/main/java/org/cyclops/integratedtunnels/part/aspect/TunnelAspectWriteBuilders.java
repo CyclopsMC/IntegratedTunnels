@@ -1049,7 +1049,7 @@ public class TunnelAspectWriteBuilders {
                     energyStorage = entity.getCapability(CapabilityEnergy.ENERGY, target.getSide());
                 }
                 boolean roundRobin = input.getMiddle().getValue(PROP_ROUNDROBIN).getRawValue();
-                PartStateEnergy<?> partState = (PartStateEnergy<?>) PartHelpers.getPart(center).getState();
+                PartStateRoundRobin<?> partState = (PartStateRoundRobin<?>) PartHelpers.getPart(center).getState();
                 return new TunnelAspectWriteBuilders.Energy.EnergyTarget(network.getCapability(Capabilities.NETWORK_ENERGY), channel, energyStorage, amount, exactAmount, roundRobin, partState);
             };
 
