@@ -138,28 +138,13 @@ public class TunnelItemHelpers {
             }
         } else if (loopSourceSlots) {
             for (sourceSlot = 0; sourceSlot < source.getSlots(); sourceSlot++) {
-                if (loopTargetSlots) {
-                    if (!source.getStackInSlot(sourceSlot).isEmpty()) {
-                        for (targetSlot = 0; targetSlot < target.getSlots(); targetSlot++) {
-                            if (!simulate) {
-                                ItemStack movedSimulated = moveItemsSingle(source, sourceSlot, sourceSlotless, target, targetSlot, targetSlotless, amount, itemStackMatcher, true);
-                                if (movedSimulated.isEmpty()) continue;
-                            }
-                            ItemStack moved = moveItemsSingle(source, sourceSlot, sourceSlotless, target, targetSlot, targetSlotless, amount, itemStackMatcher, simulate);
-                            if (!moved.isEmpty()) {
-                                return moved;
-                            }
-                        }
-                    }
-                } else {
-                    if (!simulate) {
-                        ItemStack movedSimulated = moveItemsSingle(source, sourceSlot, sourceSlotless, target, targetSlot, targetSlotless, amount, itemStackMatcher, true);
-                        if (movedSimulated.isEmpty()) continue;
-                    }
-                    ItemStack moved = moveItemsSingle(source, sourceSlot, sourceSlotless, target, targetSlot, targetSlotless, amount, itemStackMatcher, simulate);
-                    if (!moved.isEmpty()) {
-                        return moved;
-                    }
+                if (!simulate) {
+                    ItemStack movedSimulated = moveItemsSingle(source, sourceSlot, sourceSlotless, target, targetSlot, targetSlotless, amount, itemStackMatcher, true);
+                    if (movedSimulated.isEmpty()) continue;
+                }
+                ItemStack moved = moveItemsSingle(source, sourceSlot, sourceSlotless, target, targetSlot, targetSlotless, amount, itemStackMatcher, simulate);
+                if (!moved.isEmpty()) {
+                    return moved;
                 }
             }
         } else if (loopTargetSlots) {
