@@ -81,6 +81,7 @@ public class ItemNetwork extends PositionedAddonsNetwork implements IItemNetwork
     public int getHash() {
         int hash = 0;
         int i = 0;
+        // TODO: reimplement using an observer
         for(PrioritizedPartPos partPos : getPositions()) {
             IItemHandler itemHandler = getItemHandler(partPos);
             if (itemHandler != null) {

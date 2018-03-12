@@ -14,6 +14,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.items.IItemHandler;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.Level;
 import org.cyclops.commoncapabilities.api.capability.inventorystate.IInventoryState;
 import org.cyclops.commoncapabilities.api.capability.itemhandler.ISlotlessItemHandler;
@@ -32,8 +33,6 @@ import org.cyclops.integrateddynamics.core.evaluate.variable.ValueHelpers;
 import org.cyclops.integrateddynamics.core.evaluate.variable.ValueObjectTypeBlock;
 import org.cyclops.integrateddynamics.core.evaluate.variable.ValueObjectTypeItemStack;
 import org.cyclops.integrateddynamics.core.evaluate.variable.ValueTypeBoolean;
-import org.cyclops.integrateddynamics.core.evaluate.variable.ValueTypes;
-import org.cyclops.integrateddynamics.core.helper.L10NValues;
 import org.cyclops.integrateddynamics.core.helper.NbtHelpers;
 import org.cyclops.integrateddynamics.core.helper.PartHelpers;
 import org.cyclops.integratedtunnels.GeneralConfig;
@@ -68,9 +67,9 @@ public class TunnelItemHelpers {
         }
     };
 
-    private static final Cache<Integer, Integer> CACHE_INV_STATES = CacheBuilder.newBuilder()
+    private static final Cache<Integer, Pair<Integer, Integer>> CACHE_INV_STATES = CacheBuilder.newBuilder()
             .expireAfterWrite(10, TimeUnit.SECONDS).build();
-    private static final Cache<Integer, Boolean> CACHE_INV_CHECKS = CacheBuilder.newBuilder()
+    private static final Cache<Integer, Boolean> CACHE_CONNECTION_TRANSFER_ATTEMPTED = CacheBuilder.newBuilder()
             .expireAfterWrite(GeneralConfig.inventoryUnchangedTickTimeout * (1000 / MinecraftHelpers.SECOND_IN_TICKS),
                     TimeUnit.MILLISECONDS).build();
 
@@ -163,22 +162,13 @@ public class TunnelItemHelpers {
         return ItemStack.EMPTY;
     }
 
-    protected static Integer getCachedState(int posHash) {
-        return CACHE_INV_STATES.getIfPresent(posHash);
-    }
-
-    protected static void setCachedState(int posHash, int state) {
-        CACHE_INV_STATES.put(posHash, state);
-        CACHE_INV_CHECKS.put(posHash, true);
-    }
-
-    protected static boolean shouldCheckState(int posHash) {
-        return CACHE_INV_CHECKS.getIfPresent(posHash) == null;
+    protected static boolean shouldAttemptTransfer(int posHash) {
+        return CACHE_CONNECTION_TRANSFER_ATTEMPTED.getIfPresent(posHash) == null;
     }
 
     protected static void invalidateCachedState(int posHash) {
         CACHE_INV_STATES.invalidate(posHash);
-        CACHE_INV_CHECKS.invalidate(posHash);
+        CACHE_CONNECTION_TRANSFER_ATTEMPTED.invalidate(posHash);
     }
 
     /**
@@ -187,15 +177,22 @@ public class TunnelItemHelpers {
      * @param inventoryState The optional inventory state.
      * @return The inventory state.
      */
+    @Deprecated
     public static int calculateInventoryState(IItemHandler itemHandler, @Nullable IInventoryState inventoryState) {
         if (inventoryState != null) {
             return inventoryState.getHash();
         }
+        // TODO: this is an incorrect implementation of the inv state hash contract.
+        // TODO: this should be reimplemented by observing the network and changing the state if anything in the inv has changed
         int hash = itemHandler.hashCode();
         for (int i = 0; i < itemHandler.getSlots(); i++) {
             hash += ItemStackHelpers.getItemStackHashCode(itemHandler.getStackInSlot(i)) << (i % 100);
         }
         return hash;
+    }
+
+    protected static Pair<Integer, Integer> getConnectionInventoryState(IInventoryState sourceInvState, IInventoryState targetInvState) {
+        return Pair.of(sourceInvState.hashCode(), targetInvState.getHash());
     }
 
     /**
@@ -241,33 +238,30 @@ public class TunnelItemHelpers {
                                                     IItemHandler sourceHandler, @Nullable IInventoryState sourceInvState, int sourceSlot, @Nullable ISlotlessItemHandler sourceSlotless,
                                                     IItemHandler targetHandler, @Nullable IInventoryState targetInvState, int targetSlot, @Nullable ISlotlessItemHandler targetSlotless,
                                                     int amount, ItemStackPredicate itemStackMatcher, boolean exact) {
+        // TODO: connectionHash should make a unique id, as this should not be able to clash!
         if (amount <= 0) {
             return ItemStack.EMPTY;
         }
-        Integer cachedState = getCachedState(connectionHash);
 
-        boolean calculatedStates = false;
-        int currentState = 0;
-        boolean shouldMoveItems = cachedState == null;
-        if (!shouldMoveItems && shouldCheckState(connectionHash)) {
-            calculatedStates = true;
-            currentState = calculateInventoryState(sourceHandler, sourceInvState) + (calculateInventoryState(targetHandler, targetInvState) << 10);
-            shouldMoveItems = cachedState != currentState;
-            if (!shouldMoveItems) {
-                CACHE_INV_CHECKS.put(connectionHash, true);
-            }
+        boolean shouldTransfer = shouldAttemptTransfer(connectionHash);
+
+        // Optimization if a source and target inventory state is available
+        if (shouldTransfer && sourceInvState != null && targetInvState != null
+                && getConnectionInventoryState(sourceInvState, targetInvState)
+                .equals(CACHE_INV_STATES.getIfPresent(connectionHash))) {
+            shouldTransfer = false;
         }
 
         // If cache miss or a cache state is different
-        if (shouldMoveItems) {
+        if (shouldTransfer) {
             ItemStack simulatedTransfer = moveItemsSingle(sourceHandler, sourceSlot, sourceSlotless, targetHandler, targetSlot, targetSlotless, amount, itemStackMatcher, true);
 
             // If transfer failed, cache the current states and return
             if (simulatedTransfer.isEmpty() || (exact && amount != simulatedTransfer.getCount())) {
-                if (!calculatedStates) {
-                    currentState = calculateInventoryState(sourceHandler, sourceInvState) + (calculateInventoryState(targetHandler, targetInvState) << 10);
+                if (sourceInvState != null && targetInvState != null) {
+                    CACHE_INV_STATES.put(connectionHash, getConnectionInventoryState(sourceInvState, targetInvState));
                 }
-                setCachedState(connectionHash, currentState);
+                CACHE_CONNECTION_TRANSFER_ATTEMPTED.put(connectionHash, true);
                 return ItemStack.EMPTY;
             }
 
