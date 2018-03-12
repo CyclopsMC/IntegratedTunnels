@@ -251,7 +251,7 @@ public class TunnelItemHelpers {
         boolean shouldMoveItems = cachedState == null;
         if (!shouldMoveItems && shouldCheckState(connectionHash)) {
             calculatedStates = true;
-            currentState = calculateInventoryState(sourceHandler, sourceInvState) + calculateInventoryState(targetHandler, targetInvState);
+            currentState = calculateInventoryState(sourceHandler, sourceInvState) + (calculateInventoryState(targetHandler, targetInvState) << 10);
             shouldMoveItems = cachedState != currentState;
             if (!shouldMoveItems) {
                 CACHE_INV_CHECKS.put(connectionHash, true);
@@ -265,7 +265,7 @@ public class TunnelItemHelpers {
             // If transfer failed, cache the current states and return
             if (simulatedTransfer.isEmpty() || (exact && amount != simulatedTransfer.getCount())) {
                 if (!calculatedStates) {
-                    currentState = calculateInventoryState(sourceHandler, sourceInvState) + calculateInventoryState(targetHandler, targetInvState);
+                    currentState = calculateInventoryState(sourceHandler, sourceInvState) + (calculateInventoryState(targetHandler, targetInvState) << 10);
                 }
                 setCachedState(connectionHash, currentState);
                 return ItemStack.EMPTY;
