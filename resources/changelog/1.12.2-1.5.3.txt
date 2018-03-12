@@ -1,0 +1,10 @@
+As always, don't forget to backup your world before updating!
+Requires CyclopsCore version 0.11.5 or higher.
+
+Changes:
+* Optimize item transfer when the target has a slotless item handler
+
+Fixes:
+* Fix item transfer sporadically to stop working, Closes #115 and closes #108
+* Fix missing round robin property on energy aspects
+* Fix crash with World Energy Exporter
