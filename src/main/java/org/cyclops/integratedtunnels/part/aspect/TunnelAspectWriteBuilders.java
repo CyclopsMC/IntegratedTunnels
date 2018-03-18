@@ -77,6 +77,8 @@ import org.cyclops.integratedtunnels.core.part.PartStateRoundRobin;
 import org.cyclops.integratedtunnels.part.PartStateEnergy;
 import org.cyclops.integratedtunnels.part.PartStatePlayerSimulator;
 
+import javax.annotation.Nullable;
+import java.util.List;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
@@ -85,6 +87,21 @@ import java.util.function.Supplier;
  * @author rubensworks
  */
 public class TunnelAspectWriteBuilders {
+
+    @Nullable
+    public static Entity getEntity(PartPos target, int entityIndex) {
+        List<Entity> entities = target.getPos().getWorld().getEntitiesWithinAABB(Entity.class,
+                new AxisAlignedBB(target.getPos().getBlockPos()));
+        Entity entity = null;
+        if (entities.size() > 0 && entityIndex < entities.size()) {
+            if (entityIndex == -1) {
+                entity = entities.get(target.getPos().getWorld().rand.nextInt(entities.size()));
+            } else {
+                entity = entities.get(entityIndex);
+            }
+        }
+        return entity;
+    }
 
     public static final IAspectPropertyTypeInstance<ValueTypeBoolean, ValueTypeBoolean.ValueBoolean> PROP_BLACKLIST =
             new AspectPropertyTypeInstance<>(ValueTypes.BOOLEAN, "aspect.aspecttypes.integratedtunnels.boolean.blacklist.name");
@@ -1043,8 +1060,7 @@ public class TunnelAspectWriteBuilders {
                 PartPos target = partTarget.getTarget();
                 INetwork network = getNetworkChecked(center);
                 IEnergyStorage energyStorage = null;
-                Entity entity = Iterables.get(target.getPos().getWorld().getEntitiesWithinAABB(Entity.class,
-                        new AxisAlignedBB(target.getPos().getBlockPos())), entityIndex, null);
+                Entity entity = getEntity(target, entityIndex);
                 if (entity != null && entity.hasCapability(CapabilityEnergy.ENERGY, target.getSide())) {
                     energyStorage = entity.getCapability(CapabilityEnergy.ENERGY, target.getSide());
                 }
@@ -1052,7 +1068,6 @@ public class TunnelAspectWriteBuilders {
                 PartStateRoundRobin<?> partState = (PartStateRoundRobin<?>) PartHelpers.getPart(center).getState();
                 return new TunnelAspectWriteBuilders.Energy.EnergyTarget(network.getCapability(Capabilities.NETWORK_ENERGY), channel, energyStorage, amount, exactAmount, roundRobin, partState);
             };
-
         }
 
         public static final class Item {
@@ -1277,8 +1292,7 @@ public class TunnelAspectWriteBuilders {
                 PartPos target = partTarget.getTarget();
                 INetwork network = getNetworkChecked(center);
                 IItemHandler itemHandler = null;
-                Entity entity = Iterables.get(target.getPos().getWorld().getEntitiesWithinAABB(Entity.class,
-                        new AxisAlignedBB(target.getPos().getBlockPos())), entityIndex, null);
+                Entity entity = getEntity(target, entityIndex);
                 if (entity != null && entity.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, target.getSide())) {
                     itemHandler = entity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, target.getSide());
                 }
@@ -1492,8 +1506,7 @@ public class TunnelAspectWriteBuilders {
                 PartPos target = partTarget.getTarget();
                 INetwork network = getNetworkChecked(center);
                 IFluidHandler fluidHandler = null;
-                Entity entity = Iterables.get(target.getPos().getWorld().getEntitiesWithinAABB(Entity.class,
-                        new AxisAlignedBB(target.getPos().getBlockPos())), entityIndex, null);
+                Entity entity = getEntity(target, entityIndex);
                 if (entity != null && entity.hasCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, target.getSide())) {
                     fluidHandler = entity.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, target.getSide());
                 }
