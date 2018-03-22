@@ -1,0 +1,5 @@
+As always, don't forget to backup your world before updating!
+Requires CyclopsCore version 0.11.5 or higher.
+
+Fixes:
+* Fix item transfer happening on all items when an empty filter was given, Closes ##121
