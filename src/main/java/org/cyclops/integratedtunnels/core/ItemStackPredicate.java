@@ -35,7 +35,7 @@ public abstract class ItemStackPredicate implements Predicate<ItemStack> {
     }
 
     public boolean hasMatchFlags() {
-        return getMatchFlags() >= 0;
+        return getMatchFlags() >= 0 && !getItemStack().isEmpty();
     }
 
     public boolean isBlacklist() {
