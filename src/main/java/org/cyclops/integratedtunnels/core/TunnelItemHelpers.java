@@ -48,13 +48,15 @@ import java.util.concurrent.TimeUnit;
  */
 public class TunnelItemHelpers {
 
-    public static final ItemStackPredicate MATCH_ALL = new ItemStackPredicate(ItemStack.EMPTY, ItemMatch.ANY, false) {
+    public static final ItemStackPredicate MATCH_ALL = new ItemStackPredicate(ItemStack.EMPTY, ItemMatch.ANY,
+            false, ItemStackPredicate.EmptyBehaviour.ANY) {
         @Override
         public boolean test(@Nullable ItemStack input) {
             return true;
         }
     };
-    public static final ItemStackPredicate MATCH_NONE = new ItemStackPredicate(ItemStack.EMPTY, ItemMatch.EXACT, false) {
+    public static final ItemStackPredicate MATCH_NONE = new ItemStackPredicate(ItemStack.EMPTY, ItemMatch.EXACT,
+            false, ItemStackPredicate.EmptyBehaviour.NONE) {
         @Override
         public boolean test(@Nullable ItemStack input) {
             return false;
@@ -273,14 +275,18 @@ public class TunnelItemHelpers {
 
     public static ItemStackPredicate matchItemStack(final ItemStack itemStack, final boolean checkStackSize,
                                                     final boolean checkDamage, final boolean checkNbt,
-                                                    final boolean blacklist) {
+                                                    final boolean blacklist,
+                                                    final ItemStackPredicate.EmptyBehaviour emptyBehaviour) {
         int matchFlags = ItemMatch.ANY;
         if (checkDamage)    matchFlags = matchFlags | ItemMatch.DAMAGE;
         if (checkNbt)       matchFlags = matchFlags | ItemMatch.NBT;
         if (checkStackSize) matchFlags = matchFlags | ItemMatch.STACKSIZE;
-        return new ItemStackPredicate(itemStack.copy(), matchFlags, blacklist) {
+        return new ItemStackPredicate(itemStack.copy(), matchFlags, blacklist, emptyBehaviour) {
             @Override
             public boolean test(@Nullable ItemStack input) {
+                if (getItemStack().isEmpty()) {
+                    return emptyBehaviour == EmptyBehaviour.ANY;
+                }
                 boolean result = areItemStackEqual(input, itemStack, checkStackSize, true, checkDamage, checkNbt);
                 if (blacklist) {
                     result = !result;
