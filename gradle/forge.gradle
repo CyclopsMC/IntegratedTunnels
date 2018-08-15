@@ -29,11 +29,13 @@ dependencies {
     if(project.hasProperty("integratedtunnelscompat_version_local")) {
         shadow("org.cyclops.integratedtunnelscompat:IntegratedTunnelsCompat:${project.integratedtunnelscompat_version_local}") {
             exclude group: 'org.cyclops.cyclopscore', module: 'CyclopsCore'
+            exclude group: 'org.cyclops.integrateddynamics', module: 'IntegratedDynamics'
             exclude group: 'org.cyclops.integratedtunnels', module: 'IntegratedTunnels'
         }
     } else {
         shadow("org.cyclops.integratedtunnelscompat:IntegratedTunnelsCompat:${config.integratedtunnelscompat_version}") {
             exclude group: 'org.cyclops.cyclopscore', module: 'CyclopsCore'
+            exclude group: 'org.cyclops.integrateddynamics', module: 'IntegratedDynamics'
             exclude group: 'org.cyclops.integratedtunnels', module: 'IntegratedTunnels'
         }
     }
