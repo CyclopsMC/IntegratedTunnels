@@ -43,4 +43,4 @@ deploy:
     on:
       all_branches: true
       repo: CyclopsMC/IntegratedTunnels
-      condition: "$TRAVIS_BRANCH =~ ^(master|release).*$"
+      condition: "$TRAVIS_BRANCH =~ ^(master|release|feature-).*$"
