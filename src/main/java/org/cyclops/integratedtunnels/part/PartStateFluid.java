@@ -1,6 +1,7 @@
 package org.cyclops.integratedtunnels.part;
 
 import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidTankProperties;
 import org.cyclops.integrateddynamics.api.part.write.IPartTypeWriter;
@@ -21,9 +22,13 @@ public class PartStateFluid<P extends IPartTypeWriter> extends PartStatePosition
         super(inventorySize, canReceive, canExtract);
     }
 
+    protected IFluidHandler getFluidHandler() {
+        return getPositionedAddonsNetwork().getChannelExternal(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, getChannel());
+    }
+
     @Override
     public IFluidTankProperties[] getTankProperties() {
-        return getPositionedAddonsNetwork() != null ? getPositionedAddonsNetwork().getChannel(getChannel()).getTankProperties() : new IFluidTankProperties[0];
+        return getPositionedAddonsNetwork() != null ? getFluidHandler().getTankProperties() : new IFluidTankProperties[0];
     }
 
     protected FluidStack rateLimitFluid(FluidStack fluidStack) {
@@ -35,18 +40,18 @@ public class PartStateFluid<P extends IPartTypeWriter> extends PartStatePosition
 
     @Override
     public int fill(FluidStack resource, boolean doFill) {
-        return canReceive() && getPositionedAddonsNetwork() != null ? getPositionedAddonsNetwork().getChannel(getChannel()).fill(rateLimitFluid(resource), doFill) : 0;
+        return canReceive() && getPositionedAddonsNetwork() != null ? getFluidHandler().fill(rateLimitFluid(resource), doFill) : 0;
     }
 
     @Nullable
     @Override
     public FluidStack drain(FluidStack resource, boolean doDrain) {
-        return canExtract() && getPositionedAddonsNetwork() != null ? getPositionedAddonsNetwork().getChannel(getChannel()).drain(rateLimitFluid(resource), doDrain) : null;
+        return canExtract() && getPositionedAddonsNetwork() != null ? getFluidHandler().drain(rateLimitFluid(resource), doDrain) : null;
     }
 
     @Nullable
     @Override
     public FluidStack drain(int maxDrain, boolean doDrain) {
-        return canExtract() && getPositionedAddonsNetwork() != null ? getPositionedAddonsNetwork().getChannel(getChannel()).drain(Math.min(maxDrain, GeneralConfig.fluidRateLimit), doDrain) : null;
+        return canExtract() && getPositionedAddonsNetwork() != null ? getFluidHandler().drain(Math.min(maxDrain, GeneralConfig.fluidRateLimit), doDrain) : null;
     }
 }

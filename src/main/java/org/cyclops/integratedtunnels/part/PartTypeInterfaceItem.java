@@ -10,6 +10,9 @@ import org.cyclops.integratedtunnels.api.network.IItemNetwork;
 import org.cyclops.integratedtunnels.capability.network.ItemNetworkConfig;
 import org.cyclops.integratedtunnels.core.part.PartTypeInterfacePositionedAddon;
 
+import javax.annotation.Nonnull;
+import java.util.Iterator;
+
 /**
  * Interface for item handlers.
  * @author rubensworks
@@ -41,11 +44,14 @@ public class PartTypeInterfaceItem extends PartTypeInterfacePositionedAddon<IIte
             return CapabilityItemHandler.ITEM_HANDLER_CAPABILITY;
         }
 
+        protected IItemHandler getItemHandler() {
+            return getPositionedAddonsNetwork().getChannelExternal(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, getChannel());
+        }
+
         @Override
         public int getSlots() {
             disablePosition();
-            int ret = getPositionedAddonsNetwork() != null
-                    ? getPositionedAddonsNetwork().getChannel(getChannelInterface()).getSlots() : 0;
+            int ret = getPositionedAddonsNetwork() != null ? getItemHandler().getSlots() : 0;
             enablePosition();
             return ret;
         }
@@ -53,8 +59,7 @@ public class PartTypeInterfaceItem extends PartTypeInterfacePositionedAddon<IIte
         @Override
         public ItemStack getStackInSlot(int slot) {
             disablePosition();
-            ItemStack ret = getPositionedAddonsNetwork() != null
-                    ? getPositionedAddonsNetwork().getChannel(getChannelInterface()).getStackInSlot(slot) : null;
+            ItemStack ret = getPositionedAddonsNetwork() != null ? getItemHandler().getStackInSlot(slot) : null;
             enablePosition();
             return ret;
         }
@@ -62,8 +67,7 @@ public class PartTypeInterfaceItem extends PartTypeInterfacePositionedAddon<IIte
         @Override
         public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
             disablePosition();
-            ItemStack ret = getPositionedAddonsNetwork() != null
-                    ? getPositionedAddonsNetwork().getChannel(getChannelInterface()).insertItem(slot, stack, simulate) : stack;
+            ItemStack ret = getPositionedAddonsNetwork() != null ? getItemHandler().insertItem(slot, stack, simulate) : stack;
             enablePosition();
             return ret;
         }
@@ -71,8 +75,7 @@ public class PartTypeInterfaceItem extends PartTypeInterfacePositionedAddon<IIte
         @Override
         public ItemStack extractItem(int slot, int amount, boolean simulate) {
             disablePosition();
-            ItemStack ret = getPositionedAddonsNetwork() != null
-                    ? getPositionedAddonsNetwork().getChannel(getChannelInterface()).extractItem(slot, amount, simulate) : null;
+            ItemStack ret = getPositionedAddonsNetwork() != null ? getItemHandler().extractItem(slot, amount, simulate) : null;
             enablePosition();
             return ret;
         }
@@ -80,8 +83,25 @@ public class PartTypeInterfaceItem extends PartTypeInterfacePositionedAddon<IIte
         @Override
         public int getSlotLimit(int slot) {
             disablePosition();
-            int ret = getPositionedAddonsNetwork() != null
-                    ? getPositionedAddonsNetwork().getChannel(getChannelInterface()).getSlotLimit(slot) : 0;
+            int ret = getPositionedAddonsNetwork() != null ? getItemHandler().getSlotLimit(slot) : 0;
+            enablePosition();
+            return ret;
+        }
+
+        @Override
+        public Iterator<ItemStack> getItems() {
+            disablePosition();
+            Iterator<ItemStack> ret = getPositionedAddonsNetwork() != null
+                    ? getPositionedAddonsNetwork().getChannel(getChannelInterface()).iterator() : null;
+            enablePosition();
+            return ret;
+        }
+
+        @Override
+        public Iterator<ItemStack> findItems(@Nonnull ItemStack stack, int matchFlags) {
+            disablePosition();
+            Iterator<ItemStack> ret = getPositionedAddonsNetwork() != null
+                    ? getPositionedAddonsNetwork().getChannel(getChannelInterface()).iterator(stack, matchFlags) : null;
             enablePosition();
             return ret;
         }
@@ -90,7 +110,7 @@ public class PartTypeInterfaceItem extends PartTypeInterfacePositionedAddon<IIte
         public ItemStack insertItem(ItemStack stack, boolean simulate) {
             disablePosition();
             ItemStack ret = getPositionedAddonsNetwork() != null
-                    ? getPositionedAddonsNetwork().getChannel(getChannelInterface()).insertItem(stack, simulate) : stack;
+                    ? getPositionedAddonsNetwork().getChannel(getChannelInterface()).insert(stack, simulate) : stack;
             enablePosition();
             return ret;
         }
@@ -99,7 +119,7 @@ public class PartTypeInterfaceItem extends PartTypeInterfacePositionedAddon<IIte
         public ItemStack extractItem(int amount, boolean simulate) {
             disablePosition();
             ItemStack ret = getPositionedAddonsNetwork() != null
-                    ? getPositionedAddonsNetwork().getChannel(getChannelInterface()).extractItem(amount, simulate) : null;
+                    ? getPositionedAddonsNetwork().getChannel(getChannelInterface()).extract(amount, simulate) : null;
             enablePosition();
             return ret;
         }
@@ -108,7 +128,7 @@ public class PartTypeInterfaceItem extends PartTypeInterfacePositionedAddon<IIte
         public ItemStack extractItem(ItemStack matchStack, int matchFlags, boolean simulate) {
             disablePosition();
             ItemStack ret = getPositionedAddonsNetwork() != null
-                    ? getPositionedAddonsNetwork().getChannel(getChannelInterface()).extractItem(matchStack, matchFlags, simulate) : null;
+                    ? getPositionedAddonsNetwork().getChannel(getChannelInterface()).extract(matchStack, matchFlags, simulate) : null;
             enablePosition();
             return ret;
         }

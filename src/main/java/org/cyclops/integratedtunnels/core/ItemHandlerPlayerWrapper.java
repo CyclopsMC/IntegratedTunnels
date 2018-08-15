@@ -15,7 +15,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.items.IItemHandler;
-import org.cyclops.commoncapabilities.api.capability.itemhandler.ISlotlessItemHandler;
+import org.cyclops.commoncapabilities.api.ingredient.storage.IIngredientComponentStorage;
 import org.cyclops.cyclopscore.helper.ItemStackHelpers;
 import org.cyclops.cyclopscore.inventory.PlayerInventoryIterator;
 import org.cyclops.integratedtunnels.core.helper.obfuscation.ObfuscationHelpers;
@@ -48,12 +48,12 @@ public class ItemHandlerPlayerWrapper implements IItemHandler {
     private final boolean sneaking;
     private final boolean continuousClick;
     private final int entityIndex;
-    private final ISlotlessItemHandler playerReturnHandler;
+    private final IIngredientComponentStorage<ItemStack, Integer> playerReturnHandler;
 
     public ItemHandlerPlayerWrapper(@Nullable ExtendedFakePlayer player, WorldServer world, BlockPos pos,
                                     double offsetX, double offsetY, double offsetZ, EnumFacing side, EnumHand hand,
                                     boolean rightClick, boolean sneaking, boolean continuousClick, int entityIndex,
-                                    ISlotlessItemHandler playerReturnHandler) {
+                                    IIngredientComponentStorage<ItemStack, Integer> playerReturnHandler) {
         this.player = player;
         this.world = world;
         this.pos = pos;
@@ -243,7 +243,7 @@ public class ItemHandlerPlayerWrapper implements IItemHandler {
         while (it.hasNext()) {
             ItemStack itemStack = it.next();
             if (!itemStack.isEmpty()) {
-                ItemStack remaining = this.playerReturnHandler.insertItem(itemStack, false);
+                ItemStack remaining = this.playerReturnHandler.insert(itemStack, false);
                 ItemStackHelpers.spawnItemStackToPlayer(world, pos, remaining, player);
                 it.remove();
             }

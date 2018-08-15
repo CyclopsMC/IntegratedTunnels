@@ -17,7 +17,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.items.IItemHandler;
-import org.cyclops.commoncapabilities.api.capability.itemhandler.ISlotlessItemHandler;
+import org.cyclops.commoncapabilities.api.ingredient.storage.IIngredientComponentStorage;
 import org.cyclops.integratedtunnels.GeneralConfig;
 
 import javax.annotation.Nonnull;
@@ -41,7 +41,7 @@ public class ItemHandlerWorldEntityExportWrapper implements IItemHandler, IBlock
     private final float pitchOffset;
     private final boolean dispense;
 
-    private final ISlotlessItemHandler dispenseResultHandler;
+    private final IIngredientComponentStorage<ItemStack, Integer> dispenseResultHandler;
 
     private static final BehaviorDefaultDispenseItem DISPENSE_ITEM_DIRECTLY = new BehaviorDefaultDispenseItem();
 
@@ -50,7 +50,7 @@ public class ItemHandlerWorldEntityExportWrapper implements IItemHandler, IBlock
                                                int lifespan, int delayBeforePickup,
                                                EnumFacing facing, double velocity,
                                                double yawOffset, double pitchOffset,
-                                               boolean dispense, ISlotlessItemHandler dispenseResultHandler) {
+                                               boolean dispense, IIngredientComponentStorage<ItemStack, Integer> dispenseResultHandler) {
         this.world = world;
         this.pos = pos;
         this.offsetX = offsetX;
@@ -147,9 +147,9 @@ public class ItemHandlerWorldEntityExportWrapper implements IItemHandler, IBlock
         return 64;
     }
 
-    protected static void handleDispenseResult(ISlotlessItemHandler dispenseResultHandler,
+    protected static void handleDispenseResult(IIngredientComponentStorage<ItemStack, Integer> dispenseResultHandler,
                                                IBlockSource blockSource, ItemStack itemStack) {
-        ItemStack remaining = dispenseResultHandler.insertItem(itemStack, false);
+        ItemStack remaining = dispenseResultHandler.insert(itemStack, false);
         if (!remaining.isEmpty()) {
             DISPENSE_ITEM_DIRECTLY.dispense(blockSource, remaining);
         }
@@ -194,10 +194,10 @@ public class ItemHandlerWorldEntityExportWrapper implements IItemHandler, IBlock
 
     protected static class SimulatedTileEntityDispenser extends TileEntityDispenser {
 
-        private final ISlotlessItemHandler dispenseResultHandler;
+        private final IIngredientComponentStorage<ItemStack, Integer> dispenseResultHandler;
         private final IBlockSource blockSource;
 
-        public SimulatedTileEntityDispenser(ISlotlessItemHandler dispenseResultHandler, IBlockSource blockSource) {
+        public SimulatedTileEntityDispenser(IIngredientComponentStorage<ItemStack, Integer> dispenseResultHandler, IBlockSource blockSource) {
             this.dispenseResultHandler = dispenseResultHandler;
             this.blockSource = blockSource;
         }

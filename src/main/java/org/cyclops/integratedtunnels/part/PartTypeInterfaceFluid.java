@@ -42,11 +42,14 @@ public class PartTypeInterfaceFluid extends PartTypeInterfacePositionedAddon<IFl
             return CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY;
         }
 
+        protected IFluidHandler getFluidHandler() {
+            return getPositionedAddonsNetwork().getChannelExternal(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, getChannel());
+        }
+
         @Override
         public IFluidTankProperties[] getTankProperties() {
             disablePosition();
-            IFluidTankProperties[] ret = getPositionedAddonsNetwork() != null
-                    ? getPositionedAddonsNetwork().getChannel(getChannelInterface()).getTankProperties() : new IFluidTankProperties[0];
+            IFluidTankProperties[] ret = getPositionedAddonsNetwork() != null ? getFluidHandler().getTankProperties() : new IFluidTankProperties[0];
             enablePosition();
             return ret;
         }
@@ -54,8 +57,7 @@ public class PartTypeInterfaceFluid extends PartTypeInterfacePositionedAddon<IFl
         @Override
         public int fill(FluidStack resource, boolean doFill) {
             disablePosition();
-            int ret = getPositionedAddonsNetwork() != null
-                    ? getPositionedAddonsNetwork().getChannel(getChannelInterface()).fill(resource, doFill) : 0;
+            int ret = getPositionedAddonsNetwork() != null ? getFluidHandler().fill(resource, doFill) : 0;
             enablePosition();
             return ret;
         }
@@ -64,8 +66,7 @@ public class PartTypeInterfaceFluid extends PartTypeInterfacePositionedAddon<IFl
         @Override
         public FluidStack drain(FluidStack resource, boolean doDrain) {
             disablePosition();
-            FluidStack ret = getPositionedAddonsNetwork() != null
-                    ? getPositionedAddonsNetwork().getChannel(getChannelInterface()).drain(resource, doDrain) : null;
+            FluidStack ret = getPositionedAddonsNetwork() != null ? getFluidHandler().drain(resource, doDrain) : null;
             enablePosition();
             return ret;
         }
@@ -74,8 +75,7 @@ public class PartTypeInterfaceFluid extends PartTypeInterfacePositionedAddon<IFl
         @Override
         public FluidStack drain(int maxDrain, boolean doDrain) {
             disablePosition();
-            FluidStack ret = getPositionedAddonsNetwork() != null
-                    ? getPositionedAddonsNetwork().getChannel(getChannelInterface()).drain(maxDrain, doDrain) : null;
+            FluidStack ret = getPositionedAddonsNetwork() != null ? getFluidHandler().drain(maxDrain, doDrain) : null;
             enablePosition();
             return ret;
         }

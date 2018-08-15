@@ -1,6 +1,7 @@
 package org.cyclops.integratedtunnels.part;
 
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import org.cyclops.integrateddynamics.api.part.write.IPartTypeWriter;
 import org.cyclops.integratedtunnels.api.network.IItemNetwork;
@@ -17,28 +18,32 @@ public class PartStateItem<P extends IPartTypeWriter> extends PartStatePositione
         super(inventorySize, canReceive, canExtract);
     }
 
+    protected IItemHandler getItemHandler() {
+        return getPositionedAddonsNetwork().getChannelExternal(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, getChannel());
+    }
+
     @Override
     public int getSlots() {
-        return getPositionedAddonsNetwork() != null ? getPositionedAddonsNetwork().getChannel(getChannel()).getSlots() : 0;
+        return getPositionedAddonsNetwork() != null ? getItemHandler().getSlots() : 0;
     }
 
     @Override
     public ItemStack getStackInSlot(int slot) {
-        return getPositionedAddonsNetwork() != null ? getPositionedAddonsNetwork().getChannel(getChannel()).getStackInSlot(slot) : null;
+        return getPositionedAddonsNetwork() != null ? getItemHandler().getStackInSlot(slot) : null;
     }
 
     @Override
     public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
-        return canReceive() && getPositionedAddonsNetwork() != null ? getPositionedAddonsNetwork().getChannel(getChannel()).insertItem(slot, stack, simulate) : stack;
+        return canReceive() && getPositionedAddonsNetwork() != null ? getItemHandler().insertItem(slot, stack, simulate) : stack;
     }
 
     @Override
     public ItemStack extractItem(int slot, int amount, boolean simulate) {
-        return canExtract() && getPositionedAddonsNetwork() != null ? getPositionedAddonsNetwork().getChannel(getChannel()).extractItem(slot, amount, simulate) : null;
+        return canExtract() && getPositionedAddonsNetwork() != null ? getItemHandler().extractItem(slot, amount, simulate) : null;
     }
 
     @Override
     public int getSlotLimit(int slot) {
-        return getPositionedAddonsNetwork() != null ? getPositionedAddonsNetwork().getChannel(getChannel()).getSlotLimit(slot) : 0;
+        return getPositionedAddonsNetwork() != null ? getItemHandler().getSlotLimit(slot) : 0;
     }
 }
