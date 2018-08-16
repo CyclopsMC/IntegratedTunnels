@@ -29,7 +29,7 @@ public class PartStateItem<P extends IPartTypeWriter> extends PartStatePositione
 
     @Override
     public ItemStack getStackInSlot(int slot) {
-        return getPositionedAddonsNetwork() != null ? getItemHandler().getStackInSlot(slot) : null;
+        return getPositionedAddonsNetwork() != null ? getItemHandler().getStackInSlot(slot) : ItemStack.EMPTY;
     }
 
     @Override
@@ -39,7 +39,7 @@ public class PartStateItem<P extends IPartTypeWriter> extends PartStatePositione
 
     @Override
     public ItemStack extractItem(int slot, int amount, boolean simulate) {
-        return canExtract() && getPositionedAddonsNetwork() != null ? getItemHandler().extractItem(slot, amount, simulate) : null;
+        return canExtract() && getPositionedAddonsNetwork() != null ? getItemHandler().extractItem(slot, amount, simulate) : ItemStack.EMPTY;
     }
 
     @Override
