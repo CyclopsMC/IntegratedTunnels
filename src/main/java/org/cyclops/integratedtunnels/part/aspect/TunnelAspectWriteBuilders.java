@@ -24,12 +24,14 @@ import org.apache.commons.lang3.tuple.Triple;
 import org.apache.logging.log4j.Level;
 import org.cyclops.commoncapabilities.api.capability.inventorystate.IInventoryState;
 import org.cyclops.commoncapabilities.api.capability.itemhandler.ISlotlessItemHandler;
+import org.cyclops.commoncapabilities.api.ingredient.IngredientComponent;
 import org.cyclops.commoncapabilities.api.ingredient.storage.IIngredientComponentStorage;
 import org.cyclops.cyclopscore.datastructure.DimPos;
 import org.cyclops.cyclopscore.helper.BlockHelpers;
 import org.cyclops.cyclopscore.helper.ItemStackHelpers;
 import org.cyclops.cyclopscore.helper.L10NHelpers;
 import org.cyclops.cyclopscore.helper.TileHelpers;
+import org.cyclops.cyclopscore.ingredient.storage.IngredientStorageHelpers;
 import org.cyclops.integrateddynamics.IntegratedDynamics;
 import org.cyclops.integrateddynamics.api.PartStateException;
 import org.cyclops.integrateddynamics.api.evaluate.EvaluationException;
@@ -184,7 +186,7 @@ public class TunnelAspectWriteBuilders {
         };
         public static final IAspectValuePropagator<EnergyTarget, Void>
                 PROP_EXPORT = input -> {
-            if (input.getEnergyChannel() != null && input.getEnergyStorage() != null && input.getAmount() != 0) {
+            if (input.hasEnergyStorage() && input.getAmount() != 0) {
                 input.preTransfer();
                 TunnelEnergyHelpers.moveEnergy(input.getEnergyChannel(), input.getEnergyStorage(), input.getAmount(), input.isExactAmount());
                 input.postTransfer();
@@ -193,7 +195,7 @@ public class TunnelAspectWriteBuilders {
         };
         public static final IAspectValuePropagator<EnergyTarget, Void>
                 PROP_IMPORT = input -> {
-            if (input.getEnergyChannel() != null && input.getEnergyStorage() != null && input.getAmount() != 0) {
+            if (input.hasEnergyStorage() && input.getAmount() != 0) {
                 input.preTransfer();
                 TunnelEnergyHelpers.moveEnergy(input.getEnergyStorage(), input.getEnergyChannel(), input.getAmount(), input.isExactAmount());
                 input.postTransfer();
@@ -216,12 +218,17 @@ public class TunnelAspectWriteBuilders {
                 this.exactAmount = exactAmount;
             }
 
-            public IEnergyStorage getEnergyChannel() {
-                return getChanneledNetwork().getChannelExternal(CapabilityEnergy.ENERGY, getChannel());
+            public boolean hasEnergyStorage() {
+                return energyStorage != null;
             }
 
-            public IEnergyStorage getEnergyStorage() {
-                return energyStorage;
+            public IIngredientComponentStorage<Integer, Boolean> getEnergyChannel() {
+                return getChanneledNetwork().getChannel(getChannel());
+            }
+
+            public IIngredientComponentStorage<Integer, Boolean> getEnergyStorage() {
+                return IngredientComponent.ENERGY.getStorageWrapperHandler(CapabilityEnergy.ENERGY)
+                        .wrapComponentStorage(energyStorage);
             }
 
             public int getAmount() {
