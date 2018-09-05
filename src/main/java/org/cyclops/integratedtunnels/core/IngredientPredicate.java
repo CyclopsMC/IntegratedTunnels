@@ -6,13 +6,15 @@ import javax.annotation.Nonnull;
 import java.util.function.Predicate;
 
 /**
- * A predicate for matching ItemStacks.
+ * A predicate for matching ingredient components.
+ * @param <T> The instance type.
+ * @param <M> The matching condition parameter.
  * @author rubensworks
  */
 public abstract class IngredientPredicate<T, M> implements Predicate<T> {
 
     private final IngredientComponent<T, M> ingredientComponent;
-    private final T itemStack;
+    private final T instance;
     private final M matchFlags;
     private final boolean blacklist;
     private final EmptyBehaviour emptyBehaviour;
@@ -21,10 +23,10 @@ public abstract class IngredientPredicate<T, M> implements Predicate<T> {
     private final boolean exactQuantity;
 
     public IngredientPredicate(IngredientComponent<T, M> ingredientComponent,
-                               @Nonnull T itemStack, M matchFlags, boolean blacklist, boolean empty,
+                               @Nonnull T instance, M matchFlags, boolean blacklist, boolean empty,
                                int maxQuantity, boolean exactQuantity, EmptyBehaviour emptyBehaviour) {
         this.ingredientComponent = ingredientComponent;
-        this.itemStack = itemStack;
+        this.instance = instance;
         this.matchFlags = matchFlags;
         this.blacklist = blacklist;
         this.emptyBehaviour = emptyBehaviour;
@@ -44,8 +46,8 @@ public abstract class IngredientPredicate<T, M> implements Predicate<T> {
     }
 
     @Nonnull
-    public T getItemStack() {
-        return itemStack;
+    public T getInstance() {
+        return instance;
     }
 
     public M getMatchFlags() {
@@ -53,7 +55,7 @@ public abstract class IngredientPredicate<T, M> implements Predicate<T> {
     }
 
     public boolean hasMatchFlags() {
-        return matchFlags != null && (emptyBehaviour == EmptyBehaviour.ANY || !getIngredientComponent().getMatcher().isEmpty(getItemStack()));
+        return matchFlags != null && (emptyBehaviour == EmptyBehaviour.ANY || !getIngredientComponent().getMatcher().isEmpty(getInstance()));
     }
 
     public boolean isBlacklist() {

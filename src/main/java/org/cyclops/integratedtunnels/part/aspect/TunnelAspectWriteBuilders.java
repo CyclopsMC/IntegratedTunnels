@@ -60,6 +60,7 @@ import org.cyclops.integratedtunnels.core.IngredientPredicate;
 import org.cyclops.integratedtunnels.core.ItemStoragePlayerWrapper;
 import org.cyclops.integratedtunnels.core.TunnelEnergyHelpers;
 import org.cyclops.integratedtunnels.core.TunnelFluidHelpers;
+import org.cyclops.integratedtunnels.core.TunnelHelpers;
 import org.cyclops.integratedtunnels.core.TunnelItemHelpers;
 import org.cyclops.integratedtunnels.core.part.PartStatePositionedAddon;
 import org.cyclops.integratedtunnels.core.part.PartStateRoundRobin;
@@ -497,7 +498,7 @@ public class TunnelAspectWriteBuilders {
                 PROP_EXPORT = input -> {
             if (input.hasItemStorage()) {
                 input.preTransfer();
-                TunnelItemHelpers.moveItemsStateOptimized(
+                TunnelHelpers.moveSingleStateOptimized(
                         input.getConnectionHash(),
                         input.getItemChannel(), -1,
                         input.getItemStorage(), input.getSlot(),
@@ -510,7 +511,7 @@ public class TunnelAspectWriteBuilders {
                 PROP_IMPORT = input -> {
             if (input.hasItemStorage()) {
                 input.preTransfer();
-                TunnelItemHelpers.moveItemsStateOptimized(
+                TunnelHelpers.moveSingleStateOptimized(
                         input.getConnectionHash(),
                         input.getItemStorage(), input.getSlot(),
                         input.getItemChannel(), -1,

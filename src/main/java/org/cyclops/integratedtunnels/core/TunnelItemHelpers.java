@@ -1,7 +1,5 @@
 package org.cyclops.integratedtunnels.core;
 
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.Lists;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
@@ -14,15 +12,11 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
-import org.apache.logging.log4j.Level;
-import org.cyclops.commoncapabilities.api.capability.inventorystate.IInventoryState;
 import org.cyclops.commoncapabilities.api.capability.itemhandler.ItemMatch;
 import org.cyclops.commoncapabilities.api.ingredient.IngredientComponent;
 import org.cyclops.commoncapabilities.api.ingredient.storage.IIngredientComponentStorage;
 import org.cyclops.cyclopscore.helper.BlockHelpers;
 import org.cyclops.cyclopscore.helper.L10NHelpers;
-import org.cyclops.cyclopscore.helper.MinecraftHelpers;
-import org.cyclops.cyclopscore.ingredient.storage.IngredientStorageHelpers;
 import org.cyclops.integrateddynamics.api.evaluate.EvaluationException;
 import org.cyclops.integrateddynamics.api.evaluate.operator.IOperator;
 import org.cyclops.integrateddynamics.api.evaluate.variable.IValue;
@@ -35,13 +29,9 @@ import org.cyclops.integrateddynamics.core.evaluate.variable.ValueObjectTypeItem
 import org.cyclops.integrateddynamics.core.evaluate.variable.ValueTypeBoolean;
 import org.cyclops.integrateddynamics.core.helper.NbtHelpers;
 import org.cyclops.integrateddynamics.core.helper.PartHelpers;
-import org.cyclops.integratedtunnels.GeneralConfig;
-import org.cyclops.integratedtunnels.IntegratedTunnels;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 /**
  * @author rubensworks
@@ -61,98 +51,6 @@ public class TunnelItemHelpers {
         }
     };
 
-    private static final Cache<Integer, Boolean> CACHE_INV_CHECKS = CacheBuilder.newBuilder()
-            .expireAfterWrite(GeneralConfig.inventoryUnchangedTickTimeout * (1000 / MinecraftHelpers.SECOND_IN_TICKS),
-                    TimeUnit.MILLISECONDS).build();
-
-    /**
-     * Move items from source to destination.
-     * @param source The source item storage.
-     * @param sourceSlot The source slot.
-     * @param destination The destination item storage.
-     * @param destinationSlot The destination slot.
-     * @param itemStackMatcher Only itemstack matching this predicate will be moved.
-     * @param simulate If the transfer should be simulated.
-     * @return The moved itemstack.
-     */
-    @Nonnull
-    public static ItemStack moveItemsSingle(IIngredientComponentStorage<ItemStack, Integer> source, int sourceSlot,
-                                            IIngredientComponentStorage<ItemStack, Integer> destination, int destinationSlot,
-                                            IngredientPredicate<ItemStack, Integer> itemStackMatcher, boolean simulate) {
-        try {
-            if (itemStackMatcher.hasMatchFlags()) {
-                return IngredientStorageHelpers.moveIngredientsSlotted(source, sourceSlot, destination, destinationSlot,
-                        itemStackMatcher.getItemStack(), itemStackMatcher.getMatchFlags(), simulate);
-            } else {
-                return IngredientStorageHelpers.moveIngredientsSlotted(source, sourceSlot, destination, destinationSlot,
-                        itemStackMatcher, Integer.MAX_VALUE, itemStackMatcher.isExactQuantity(), simulate);
-            }
-        } catch (IllegalStateException e) {
-            IntegratedTunnels.clog(Level.WARN, e.getMessage());
-            return ItemStack.EMPTY;
-        }
-    }
-
-    /**
-     * Move items from source to destination.
-     * @param source The source item storage.
-     * @param sourceSlot The source slot.
-     * @param destination The destination item storage.
-     * @param destinationSlot The destination slot.
-     * @param amount The maximum item amount to transfer.
-     * @param exact If the amount should match exactly.
-     * @return The moved itemstack.
-     */
-    @Nonnull
-    public static ItemStack moveItems(IIngredientComponentStorage<ItemStack, Integer> source, int sourceSlot,
-                                      IIngredientComponentStorage<ItemStack, Integer> destination, int destinationSlot,
-                                      int amount, boolean exact) {
-        if (amount <= 0) {
-            return ItemStack.EMPTY;
-        }
-
-        IngredientPredicate<ItemStack, Integer> matcher = matchAll(amount, exact);
-        ItemStack simulatedTransfer = moveItemsSingle(source, sourceSlot, destination, destinationSlot, matcher, true);
-        if (simulatedTransfer.isEmpty()) {
-            return ItemStack.EMPTY;
-        }
-        return moveItemsSingle(source, sourceSlot, destination, destinationSlot, matcher, false);
-    }
-
-    /**
-     * Move items from source to destination.
-     * @param connectionHash The connection hash.
-     * @param source The source item storage.
-     * @param sourceSlot The source slot.
-     * @param destination The destination item storage.
-     * @param destinationSlot The destination slot.
-     * @param itemStackMatcher Only itemstack matching this predicate will be moved.
-     * @return The moved itemstack.
-     */
-    @Nonnull
-    public static ItemStack moveItemsStateOptimized(int connectionHash,
-                                                    IIngredientComponentStorage<ItemStack, Integer> source, int sourceSlot,
-                                                    IIngredientComponentStorage<ItemStack, Integer> destination, int destinationSlot,
-                                                    IngredientPredicate<ItemStack, Integer> itemStackMatcher) {
-        // Don't do any expensive transfers if the to-be-moved stack is empty
-        if (itemStackMatcher.isEmpty()) {
-            return ItemStack.EMPTY;
-        }
-
-        // Don't do anything if we are sleeping for this connection
-        if (CACHE_INV_CHECKS.getIfPresent(connectionHash) != null) {
-            return ItemStack.EMPTY;
-        }
-
-        //
-        ItemStack transfer = moveItemsSingle(source, sourceSlot, destination, destinationSlot, itemStackMatcher, false);
-        if (transfer.isEmpty()) {
-            // Mark this connection as 'sleeping' if nothing was moved
-            CACHE_INV_CHECKS.put(connectionHash, true);
-        }
-        return transfer;
-    }
-
     public static IngredientPredicate<ItemStack, Integer> matchAll(final int amount, final boolean exactAmount) {
         return new IngredientPredicate<ItemStack, Integer>(IngredientComponent.ITEMSTACK, new ItemStack(Items.APPLE, amount), exactAmount ? ItemMatch.STACKSIZE : ItemMatch.ANY, false, false, amount, exactAmount, IngredientPredicate.EmptyBehaviour.NONE) {
             @Override
@@ -163,9 +61,9 @@ public class TunnelItemHelpers {
     }
 
     public static IngredientPredicate<ItemStack, Integer> matchItemStack(final ItemStack itemStack, final boolean checkItem,
-                                                     final boolean checkStackSize, final boolean checkDamage,
-                                                     final boolean checkNbt, final boolean blacklist,
-                                                     final boolean exactAmount, final IngredientPredicate.EmptyBehaviour emptyBehaviour) {
+                                                                         final boolean checkStackSize, final boolean checkDamage,
+                                                                         final boolean checkNbt, final boolean blacklist,
+                                                                         final boolean exactAmount, final IngredientPredicate.EmptyBehaviour emptyBehaviour) {
         int matchFlags = ItemMatch.ANY;
         if (checkItem)      matchFlags = matchFlags | ItemMatch.ITEM;
         if (checkDamage)    matchFlags = matchFlags | ItemMatch.DAMAGE;
@@ -175,7 +73,7 @@ public class TunnelItemHelpers {
                 itemStack.getCount(), exactAmount, emptyBehaviour) {
             @Override
             public boolean test(@Nullable ItemStack input) {
-                if (getItemStack().isEmpty()) {
+                if (getInstance().isEmpty()) {
                     return emptyBehaviour == EmptyBehaviour.ANY;
                 }
                 boolean result = areItemStackEqual(input, itemStack, checkStackSize, true, checkDamage, checkNbt);
@@ -188,9 +86,9 @@ public class TunnelItemHelpers {
     }
 
     public static IngredientPredicate<ItemStack, Integer> matchItemStacks(final IValueTypeListProxy<ValueObjectTypeItemStack, ValueObjectTypeItemStack.ValueItemStack> itemStacks,
-                                                      final boolean checkItem, final boolean checkStackSize,
-                                                      final boolean checkDamage, final boolean checkNbt,
-                                                      final boolean blacklist, final int amount, final boolean exactAmount) {
+                                                                          final boolean checkItem, final boolean checkStackSize,
+                                                                          final boolean checkDamage, final boolean checkNbt,
+                                                                          final boolean blacklist, final int amount, final boolean exactAmount) {
         return new IngredientPredicate<ItemStack, Integer>(IngredientComponent.ITEMSTACK, blacklist, false, amount, exactAmount) {
             @Override
             public boolean test(@Nullable ItemStack input) {
@@ -206,7 +104,7 @@ public class TunnelItemHelpers {
     }
 
     public static IngredientPredicate<ItemStack, Integer> matchPredicateItem(final PartTarget partTarget, final IOperator predicate,
-                                                         final int amount, final boolean exactAmount) {
+                                                                             final int amount, final boolean exactAmount) {
         return new IngredientPredicate<ItemStack, Integer>(IngredientComponent.ITEMSTACK, false, false, amount, exactAmount) {
             @Override
             public boolean test(@Nullable ItemStack input) {
@@ -229,9 +127,9 @@ public class TunnelItemHelpers {
     }
 
     public static IngredientPredicate<ItemStack, Integer> matchBlocks(final IValueTypeListProxy<ValueObjectTypeBlock, ValueObjectTypeBlock.ValueBlock> blocks,
-                                                  final boolean checkItem, final boolean checkStackSize,
-                                                  final boolean checkDamage, final boolean checkNbt,
-                                                  final boolean blacklist, final int amount, final boolean exactAmount) {
+                                                                      final boolean checkItem, final boolean checkStackSize,
+                                                                      final boolean checkDamage, final boolean checkNbt,
+                                                                      final boolean blacklist, final int amount, final boolean exactAmount) {
         return new IngredientPredicate<ItemStack, Integer>(IngredientComponent.ITEMSTACK, blacklist, false, amount, exactAmount) {
             @Override
             public boolean test(@Nullable ItemStack input) {
@@ -247,7 +145,7 @@ public class TunnelItemHelpers {
     }
 
     public static IngredientPredicate<ItemStack, Integer> matchPredicateBlock(final PartTarget partTarget, final IOperator predicate,
-                                                          final int amount, final boolean exactAmount) {
+                                                                              final int amount, final boolean exactAmount) {
         return new IngredientPredicate<ItemStack, Integer>(IngredientComponent.ITEMSTACK, false, false, amount, exactAmount) {
             @Override
             public boolean test(@Nullable ItemStack input) {
@@ -271,8 +169,8 @@ public class TunnelItemHelpers {
     }
 
     public static IngredientPredicate<ItemStack, Integer> matchNbt(final NBTTagCompound tag, final boolean subset, final boolean superset,
-                                               final boolean requireNbt, final boolean recursive, final boolean blacklist,
-                                               final int amount, final boolean exactAmount) {
+                                                                   final boolean requireNbt, final boolean recursive, final boolean blacklist,
+                                                                   final int amount, final boolean exactAmount) {
         return new IngredientPredicate<ItemStack, Integer>(IngredientComponent.ITEMSTACK, blacklist, false, amount, exactAmount) {
             @Override
             public boolean test(@Nullable ItemStack input) {
@@ -332,7 +230,7 @@ public class TunnelItemHelpers {
 
         IIngredientComponentStorage<ItemStack, Integer> destinationBlock = new ItemStorageBlockWrapper(
                 true, (WorldServer) world, pos, side, hand, blockUpdate, 0, false, ignoreReplacable, true);
-        return TunnelItemHelpers.moveItemsStateOptimized(connectionHash, source, -1, destinationBlock, -1, itemStackMatcher);
+        return TunnelHelpers.moveSingleStateOptimized(connectionHash, source, -1, destinationBlock, -1, itemStackMatcher);
     }
 
     /**
@@ -368,7 +266,7 @@ public class TunnelItemHelpers {
                 false, (WorldServer) world, pos, side, hand, blockUpdate, fortune, silkTouch, ignoreReplacable, breakOnNoDrops);
         List<ItemStack> itemStacks = Lists.newArrayList();
         ItemStack itemStack;
-        while (!(itemStack = TunnelItemHelpers.moveItemsStateOptimized(connectionHash, sourceBlock, -1,
+        while (!(itemStack = TunnelHelpers.moveSingleStateOptimized(connectionHash, sourceBlock, -1,
                 destination, -1, itemStackMatcher)).isEmpty()) {
             itemStacks.add(itemStack);
         }
