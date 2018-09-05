@@ -154,16 +154,6 @@ public class TunnelItemHelpers {
         return transfer;
     }
 
-    public static ItemStackPredicate matchAmount(final int amount, final boolean exact) {
-        return new ItemStackPredicate(new ItemStack(Items.APPLE, amount), exact ? ItemMatch.STACKSIZE : ItemMatch.ANY,
-                false, false, amount, exact, ItemStackPredicate.EmptyBehaviour.NONE) {
-            @Override
-            public boolean test(@Nullable ItemStack input) {
-                return exact ? input.getCount() == amount : input.getCount() <= amount;
-            }
-        };
-    }
-
     public static ItemStackPredicate matchAll(final int amount, final boolean exactAmount) {
         return new ItemStackPredicate(new ItemStack(Items.APPLE, amount), exactAmount ? ItemMatch.STACKSIZE : ItemMatch.ANY,
                 false, false, amount, exactAmount, ItemStackPredicate.EmptyBehaviour.NONE) {
