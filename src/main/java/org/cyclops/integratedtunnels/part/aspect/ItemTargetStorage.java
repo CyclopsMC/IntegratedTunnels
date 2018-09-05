@@ -1,20 +1,14 @@
 package org.cyclops.integratedtunnels.part.aspect;
 
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumFacing;
-import net.minecraftforge.common.capabilities.ICapabilityProvider;
-import net.minecraftforge.items.IItemHandler;
-import org.cyclops.commoncapabilities.api.ingredient.IngredientComponent;
 import org.cyclops.commoncapabilities.api.ingredient.storage.IIngredientComponentStorage;
 import org.cyclops.integrateddynamics.api.network.INetwork;
 import org.cyclops.integrateddynamics.api.part.PartTarget;
 import org.cyclops.integrateddynamics.api.part.aspect.property.IAspectProperties;
 import org.cyclops.integratedtunnels.api.network.IItemNetwork;
 import org.cyclops.integratedtunnels.capability.network.ItemNetworkConfig;
-import org.cyclops.integratedtunnels.core.ItemStackPredicate;
+import org.cyclops.integratedtunnels.core.IngredientPredicate;
 import org.cyclops.integratedtunnels.core.part.PartStateRoundRobin;
-
-import javax.annotation.Nullable;
 
 /**
  * @author rubensworks
@@ -24,13 +18,13 @@ public class ItemTargetStorage extends ChanneledTarget<IItemNetwork> implements 
     private final int connectionHash;
     private final IIngredientComponentStorage<ItemStack, Integer> storage;
     private final int slot;
-    private final ItemStackPredicate itemStackMatcher;
+    private final IngredientPredicate<ItemStack, Integer> itemStackMatcher;
     private final PartTarget partTarget;
     private final IAspectProperties properties;
 
     public ItemTargetStorage(int transferHash, INetwork network,
                              IIngredientComponentStorage<ItemStack, Integer> storage, int slot,
-                             ItemStackPredicate itemStackMatcher, PartTarget partTarget,
+                             IngredientPredicate<ItemStack, Integer> itemStackMatcher, PartTarget partTarget,
                              IAspectProperties properties, PartStateRoundRobin<?> partState) {
         super(network.getCapability(ItemNetworkConfig.CAPABILITY), partState,
                 properties.getValue(TunnelAspectWriteBuilders.PROP_CHANNEL).getRawValue(),
@@ -65,7 +59,7 @@ public class ItemTargetStorage extends ChanneledTarget<IItemNetwork> implements 
     }
 
     @Override
-    public ItemStackPredicate getItemStackMatcher() {
+    public IngredientPredicate<ItemStack, Integer> getItemStackMatcher() {
         return itemStackMatcher;
     }
 

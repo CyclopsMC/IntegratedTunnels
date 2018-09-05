@@ -56,7 +56,7 @@ import org.cyclops.integratedtunnels.capability.network.FluidNetworkConfig;
 import org.cyclops.integratedtunnels.capability.network.ItemNetworkConfig;
 import org.cyclops.integratedtunnels.core.ItemHandlerWorldEntityExportWrapper;
 import org.cyclops.integratedtunnels.core.ItemHandlerWorldEntityImportWrapper;
-import org.cyclops.integratedtunnels.core.ItemStackPredicate;
+import org.cyclops.integratedtunnels.core.IngredientPredicate;
 import org.cyclops.integratedtunnels.core.ItemStoragePlayerWrapper;
 import org.cyclops.integratedtunnels.core.TunnelEnergyHelpers;
 import org.cyclops.integratedtunnels.core.TunnelFluidHelpers;
@@ -339,7 +339,7 @@ public class TunnelAspectWriteBuilders {
             IAspectProperties properties = input.getMiddle();
             int amount = input.getRight() ? input.getMiddle().getValue(PROP_RATE).getRawValue() : 0;
             boolean exactAmount = properties.getValue(PROP_EXACTAMOUNT).getRawValue();
-            ItemStackPredicate itemStackMatcher = input.getRight() ? TunnelItemHelpers.matchAll(amount, exactAmount) : TunnelItemHelpers.MATCH_NONE;
+            IngredientPredicate<ItemStack, Integer> itemStackMatcher = input.getRight() ? TunnelItemHelpers.matchAll(amount, exactAmount) : TunnelItemHelpers.MATCH_NONE;
             int transferHash = input.getRight() ? 1 : 0;
             int slot = input.getMiddle().getValue(PROP_SLOT).getRawValue();
             return Triple.of(input.getLeft(), input.getMiddle(), ItemInformation.of(itemStackMatcher, transferHash, slot));
@@ -349,7 +349,7 @@ public class TunnelAspectWriteBuilders {
             IAspectProperties properties = input.getMiddle();
             int amount = input.getRight();
             boolean exactAmount = properties.getValue(PROP_EXACTAMOUNT).getRawValue();
-            ItemStackPredicate itemStackMatcher = TunnelItemHelpers.matchAll(amount, exactAmount);
+            IngredientPredicate<ItemStack, Integer> itemStackMatcher = TunnelItemHelpers.matchAll(amount, exactAmount);
             int transferHash = input.getRight();
             int slot = properties.getValue(PROP_SLOT).getRawValue();
             return Triple.of(input.getLeft(), input.getMiddle(), ItemInformation.of(itemStackMatcher, transferHash, slot));
@@ -359,7 +359,7 @@ public class TunnelAspectWriteBuilders {
             IAspectProperties properties = input.getMiddle();
             int amount = input.getRight() >= -1 ? properties.getValue(PROP_RATE).getRawValue() : 0;
             boolean exactAmount = properties.getValue(PROP_EXACTAMOUNT).getRawValue();
-            ItemStackPredicate itemStackMatcher = TunnelItemHelpers.matchAll(amount, exactAmount);
+            IngredientPredicate<ItemStack, Integer> itemStackMatcher = TunnelItemHelpers.matchAll(amount, exactAmount);
             int transferHash = input.getRight() > 0 ? 1 : 0;
             int slot = input.getRight();
             return Triple.of(input.getLeft(), input.getMiddle(), ItemInformation.of(itemStackMatcher, transferHash, slot));
@@ -371,12 +371,12 @@ public class TunnelAspectWriteBuilders {
             boolean checkDamage = properties.getValue(PROP_CHECK_DAMAGE).getRawValue();
             boolean checkNbt = properties.getValue(PROP_CHECK_NBT).getRawValue();
             boolean blacklist = properties.getValue(PROP_BLACKLIST).getRawValue();
-            ItemStackPredicate.EmptyBehaviour emptyBehaviour = ItemStackPredicate.EmptyBehaviour.fromBoolean(properties.getValue(PROP_EMPTYISANY).getRawValue());
+            IngredientPredicate.EmptyBehaviour emptyBehaviour = IngredientPredicate.EmptyBehaviour.fromBoolean(properties.getValue(PROP_EMPTYISANY).getRawValue());
             boolean exactAmount = properties.getValue(PROP_EXACTAMOUNT).getRawValue();
             int amount = properties.getValue(PROP_RATE).getRawValue();
             ItemStack prototype = TunnelItemHelpers.prototypeWithCount(input.getRight(), amount);
 
-            ItemStackPredicate itemStackMatcher = TunnelItemHelpers.matchItemStack(prototype, true, checkStackSize, checkDamage, checkNbt, blacklist, exactAmount, emptyBehaviour);
+            IngredientPredicate<ItemStack, Integer> itemStackMatcher = TunnelItemHelpers.matchItemStack(prototype, true, checkStackSize, checkDamage, checkNbt, blacklist, exactAmount, emptyBehaviour);
             int transferHash = ItemStackHelpers.getItemStackHashCode(input.getRight());
             int slot = properties.getValue(PROP_SLOT).getRawValue();
             return Triple.of(input.getLeft(), input.getMiddle(), ItemInformation.of(itemStackMatcher, transferHash, slot));
@@ -396,7 +396,7 @@ public class TunnelAspectWriteBuilders {
             boolean exactAmount = properties.getValue(PROP_EXACTAMOUNT).getRawValue();
             int amount = properties.getValue(PROP_RATE).getRawValue();
 
-            ItemStackPredicate itemStackMatcher = TunnelItemHelpers.matchItemStacks(list.getRawValue(), true, checkStackSize, checkDamage, checkNbt, blacklist, amount, exactAmount);
+            IngredientPredicate<ItemStack, Integer> itemStackMatcher = TunnelItemHelpers.matchItemStacks(list.getRawValue(), true, checkStackSize, checkDamage, checkNbt, blacklist, amount, exactAmount);
             int transferHash = list.getRawValue().hashCode();
             int slot = properties.getValue(PROP_SLOT).getRawValue();
             return Triple.of(input.getLeft(), input.getMiddle(), ItemInformation.of(itemStackMatcher, transferHash, slot));
@@ -410,7 +410,7 @@ public class TunnelAspectWriteBuilders {
                 IAspectProperties properties = input.getMiddle();
                 int amount = properties.getValue(PROP_RATE).getRawValue();
                 boolean exactAmount = properties.getValue(PROP_EXACTAMOUNT).getRawValue();
-                ItemStackPredicate itemStackMatcher = TunnelItemHelpers.matchPredicateItem(input.getLeft(), predicate, amount, exactAmount);
+                IngredientPredicate<ItemStack, Integer> itemStackMatcher = TunnelItemHelpers.matchPredicateItem(input.getLeft(), predicate, amount, exactAmount);
                 int transferHash = predicate.hashCode();
                 int slot = properties.getValue(PROP_SLOT).getRawValue();
                 return Triple.of(input.getLeft(), input.getMiddle(), ItemInformation.of(itemStackMatcher, transferHash, slot));
@@ -434,7 +434,7 @@ public class TunnelAspectWriteBuilders {
             boolean requireNbt = properties.getValue(PROP_NBT_REQUIRE).getRawValue();
             boolean recursive = properties.getValue(PROP_NBT_RECURSIVE).getRawValue();
             boolean blacklist = properties.getValue(PROP_BLACKLIST).getRawValue();
-            ItemStackPredicate itemStackMatcher = TunnelItemHelpers.matchNbt(tag, subset, superset, requireNbt, recursive, blacklist, amount, exactAmount);
+            IngredientPredicate<ItemStack, Integer> itemStackMatcher = TunnelItemHelpers.matchNbt(tag, subset, superset, requireNbt, recursive, blacklist, amount, exactAmount);
             return Triple.of(input.getLeft(), input.getMiddle(), ItemInformation.of(itemStackMatcher, transferHash, slot));
         };
         public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, IBlockState>, Triple<PartTarget, IAspectProperties, ItemInformation>>
@@ -442,11 +442,11 @@ public class TunnelAspectWriteBuilders {
             IAspectProperties properties = input.getMiddle();
 
             boolean blacklist = properties.getValue(PROP_BLACKLIST).getRawValue();
-            ItemStackPredicate.EmptyBehaviour emptyBehaviour = ItemStackPredicate.EmptyBehaviour.fromBoolean(properties.getValue(PROP_EMPTYISANY).getRawValue());
+            IngredientPredicate.EmptyBehaviour emptyBehaviour = IngredientPredicate.EmptyBehaviour.fromBoolean(properties.getValue(PROP_EMPTYISANY).getRawValue());
             int amount = properties.getValue(PROP_RATE).getRawValue();
             boolean exactAmount = false;
             ItemStack prototype = TunnelItemHelpers.prototypeWithCount(BlockHelpers.getItemStackFromBlockState(input.getRight()), amount);
-            ItemStackPredicate itemStackMatcher = TunnelItemHelpers.matchItemStack(prototype, true, false, true, false, blacklist, exactAmount, emptyBehaviour);
+            IngredientPredicate<ItemStack, Integer> itemStackMatcher = TunnelItemHelpers.matchItemStack(prototype, true, false, true, false, blacklist, exactAmount, emptyBehaviour);
             int transferHash = ItemStackHelpers.getItemStackHashCode(prototype);
             int slot = properties.getValue(PROP_SLOT).getRawValue();
             return Triple.of(input.getLeft(), input.getMiddle(), ItemInformation.of(itemStackMatcher, transferHash, slot));
@@ -463,7 +463,7 @@ public class TunnelAspectWriteBuilders {
             int amount = 1;
             boolean exactAmount = false;
 
-            ItemStackPredicate itemStackMatcher = TunnelItemHelpers.matchBlocks(list.getRawValue(), true, false, true, false, blacklist, amount, exactAmount);
+            IngredientPredicate<ItemStack, Integer> itemStackMatcher = TunnelItemHelpers.matchBlocks(list.getRawValue(), true, false, true, false, blacklist, amount, exactAmount);
             int transferHash = list.getRawValue().hashCode();
             int slot = properties.getValue(PROP_SLOT).getRawValue();
             return Triple.of(input.getLeft(), input.getMiddle(), ItemInformation.of(itemStackMatcher, transferHash, slot));
@@ -477,7 +477,7 @@ public class TunnelAspectWriteBuilders {
                 IAspectProperties properties = input.getMiddle();
                 int amount = 1;
                 boolean exactAmount = false;
-                ItemStackPredicate itemStackMatcher = TunnelItemHelpers.matchPredicateBlock(input.getLeft(), predicate, amount, exactAmount);
+                IngredientPredicate<ItemStack, Integer> itemStackMatcher = TunnelItemHelpers.matchPredicateBlock(input.getLeft(), predicate, amount, exactAmount);
                 int transferHash = predicate.hashCode();
                 int slot = properties.getValue(PROP_SLOT).getRawValue();
                 return Triple.of(input.getLeft(), input.getMiddle(), ItemInformation.of(itemStackMatcher, transferHash, slot));
@@ -522,21 +522,21 @@ public class TunnelAspectWriteBuilders {
 
         public static class ItemInformation {
 
-            private final ItemStackPredicate itemStackPredicate;
+            private final IngredientPredicate<ItemStack, Integer> itemStackPredicate;
             private final int transferHash;
             private final int slot;
 
-            protected ItemInformation(ItemStackPredicate itemStackPredicate, int transferHash, int slot) {
+            protected ItemInformation(IngredientPredicate<ItemStack, Integer> itemStackPredicate, int transferHash, int slot) {
                 this.itemStackPredicate = itemStackPredicate;
                 this.transferHash = transferHash;
                 this.slot = slot;
             }
 
-            public static ItemInformation of(ItemStackPredicate itemStackPredicate, int transferHash, int slot) {
+            public static ItemInformation of(IngredientPredicate<ItemStack, Integer> itemStackPredicate, int transferHash, int slot) {
                 return new ItemInformation(itemStackPredicate, transferHash, slot);
             }
 
-            public ItemStackPredicate getItemStackPredicate() {
+            public IngredientPredicate<ItemStack, Integer> getItemStackPredicate() {
                 return itemStackPredicate;
             }
 
@@ -1032,7 +1032,7 @@ public class TunnelAspectWriteBuilders {
                     PartTarget partTarget = input.getLeft();
                     IAspectProperties properties = input.getMiddle();
                     int transferHash = input.getRight().getTransferHash();
-                    ItemStackPredicate itemStackMatcher = input.getRight().getItemStackPredicate();
+                    IngredientPredicate<ItemStack, Integer> itemStackMatcher = input.getRight().getItemStackPredicate();
 
                     PartPos center = partTarget.getCenter();
                     PartPos target = partTarget.getTarget();
@@ -1076,7 +1076,7 @@ public class TunnelAspectWriteBuilders {
                 PartTarget partTarget = input.getLeft();
                 IAspectProperties properties = input.getMiddle();
                 int transferHash = input.getRight().getTransferHash();
-                ItemStackPredicate itemStackMatcher = input.getRight().getItemStackPredicate();
+                IngredientPredicate<ItemStack, Integer> itemStackMatcher = input.getRight().getItemStackPredicate();
                 int entityIndex = properties.getValue(World.PROPERTY_ENTITYINDEX).getRawValue();
 
                 PartPos target = partTarget.getTarget();
@@ -1707,7 +1707,7 @@ public class TunnelAspectWriteBuilders {
             PartTarget partTarget = input.getLeft();
             IAspectProperties properties = input.getMiddle();
             int transferHash = input.getRight().getTransferHash();
-            ItemStackPredicate itemStackMatcher = input.getRight().getItemStackPredicate();
+            IngredientPredicate<ItemStack, Integer> itemStackMatcher = input.getRight().getItemStackPredicate();
             EnumHand hand = input.getMiddle().getValue(World.PROP_HAND_RIGHT).getRawValue()
                     ? EnumHand.MAIN_HAND : EnumHand.OFF_HAND;
             boolean rightClick = input.getMiddle().getValue(PROP_RIGHT_CLICK).getRawValue();

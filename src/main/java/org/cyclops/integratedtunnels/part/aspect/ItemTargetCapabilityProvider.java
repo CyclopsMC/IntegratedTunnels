@@ -10,7 +10,7 @@ import org.cyclops.integrateddynamics.api.part.PartTarget;
 import org.cyclops.integrateddynamics.api.part.aspect.property.IAspectProperties;
 import org.cyclops.integratedtunnels.api.network.IItemNetwork;
 import org.cyclops.integratedtunnels.capability.network.ItemNetworkConfig;
-import org.cyclops.integratedtunnels.core.ItemStackPredicate;
+import org.cyclops.integratedtunnels.core.IngredientPredicate;
 import org.cyclops.integratedtunnels.core.part.PartStateRoundRobin;
 
 import javax.annotation.Nullable;
@@ -24,13 +24,13 @@ public class ItemTargetCapabilityProvider extends ChanneledTarget<IItemNetwork> 
     private final ICapabilityProvider capabilityProvider;
     private final EnumFacing side;
     private final int slot;
-    private final ItemStackPredicate itemStackMatcher;
+    private final IngredientPredicate<ItemStack, Integer> itemStackMatcher;
     private final PartTarget partTarget;
     private final IAspectProperties properties;
 
     public ItemTargetCapabilityProvider(int transferHash, INetwork network, @Nullable ICapabilityProvider capabilityProvider,
                                         EnumFacing side, int slot,
-                                        ItemStackPredicate itemStackMatcher, PartTarget partTarget,
+                                        IngredientPredicate<ItemStack, Integer> itemStackMatcher, PartTarget partTarget,
                                         IAspectProperties properties, PartStateRoundRobin<?> partState) {
         super(network.getCapability(ItemNetworkConfig.CAPABILITY), partState,
                 properties.getValue(TunnelAspectWriteBuilders.PROP_CHANNEL).getRawValue(),
@@ -66,7 +66,7 @@ public class ItemTargetCapabilityProvider extends ChanneledTarget<IItemNetwork> 
     }
 
     @Override
-    public ItemStackPredicate getItemStackMatcher() {
+    public IngredientPredicate<ItemStack, Integer> getItemStackMatcher() {
         return itemStackMatcher;
     }
 

@@ -10,7 +10,7 @@ import org.cyclops.integrateddynamics.api.part.PartTarget;
 import org.cyclops.integrateddynamics.api.part.aspect.property.IAspectProperties;
 import org.cyclops.integrateddynamics.core.helper.PartHelpers;
 import org.cyclops.integratedtunnels.api.network.IItemNetwork;
-import org.cyclops.integratedtunnels.core.ItemStackPredicate;
+import org.cyclops.integratedtunnels.core.IngredientPredicate;
 import org.cyclops.integratedtunnels.core.part.PartStateRoundRobin;
 
 import javax.annotation.Nullable;
@@ -28,7 +28,7 @@ public interface IItemTarget extends IChanneledTarget<IItemNetwork> {
 
     public int getSlot();
 
-    public ItemStackPredicate getItemStackMatcher();
+    public IngredientPredicate<ItemStack, Integer> getItemStackMatcher();
 
     public PartTarget getPartTarget();
 
@@ -37,7 +37,7 @@ public interface IItemTarget extends IChanneledTarget<IItemNetwork> {
     public int getConnectionHash();
 
     public static ItemTargetCapabilityProvider ofCapabilityProvider(int transferHash, PartTarget partTarget, IAspectProperties properties,
-                                                                    ItemStackPredicate itemStackMatcher, int slot) {
+                                                                    IngredientPredicate<ItemStack, Integer> itemStackMatcher, int slot) {
         PartPos center = partTarget.getCenter();
         PartPos target = partTarget.getTarget();
         INetwork network = IChanneledTarget.getNetworkChecked(center);
@@ -49,7 +49,7 @@ public interface IItemTarget extends IChanneledTarget<IItemNetwork> {
 
     public static ItemTargetCapabilityProvider ofEntity(int transferHash, PartTarget partTarget,
                                                         @Nullable Entity entity, IAspectProperties properties,
-                                                        ItemStackPredicate itemStackMatcher, int slot) {
+                                                        IngredientPredicate<ItemStack, Integer> itemStackMatcher, int slot) {
         PartPos center = partTarget.getCenter();
         PartPos target = partTarget.getTarget();
         INetwork network = IChanneledTarget.getNetworkChecked(center);
@@ -59,7 +59,7 @@ public interface IItemTarget extends IChanneledTarget<IItemNetwork> {
     }
 
     public static ItemTargetStorage ofStorage(int transferHash, INetwork network, PartTarget partTarget,
-                                              IAspectProperties properties, ItemStackPredicate itemStackMatcher,
+                                              IAspectProperties properties, IngredientPredicate<ItemStack, Integer> itemStackMatcher,
                                               IIngredientComponentStorage<ItemStack, Integer> storage, int slot) {
         PartPos center = partTarget.getCenter();
         PartStateRoundRobin<?> partState = (PartStateRoundRobin<?>) PartHelpers.getPart(center).getState();
