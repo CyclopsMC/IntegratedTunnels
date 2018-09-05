@@ -5,6 +5,7 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.Lists;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.init.Items;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -13,16 +14,14 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
-import net.minecraftforge.items.IItemHandler;
-import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.Level;
 import org.cyclops.commoncapabilities.api.capability.inventorystate.IInventoryState;
-import org.cyclops.commoncapabilities.api.capability.itemhandler.ISlotlessItemHandler;
 import org.cyclops.commoncapabilities.api.capability.itemhandler.ItemMatch;
+import org.cyclops.commoncapabilities.api.ingredient.storage.IIngredientComponentStorage;
 import org.cyclops.cyclopscore.helper.BlockHelpers;
-import org.cyclops.cyclopscore.helper.ItemStackHelpers;
 import org.cyclops.cyclopscore.helper.L10NHelpers;
 import org.cyclops.cyclopscore.helper.MinecraftHelpers;
+import org.cyclops.cyclopscore.ingredient.storage.IngredientStorageHelpers;
 import org.cyclops.integrateddynamics.api.evaluate.EvaluationException;
 import org.cyclops.integrateddynamics.api.evaluate.operator.IOperator;
 import org.cyclops.integrateddynamics.api.evaluate.variable.IValue;
@@ -48,240 +47,144 @@ import java.util.concurrent.TimeUnit;
  */
 public class TunnelItemHelpers {
 
-    public static final ItemStackPredicate MATCH_ALL = new ItemStackPredicate(ItemStack.EMPTY, ItemMatch.ANY,
-            false, ItemStackPredicate.EmptyBehaviour.ANY) {
+    public static final ItemStackPredicate MATCH_ALL = new ItemStackPredicate(ItemStack.EMPTY, ItemMatch.ANY, // TODO: rm?
+            false, true, 0, false, ItemStackPredicate.EmptyBehaviour.ANY) {
         @Override
         public boolean test(@Nullable ItemStack input) {
             return true;
         }
     };
     public static final ItemStackPredicate MATCH_NONE = new ItemStackPredicate(ItemStack.EMPTY, ItemMatch.EXACT,
-            false, ItemStackPredicate.EmptyBehaviour.NONE) {
+            false, true, 0, false, ItemStackPredicate.EmptyBehaviour.ANY) {
         @Override
         public boolean test(@Nullable ItemStack input) {
             return false;
         }
     };
-    public static final ItemStackPredicate MATCH_BLOCK = new ItemStackPredicate(false) {
-        @Override
-        public boolean test(@Nullable ItemStack input) {
-            return !input.isEmpty();
-        }
-    };
 
-    private static final Cache<Integer, Pair<Integer, Integer>> CACHE_INV_STATES = CacheBuilder.newBuilder()
-            .expireAfterWrite(10, TimeUnit.SECONDS).build();
-    private static final Cache<Integer, Boolean> CACHE_CONNECTION_TRANSFER_ATTEMPTED = CacheBuilder.newBuilder()
+    private static final Cache<Integer, Boolean> CACHE_INV_CHECKS = CacheBuilder.newBuilder()
             .expireAfterWrite(GeneralConfig.inventoryUnchangedTickTimeout * (1000 / MinecraftHelpers.SECOND_IN_TICKS),
                     TimeUnit.MILLISECONDS).build();
 
     /**
-     * Move items from source to target.
-     * @param source The source item handler.
+     * Move items from source to destination.
+     * @param source The source item storage.
      * @param sourceSlot The source slot.
-     * @param sourceSlotless The slotless source item handler.
-     * @param target The target item handler.
-     * @param targetSlot The target slot.
-     * @param targetSlotless The slotless target item handler.
-     * @param amount The maximum item amount to transfer.
+     * @param destination The destination item storage.
+     * @param destinationSlot The destination slot.
      * @param itemStackMatcher Only itemstack matching this predicate will be moved.
      * @param simulate If the transfer should be simulated.
      * @return The moved itemstack.
      */
     @Nonnull
-    public static ItemStack moveItemsSingle(IItemHandler source, int sourceSlot, @Nullable ISlotlessItemHandler sourceSlotless,
-                                            IItemHandler target, int targetSlot, @Nullable ISlotlessItemHandler targetSlotless,
-                                            int amount, ItemStackPredicate itemStackMatcher, boolean simulate) {
-        if (sourceSlot >= source.getSlots() || targetSlot >= target.getSlots()) {
-            return ItemStack.EMPTY;
-        }
-        boolean loopSourceSlots = sourceSlot < 0;
-        boolean loopTargetSlots = targetSlot < 0;
-
-        if ((!loopSourceSlots || (sourceSlotless != null && itemStackMatcher.hasMatchFlags() && !itemStackMatcher.isBlacklist())) // Only use slotless source for match flags and NOT blacklist
-                && (!loopTargetSlots || targetSlotless != null)) {
-            ItemStack extracted;
-            boolean appliedMatcher = false;
-            // In this case it is implied that sourceSlotless != null
-            // Don't use matcher if we have a blacklist, as the flags don't support that (yet: https://github.com/CyclopsMC/CommonCapabilitiesAPI/issues/4)
-            if (loopSourceSlots && itemStackMatcher.hasMatchFlags() && !itemStackMatcher.isBlacklist()) {
-                if (itemStackMatcher.getItemStack().isEmpty()) {
-                    extracted = sourceSlotless.extractItem(amount, simulate);
-                    appliedMatcher = true;
-                } else {
-                    ItemStack itemStack = itemStackMatcher.getItemStack();
-                    if (!itemStack.isEmpty() && itemStack.getCount() != amount) {
-                        itemStack = itemStack.copy();
-                        itemStack.setCount(amount);
-                    }
-                    extracted = sourceSlotless.extractItem(itemStack, itemStackMatcher.getMatchFlags(), simulate);
-                    appliedMatcher = true;
-                }
+    public static ItemStack moveItemsSingle(IIngredientComponentStorage<ItemStack, Integer> source, int sourceSlot,
+                                            IIngredientComponentStorage<ItemStack, Integer> destination, int destinationSlot,
+                                            ItemStackPredicate itemStackMatcher, boolean simulate) {
+        try {
+            if (itemStackMatcher.hasMatchFlags()) {
+                return IngredientStorageHelpers.moveIngredientsSlotted(source, sourceSlot, destination, destinationSlot,
+                        itemStackMatcher.getItemStack(), itemStackMatcher.getMatchFlags(), simulate);
             } else {
-                extracted = source.extractItem(sourceSlot, amount, simulate);
+                return IngredientStorageHelpers.moveIngredientsSlotted(source, sourceSlot, destination, destinationSlot,
+                        itemStackMatcher, Integer.MAX_VALUE, itemStackMatcher.isExactQuantity(), simulate);
             }
-            if (!extracted.isEmpty() && (!simulate || appliedMatcher || itemStackMatcher.test(extracted))) {
-                ItemStack remaining = !loopTargetSlots ? target.insertItem(targetSlot, extracted, simulate) : targetSlotless.insertItem(extracted, simulate);
-                if (remaining.isEmpty()) {
-                    return extracted;
-                } else {
-                    extracted = extracted.copy();
-                    extracted.shrink(remaining.getCount());
-                    if (!simulate) {
-                        // Re-insert remaining stacks that failed to go into the target, back into the source.
-                        remaining = loopSourceSlots ? sourceSlotless.insertItem(remaining, false) : source.insertItem(sourceSlot, remaining, false);
-                        if (!remaining.isEmpty()) {
-                            IntegratedTunnels.clog(Level.WARN, "Just lost stack " + remaining + " while transfering items, report this to the Integrated Tunnels issue tracker with some details about your setup!");
-                        }
-                    }
-                    return extracted.getCount() > 0 && (simulate || itemStackMatcher.test(extracted)) ? extracted : ItemStack.EMPTY;
-                }
-            }
-        } else if (loopSourceSlots) {
-            for (sourceSlot = 0; sourceSlot < source.getSlots(); sourceSlot++) {
-                if (!simulate) {
-                    ItemStack movedSimulated = moveItemsSingle(source, sourceSlot, sourceSlotless, target, targetSlot, targetSlotless, amount, itemStackMatcher, true);
-                    if (movedSimulated.isEmpty()) continue;
-                }
-                ItemStack moved = moveItemsSingle(source, sourceSlot, sourceSlotless, target, targetSlot, targetSlotless, amount, itemStackMatcher, simulate);
-                if (!moved.isEmpty()) {
-                    return moved;
-                }
-            }
-        } else if (loopTargetSlots) {
-            for (targetSlot = 0; targetSlot < target.getSlots(); targetSlot++) {
-                if (!simulate) {
-                    ItemStack movedSimulated = moveItemsSingle(source, sourceSlot, sourceSlotless, target, targetSlot, targetSlotless, amount, itemStackMatcher, true);
-                    if (movedSimulated.isEmpty()) continue;
-                }
-                ItemStack moved = moveItemsSingle(source, sourceSlot, sourceSlotless, target, targetSlot, targetSlotless, amount, itemStackMatcher, simulate);
-                if (!moved.isEmpty()) {
-                    return moved;
-                }
-            }
-        }
-
-        return ItemStack.EMPTY;
-    }
-
-    protected static boolean shouldAttemptTransfer(int posHash) {
-        return CACHE_CONNECTION_TRANSFER_ATTEMPTED.getIfPresent(posHash) == null;
-    }
-
-    protected static void invalidateCachedState(int posHash) {
-        CACHE_INV_STATES.invalidate(posHash);
-        CACHE_CONNECTION_TRANSFER_ATTEMPTED.invalidate(posHash);
-    }
-
-    /**
-     * Calculate an inventory state.
-     * @param itemHandler The item handler.
-     * @param inventoryState The optional inventory state.
-     * @return The inventory state.
-     */
-    @Deprecated
-    public static int calculateInventoryState(IItemHandler itemHandler, @Nullable IInventoryState inventoryState) {
-        if (inventoryState != null) {
-            return inventoryState.getHash();
-        }
-        // TODO: this is an incorrect implementation of the inv state hash contract.
-        // TODO: this should be reimplemented by observing the network and changing the state if anything in the inv has changed
-        int hash = itemHandler.hashCode();
-        for (int i = 0; i < itemHandler.getSlots(); i++) {
-            hash += ItemStackHelpers.getItemStackHashCode(itemHandler.getStackInSlot(i)) << (i % 100);
-        }
-        return hash;
-    }
-
-    protected static Pair<Integer, Integer> getConnectionInventoryState(IInventoryState sourceInvState, IInventoryState targetInvState) {
-        return Pair.of(sourceInvState.hashCode(), targetInvState.getHash());
-    }
-
-    /**
-     * Move items from source to target.
-     * @param source The source item handler.
-     * @param sourceSlot The source slot.
-     * @param sourceSlotless The slotless source item handler.
-     * @param target The target item handler.
-     * @param targetSlot The target slot.
-     * @param targetSlotless The slotless target item handler.
-     * @param amount The maximum item amount to transfer.
-     * @return The moved itemstack.
-     */
-    @Nonnull
-    public static ItemStack moveItems(IItemHandler source, int sourceSlot, @Nullable ISlotlessItemHandler sourceSlotless,
-                                      IItemHandler target, int targetSlot, @Nullable ISlotlessItemHandler targetSlotless,
-                                      int amount) {
-        ItemStack simulatedTransfer = moveItemsSingle(source, sourceSlot, sourceSlotless, target, targetSlot, targetSlotless, amount, MATCH_ALL, true);
-        if (simulatedTransfer.isEmpty()) {
+        } catch (IllegalStateException e) {
+            IntegratedTunnels.clog(Level.WARN, e.getMessage());
             return ItemStack.EMPTY;
         }
-        return moveItemsSingle(source, sourceSlot, sourceSlotless, target, targetSlot, targetSlotless, simulatedTransfer.getCount(), MATCH_ALL, false);
     }
 
     /**
-     * Move items from source to target.
-     * @param connectionHash The connection hash.
-     * @param sourceHandler The source item handler.
-     * @param sourceInvState Optional inventory state of the source.
+     * Move items from source to destination.
+     * @param source The source item storage.
      * @param sourceSlot The source slot.
-     * @param sourceSlotless The slotless source item handler.
-     * @param targetHandler The target item handler.
-     * @param targetInvState Optional inventory state of the target.
-     * @param targetSlot The target slot.
-     * @param targetSlotless The slotless target item handler.
+     * @param destination The destination item storage.
+     * @param destinationSlot The destination slot.
      * @param amount The maximum item amount to transfer.
-     * @param itemStackMatcher Only itemstack matching this predicate will be moved.
-     * @param exact If only the exact amount is allowed to be transferred.
+     * @param exact If the amount should match exactly.
      * @return The moved itemstack.
      */
     @Nonnull
-    public static ItemStack moveItemsStateOptimized(int connectionHash,
-                                                    IItemHandler sourceHandler, @Nullable IInventoryState sourceInvState, int sourceSlot, @Nullable ISlotlessItemHandler sourceSlotless,
-                                                    IItemHandler targetHandler, @Nullable IInventoryState targetInvState, int targetSlot, @Nullable ISlotlessItemHandler targetSlotless,
-                                                    int amount, ItemStackPredicate itemStackMatcher, boolean exact) {
-        // TODO: connectionHash should make a unique id, as this should not be able to clash!
+    public static ItemStack moveItems(IIngredientComponentStorage<ItemStack, Integer> source, int sourceSlot,
+                                      IIngredientComponentStorage<ItemStack, Integer> destination, int destinationSlot,
+                                      int amount, boolean exact) {
         if (amount <= 0) {
             return ItemStack.EMPTY;
         }
 
-        boolean shouldTransfer = shouldAttemptTransfer(connectionHash);
-
-        // Optimization if a source and target inventory state is available
-        if (shouldTransfer && sourceInvState != null && targetInvState != null
-                && getConnectionInventoryState(sourceInvState, targetInvState)
-                .equals(CACHE_INV_STATES.getIfPresent(connectionHash))) {
-            shouldTransfer = false;
+        ItemStackPredicate matcher = matchAll(amount, exact);
+        ItemStack simulatedTransfer = moveItemsSingle(source, sourceSlot, destination, destinationSlot, matcher, true);
+        if (simulatedTransfer.isEmpty()) {
+            return ItemStack.EMPTY;
         }
-
-        // If cache miss or a cache state is different
-        if (shouldTransfer) {
-            ItemStack simulatedTransfer = moveItemsSingle(sourceHandler, sourceSlot, sourceSlotless, targetHandler, targetSlot, targetSlotless, amount, itemStackMatcher, true);
-
-            // If transfer failed, cache the current states and return
-            if (simulatedTransfer.isEmpty() || (exact && amount != simulatedTransfer.getCount())) {
-                if (sourceInvState != null && targetInvState != null) {
-                    CACHE_INV_STATES.put(connectionHash, getConnectionInventoryState(sourceInvState, targetInvState));
-                }
-                CACHE_CONNECTION_TRANSFER_ATTEMPTED.put(connectionHash, true);
-                return ItemStack.EMPTY;
-            }
-
-            invalidateCachedState(connectionHash);
-            return moveItemsSingle(sourceHandler, sourceSlot, sourceSlotless, targetHandler, targetSlot, targetSlotless, simulatedTransfer.getCount(), itemStackMatcher, false);
-        }
-        return ItemStack.EMPTY;
+        return moveItemsSingle(source, sourceSlot, destination, destinationSlot, matcher, false);
     }
 
-    public static ItemStackPredicate matchItemStack(final ItemStack itemStack, final boolean checkStackSize,
-                                                    final boolean checkDamage, final boolean checkNbt,
-                                                    final boolean blacklist,
-                                                    final ItemStackPredicate.EmptyBehaviour emptyBehaviour) {
+    /**
+     * Move items from source to destination.
+     * @param connectionHash The connection hash.
+     * @param source The source item storage.
+     * @param sourceSlot The source slot.
+     * @param destination The destination item storage.
+     * @param destinationSlot The destination slot.
+     * @param itemStackMatcher Only itemstack matching this predicate will be moved.
+     * @return The moved itemstack.
+     */
+    @Nonnull
+    public static ItemStack moveItemsStateOptimized(int connectionHash,
+                                                    IIngredientComponentStorage<ItemStack, Integer> source, int sourceSlot,
+                                                    IIngredientComponentStorage<ItemStack, Integer> destination, int destinationSlot,
+                                                    ItemStackPredicate itemStackMatcher) {
+        // Don't do any expensive transfers if the to-be-moved stack is empty
+        if (itemStackMatcher.isEmpty()) {
+            return ItemStack.EMPTY;
+        }
+
+        // Don't do anything if we are sleeping for this connection
+        if (CACHE_INV_CHECKS.getIfPresent(connectionHash) != null) {
+            return ItemStack.EMPTY;
+        }
+
+        //
+        ItemStack transfer = moveItemsSingle(source, sourceSlot, destination, destinationSlot, itemStackMatcher, false);
+        if (transfer.isEmpty()) {
+            // Mark this connection as 'sleeping' if nothing was moved
+            CACHE_INV_CHECKS.put(connectionHash, true);
+        }
+        return transfer;
+    }
+
+    public static ItemStackPredicate matchAmount(final int amount, final boolean exact) {
+        return new ItemStackPredicate(new ItemStack(Items.APPLE, amount), exact ? ItemMatch.STACKSIZE : ItemMatch.ANY,
+                false, false, amount, exact, ItemStackPredicate.EmptyBehaviour.NONE) {
+            @Override
+            public boolean test(@Nullable ItemStack input) {
+                return exact ? input.getCount() == amount : input.getCount() <= amount;
+            }
+        };
+    }
+
+    public static ItemStackPredicate matchAll(final int amount, final boolean exactAmount) {
+        return new ItemStackPredicate(new ItemStack(Items.APPLE, amount), exactAmount ? ItemMatch.STACKSIZE : ItemMatch.ANY,
+                false, false, amount, exactAmount, ItemStackPredicate.EmptyBehaviour.NONE) {
+            @Override
+            public boolean test(ItemStack input) {
+                return true;
+            }
+        };
+    }
+
+    public static ItemStackPredicate matchItemStack(final ItemStack itemStack, final boolean checkItem,
+                                                    final boolean checkStackSize, final boolean checkDamage,
+                                                    final boolean checkNbt, final boolean blacklist,
+                                                    final boolean exactAmount, final ItemStackPredicate.EmptyBehaviour emptyBehaviour) {
         int matchFlags = ItemMatch.ANY;
+        if (checkItem)      matchFlags = matchFlags | ItemMatch.ITEM;
         if (checkDamage)    matchFlags = matchFlags | ItemMatch.DAMAGE;
         if (checkNbt)       matchFlags = matchFlags | ItemMatch.NBT;
         if (checkStackSize) matchFlags = matchFlags | ItemMatch.STACKSIZE;
-        return new ItemStackPredicate(itemStack.copy(), matchFlags, blacklist, emptyBehaviour) {
+        return new ItemStackPredicate(itemStack.copy(), matchFlags, blacklist, itemStack.isEmpty() && !blacklist,
+                itemStack.getCount(), exactAmount, emptyBehaviour) {
             @Override
             public boolean test(@Nullable ItemStack input) {
                 if (getItemStack().isEmpty()) {
@@ -297,13 +200,15 @@ public class TunnelItemHelpers {
     }
 
     public static ItemStackPredicate matchItemStacks(final IValueTypeListProxy<ValueObjectTypeItemStack, ValueObjectTypeItemStack.ValueItemStack> itemStacks,
-                                                       final boolean checkStackSize, final boolean checkDamage, final boolean checkNbt, final boolean blacklist) {
-        return new ItemStackPredicate(blacklist) {
+                                                     final boolean checkItem, final boolean checkStackSize,
+                                                     final boolean checkDamage, final boolean checkNbt,
+                                                     final boolean blacklist, final int amount, final boolean exactAmount) {
+        return new ItemStackPredicate(blacklist, false, amount, exactAmount) {
             @Override
             public boolean test(@Nullable ItemStack input) {
                 for (ValueObjectTypeItemStack.ValueItemStack itemStack : itemStacks) {
                     if (!itemStack.getRawValue().isEmpty()
-                            && areItemStackEqual(input, itemStack.getRawValue(), checkStackSize, true, checkDamage, checkNbt)) {
+                            && areItemStackEqual(input, itemStack.getRawValue(), checkStackSize, checkItem, checkDamage, checkNbt)) {
                         return !blacklist;
                     }
                 }
@@ -312,8 +217,9 @@ public class TunnelItemHelpers {
         };
     }
 
-    public static ItemStackPredicate matchPredicateItem(final PartTarget partTarget, final IOperator predicate) {
-        return new ItemStackPredicate(false) {
+    public static ItemStackPredicate matchPredicateItem(final PartTarget partTarget, final IOperator predicate,
+                                                        final int amount, final boolean exactAmount) {
+        return new ItemStackPredicate(false, false, amount, exactAmount) {
             @Override
             public boolean test(@Nullable ItemStack input) {
                 ValueObjectTypeItemStack.ValueItemStack valueItemStack = ValueObjectTypeItemStack.ValueItemStack.of(input);
@@ -335,13 +241,15 @@ public class TunnelItemHelpers {
     }
 
     public static ItemStackPredicate matchBlocks(final IValueTypeListProxy<ValueObjectTypeBlock, ValueObjectTypeBlock.ValueBlock> blocks,
-                                                     final boolean checkStackSize, final boolean checkDamage, final boolean checkNbt, final boolean blacklist) {
-        return new ItemStackPredicate(blacklist) {
+                                                 final boolean checkItem, final boolean checkStackSize,
+                                                 final boolean checkDamage, final boolean checkNbt,
+                                                 final boolean blacklist, final int amount, final boolean exactAmount) {
+        return new ItemStackPredicate(blacklist, false, amount, exactAmount) {
             @Override
             public boolean test(@Nullable ItemStack input) {
                 for (ValueObjectTypeBlock.ValueBlock block : blocks) {
                     if (!block.getRawValue().isPresent()
-                            && areItemStackEqual(input, BlockHelpers.getItemStackFromBlockState(block.getRawValue().get()), checkStackSize, true, checkDamage, checkNbt)) {
+                            && areItemStackEqual(input, BlockHelpers.getItemStackFromBlockState(block.getRawValue().get()), checkStackSize, checkItem, checkDamage, checkNbt)) {
                         return !blacklist;
                     }
                 }
@@ -350,8 +258,9 @@ public class TunnelItemHelpers {
         };
     }
 
-    public static ItemStackPredicate matchPredicateBlock(final PartTarget partTarget, final IOperator predicate) {
-        return new ItemStackPredicate(false) {
+    public static ItemStackPredicate matchPredicateBlock(final PartTarget partTarget, final IOperator predicate,
+                                                         final int amount, final boolean exactAmount) {
+        return new ItemStackPredicate(false, false, amount, exactAmount) {
             @Override
             public boolean test(@Nullable ItemStack input) {
                 ValueObjectTypeBlock.ValueBlock valueBlock = ValueObjectTypeBlock.ValueBlock.of(
@@ -373,8 +282,10 @@ public class TunnelItemHelpers {
         };
     }
 
-    public static ItemStackPredicate matchNbt(final NBTTagCompound tag, final boolean subset, final boolean superset, final boolean requireNbt, final boolean recursive, final boolean blacklist) {
-        return new ItemStackPredicate(blacklist) {
+    public static ItemStackPredicate matchNbt(final NBTTagCompound tag, final boolean subset, final boolean superset,
+                                              final boolean requireNbt, final boolean recursive, final boolean blacklist,
+                                              final int amount, final boolean exactAmount) {
+        return new ItemStackPredicate(blacklist, false, amount, exactAmount) {
             @Override
             public boolean test(@Nullable ItemStack input) {
                 if (!input.hasTagCompound() && requireNbt) {
@@ -392,7 +303,8 @@ public class TunnelItemHelpers {
     }
 
     public static boolean areItemStackEqual(ItemStack stackA, ItemStack stackB,
-                                            boolean checkStackSize, boolean checkItem, boolean checkDamage, boolean checkNbt) {
+                                            boolean checkStackSize, boolean checkItem,
+                                            boolean checkDamage, boolean checkNbt) {
         if (stackA == null && stackB == null) return true;
         if (stackA != null && stackB != null) {
             if (checkStackSize && stackA.getCount() != stackB.getCount()) return false;
@@ -406,26 +318,21 @@ public class TunnelItemHelpers {
 
     /**
      * Place item blocks from the given source in the world.
-     * @param connectionHash The connection hash.
-     * @param sourceHandler The source item handler.
-     * @param sourceInvState Optional inventory state of the source.
-     * @param sourceSlotless The slotless source item handler.
-     * @param world The target world.
-     * @param pos The target position.
-     * @param side The target side.
+     * @param source The source item storage.
+     * @param world The destination world.
+     * @param pos The destination position.
+     * @param side The destination side.
      * @param itemStackMatcher The itemstack match predicate.
      * @param hand The hand to place the block with.
      * @param blockUpdate If a block update should occur after placement.
      * @param ignoreReplacable If replacable blocks should be overriden when placing blocks.
-     * @param exact If only the exact amount is allowed to be transferred.
      * @return The placed item.
      */
     public static ItemStack placeItems(int connectionHash,
-                                       IItemHandler sourceHandler, @Nullable IInventoryState sourceInvState,
-                                       @Nullable ISlotlessItemHandler sourceSlotless,
+                                       IIngredientComponentStorage<ItemStack, Integer> source,
                                        World world, BlockPos pos, EnumFacing side,
                                        ItemStackPredicate itemStackMatcher, EnumHand hand,
-                                       boolean blockUpdate, boolean ignoreReplacable, boolean exact) {
+                                       boolean blockUpdate, boolean ignoreReplacable) {
         IBlockState destBlockState = world.getBlockState(pos);
         final Material destMaterial = destBlockState.getMaterial();
         final boolean isDestNonSolid = !destMaterial.isSolid();
@@ -435,22 +342,18 @@ public class TunnelItemHelpers {
             return null;
         }
 
-        IItemHandler targetBlock = new ItemHandlerBlockWrapper(true, (WorldServer) world, pos, side,
-                hand, blockUpdate, 0, false, ignoreReplacable, true);
-        return TunnelItemHelpers.moveItemsStateOptimized(connectionHash, sourceHandler, sourceInvState, -1,
-                sourceSlotless, targetBlock, null, 0, null, 1,
-                itemStackMatcher, exact);
+        IIngredientComponentStorage<ItemStack, Integer> destinationBlock = new ItemStorageBlockWrapper(
+                true, (WorldServer) world, pos, side, hand, blockUpdate, 0, false, ignoreReplacable, true);
+        return TunnelItemHelpers.moveItemsStateOptimized(connectionHash, source, -1, destinationBlock, -1, itemStackMatcher);
     }
 
     /**
      * Pick up item blocks from the given source in the world.
      * @param connectionHash The connection hash.
-     * @param world The target world.
-     * @param pos The target position.
-     * @param side The target side.
-     * @param targetHandler The source item handler.
-     * @param targetInvState Optional inventory state of the source.
-     * @param targetSlotless The slotless source item handler.
+     * @param world The destination world.
+     * @param pos The destination position.
+     * @param side The destination side.
+     * @param destination The destination item storage.
      * @param itemStackMatcher The itemstack match predicate.
      * @param hand The hand to place the block with.
      * @param blockUpdate If a block update should occur after placement.
@@ -458,15 +361,13 @@ public class TunnelItemHelpers {
      * @param fortune The fortune level.
      * @param silkTouch If the block should be broken with silk touch.
      * @param breakOnNoDrops If the block should be broken if it produced no drops.
-     * @param exact If only the exact amount is allowed to be transferred.
      * @return The picked-up items.
      */
     public static List<ItemStack> pickUpItems(int connectionHash, World world, BlockPos pos, EnumFacing side,
-                                              IItemHandler targetHandler, @Nullable IInventoryState targetInvState,
-                                              @Nullable ISlotlessItemHandler targetSlotless,
+                                              IIngredientComponentStorage<ItemStack, Integer> destination,
                                               ItemStackPredicate itemStackMatcher, EnumHand hand, boolean blockUpdate,
                                               boolean ignoreReplacable, int fortune, boolean silkTouch,
-                                              boolean breakOnNoDrops, boolean exact) {
+                                              boolean breakOnNoDrops) {
         IBlockState destBlockState = world.getBlockState(pos);
         final Material destMaterial = destBlockState.getMaterial();
         final boolean isDestReplaceable = destBlockState.getBlock().isReplaceable(world, pos);
@@ -475,15 +376,33 @@ public class TunnelItemHelpers {
             return null;
         }
 
-        IItemHandler sourceBlock = new ItemHandlerBlockWrapper(false, (WorldServer) world, pos, side,
-                hand, blockUpdate, fortune, silkTouch, ignoreReplacable, breakOnNoDrops);
+        IIngredientComponentStorage<ItemStack, Integer> sourceBlock = new ItemStorageBlockWrapper(
+                false, (WorldServer) world, pos, side, hand, blockUpdate, fortune, silkTouch, ignoreReplacable, breakOnNoDrops);
         List<ItemStack> itemStacks = Lists.newArrayList();
         ItemStack itemStack;
-        while (!(itemStack = TunnelItemHelpers.moveItemsStateOptimized(connectionHash, sourceBlock, null, -1, null,
-                targetHandler, targetInvState, -1, targetSlotless, Integer.MAX_VALUE, itemStackMatcher, exact)).isEmpty()) {
+        while (!(itemStack = TunnelItemHelpers.moveItemsStateOptimized(connectionHash, sourceBlock, -1,
+                destination, -1, itemStackMatcher)).isEmpty()) {
             itemStacks.add(itemStack);
         }
         return itemStacks;
+    }
+
+    /**
+     * Helper function to get a copy of the given stack with the given stacksize.
+     * @param prototype A prototype stack.
+     * @param count A new stacksize.
+     * @return A copy of the given stack with the given count.
+     */
+    public static ItemStack prototypeWithCount(ItemStack prototype, int count) {
+        if (prototype.getCount() != count) {
+            if (prototype.isEmpty()) {
+                return new ItemStack(Items.APPLE, count);
+            } else {
+                prototype.copy();
+                prototype.setCount(count);
+            }
+        }
+        return prototype;
     }
 
 }

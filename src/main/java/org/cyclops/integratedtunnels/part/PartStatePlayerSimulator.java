@@ -3,9 +3,8 @@ package org.cyclops.integratedtunnels.part;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import org.cyclops.integrateddynamics.api.part.PartTarget;
-import org.cyclops.integrateddynamics.core.part.write.PartStateWriterBase;
 import org.cyclops.integratedtunnels.core.ExtendedFakePlayer;
-import org.cyclops.integratedtunnels.core.ItemHandlerPlayerWrapper;
+import org.cyclops.integratedtunnels.core.ItemStoragePlayerWrapper;
 import org.cyclops.integratedtunnels.core.part.PartStateRoundRobin;
 
 import javax.annotation.Nullable;
@@ -32,7 +31,7 @@ public class PartStatePlayerSimulator extends PartStateRoundRobin<PartTypePlayer
             if (player == null) {
                 player = new ExtendedFakePlayer((WorldServer) world);
             }
-            ItemHandlerPlayerWrapper.cancelDestroyingBlock(player);
+            ItemStoragePlayerWrapper.cancelDestroyingBlock(player);
         }
     }
 

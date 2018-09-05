@@ -18,8 +18,12 @@ import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.event.world.BlockEvent;
-import net.minecraftforge.items.IItemHandler;
+import org.cyclops.commoncapabilities.api.ingredient.IIngredientMatcher;
+import org.cyclops.commoncapabilities.api.ingredient.IngredientComponent;
+import org.cyclops.commoncapabilities.api.ingredient.storage.IIngredientComponentStorage;
 import org.cyclops.cyclopscore.helper.BlockHelpers;
+import org.cyclops.cyclopscore.helper.Helpers;
+import org.cyclops.cyclopscore.ingredient.collection.FilteredIngredientCollectionIterator;
 import org.cyclops.integratedtunnels.GeneralConfig;
 import org.cyclops.integratedtunnels.IntegratedTunnels;
 import org.cyclops.integratedtunnels.api.world.IBlockBreakHandler;
@@ -31,12 +35,13 @@ import org.cyclops.integratedtunnels.core.helper.obfuscation.ObfuscationHelpers;
 import javax.annotation.Nonnull;
 import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 
 /**
- * An item handler for world block placement.
+ * An item storage for world block placement.
  * @author rubensworks
  */
-public class ItemHandlerBlockWrapper implements IItemHandler {
+public class ItemStorageBlockWrapper implements IIngredientComponentStorage<ItemStack, Integer> {
 
     private final boolean writeOnly;
     private final WorldServer world;
@@ -52,7 +57,7 @@ public class ItemHandlerBlockWrapper implements IItemHandler {
     private IBlockBreakHandler blockBreakHandler = null;
     private List<ItemStack> cachedDrops = null;
 
-    public ItemHandlerBlockWrapper(boolean writeOnly, WorldServer world, BlockPos pos, EnumFacing side, EnumHand hand,
+    public ItemStorageBlockWrapper(boolean writeOnly, WorldServer world, BlockPos pos, EnumFacing side, EnumHand hand,
                                    boolean blockUpdate, int fortune, boolean silkTouch, boolean ignoreReplacable,
                                    boolean breakOnNoDrops) {
         this.writeOnly = writeOnly;
@@ -65,18 +70,6 @@ public class ItemHandlerBlockWrapper implements IItemHandler {
         this.silkTouch = silkTouch;
         this.ignoreReplacable = ignoreReplacable;
         this.breakOnNoDrops = breakOnNoDrops;
-    }
-
-    @Override
-    public int getSlots() {
-        return getItemStacks().size();
-    }
-
-    @Nonnull
-    @Override
-    public ItemStack getStackInSlot(int slot) {
-        List<ItemStack> itemStacks = getItemStacks();
-        return slot < itemStacks.size() ? itemStacks.get(0) : ItemStack.EMPTY;
     }
 
     protected void sendBlockUpdate() {
@@ -205,13 +198,28 @@ public class ItemHandlerBlockWrapper implements IItemHandler {
         return itemStack;
     }
 
-    @Nonnull
     @Override
-    public ItemStack insertItem(int slot, @Nonnull ItemStack stack, boolean simulate) {
-        if (slot != 0) {
-            return stack;
-        }
+    public IngredientComponent<ItemStack, Integer> getComponent() {
+        return IngredientComponent.ITEMSTACK;
+    }
 
+    @Override
+    public Iterator<ItemStack> iterator() {
+        return getItemStacks().iterator();
+    }
+
+    @Override
+    public Iterator<ItemStack> iterator(@Nonnull ItemStack prototype, Integer matchCondition) {
+        return new FilteredIngredientCollectionIterator<>(this, getComponent().getMatcher(), prototype, matchCondition);
+    }
+
+    @Override
+    public long getMaxQuantity() {
+        return 1;
+    }
+
+    @Override
+    public ItemStack insert(@Nonnull ItemStack stack, boolean simulate) {
         List<ItemStack> itemStacks = getItemStacks();
         if (itemStacks.size() > 0) {
             ItemStack itemStack = itemStacks.get(0);
@@ -232,46 +240,81 @@ public class ItemHandlerBlockWrapper implements IItemHandler {
         return remaining;
     }
 
-    @Nonnull
+    protected void postExtract() {
+        boolean allEmpty = true;
+        for (ItemStack stack : getItemStacks()) {
+            if (!stack.isEmpty()) {
+                allEmpty = false;
+                break;
+            }
+        }
+        if (allEmpty) {
+            IBlockState blockState = world.getBlockState(pos);
+            EntityPlayer player = PlayerHelpers.getFakePlayer(world);
+            player.setActiveHand(hand);
+            removeBlock(blockState, player);
+        }
+    }
+
     @Override
-    public ItemStack extractItem(int slot, int amount, boolean simulate) {
+    public ItemStack extract(@Nonnull ItemStack prototype, Integer matchCondition, boolean simulate) {
+        IIngredientMatcher<ItemStack, Integer> matcher = getComponent().getMatcher();
+        Integer quantityFlag = getComponent().getPrimaryQuantifier().getMatchCondition();
+        Integer subMatchCondition = matcher.withoutCondition(matchCondition, quantityFlag);
         List<ItemStack> itemStacks = getItemStacks();
-        if (slot > itemStacks.size()) {
+        if (itemStacks.isEmpty()) {
             return ItemStack.EMPTY;
         }
-        ItemStack itemStack = itemStacks.get(slot);
+
+        ListIterator<ItemStack> it = itemStacks.listIterator();
+        while (it.hasNext()) {
+            ItemStack itemStack = it.next();
+            if (matcher.matches(prototype, itemStack, subMatchCondition)
+                    && (!matcher.hasCondition(matchCondition, quantityFlag) || itemStack.getCount() >= prototype.getCount())) {
+                itemStack = itemStack.copy();
+                ItemStack ret = itemStack.splitStack(Helpers.castSafe(prototype.getCount()));
+                if (!simulate) {
+                    if (itemStack.isEmpty()) {
+                        it.remove();
+                    } else {
+                        it.set(itemStack);
+                    }
+                }
+
+                // Check if all items have been extracted, if so, remove block
+                if (!simulate) {
+                    postExtract();
+                }
+
+                return ret;
+            }
+        }
+
+        return ItemStack.EMPTY;
+    }
+
+    @Override
+    public ItemStack extract(long maxQuantity, boolean simulate) {
+        List<ItemStack> itemStacks = getItemStacks();
+        if (itemStacks.isEmpty()) {
+            return ItemStack.EMPTY;
+        }
+        ItemStack itemStack = itemStacks.get(0);
         itemStack = itemStack.copy();
-        ItemStack ret = itemStack.splitStack(amount);
+        ItemStack ret = itemStack.splitStack(Helpers.castSafe(maxQuantity));
         if (!simulate) {
             if (itemStack.isEmpty()) {
-                itemStacks.remove(slot);
+                itemStacks.remove(0);
             } else {
-                itemStacks.set(slot, itemStack);
+                itemStacks.set(0, itemStack);
             }
         }
 
         // Check if all items have been extracted, if so, remove block
         if (!simulate) {
-            boolean allEmpty = true;
-            for (ItemStack stack : itemStacks) {
-                if (!stack.isEmpty()) {
-                    allEmpty = false;
-                    break;
-                }
-            }
-            if (allEmpty) {
-                IBlockState blockState = world.getBlockState(pos);
-                EntityPlayer player = PlayerHelpers.getFakePlayer(world);
-                player.setActiveHand(hand);
-                removeBlock(blockState, player);
-            }
+            postExtract();
         }
 
         return ret;
-    }
-
-    @Override
-    public int getSlotLimit(int slot) {
-        return 1;
     }
 }

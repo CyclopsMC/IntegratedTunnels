@@ -15,16 +15,23 @@ public abstract class ItemStackPredicate implements Predicate<ItemStack> {
     private final int matchFlags;
     private final boolean blacklist;
     private final EmptyBehaviour emptyBehaviour;
+    private final boolean empty;
+    private final int maxQuantity;
+    private final boolean exactQuantity;
 
-    public ItemStackPredicate(@Nonnull ItemStack itemStack, int matchFlags, boolean blacklist, EmptyBehaviour emptyBehaviour) {
+    public ItemStackPredicate(@Nonnull ItemStack itemStack, int matchFlags, boolean blacklist, boolean empty,
+                              int maxQuantity, boolean exactQuantity, EmptyBehaviour emptyBehaviour) {
         this.itemStack = itemStack;
         this.matchFlags = matchFlags;
         this.blacklist = blacklist;
+        this.empty = empty;
+        this.maxQuantity = maxQuantity;
+        this.exactQuantity = exactQuantity;
         this.emptyBehaviour = emptyBehaviour;
     }
 
-    public ItemStackPredicate(boolean blacklist) {
-        this(ItemStack.EMPTY, -1, blacklist, EmptyBehaviour.NONE);
+    public ItemStackPredicate(boolean blacklist, boolean empty, int maxQuantity, boolean exactQuantity) {
+        this(ItemStack.EMPTY, -1, blacklist, empty, maxQuantity, exactQuantity, EmptyBehaviour.NONE);
     }
 
     @Nonnull
@@ -44,6 +51,18 @@ public abstract class ItemStackPredicate implements Predicate<ItemStack> {
         return blacklist;
     }
 
+    public boolean isEmpty() {
+        return empty;
+    }
+
+    public int getMaxQuantity() {
+        return maxQuantity;
+    }
+
+    public boolean isExactQuantity() {
+        return exactQuantity;
+    }
+
     public static enum EmptyBehaviour {
         ANY,
         NONE;
@@ -51,6 +70,5 @@ public abstract class ItemStackPredicate implements Predicate<ItemStack> {
         public static EmptyBehaviour fromBoolean(boolean emptyIsAny) {
             return emptyIsAny ? ANY : NONE;
         }
-
     }
 }

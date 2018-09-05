@@ -1,23 +1,28 @@
 package org.cyclops.integratedtunnels.core;
 
-import com.google.common.base.Predicate;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.WorldServer;
-import net.minecraftforge.items.IItemHandler;
+import org.cyclops.commoncapabilities.api.ingredient.IIngredientMatcher;
+import org.cyclops.commoncapabilities.api.ingredient.IngredientComponent;
+import org.cyclops.commoncapabilities.api.ingredient.storage.IIngredientComponentStorage;
+import org.cyclops.cyclopscore.helper.Helpers;
+import org.cyclops.cyclopscore.ingredient.collection.FilteredIngredientCollectionIterator;
 import org.cyclops.integratedtunnels.GeneralConfig;
 
 import javax.annotation.Nonnull;
+import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 
 /**
  * An item handler for importing item entities from the world.
  * @author rubensworks
  */
-public class ItemHandlerWorldEntityImportWrapper implements IItemHandler {
+public class ItemHandlerWorldEntityImportWrapper implements IIngredientComponentStorage<ItemStack, Integer> {
 
     private final WorldServer world;
     private final BlockPos pos;
@@ -32,59 +37,91 @@ public class ItemHandlerWorldEntityImportWrapper implements IItemHandler {
         this.world = world;
         this.pos = pos;
         this.facing = facing;
-        this.entities = world.getEntitiesWithinAABB(EntityItem.class, area, new Predicate<EntityItem>() {
-            @Override
-            public boolean apply(EntityItem input) {
-                return (ignorePickupDelay || !input.cannotPickup()) && !input.isDead;
-            }
-        });
+        this.entities = world.getEntitiesWithinAABB(EntityItem.class, area,
+                input -> (ignorePickupDelay || !input.cannotPickup()) && !input.isDead);
     }
 
     @Override
-    public int getSlots() {
-        return entities.size();
+    public IngredientComponent<ItemStack, Integer> getComponent() {
+        return IngredientComponent.ITEMSTACK;
     }
 
-    @Nonnull
     @Override
-    public ItemStack getStackInSlot(int slot) {
-        return slot < this.entities.size() ? this.entities.get(slot).getItem() : ItemStack.EMPTY;
+    public Iterator<ItemStack> iterator() {
+        return this.entities.stream().map(EntityItem::getItem).iterator();
     }
 
-    @Nonnull
     @Override
-    public ItemStack insertItem(int slot, @Nonnull ItemStack stack, boolean simulate) {
+    public Iterator<ItemStack> iterator(@Nonnull ItemStack prototype, Integer matchCondition) {
+        return new FilteredIngredientCollectionIterator<>(this, getComponent().getMatcher(), prototype, matchCondition);
+    }
+
+    @Override
+    public long getMaxQuantity() {
+        return 64 * entities.size();
+    }
+
+    @Override
+    public ItemStack insert(@Nonnull ItemStack ingredient, boolean simulate) {
         return ItemStack.EMPTY;
     }
 
-    @Nonnull
-    @Override
-    public ItemStack extractItem(int slot, int amount, boolean simulate) {
-        if (slot >= this.entities.size()) {
-            return ItemStack.EMPTY;
+    protected void postExtract(EntityItem entity, ItemStack itemStack) {
+        if (itemStack.isEmpty()) {
+            entity.setDead();
+        } else {
+            entity.setItem(itemStack);
         }
-
-        EntityItem entity = this.entities.get(slot);
-        ItemStack itemStack = entity.getItem();
-        itemStack = itemStack.copy();
-        ItemStack ret = itemStack.splitStack(amount);
-        if (!simulate) {
-            if (itemStack.isEmpty()) {
-                entity.setDead();
-            } else {
-                entity.setItem(itemStack);
-            }
-            if (GeneralConfig.worldInteractionEvents) {
-                world.playEvent(1000, pos, 0); // Sound
-                world.playEvent(2000, pos.offset(facing.getOpposite()), facing.getFrontOffsetX() + 1 + (facing.getFrontOffsetZ() + 1) * 3); // Particles
-            }
+        if (GeneralConfig.worldInteractionEvents) {
+            world.playEvent(1000, pos, 0); // Sound
+            world.playEvent(2000, pos.offset(facing.getOpposite()), facing.getFrontOffsetX() + 1 + (facing.getFrontOffsetZ() + 1) * 3); // Particles
         }
-
-        return ret;
     }
 
     @Override
-    public int getSlotLimit(int slot) {
-        return 64;
+    public ItemStack extract(@Nonnull ItemStack prototype, Integer matchCondition, boolean simulate) {
+        IIngredientMatcher<ItemStack, Integer> matcher = getComponent().getMatcher();
+        Integer quantityFlag = getComponent().getPrimaryQuantifier().getMatchCondition();
+        Integer subMatchCondition = matcher.withoutCondition(matchCondition,
+                getComponent().getPrimaryQuantifier().getMatchCondition());
+        List<EntityItem> entities = this.entities;
+        if (entities.isEmpty()) {
+            return ItemStack.EMPTY;
+        }
+
+        for (EntityItem entity : entities) {
+            ItemStack itemStack = entity.getItem();
+            if (matcher.matches(prototype, itemStack, subMatchCondition)
+                    && (!matcher.hasCondition(matchCondition, quantityFlag) || itemStack.getCount() >= prototype.getCount())) {
+                itemStack = itemStack.copy();
+                ItemStack ret = itemStack.splitStack(Helpers.castSafe(prototype.getCount()));
+
+                // Check if all items have been extracted, if so, remove block
+                if (!simulate) {
+                    postExtract(entity, itemStack);
+                }
+
+                return ret;
+            }
+        }
+
+        return ItemStack.EMPTY;
+    }
+
+    @Override
+    public ItemStack extract(long maxQuantity, boolean simulate) {
+        if (this.entities.isEmpty()) {
+            return ItemStack.EMPTY;
+        }
+
+        EntityItem entity = this.entities.get(0);
+        ItemStack itemStack = entity.getItem();
+        itemStack = itemStack.copy();
+        ItemStack ret = itemStack.splitStack(Helpers.castSafe(maxQuantity));
+        if (!simulate) {
+            postExtract(entity, itemStack);
+        }
+
+        return ret;
     }
 }

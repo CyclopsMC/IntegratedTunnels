@@ -1,6 +1,6 @@
 package org.cyclops.integratedtunnels.core;
 
-import com.google.common.base.Predicate;
+import com.google.common.collect.Iterators;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
@@ -14,7 +14,9 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.WorldServer;
-import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.common.ForgeHooks;
+import net.minecraftforge.event.ForgeEventFactory;
+import org.cyclops.commoncapabilities.api.ingredient.IngredientComponent;
 import org.cyclops.commoncapabilities.api.ingredient.storage.IIngredientComponentStorage;
 import org.cyclops.cyclopscore.helper.ItemStackHelpers;
 import org.cyclops.cyclopscore.inventory.PlayerInventoryIterator;
@@ -22,19 +24,17 @@ import org.cyclops.integratedtunnels.core.helper.obfuscation.ObfuscationHelpers;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.Iterator;
 import java.util.List;
+import java.util.function.Predicate;
 
 /**
- * An item handler for player interaction simulation
+ * An item storage for player interaction simulation
  * @author rubensworks
  */
-public class ItemHandlerPlayerWrapper implements IItemHandler {
+public class ItemStoragePlayerWrapper implements IIngredientComponentStorage<ItemStack, Integer> {
 
-    private static final Predicate<Entity> CAN_BE_ATTACKED = new Predicate<Entity>() {
-        public boolean apply(@Nullable Entity entity) {
-            return entity.canBeAttackedWithItem();
-        }
-    };
+    private static final Predicate<Entity> CAN_BE_ATTACKED = Entity::canBeAttackedWithItem;
 
     private final ExtendedFakePlayer player;
     private final WorldServer world;
@@ -50,7 +50,7 @@ public class ItemHandlerPlayerWrapper implements IItemHandler {
     private final int entityIndex;
     private final IIngredientComponentStorage<ItemStack, Integer> playerReturnHandler;
 
-    public ItemHandlerPlayerWrapper(@Nullable ExtendedFakePlayer player, WorldServer world, BlockPos pos,
+    public ItemStoragePlayerWrapper(@Nullable ExtendedFakePlayer player, WorldServer world, BlockPos pos,
                                     double offsetX, double offsetY, double offsetZ, EnumFacing side, EnumHand hand,
                                     boolean rightClick, boolean sneaking, boolean continuousClick, int entityIndex,
                                     IIngredientComponentStorage<ItemStack, Integer> playerReturnHandler) {
@@ -69,20 +69,52 @@ public class ItemHandlerPlayerWrapper implements IItemHandler {
         this.playerReturnHandler = playerReturnHandler;
     }
 
+    public static void cancelDestroyingBlock(EntityPlayerMP player) {
+        player.interactionManager.cancelDestroyingBlock();
+        ObfuscationHelpers.setDurabilityRemaining(player.interactionManager, -1);
+    }
+
+    protected Entity getEntity(List<Entity> entities) {
+        if (this.entityIndex < 0) {
+            return entities.get(world.rand.nextInt(entities.size()));
+        }
+        return entities.get(Math.min(this.entityIndex, entities.size() - 1));
+    }
+
+    private void returnPlayerInventory(EntityPlayer player) {
+        PlayerInventoryIterator it = new PlayerInventoryIterator(player);
+        while (it.hasNext()) {
+            ItemStack itemStack = it.next();
+            if (!itemStack.isEmpty()) {
+                ItemStack remaining = this.playerReturnHandler.insert(itemStack, false);
+                ItemStackHelpers.spawnItemStackToPlayer(world, pos, remaining, player);
+                it.remove();
+            }
+        }
+    }
+
     @Override
-    public int getSlots() {
+    public IngredientComponent<ItemStack, Integer> getComponent() {
+        return IngredientComponent.ITEMSTACK;
+    }
+
+    @Override
+    public Iterator<ItemStack> iterator() {
+        return Iterators.forArray();
+    }
+
+    @Override
+    public Iterator<ItemStack> iterator(@Nonnull ItemStack prototype, Integer matchCondition) {
+        return iterator();
+    }
+
+    @Override
+    public long getMaxQuantity() {
         return 1;
     }
 
-    @Nonnull
     @Override
-    public ItemStack getStackInSlot(int slot) {
-        return ItemStack.EMPTY;
-    }
-
-    @Nonnull
-    @Override
-    public ItemStack insertItem(int slot, @Nonnull ItemStack stack, boolean simulate) {
+    public ItemStack insert(@Nonnull ItemStack stack, boolean simulate) {
         if (simulate) {
             // We can ALWAYS click with items, so consume the whole item when simulating.
             return ItemStack.EMPTY;
@@ -124,7 +156,7 @@ public class ItemHandlerPlayerWrapper implements IItemHandler {
 
             // Use itemstack
             if (!stack.isEmpty()) {
-                EnumActionResult cancelResult = net.minecraftforge.common.ForgeHooks.onItemRightClick(player, hand);
+                EnumActionResult cancelResult = ForgeHooks.onItemRightClick(player, hand);
                 if (cancelResult != null)  {
                     if (cancelResult == EnumActionResult.FAIL) {
                         return stack;
@@ -141,7 +173,7 @@ public class ItemHandlerPlayerWrapper implements IItemHandler {
                     }
                     if (actionresult.getResult().isEmpty()) {
                         PlayerHelpers.setHeldItemSilent(player, hand, ItemStack.EMPTY);
-                        net.minecraftforge.event.ForgeEventFactory.onPlayerDestroyItem(player, copyBeforeUse, hand);
+                        ForgeEventFactory.onPlayerDestroyItem(player, copyBeforeUse, hand);
                     } else {
                         PlayerHelpers.setHeldItemSilent(player, hand, actionresult.getResult());
                     }
@@ -211,7 +243,7 @@ public class ItemHandlerPlayerWrapper implements IItemHandler {
                 cancelDestroyingBlock(player);
 
                 // Interact with entity
-                List<Entity> entities = world.getEntitiesWithinAABB(Entity.class, new AxisAlignedBB(pos), CAN_BE_ATTACKED);
+                List<Entity> entities = world.getEntitiesWithinAABB(Entity.class, new AxisAlignedBB(pos), CAN_BE_ATTACKED::test);
                 if (entities.size() > 0) {
                     Entity entity = getEntity(entities);
                     player.attackTargetEntityWithCurrentItem(entity);
@@ -226,38 +258,13 @@ public class ItemHandlerPlayerWrapper implements IItemHandler {
         return stack;
     }
 
-    public static void cancelDestroyingBlock(EntityPlayerMP player) {
-        player.interactionManager.cancelDestroyingBlock();
-        ObfuscationHelpers.setDurabilityRemaining(player.interactionManager, -1);
-    }
-
-    protected Entity getEntity(List<Entity> entities) {
-        if (this.entityIndex < 0) {
-            return entities.get(world.rand.nextInt(entities.size()));
-        }
-        return entities.get(Math.min(this.entityIndex, entities.size() - 1));
-    }
-
-    private void returnPlayerInventory(EntityPlayer player) {
-        PlayerInventoryIterator it = new PlayerInventoryIterator(player);
-        while (it.hasNext()) {
-            ItemStack itemStack = it.next();
-            if (!itemStack.isEmpty()) {
-                ItemStack remaining = this.playerReturnHandler.insert(itemStack, false);
-                ItemStackHelpers.spawnItemStackToPlayer(world, pos, remaining, player);
-                it.remove();
-            }
-        }
-    }
-
-    @Nonnull
     @Override
-    public ItemStack extractItem(int slot, int amount, boolean simulate) {
+    public ItemStack extract(@Nonnull ItemStack prototype, Integer matchCondition, boolean simulate) {
         return ItemStack.EMPTY;
     }
 
     @Override
-    public int getSlotLimit(int slot) {
-        return 1;
+    public ItemStack extract(long maxQuantity, boolean simulate) {
+        return ItemStack.EMPTY;
     }
 }

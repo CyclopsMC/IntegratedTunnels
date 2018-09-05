@@ -135,6 +135,20 @@ public class PartTypeInterfaceItem extends PartTypeInterfacePositionedAddon<IIte
         }
 
         @Override
+        public int getLimit() {
+            disablePosition();
+            int limit = 0;
+            if (getPositionedAddonsNetwork() != null) {
+                IItemHandler itemHandler = getItemHandler();
+                for (int i = 0; i < itemHandler.getSlots(); i++) {
+                    limit += itemHandler.getSlotLimit(i);
+                }
+            }
+            enablePosition();
+            return limit;
+        }
+
+        @Override
         public boolean hasCapability(Capability<?> capability) {
             return (getPositionedAddonsNetwork() != null && capability == Capabilities.SLOTLESS_ITEMHANDLER)
                     || super.hasCapability(capability);
