@@ -22,7 +22,7 @@ public interface IFluidTarget extends IChanneledTarget<IFluidNetwork> {
 
     public IIngredientComponentStorage<FluidStack, Integer> getFluidChannel();
 
-    public IIngredientComponentStorage<FluidStack, Integer> getFluidStorage();
+    public IIngredientComponentStorage<FluidStack, Integer> getStorage();
 
     public IngredientPredicate<FluidStack, Integer> getFluidStackMatcher();
 

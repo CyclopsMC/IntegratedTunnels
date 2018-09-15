@@ -22,7 +22,7 @@ public interface IItemTarget extends IChanneledTarget<IItemNetwork> {
 
     public IIngredientComponentStorage<ItemStack, Integer> getItemChannel();
 
-    public IIngredientComponentStorage<ItemStack, Integer> getItemStorage();
+    public IIngredientComponentStorage<ItemStack, Integer> getStorage();
 
     public int getSlot();
 

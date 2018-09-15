@@ -20,7 +20,7 @@ public interface IEnergyTarget extends IChanneledTarget<IEnergyNetwork> {
 
     public IIngredientComponentStorage<Integer, Boolean> getEnergyChannel();
 
-    public IIngredientComponentStorage<Integer, Boolean> getEnergyStorage();
+    public IIngredientComponentStorage<Integer, Boolean> getStorage();
 
     public int getAmount();
 

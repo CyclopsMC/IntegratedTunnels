@@ -18,12 +18,11 @@ import javax.annotation.Nullable;
 /**
  * @author rubensworks
  */
-public class FluidTargetCapabilityProvider extends ChanneledTarget<IFluidNetwork> implements IFluidTarget {
+public class FluidTargetCapabilityProvider extends ChanneledTargetCapabilityProvider<IFluidNetwork, FluidStack, Integer>
+        implements IFluidTarget {
 
     private final int connectionHash;
     private final PartTarget partTarget;
-    private final ICapabilityProvider capabilityProvider;
-    private final EnumFacing side;
     private final IngredientPredicate<FluidStack, Integer> fluidStackMatcher;
     private final IAspectProperties properties;
 
@@ -31,13 +30,11 @@ public class FluidTargetCapabilityProvider extends ChanneledTarget<IFluidNetwork
                                          EnumFacing side, IngredientPredicate<FluidStack, Integer> fluidStackMatcher,
                                          PartTarget partTarget, IAspectProperties properties,
                                          PartStateRoundRobin<?> partState) {
-        super(network.getCapability(FluidNetworkConfig.CAPABILITY), partState,
+        super(capabilityProvider, side, network.getCapability(FluidNetworkConfig.CAPABILITY), partState,
                 properties.getValue(TunnelAspectWriteBuilders.PROP_CHANNEL).getRawValue(),
                 properties.getValue(TunnelAspectWriteBuilders.PROP_ROUNDROBIN).getRawValue());
         int storagePosHash = partTarget.getTarget().hashCode();
         this.connectionHash = transferHash << 4 + storagePosHash ^ System.identityHashCode(getChanneledNetwork());
-        this.capabilityProvider = capabilityProvider;
-        this.side = side;
         this.fluidStackMatcher = fluidStackMatcher;
         this.partTarget = partTarget;
         this.properties = properties;
@@ -51,11 +48,6 @@ public class FluidTargetCapabilityProvider extends ChanneledTarget<IFluidNetwork
     @Override
     public IIngredientComponentStorage<FluidStack, Integer> getFluidChannel() {
         return getChanneledNetwork().getChannel(getChannel());
-    }
-
-    @Override
-    public IIngredientComponentStorage<FluidStack, Integer> getFluidStorage() {
-        return IngredientComponent.FLUIDSTACK.getStorage(capabilityProvider, side);
     }
 
     @Override
@@ -74,7 +66,7 @@ public class FluidTargetCapabilityProvider extends ChanneledTarget<IFluidNetwork
     }
 
     @Override
-    public boolean hasValidTarget() {
-        return capabilityProvider != null;
+    protected IngredientComponent<FluidStack, Integer> getComponent() {
+        return IngredientComponent.FLUIDSTACK;
     }
 }

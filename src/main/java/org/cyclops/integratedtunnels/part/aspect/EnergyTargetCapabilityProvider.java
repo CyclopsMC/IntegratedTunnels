@@ -14,36 +14,23 @@ import javax.annotation.Nullable;
 /**
  * @author rubensworks
  */
-public class EnergyTargetCapabilityProvider extends ChanneledTarget<IEnergyNetwork> implements IEnergyTarget {
+public class EnergyTargetCapabilityProvider extends ChanneledTargetCapabilityProvider<IEnergyNetwork, Integer, Boolean>
+        implements IEnergyTarget {
 
-    private final ICapabilityProvider capabilityProvider;
-    private final EnumFacing side;
     private final int amount;
     private final boolean exactAmount;
 
     public EnergyTargetCapabilityProvider(@Nullable ICapabilityProvider capabilityProvider, EnumFacing side, INetwork network, int channel,
                                           int amount, boolean exactAmount,
                                           boolean roundRobin, PartStateRoundRobin<?> partStateEnergy) {
-        super(network.getCapability(Capabilities.NETWORK_ENERGY), partStateEnergy, channel, roundRobin);
-        this.capabilityProvider = capabilityProvider;
-        this.side = side;
+        super(capabilityProvider, side, network.getCapability(Capabilities.NETWORK_ENERGY), partStateEnergy, channel, roundRobin);
         this.amount = amount;
         this.exactAmount = exactAmount;
     }
 
     @Override
-    public boolean hasValidTarget() {
-        return capabilityProvider != null;
-    }
-
-    @Override
     public IIngredientComponentStorage<Integer, Boolean> getEnergyChannel() {
         return getChanneledNetwork().getChannel(getChannel());
-    }
-
-    @Override
-    public IIngredientComponentStorage<Integer, Boolean> getEnergyStorage() {
-        return IngredientComponent.ENERGY.getStorage(capabilityProvider, side);
     }
 
     @Override
@@ -54,5 +41,10 @@ public class EnergyTargetCapabilityProvider extends ChanneledTarget<IEnergyNetwo
     @Override
     public boolean isExactAmount() {
         return exactAmount;
+    }
+
+    @Override
+    protected IngredientComponent<Integer, Boolean> getComponent() {
+        return IngredientComponent.ENERGY;
     }
 }

@@ -49,7 +49,7 @@ public class ItemTargetStorage extends ChanneledTarget<IItemNetwork> implements 
     }
 
     @Override
-    public IIngredientComponentStorage<ItemStack, Integer> getItemStorage() {
+    public IIngredientComponentStorage<ItemStack, Integer> getStorage() {
         return storage;
     }
 

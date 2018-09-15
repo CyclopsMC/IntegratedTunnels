@@ -160,7 +160,7 @@ public class TunnelAspectWriteBuilders {
                 PROP_EXPORT = input -> {
             if (input.hasValidTarget() && input.getAmount() != 0) {
                 input.preTransfer();
-                TunnelEnergyHelpers.moveEnergy(input.getEnergyChannel(), input.getEnergyStorage(), input.getAmount(), input.isExactAmount());
+                TunnelEnergyHelpers.moveEnergy(input.getEnergyChannel(), input.getStorage(), input.getAmount(), input.isExactAmount());
                 input.postTransfer();
             }
             return null;
@@ -169,7 +169,7 @@ public class TunnelAspectWriteBuilders {
                 PROP_IMPORT = input -> {
             if (input.hasValidTarget() && input.getAmount() != 0) {
                 input.preTransfer();
-                TunnelEnergyHelpers.moveEnergy(input.getEnergyStorage(), input.getEnergyChannel(), input.getAmount(), input.isExactAmount());
+                TunnelEnergyHelpers.moveEnergy(input.getStorage(), input.getEnergyChannel(), input.getAmount(), input.isExactAmount());
                 input.postTransfer();
             }
             return null;
@@ -498,7 +498,7 @@ public class TunnelAspectWriteBuilders {
                 TunnelHelpers.moveSingleStateOptimized(
                         input.getConnectionHash(),
                         input.getItemChannel(), -1,
-                        input.getItemStorage(), input.getSlot(),
+                        input.getStorage(), input.getSlot(),
                         input.getItemStackMatcher());
                 input.postTransfer();
             }
@@ -510,7 +510,7 @@ public class TunnelAspectWriteBuilders {
                 input.preTransfer();
                 TunnelHelpers.moveSingleStateOptimized(
                         input.getConnectionHash(),
-                        input.getItemStorage(), input.getSlot(),
+                        input.getStorage(), input.getSlot(),
                         input.getItemChannel(), -1,
                         input.getItemStackMatcher());
                 input.postTransfer();
@@ -721,7 +721,7 @@ public class TunnelAspectWriteBuilders {
                 PROP_EXPORT = input -> {
             if (input.hasValidTarget()) {
                 input.preTransfer();
-                TunnelHelpers.moveSingleStateOptimized(input.getConnectionHash(), input.getFluidChannel(), -1, input.getFluidStorage(), -1, input.getFluidStackMatcher());
+                TunnelHelpers.moveSingleStateOptimized(input.getConnectionHash(), input.getFluidChannel(), -1, input.getStorage(), -1, input.getFluidStackMatcher());
                 input.postTransfer();
             }
             return null;
@@ -730,7 +730,7 @@ public class TunnelAspectWriteBuilders {
                 PROP_IMPORT = input -> {
             if (input.hasValidTarget()) {
                 input.preTransfer();
-                TunnelHelpers.moveSingleStateOptimized(input.getConnectionHash(), input.getFluidStorage(), -1, input.getFluidChannel(), -1, input.getFluidStackMatcher());
+                TunnelHelpers.moveSingleStateOptimized(input.getConnectionHash(), input.getStorage(), -1, input.getFluidChannel(), -1, input.getFluidStackMatcher());
                 input.postTransfer();
             }
             return null;

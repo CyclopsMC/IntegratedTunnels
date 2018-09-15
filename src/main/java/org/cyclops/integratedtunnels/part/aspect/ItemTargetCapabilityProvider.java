@@ -18,11 +18,10 @@ import javax.annotation.Nullable;
 /**
  * @author rubensworks
  */
-public class ItemTargetCapabilityProvider extends ChanneledTarget<IItemNetwork> implements IItemTarget {
+public class ItemTargetCapabilityProvider extends ChanneledTargetCapabilityProvider<IItemNetwork, ItemStack, Integer>
+        implements IItemTarget {
 
     private final int connectionHash;
-    private final ICapabilityProvider capabilityProvider;
-    private final EnumFacing side;
     private final int slot;
     private final IngredientPredicate<ItemStack, Integer> itemStackMatcher;
     private final PartTarget partTarget;
@@ -32,13 +31,11 @@ public class ItemTargetCapabilityProvider extends ChanneledTarget<IItemNetwork> 
                                         EnumFacing side, int slot,
                                         IngredientPredicate<ItemStack, Integer> itemStackMatcher, PartTarget partTarget,
                                         IAspectProperties properties, PartStateRoundRobin<?> partState) {
-        super(network.getCapability(ItemNetworkConfig.CAPABILITY), partState,
+        super(capabilityProvider, side, network.getCapability(ItemNetworkConfig.CAPABILITY), partState,
                 properties.getValue(TunnelAspectWriteBuilders.PROP_CHANNEL).getRawValue(),
                 properties.getValue(TunnelAspectWriteBuilders.PROP_ROUNDROBIN).getRawValue());
         int storagePosHash = partTarget.getTarget().hashCode();
         this.connectionHash = transferHash << 4 + storagePosHash ^ System.identityHashCode(getChanneledNetwork());
-        this.capabilityProvider = capabilityProvider;
-        this.side = side;
         this.slot = slot;
         this.itemStackMatcher = itemStackMatcher;
         this.partTarget = partTarget;
@@ -48,16 +45,6 @@ public class ItemTargetCapabilityProvider extends ChanneledTarget<IItemNetwork> 
     @Override
     public IIngredientComponentStorage<ItemStack, Integer> getItemChannel() {
         return getChanneledNetwork().getChannel(getChannel());
-    }
-
-    @Override
-    public boolean hasValidTarget() {
-        return capabilityProvider != null;
-    }
-
-    @Override
-    public IIngredientComponentStorage<ItemStack, Integer> getItemStorage() {
-        return IngredientComponent.ITEMSTACK.getStorage(capabilityProvider, side);
     }
 
     @Override
@@ -83,5 +70,10 @@ public class ItemTargetCapabilityProvider extends ChanneledTarget<IItemNetwork> 
     @Override
     public int getConnectionHash() {
         return connectionHash;
+    }
+
+    @Override
+    protected IngredientComponent<ItemStack, Integer> getComponent() {
+        return IngredientComponent.ITEMSTACK;
     }
 }

@@ -47,7 +47,7 @@ public class FluidTargetStorage extends ChanneledTarget<IFluidNetwork> implement
     }
 
     @Override
-    public IIngredientComponentStorage<FluidStack, Integer> getFluidStorage() {
+    public IIngredientComponentStorage<FluidStack, Integer> getStorage() {
         return storage;
     }
 
