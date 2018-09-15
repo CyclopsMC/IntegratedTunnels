@@ -998,7 +998,7 @@ public class TunnelAspectWriteBuilders {
                 };
             }
             public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, Boolean>, IItemTarget>
-                    PROP_BOOLEAN_ITEMTARGET = input -> IItemTarget.ofCapabilityProvider(input.getRight() ? 1 : 0,
+                    PROP_BOOLEAN_ITEMTARGET = input -> IItemTarget.ofBlock(input.getRight() ? 1 : 0,
                     input.getLeft(), input.getMiddle(),
                     input.getRight() ? TunnelItemHelpers.matchAll(64, false) : TunnelItemHelpers.MATCH_NONE,
                     input.getMiddle().getValue(TunnelAspectWriteBuilders.Item.PROP_SLOT).getRawValue());
@@ -1185,7 +1185,7 @@ public class TunnelAspectWriteBuilders {
                 boolean checkNbt = properties.getValue(TunnelAspectWriteBuilders.Fluid.PROP_CHECK_NBT).getRawValue();
                 boolean blacklist = properties.getValue(PROP_BLACKLIST).getRawValue();
                 int transferHash = input.getRight().hashCode();
-                return IFluidTarget.ofCapabilityProvider(transferHash, input.getLeft(), input.getMiddle(),
+                return IFluidTarget.ofBlock(transferHash, input.getLeft(), input.getMiddle(),
                         TunnelFluidHelpers.matchFluidStack(input.getRight(), true, false, checkNbt, blacklist, true));
             };
             public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, ValueTypeList.ValueList>, IFluidTarget>
@@ -1200,7 +1200,7 @@ public class TunnelAspectWriteBuilders {
                 boolean blacklist = properties.getValue(PROP_BLACKLIST).getRawValue();
                 int transferHash = list.getRawValue().hashCode();
                 IngredientPredicate<FluidStack, Integer> fluidStackPredicate = TunnelFluidHelpers.matchFluidStacks(list.getRawValue(), false, false, checkNbt, blacklist, net.minecraftforge.fluids.Fluid.BUCKET_VOLUME, true);
-                return IFluidTarget.ofCapabilityProvider(transferHash, input.getLeft(), input.getMiddle(), fluidStackPredicate);
+                return IFluidTarget.ofBlock(transferHash, input.getLeft(), input.getMiddle(), fluidStackPredicate);
             };
             public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, ValueTypeOperator.ValueOperator>, IFluidTarget>
                     PROP_FLUIDSTACKPREDICATE_FLUIDTARGET = input -> {
@@ -1209,7 +1209,7 @@ public class TunnelAspectWriteBuilders {
                         && ValueHelpers.correspondsTo(predicate.getInputTypes()[0], ValueTypes.OBJECT_FLUIDSTACK)
                         && ValueHelpers.correspondsTo(predicate.getOutputType(), ValueTypes.BOOLEAN)) {
                     int transferHash = predicate.hashCode();
-                    return IFluidTarget.ofCapabilityProvider(transferHash, input.getLeft(), input.getMiddle(),
+                    return IFluidTarget.ofBlock(transferHash, input.getLeft(), input.getMiddle(),
                             TunnelFluidHelpers.matchPredicate(input.getLeft(), predicate,
                                     net.minecraftforge.fluids.Fluid.BUCKET_VOLUME, true));
                 } else {
@@ -1230,7 +1230,7 @@ public class TunnelAspectWriteBuilders {
                 boolean blacklist = properties.getValue(PROP_BLACKLIST).getRawValue();
                 int transferHash = tag.hashCode();
                 IngredientPredicate<FluidStack, Integer> fluidStackMatcher = TunnelFluidHelpers.matchNbt(tag, subset, superset, requireNbt, recursive, blacklist, net.minecraftforge.fluids.Fluid.BUCKET_VOLUME, true);
-                return IFluidTarget.ofCapabilityProvider(transferHash, input.getLeft(), input.getMiddle(), fluidStackMatcher);
+                return IFluidTarget.ofBlock(transferHash, input.getLeft(), input.getMiddle(), fluidStackMatcher);
             };
 
             public static final IAspectValuePropagator<IFluidTarget, Void>

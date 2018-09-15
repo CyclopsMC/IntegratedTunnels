@@ -54,6 +54,16 @@ public interface IFluidTarget extends IChanneledTarget<IFluidNetwork> {
                 fluidStackMatcher, partTarget, properties, partState);
     }
 
+    public static FluidTargetCapabilityProvider ofBlock(int transferHash, PartTarget partTarget, IAspectProperties properties,
+                                                        IngredientPredicate<FluidStack, Integer> fluidStackMatcher) {
+        PartPos center = partTarget.getCenter();
+        PartPos target = partTarget.getTarget();
+        INetwork network = IChanneledTarget.getNetworkChecked(center);
+        PartStateRoundRobin<?> partState = (PartStateRoundRobin<?>) PartHelpers.getPart(center).getState();
+        return new FluidTargetCapabilityProvider(transferHash, network, null, target.getSide(),
+                fluidStackMatcher, partTarget, properties, partState);
+    }
+
     public static FluidTargetStorage ofStorage(int transferHash, INetwork network, PartTarget partTarget,
                                                IAspectProperties properties,
                                                IngredientPredicate<FluidStack, Integer> fluidStackMatcher,

@@ -56,6 +56,16 @@ public interface IItemTarget extends IChanneledTarget<IItemNetwork> {
                 slot, itemStackMatcher, partTarget, properties, partState);
     }
 
+    public static ItemTargetCapabilityProvider ofBlock(int transferHash, PartTarget partTarget, IAspectProperties properties,
+                                                                    IngredientPredicate<ItemStack, Integer> itemStackMatcher, int slot) {
+        PartPos center = partTarget.getCenter();
+        PartPos target = partTarget.getTarget();
+        INetwork network = IChanneledTarget.getNetworkChecked(center);
+        PartStateRoundRobin<?> partState = (PartStateRoundRobin<?>) PartHelpers.getPart(center).getState();
+        return new ItemTargetCapabilityProvider(transferHash, network, null, target.getSide(),
+                slot, itemStackMatcher, partTarget, properties, partState);
+    }
+
     public static ItemTargetStorage ofStorage(int transferHash, INetwork network, PartTarget partTarget,
                                               IAspectProperties properties, IngredientPredicate<ItemStack, Integer> itemStackMatcher,
                                               IIngredientComponentStorage<ItemStack, Integer> storage, int slot) {
