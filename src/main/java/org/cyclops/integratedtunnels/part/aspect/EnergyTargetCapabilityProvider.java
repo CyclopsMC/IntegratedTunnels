@@ -32,7 +32,7 @@ public class EnergyTargetCapabilityProvider extends ChanneledTarget<IEnergyNetwo
     }
 
     @Override
-    public boolean hasEnergyStorage() {
+    public boolean hasValidTarget() {
         return capabilityProvider != null;
     }
 

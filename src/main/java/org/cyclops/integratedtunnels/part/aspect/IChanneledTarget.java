@@ -17,6 +17,8 @@ public interface IChanneledTarget<N extends IPositionedAddonsNetwork> {
 
     public N getChanneledNetwork();
 
+    public boolean hasValidTarget();
+
     public PartStateRoundRobin<?> getPartState();
 
     public int getChannel();

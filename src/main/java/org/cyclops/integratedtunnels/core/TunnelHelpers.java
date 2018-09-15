@@ -44,7 +44,7 @@ public class TunnelHelpers {
                         ingredientPredicate.getInstance(), ingredientPredicate.getMatchFlags(), simulate);
             } else {
                 return IngredientStorageHelpers.moveIngredientsSlotted(source, sourceSlot, destination, destinationSlot,
-                        ingredientPredicate, Integer.MAX_VALUE, ingredientPredicate.isExactQuantity(), simulate);
+                        ingredientPredicate, ingredientPredicate.getMaxQuantity(), ingredientPredicate.isExactQuantity(), simulate);
             }
         } catch (IllegalStateException e) {
             IntegratedTunnels.clog(Level.WARN, e.getMessage());

@@ -18,8 +18,6 @@ import javax.annotation.Nullable;
  */
 public interface IEnergyTarget extends IChanneledTarget<IEnergyNetwork> {
 
-    public boolean hasEnergyStorage();
-
     public IIngredientComponentStorage<Integer, Boolean> getEnergyChannel();
 
     public IIngredientComponentStorage<Integer, Boolean> getEnergyStorage();

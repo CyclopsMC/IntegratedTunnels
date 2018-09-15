@@ -51,7 +51,7 @@ public class ItemTargetCapabilityProvider extends ChanneledTarget<IItemNetwork> 
     }
 
     @Override
-    public boolean hasItemStorage() {
+    public boolean hasValidTarget() {
         return capabilityProvider != null;
     }
 

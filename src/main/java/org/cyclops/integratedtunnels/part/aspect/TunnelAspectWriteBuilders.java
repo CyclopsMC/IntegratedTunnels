@@ -15,9 +15,7 @@ import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
-import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.items.CapabilityItemHandler;
-import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.lang3.tuple.Triple;
 import org.cyclops.commoncapabilities.api.ingredient.storage.IIngredientComponentStorage;
 import org.cyclops.cyclopscore.datastructure.DimPos;
@@ -54,16 +52,15 @@ import org.cyclops.integratedtunnels.IntegratedTunnels;
 import org.cyclops.integratedtunnels.api.network.IItemNetwork;
 import org.cyclops.integratedtunnels.capability.network.FluidNetworkConfig;
 import org.cyclops.integratedtunnels.capability.network.ItemNetworkConfig;
+import org.cyclops.integratedtunnels.core.IngredientPredicate;
 import org.cyclops.integratedtunnels.core.ItemHandlerWorldEntityExportWrapper;
 import org.cyclops.integratedtunnels.core.ItemHandlerWorldEntityImportWrapper;
-import org.cyclops.integratedtunnels.core.IngredientPredicate;
 import org.cyclops.integratedtunnels.core.ItemStoragePlayerWrapper;
 import org.cyclops.integratedtunnels.core.TunnelEnergyHelpers;
 import org.cyclops.integratedtunnels.core.TunnelFluidHelpers;
 import org.cyclops.integratedtunnels.core.TunnelHelpers;
 import org.cyclops.integratedtunnels.core.TunnelItemHelpers;
 import org.cyclops.integratedtunnels.core.part.PartStatePositionedAddon;
-import org.cyclops.integratedtunnels.core.part.PartStateRoundRobin;
 import org.cyclops.integratedtunnels.part.PartStatePlayerSimulator;
 
 import javax.annotation.Nullable;
@@ -161,7 +158,7 @@ public class TunnelAspectWriteBuilders {
                 PROP_ENERGYTARGET = input -> IEnergyTarget.ofTile(input.getLeft(), input.getMiddle(), input.getRight());
         public static final IAspectValuePropagator<IEnergyTarget, Void>
                 PROP_EXPORT = input -> {
-            if (input.hasEnergyStorage() && input.getAmount() != 0) {
+            if (input.hasValidTarget() && input.getAmount() != 0) {
                 input.preTransfer();
                 TunnelEnergyHelpers.moveEnergy(input.getEnergyChannel(), input.getEnergyStorage(), input.getAmount(), input.isExactAmount());
                 input.postTransfer();
@@ -170,7 +167,7 @@ public class TunnelAspectWriteBuilders {
         };
         public static final IAspectValuePropagator<IEnergyTarget, Void>
                 PROP_IMPORT = input -> {
-            if (input.hasEnergyStorage() && input.getAmount() != 0) {
+            if (input.hasValidTarget() && input.getAmount() != 0) {
                 input.preTransfer();
                 TunnelEnergyHelpers.moveEnergy(input.getEnergyStorage(), input.getEnergyChannel(), input.getAmount(), input.isExactAmount());
                 input.postTransfer();
@@ -335,7 +332,7 @@ public class TunnelAspectWriteBuilders {
             PROPERTIES_NBT.setValue(PROP_NBT_RECURSIVE, ValueTypeBoolean.ValueBoolean.of(true));
         }
 
-        public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, Boolean>, Triple<PartTarget, IAspectProperties, ItemInformation>>
+        public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, Boolean>, Triple<PartTarget, IAspectProperties, ChanneledTargetInformation<ItemStack, Integer>>>
                 PROP_BOOLEAN_ITEMPREDICATE = input -> {
             IAspectProperties properties = input.getMiddle();
             int amount = input.getRight() ? input.getMiddle().getValue(PROP_RATE).getRawValue() : 0;
@@ -343,9 +340,9 @@ public class TunnelAspectWriteBuilders {
             IngredientPredicate<ItemStack, Integer> itemStackMatcher = input.getRight() ? TunnelItemHelpers.matchAll(amount, exactAmount) : TunnelItemHelpers.MATCH_NONE;
             int transferHash = input.getRight() ? 1 : 0;
             int slot = input.getMiddle().getValue(PROP_SLOT).getRawValue();
-            return Triple.of(input.getLeft(), input.getMiddle(), ItemInformation.of(itemStackMatcher, transferHash, slot));
+            return Triple.of(input.getLeft(), input.getMiddle(), ChanneledTargetInformation.of(itemStackMatcher, transferHash, slot));
         };
-        public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, Integer>, Triple<PartTarget, IAspectProperties, ItemInformation>>
+        public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, Integer>, Triple<PartTarget, IAspectProperties, ChanneledTargetInformation<ItemStack, Integer>>>
                 PROP_INTEGER_ITEMPREDICATE = input -> {
             IAspectProperties properties = input.getMiddle();
             int amount = input.getRight();
@@ -353,9 +350,9 @@ public class TunnelAspectWriteBuilders {
             IngredientPredicate<ItemStack, Integer> itemStackMatcher = TunnelItemHelpers.matchAll(amount, exactAmount);
             int transferHash = input.getRight();
             int slot = properties.getValue(PROP_SLOT).getRawValue();
-            return Triple.of(input.getLeft(), input.getMiddle(), ItemInformation.of(itemStackMatcher, transferHash, slot));
+            return Triple.of(input.getLeft(), input.getMiddle(), ChanneledTargetInformation.of(itemStackMatcher, transferHash, slot));
         };
-        public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, Integer>, Triple<PartTarget, IAspectProperties, ItemInformation>>
+        public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, Integer>, Triple<PartTarget, IAspectProperties, ChanneledTargetInformation<ItemStack, Integer>>>
                 PROP_INTEGER_SLOT_ITEMPREDICATE = input -> {
             IAspectProperties properties = input.getMiddle();
             int amount = input.getRight() >= -1 ? properties.getValue(PROP_RATE).getRawValue() : 0;
@@ -363,9 +360,9 @@ public class TunnelAspectWriteBuilders {
             IngredientPredicate<ItemStack, Integer> itemStackMatcher = TunnelItemHelpers.matchAll(amount, exactAmount);
             int transferHash = input.getRight() > 0 ? 1 : 0;
             int slot = input.getRight();
-            return Triple.of(input.getLeft(), input.getMiddle(), ItemInformation.of(itemStackMatcher, transferHash, slot));
+            return Triple.of(input.getLeft(), input.getMiddle(), ChanneledTargetInformation.of(itemStackMatcher, transferHash, slot));
         };
-        public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, ItemStack>, Triple<PartTarget, IAspectProperties, ItemInformation>>
+        public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, ItemStack>, Triple<PartTarget, IAspectProperties, ChanneledTargetInformation<ItemStack, Integer>>>
                 PROP_ITEMSTACK_ITEMPREDICATE = input -> {
             IAspectProperties properties = input.getMiddle();
             boolean checkStackSize = properties.getValue(PROP_CHECK_STACKSIZE).getRawValue();
@@ -380,9 +377,9 @@ public class TunnelAspectWriteBuilders {
             IngredientPredicate<ItemStack, Integer> itemStackMatcher = TunnelItemHelpers.matchItemStack(prototype, true, checkStackSize, checkDamage, checkNbt, blacklist, exactAmount, emptyBehaviour);
             int transferHash = ItemStackHelpers.getItemStackHashCode(input.getRight());
             int slot = properties.getValue(PROP_SLOT).getRawValue();
-            return Triple.of(input.getLeft(), input.getMiddle(), ItemInformation.of(itemStackMatcher, transferHash, slot));
+            return Triple.of(input.getLeft(), input.getMiddle(), ChanneledTargetInformation.of(itemStackMatcher, transferHash, slot));
         };
-        public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, ValueTypeList.ValueList>, Triple<PartTarget, IAspectProperties, ItemInformation>>
+        public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, ValueTypeList.ValueList>, Triple<PartTarget, IAspectProperties, ChanneledTargetInformation<ItemStack, Integer>>>
                 PROP_ITEMSTACKLIST_ITEMPREDICATE = input -> {
             ValueTypeList.ValueList list = input.getRight();
             if (list.getRawValue().getValueType() != ValueTypes.OBJECT_ITEMSTACK) {
@@ -400,9 +397,9 @@ public class TunnelAspectWriteBuilders {
             IngredientPredicate<ItemStack, Integer> itemStackMatcher = TunnelItemHelpers.matchItemStacks(list.getRawValue(), true, checkStackSize, checkDamage, checkNbt, blacklist, amount, exactAmount);
             int transferHash = list.getRawValue().hashCode();
             int slot = properties.getValue(PROP_SLOT).getRawValue();
-            return Triple.of(input.getLeft(), input.getMiddle(), ItemInformation.of(itemStackMatcher, transferHash, slot));
+            return Triple.of(input.getLeft(), input.getMiddle(), ChanneledTargetInformation.of(itemStackMatcher, transferHash, slot));
         };
-        public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, ValueTypeOperator.ValueOperator>, Triple<PartTarget, IAspectProperties, ItemInformation>>
+        public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, ValueTypeOperator.ValueOperator>, Triple<PartTarget, IAspectProperties, ChanneledTargetInformation<ItemStack, Integer>>>
                 PROP_ITEMSTACKPREDICATE_ITEMPREDICATE = input -> {
             IOperator predicate = input.getRight().getRawValue();
             if (predicate.getInputTypes().length == 1
@@ -414,7 +411,7 @@ public class TunnelAspectWriteBuilders {
                 IngredientPredicate<ItemStack, Integer> itemStackMatcher = TunnelItemHelpers.matchPredicateItem(input.getLeft(), predicate, amount, exactAmount);
                 int transferHash = predicate.hashCode();
                 int slot = properties.getValue(PROP_SLOT).getRawValue();
-                return Triple.of(input.getLeft(), input.getMiddle(), ItemInformation.of(itemStackMatcher, transferHash, slot));
+                return Triple.of(input.getLeft(), input.getMiddle(), ChanneledTargetInformation.of(itemStackMatcher, transferHash, slot));
             } else {
                 String current = ValueTypeOperator.getSignature(predicate);
                 String expected = ValueTypeOperator.getSignature(new IValueType[]{ValueTypes.OBJECT_ITEMSTACK}, ValueTypes.BOOLEAN);
@@ -422,7 +419,7 @@ public class TunnelAspectWriteBuilders {
                         expected, current).localize());
             }
         };
-        public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, NBTTagCompound>, Triple<PartTarget, IAspectProperties, ItemInformation>>
+        public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, NBTTagCompound>, Triple<PartTarget, IAspectProperties, ChanneledTargetInformation<ItemStack, Integer>>>
                 PROP_NBT_ITEMPREDICATE = input -> {
             NBTTagCompound tag = input.getRight();
             IAspectProperties properties = input.getMiddle();
@@ -436,9 +433,9 @@ public class TunnelAspectWriteBuilders {
             boolean recursive = properties.getValue(PROP_NBT_RECURSIVE).getRawValue();
             boolean blacklist = properties.getValue(PROP_BLACKLIST).getRawValue();
             IngredientPredicate<ItemStack, Integer> itemStackMatcher = TunnelItemHelpers.matchNbt(tag, subset, superset, requireNbt, recursive, blacklist, amount, exactAmount);
-            return Triple.of(input.getLeft(), input.getMiddle(), ItemInformation.of(itemStackMatcher, transferHash, slot));
+            return Triple.of(input.getLeft(), input.getMiddle(), ChanneledTargetInformation.of(itemStackMatcher, transferHash, slot));
         };
-        public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, IBlockState>, Triple<PartTarget, IAspectProperties, ItemInformation>>
+        public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, IBlockState>, Triple<PartTarget, IAspectProperties, ChanneledTargetInformation<ItemStack, Integer>>>
                 PROP_BLOCK_ITEMPREDICATE = input -> {
             IAspectProperties properties = input.getMiddle();
 
@@ -450,9 +447,9 @@ public class TunnelAspectWriteBuilders {
             IngredientPredicate<ItemStack, Integer> itemStackMatcher = TunnelItemHelpers.matchItemStack(prototype, true, false, true, false, blacklist, exactAmount, emptyBehaviour);
             int transferHash = ItemStackHelpers.getItemStackHashCode(prototype);
             int slot = properties.getValue(PROP_SLOT).getRawValue();
-            return Triple.of(input.getLeft(), input.getMiddle(), ItemInformation.of(itemStackMatcher, transferHash, slot));
+            return Triple.of(input.getLeft(), input.getMiddle(), ChanneledTargetInformation.of(itemStackMatcher, transferHash, slot));
         };
-        public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, ValueTypeList.ValueList>, Triple<PartTarget, IAspectProperties, ItemInformation>>
+        public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, ValueTypeList.ValueList>, Triple<PartTarget, IAspectProperties, ChanneledTargetInformation<ItemStack, Integer>>>
                 PROP_BLOCKLIST_ITEMPREDICATE = input -> {
             ValueTypeList.ValueList list = input.getRight();
             if (list.getRawValue().getValueType() != ValueTypes.OBJECT_BLOCK) {
@@ -467,9 +464,9 @@ public class TunnelAspectWriteBuilders {
             IngredientPredicate<ItemStack, Integer> itemStackMatcher = TunnelItemHelpers.matchBlocks(list.getRawValue(), true, false, true, false, blacklist, amount, exactAmount);
             int transferHash = list.getRawValue().hashCode();
             int slot = properties.getValue(PROP_SLOT).getRawValue();
-            return Triple.of(input.getLeft(), input.getMiddle(), ItemInformation.of(itemStackMatcher, transferHash, slot));
+            return Triple.of(input.getLeft(), input.getMiddle(), ChanneledTargetInformation.of(itemStackMatcher, transferHash, slot));
         };
-        public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, ValueTypeOperator.ValueOperator>, Triple<PartTarget, IAspectProperties, ItemInformation>>
+        public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, ValueTypeOperator.ValueOperator>, Triple<PartTarget, IAspectProperties, ChanneledTargetInformation<ItemStack, Integer>>>
                 PROP_BLOCKPREDICATE_ITEMPREDICATE = input -> {
             IOperator predicate = input.getRight().getRawValue();
             if (predicate.getInputTypes().length == 1
@@ -481,7 +478,7 @@ public class TunnelAspectWriteBuilders {
                 IngredientPredicate<ItemStack, Integer> itemStackMatcher = TunnelItemHelpers.matchPredicateBlock(input.getLeft(), predicate, amount, exactAmount);
                 int transferHash = predicate.hashCode();
                 int slot = properties.getValue(PROP_SLOT).getRawValue();
-                return Triple.of(input.getLeft(), input.getMiddle(), ItemInformation.of(itemStackMatcher, transferHash, slot));
+                return Triple.of(input.getLeft(), input.getMiddle(), ChanneledTargetInformation.of(itemStackMatcher, transferHash, slot));
             } else {
                 String current = ValueTypeOperator.getSignature(predicate);
                 String expected = ValueTypeOperator.getSignature(new IValueType[]{ValueTypes.OBJECT_BLOCK}, ValueTypes.BOOLEAN);
@@ -490,13 +487,13 @@ public class TunnelAspectWriteBuilders {
             }
         };
 
-        public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, ItemInformation>, IItemTarget>
+        public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, ChanneledTargetInformation<ItemStack, Integer>>, IItemTarget>
                 PROP_ITEMTARGET = input -> IItemTarget.ofCapabilityProvider(input.getRight().getTransferHash(), input.getLeft(),
-                input.getMiddle(), input.getRight().getItemStackPredicate(), input.getRight().getSlot());
+                input.getMiddle(), input.getRight().getIngredientPredicate(), input.getRight().getSlot());
 
         public static final IAspectValuePropagator<IItemTarget, Void>
                 PROP_EXPORT = input -> {
-            if (input.hasItemStorage()) {
+            if (input.hasValidTarget()) {
                 input.preTransfer();
                 TunnelHelpers.moveSingleStateOptimized(
                         input.getConnectionHash(),
@@ -509,7 +506,7 @@ public class TunnelAspectWriteBuilders {
         };
         public static final IAspectValuePropagator<IItemTarget, Void>
                 PROP_IMPORT = input -> {
-            if (input.hasItemStorage()) {
+            if (input.hasValidTarget()) {
                 input.preTransfer();
                 TunnelHelpers.moveSingleStateOptimized(
                         input.getConnectionHash(),
@@ -520,35 +517,6 @@ public class TunnelAspectWriteBuilders {
             }
             return null;
         };
-
-        public static class ItemInformation {
-
-            private final IngredientPredicate<ItemStack, Integer> itemStackPredicate;
-            private final int transferHash;
-            private final int slot;
-
-            protected ItemInformation(IngredientPredicate<ItemStack, Integer> itemStackPredicate, int transferHash, int slot) {
-                this.itemStackPredicate = itemStackPredicate;
-                this.transferHash = transferHash;
-                this.slot = slot;
-            }
-
-            public static ItemInformation of(IngredientPredicate<ItemStack, Integer> itemStackPredicate, int transferHash, int slot) {
-                return new ItemInformation(itemStackPredicate, transferHash, slot);
-            }
-
-            public IngredientPredicate<ItemStack, Integer> getItemStackPredicate() {
-                return itemStackPredicate;
-            }
-
-            public int getTransferHash() {
-                return transferHash;
-            }
-
-            public int getSlot() {
-                return slot;
-            }
-        }
 
     }
 
@@ -677,19 +645,22 @@ public class TunnelAspectWriteBuilders {
         public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, Boolean>, Triple<PartTarget, IAspectProperties, Integer>>
                 PROP_BOOLEAN_GETRATE = input -> Triple.of(input.getLeft(), input.getMiddle(), input.getRight() ? input.getMiddle().getValue(PROP_RATE).getRawValue() : 0);
 
-        public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, Integer>, Triple<PartTarget, IAspectProperties, Pair<Predicate<FluidStack>, Integer>>>
-                PROP_INTEGER_FLUIDPREDICATE = input -> Triple.of(input.getLeft(), input.getMiddle(), Pair.of(TunnelFluidHelpers.MATCH_ALL, input.getRight()));
-        public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, FluidStack>, Triple<PartTarget, IAspectProperties, Pair<Predicate<FluidStack>, Integer>>>
+        public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, Integer>, Triple<PartTarget, IAspectProperties, ChanneledTargetInformation<FluidStack, Integer>>>
+                PROP_INTEGER_FLUIDPREDICATE = input -> Triple.of(input.getLeft(), input.getMiddle(), ChanneledTargetInformation.of(TunnelFluidHelpers.matchAll(input.getRight(), false), input.getRight(), -1));
+        public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, FluidStack>, Triple<PartTarget, IAspectProperties, ChanneledTargetInformation<FluidStack, Integer>>>
                 PROP_FLUIDSTACK_FLUIDPREDICATE = input -> {
             IAspectProperties properties = input.getMiddle();
             int rate = properties.getValue(PROP_RATE).getRawValue();
+            boolean exactAmount = properties.getValue(PROP_EXACTAMOUNT).getRawValue();
             boolean checkAmount = properties.getValue(PROP_CHECK_AMOUNT).getRawValue();
             boolean checkNbt = properties.getValue(PROP_CHECK_NBT).getRawValue();
             boolean blacklist = properties.getValue(PROP_BLACKLIST).getRawValue();
+            int transferHash = input.getRight().hashCode();
             return Triple.of(input.getLeft(), input.getMiddle(),
-                    Pair.of(TunnelFluidHelpers.matchFluidStack(input.getRight(), checkAmount, checkNbt, blacklist), rate));
+                    ChanneledTargetInformation.of(TunnelFluidHelpers.matchFluidStack(TunnelFluidHelpers.prototypeWithCount(input.getRight(), rate), true, checkAmount, checkNbt, blacklist, exactAmount),
+                            transferHash, -1));
         };
-        public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, ValueTypeList.ValueList>, Triple<PartTarget, IAspectProperties, Pair<Predicate<FluidStack>, Integer>>>
+        public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, ValueTypeList.ValueList>, Triple<PartTarget, IAspectProperties, ChanneledTargetInformation<FluidStack, Integer>>>
                 PROP_FLUIDSTACKLIST_FLUIDPREDICATE = input -> {
             ValueTypeList.ValueList<ValueObjectTypeFluidStack, ValueObjectTypeFluidStack.ValueFluidStack> list = input.getRight();
             if (list.getRawValue().getValueType() != ValueTypes.OBJECT_FLUIDSTACK) {
@@ -698,17 +669,16 @@ public class TunnelAspectWriteBuilders {
             }
             IAspectProperties properties = input.getMiddle();
             int rate = properties.getValue(PROP_RATE).getRawValue();
+            boolean exactAmount = properties.getValue(PROP_EXACTAMOUNT).getRawValue();
             boolean checkAmount = properties.getValue(PROP_CHECK_AMOUNT).getRawValue();
             boolean checkNbt = properties.getValue(PROP_CHECK_NBT).getRawValue();
             boolean blacklist = properties.getValue(PROP_BLACKLIST).getRawValue();
-            Predicate<FluidStack> fluidStackPredicate = TunnelFluidHelpers.matchFluidStacks(list.getRawValue(), checkAmount, checkNbt);
-            if (blacklist) {
-                fluidStackPredicate = fluidStackPredicate.negate();
-            }
+            int transferHash = list.getRawValue().hashCode();
             return Triple.of(input.getLeft(), input.getMiddle(),
-                    Pair.of(fluidStackPredicate, rate));
+                    ChanneledTargetInformation.of(TunnelFluidHelpers.matchFluidStacks(list.getRawValue(), true, checkAmount, checkNbt, blacklist, rate, exactAmount),
+                            transferHash, -1));
         };
-        public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, ValueTypeOperator.ValueOperator>, Triple<PartTarget, IAspectProperties, Pair<Predicate<FluidStack>, Integer>>>
+        public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, ValueTypeOperator.ValueOperator>, Triple<PartTarget, IAspectProperties, ChanneledTargetInformation<FluidStack, Integer>>>
                 PROP_FLUIDSTACKPREDICATE_FLUIDPREDICATE = input -> {
             IOperator predicate = input.getRight().getRawValue();
             if (predicate.getInputTypes().length == 1
@@ -716,8 +686,11 @@ public class TunnelAspectWriteBuilders {
                     && ValueHelpers.correspondsTo(predicate.getOutputType(), ValueTypes.BOOLEAN)) {
                 IAspectProperties properties = input.getMiddle();
                 int rate = properties.getValue(PROP_RATE).getRawValue();
+                boolean exactAmount = properties.getValue(PROP_EXACTAMOUNT).getRawValue();
+                int transferHash = predicate.hashCode();
                 return Triple.of(input.getLeft(), input.getMiddle(),
-                        Pair.of(TunnelFluidHelpers.matchPredicate(input.getLeft(), predicate), rate));
+                        ChanneledTargetInformation.of(TunnelFluidHelpers.matchPredicate(input.getLeft(), predicate, rate, exactAmount),
+                                transferHash, -1));
             } else {
                 String current = ValueTypeOperator.getSignature(predicate);
                 String expected = ValueTypeOperator.getSignature(new IValueType[]{ValueTypes.OBJECT_FLUIDSTACK}, ValueTypes.BOOLEAN);
@@ -725,36 +698,39 @@ public class TunnelAspectWriteBuilders {
                         expected, current).localize());
             }
         };
-        public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, NBTTagCompound>, Triple<PartTarget, IAspectProperties, Pair<Predicate<FluidStack>, Integer>>>
+        public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, NBTTagCompound>, Triple<PartTarget, IAspectProperties, ChanneledTargetInformation<FluidStack, Integer>>>
                 PROP_NBT_FLUIDPREDICATE = input -> {
             IAspectProperties properties = input.getMiddle();
             NBTTagCompound tag = input.getRight();
             int rate = properties.getValue(PROP_RATE).getRawValue();
+            boolean exactAmount = properties.getValue(PROP_EXACTAMOUNT).getRawValue();
             boolean subset = properties.getValue(PROP_NBT_SUBSET).getRawValue();
             boolean superset = properties.getValue(PROP_NBT_SUPERSET).getRawValue();
             boolean requireNbt = properties.getValue(PROP_NBT_REQUIRE).getRawValue();
             boolean recursive = properties.getValue(PROP_NBT_RECURSIVE).getRawValue();
-            Predicate<FluidStack> fluidStackMatcher = TunnelFluidHelpers.matchNbt(tag, subset, superset, requireNbt, recursive);
-            return Triple.of(input.getLeft(), input.getMiddle(), Pair.of(fluidStackMatcher, rate));
+            boolean blacklist = properties.getValue(PROP_BLACKLIST).getRawValue();
+            int transferHash = tag.hashCode();
+            IngredientPredicate<FluidStack, Integer> fluidStackMatcher = TunnelFluidHelpers.matchNbt(tag, subset, superset, requireNbt, recursive, blacklist, rate, exactAmount);
+            return Triple.of(input.getLeft(), input.getMiddle(), ChanneledTargetInformation.of(fluidStackMatcher, transferHash, -1));
         };
-        public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, Pair<Predicate<FluidStack>, Integer>>, IFluidTarget>
-                PROP_FLUIDTARGET = input -> IFluidTarget.ofCapabilityProvider(input.getLeft(), input.getMiddle(),
-                input.getRight().getRight(), input.getRight().getLeft());
+        public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, ChanneledTargetInformation<FluidStack, Integer>>, IFluidTarget>
+                PROP_FLUIDTARGET = input -> IFluidTarget.ofCapabilityProvider(input.getRight().getTransferHash(),
+                input.getLeft(), input.getMiddle(), input.getRight().getIngredientPredicate());
 
         public static final IAspectValuePropagator<IFluidTarget, Void>
                 PROP_EXPORT = input -> {
-            if (input.getChanneledNetwork() != null && input.getFluidHandler() != null && input.getAmount() != 0) {
+            if (input.hasValidTarget()) {
                 input.preTransfer();
-                TunnelFluidHelpers.moveFluids(input.getFluidChannelExternal(), input.getFluidHandler(), input.getAmount(), true, input.getFluidStackMatcher(), input.isExactAmount());
+                TunnelHelpers.moveSingleStateOptimized(input.getConnectionHash(), input.getFluidChannel(), -1, input.getFluidStorage(), -1, input.getFluidStackMatcher());
                 input.postTransfer();
             }
             return null;
         };
         public static final IAspectValuePropagator<IFluidTarget, Void>
                 PROP_IMPORT = input -> {
-            if (input.getChanneledNetwork() != null && input.getFluidHandler() != null && input.getAmount() != 0) {
+            if (input.hasValidTarget()) {
                 input.preTransfer();
-                TunnelFluidHelpers.moveFluids(input.getFluidHandler(), input.getFluidChannelExternal(), input.getAmount(), true, input.getFluidStackMatcher(), input.isExactAmount());
+                TunnelHelpers.moveSingleStateOptimized(input.getConnectionHash(), input.getFluidStorage(), -1, input.getFluidChannel(), -1, input.getFluidStackMatcher());
                 input.postTransfer();
             }
             return null;
@@ -1027,13 +1003,13 @@ public class TunnelAspectWriteBuilders {
                     input.getRight() ? TunnelItemHelpers.matchAll(64, false) : TunnelItemHelpers.MATCH_NONE,
                     input.getMiddle().getValue(TunnelAspectWriteBuilders.Item.PROP_SLOT).getRawValue());
 
-            public static IAspectValuePropagator<Triple<PartTarget, IAspectProperties, TunnelAspectWriteBuilders.Item.ItemInformation>, IItemTarget>
+            public static IAspectValuePropagator<Triple<PartTarget, IAspectProperties, ChanneledTargetInformation<ItemStack, Integer>>, IItemTarget>
             newPropEntityItemItemTarget(final boolean doImport) {
                 return input -> {
                     PartTarget partTarget = input.getLeft();
                     IAspectProperties properties = input.getMiddle();
                     int transferHash = input.getRight().getTransferHash();
-                    IngredientPredicate<ItemStack, Integer> itemStackMatcher = input.getRight().getItemStackPredicate();
+                    IngredientPredicate<ItemStack, Integer> itemStackMatcher = input.getRight().getIngredientPredicate();
 
                     PartPos center = partTarget.getCenter();
                     PartPos target = partTarget.getTarget();
@@ -1067,17 +1043,17 @@ public class TunnelAspectWriteBuilders {
                 };
             }
 
-            public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, TunnelAspectWriteBuilders.Item.ItemInformation>, IItemTarget>
+            public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, ChanneledTargetInformation<ItemStack, Integer>>, IItemTarget>
                     PROP_ENTITYITEM_ITEMTARGET_IMPORT = newPropEntityItemItemTarget(true);
-            public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, TunnelAspectWriteBuilders.Item.ItemInformation>, IItemTarget>
+            public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, ChanneledTargetInformation<ItemStack, Integer>>, IItemTarget>
                     PROP_ENTITYITEM_ITEMTARGET_EXPORT = newPropEntityItemItemTarget(false);
 
-            public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, TunnelAspectWriteBuilders.Item.ItemInformation>, IItemTarget>
+            public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, ChanneledTargetInformation<ItemStack, Integer>>, IItemTarget>
                     PROP_ENTITY_ITEMTARGET = input -> {
                 PartTarget partTarget = input.getLeft();
                 IAspectProperties properties = input.getMiddle();
                 int transferHash = input.getRight().getTransferHash();
-                IngredientPredicate<ItemStack, Integer> itemStackMatcher = input.getRight().getItemStackPredicate();
+                IngredientPredicate<ItemStack, Integer> itemStackMatcher = input.getRight().getIngredientPredicate();
                 int entityIndex = properties.getValue(World.PROPERTY_ENTITYINDEX).getRawValue();
 
                 PartPos target = partTarget.getTarget();
@@ -1196,15 +1172,21 @@ public class TunnelAspectWriteBuilders {
             }
 
             public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, Boolean>, IFluidTarget>
-                    PROP_BOOLEAN_FLUIDTARGET = input -> IFluidTarget.ofCapabilityProvider(input.getLeft(), input.getMiddle(), net.minecraftforge.fluids.Fluid.BUCKET_VOLUME,
-                    input.getRight() ? TunnelFluidHelpers.MATCH_ALL : TunnelFluidHelpers.MATCH_NONE);
+                    PROP_BOOLEAN_FLUIDTARGET = input -> IFluidTarget.ofCapabilityProvider(
+                            input.getRight() ? 1 : 0,
+                    input.getLeft(),
+                    input.getMiddle(),
+                    input.getRight() ? TunnelFluidHelpers
+                            .matchAll(net.minecraftforge.fluids.Fluid.BUCKET_VOLUME, false)
+                            : TunnelFluidHelpers.MATCH_NONE);
             public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, FluidStack>, IFluidTarget>
                     PROP_FLUIDSTACK_FLUIDTARGET = input -> {
                 IAspectProperties properties = input.getMiddle();
                 boolean checkNbt = properties.getValue(TunnelAspectWriteBuilders.Fluid.PROP_CHECK_NBT).getRawValue();
                 boolean blacklist = properties.getValue(PROP_BLACKLIST).getRawValue();
-                return IFluidTarget.ofCapabilityProvider(input.getLeft(), input.getMiddle(), net.minecraftforge.fluids.Fluid.BUCKET_VOLUME,
-                        TunnelFluidHelpers.matchFluidStack(input.getRight(), false, checkNbt, blacklist));
+                int transferHash = input.getRight().hashCode();
+                return IFluidTarget.ofCapabilityProvider(transferHash, input.getLeft(), input.getMiddle(),
+                        TunnelFluidHelpers.matchFluidStack(input.getRight(), true, false, checkNbt, blacklist, true));
             };
             public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, ValueTypeList.ValueList>, IFluidTarget>
                     PROP_FLUIDSTACKLIST_FLUIDTARGET = input -> {
@@ -1216,11 +1198,9 @@ public class TunnelAspectWriteBuilders {
                 IAspectProperties properties = input.getMiddle();
                 boolean checkNbt = properties.getValue(TunnelAspectWriteBuilders.Fluid.PROP_CHECK_NBT).getRawValue();
                 boolean blacklist = properties.getValue(PROP_BLACKLIST).getRawValue();
-                Predicate<FluidStack> fluidStackPredicate = TunnelFluidHelpers.matchFluidStacks(list.getRawValue(), false, checkNbt);
-                if (blacklist) {
-                    fluidStackPredicate = fluidStackPredicate.negate();
-                }
-                return IFluidTarget.ofCapabilityProvider(input.getLeft(), input.getMiddle(), net.minecraftforge.fluids.Fluid.BUCKET_VOLUME, fluidStackPredicate);
+                int transferHash = list.getRawValue().hashCode();
+                IngredientPredicate<FluidStack, Integer> fluidStackPredicate = TunnelFluidHelpers.matchFluidStacks(list.getRawValue(), false, false, checkNbt, blacklist, net.minecraftforge.fluids.Fluid.BUCKET_VOLUME, true);
+                return IFluidTarget.ofCapabilityProvider(transferHash, input.getLeft(), input.getMiddle(), fluidStackPredicate);
             };
             public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, ValueTypeOperator.ValueOperator>, IFluidTarget>
                     PROP_FLUIDSTACKPREDICATE_FLUIDTARGET = input -> {
@@ -1228,8 +1208,10 @@ public class TunnelAspectWriteBuilders {
                 if (predicate.getInputTypes().length == 1
                         && ValueHelpers.correspondsTo(predicate.getInputTypes()[0], ValueTypes.OBJECT_FLUIDSTACK)
                         && ValueHelpers.correspondsTo(predicate.getOutputType(), ValueTypes.BOOLEAN)) {
-                    return IFluidTarget.ofCapabilityProvider(input.getLeft(), input.getMiddle(), net.minecraftforge.fluids.Fluid.BUCKET_VOLUME,
-                            TunnelFluidHelpers.matchPredicate(input.getLeft(), predicate));
+                    int transferHash = predicate.hashCode();
+                    return IFluidTarget.ofCapabilityProvider(transferHash, input.getLeft(), input.getMiddle(),
+                            TunnelFluidHelpers.matchPredicate(input.getLeft(), predicate,
+                                    net.minecraftforge.fluids.Fluid.BUCKET_VOLUME, true));
                 } else {
                     String current = ValueTypeOperator.getSignature(predicate);
                     String expected = ValueTypeOperator.getSignature(new IValueType[]{ValueTypes.OBJECT_FLUIDSTACK}, ValueTypes.BOOLEAN);
@@ -1245,8 +1227,10 @@ public class TunnelAspectWriteBuilders {
                 boolean superset = properties.getValue(TunnelAspectWriteBuilders.Fluid.PROP_NBT_SUPERSET).getRawValue();
                 boolean requireNbt = properties.getValue(TunnelAspectWriteBuilders.Fluid.PROP_NBT_REQUIRE).getRawValue();
                 boolean recursive = properties.getValue(TunnelAspectWriteBuilders.Fluid.PROP_NBT_RECURSIVE).getRawValue();
-                Predicate<FluidStack> fluidStackMatcher = TunnelFluidHelpers.matchNbt(tag, subset, superset, requireNbt, recursive);
-                return IFluidTarget.ofCapabilityProvider(input.getLeft(), input.getMiddle(), net.minecraftforge.fluids.Fluid.BUCKET_VOLUME, fluidStackMatcher);
+                boolean blacklist = properties.getValue(PROP_BLACKLIST).getRawValue();
+                int transferHash = tag.hashCode();
+                IngredientPredicate<FluidStack, Integer> fluidStackMatcher = TunnelFluidHelpers.matchNbt(tag, subset, superset, requireNbt, recursive, blacklist, net.minecraftforge.fluids.Fluid.BUCKET_VOLUME, true);
+                return IFluidTarget.ofCapabilityProvider(transferHash, input.getLeft(), input.getMiddle(), fluidStackMatcher);
             };
 
             public static final IAspectValuePropagator<IFluidTarget, Void>
@@ -1254,9 +1238,9 @@ public class TunnelAspectWriteBuilders {
                 PartPos target = input.getPartTarget().getTarget();
                 final DimPos pos = target.getPos();
                 if (pos.isLoaded() && input.getChanneledNetwork() != null) {
-                    IFluidHandler fluidChannel = input.getFluidChannelExternal();
+                    IIngredientComponentStorage<FluidStack, Integer> fluidChannel = input.getFluidChannel();
                     input.preTransfer();
-                    TunnelFluidHelpers.placeFluids(fluidChannel, pos.getWorld(), pos.getBlockPos(),
+                    TunnelFluidHelpers.placeFluids(input.getConnectionHash(), fluidChannel, pos.getWorld(), pos.getBlockPos(),
                             input.getFluidStackMatcher(), input.getProperties().getValue(PROP_BLOCK_UPDATE).getRawValue(),
                             input.getProperties().getValue(PROP_IGNORE_REPLACABLE).getRawValue());
                     input.postTransfer();
@@ -1270,34 +1254,27 @@ public class TunnelAspectWriteBuilders {
                 PartPos target = input.getPartTarget().getTarget();
                 final DimPos pos = target.getPos();
                 if (pos.isLoaded() && input.getChanneledNetwork() != null) {
-                    IFluidHandler fluidChannel = input.getFluidChannelExternal();
+                    IIngredientComponentStorage<FluidStack, Integer> fluidChannel = input.getFluidChannel();
                     input.preTransfer();
-                    TunnelFluidHelpers.pickUpFluids(target.getPos().getWorld(), target.getPos().getBlockPos(),
-                            target.getSide(), fluidChannel, input.getFluidStackMatcher());
+                    TunnelFluidHelpers.pickUpFluids(input.getConnectionHash(), target.getPos().getWorld(),
+                            target.getPos().getBlockPos(), target.getSide(), fluidChannel, input.getFluidStackMatcher());
                     input.postTransfer();
                 }
                 return null;
             };
 
-            public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, Pair<Predicate<FluidStack>, Integer>>, IFluidTarget>
+            public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, ChanneledTargetInformation<FluidStack, Integer>>, IFluidTarget>
                     PROP_ENTITY_FLUIDTARGET = input -> {
                 PartTarget partTarget = input.getLeft();
                 IAspectProperties properties = input.getMiddle();
-                int amount = input.getRight().getRight();
-                Predicate<FluidStack> fluidStackPredicate = input.getRight().getLeft();
+                IngredientPredicate<FluidStack, Integer> fluidStackPredicate = input.getRight().getIngredientPredicate();
                 int entityIndex = properties.getValue(World.PROPERTY_ENTITYINDEX).getRawValue();
 
-                PartPos center = partTarget.getCenter();
                 PartPos target = partTarget.getTarget();
-                INetwork network = IChanneledTarget.getNetworkChecked(center);
-                IFluidHandler fluidHandler = null;
-                Entity entity = getEntity(target, entityIndex);
-                if (entity != null && entity.hasCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, target.getSide())) {
-                    fluidHandler = entity.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, target.getSide());
-                }
-                PartStateRoundRobin<?> partState = (PartStateRoundRobin<?>) PartHelpers.getPart(center).getState();
-                return new FluidTargetCapabilityProvider(partTarget, network.getCapability(Capabilities.NETWORK_FLUID),
-                        fluidHandler, amount, fluidStackPredicate, properties, partState);
+                Entity entity = Iterables.get(target.getPos().getWorld().getEntitiesWithinAABB(Entity.class,
+                        new AxisAlignedBB(target.getPos().getBlockPos())), entityIndex, null);
+                int transferHash = input.getRight().getTransferHash();
+                return IFluidTarget.ofEntity(transferHash, partTarget, entity, properties, fluidStackPredicate);
             };
 
         }
@@ -1703,12 +1680,12 @@ public class TunnelAspectWriteBuilders {
             return null;
         };
 
-        public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, TunnelAspectWriteBuilders.Item.ItemInformation>, IItemTarget>
+        public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, ChanneledTargetInformation<ItemStack, Integer>>, IItemTarget>
                 PROP_ITEMTARGET_CLICK = input -> {
             PartTarget partTarget = input.getLeft();
             IAspectProperties properties = input.getMiddle();
             int transferHash = input.getRight().getTransferHash();
-            IngredientPredicate<ItemStack, Integer> itemStackMatcher = input.getRight().getItemStackPredicate();
+            IngredientPredicate<ItemStack, Integer> itemStackMatcher = input.getRight().getIngredientPredicate();
             EnumHand hand = input.getMiddle().getValue(World.PROP_HAND_RIGHT).getRawValue()
                     ? EnumHand.MAIN_HAND : EnumHand.OFF_HAND;
             boolean rightClick = input.getMiddle().getValue(PROP_RIGHT_CLICK).getRawValue();

@@ -1,38 +1,45 @@
 package org.cyclops.integratedtunnels.part.aspect;
 
+import net.minecraft.util.EnumFacing;
+import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
-import net.minecraftforge.fluids.capability.IFluidHandler;
+import org.cyclops.commoncapabilities.api.ingredient.IngredientComponent;
 import org.cyclops.commoncapabilities.api.ingredient.storage.IIngredientComponentStorage;
+import org.cyclops.integrateddynamics.api.network.INetwork;
 import org.cyclops.integrateddynamics.api.part.PartTarget;
 import org.cyclops.integrateddynamics.api.part.aspect.property.IAspectProperties;
 import org.cyclops.integratedtunnels.api.network.IFluidNetwork;
+import org.cyclops.integratedtunnels.capability.network.FluidNetworkConfig;
+import org.cyclops.integratedtunnels.core.IngredientPredicate;
 import org.cyclops.integratedtunnels.core.part.PartStateRoundRobin;
 
-import java.util.function.Predicate;
+import javax.annotation.Nullable;
 
 /**
  * @author rubensworks
  */
 public class FluidTargetCapabilityProvider extends ChanneledTarget<IFluidNetwork> implements IFluidTarget {
 
+    private final int connectionHash;
     private final PartTarget partTarget;
-    private final IFluidHandler fluidHandler;
-    private final int amount;
-    private final Predicate<FluidStack> fluidStackMatcher;
+    private final ICapabilityProvider capabilityProvider;
+    private final EnumFacing side;
+    private final IngredientPredicate<FluidStack, Integer> fluidStackMatcher;
     private final IAspectProperties properties;
-    private final boolean exactAmount;
 
-    public FluidTargetCapabilityProvider(PartTarget partTarget, IFluidNetwork fluidNetwork, IFluidHandler fluidHandler,
-                                         int amount, Predicate<FluidStack> fluidStackMatcher, IAspectProperties properties,
+    public FluidTargetCapabilityProvider(int transferHash, INetwork network, @Nullable ICapabilityProvider capabilityProvider,
+                                         EnumFacing side, IngredientPredicate<FluidStack, Integer> fluidStackMatcher,
+                                         PartTarget partTarget, IAspectProperties properties,
                                          PartStateRoundRobin<?> partState) {
-        super(fluidNetwork, partState, properties.getValue(TunnelAspectWriteBuilders.PROP_CHANNEL).getRawValue(),
+        super(network.getCapability(FluidNetworkConfig.CAPABILITY), partState,
+                properties.getValue(TunnelAspectWriteBuilders.PROP_CHANNEL).getRawValue(),
                 properties.getValue(TunnelAspectWriteBuilders.PROP_ROUNDROBIN).getRawValue());
-        this.partTarget = partTarget;
-        this.fluidHandler = fluidHandler;
-        this.amount = amount;
-        this.exactAmount = properties.getValue(TunnelAspectWriteBuilders.PROP_EXACTAMOUNT).getRawValue();
+        int storagePosHash = partTarget.getTarget().hashCode();
+        this.connectionHash = transferHash << 4 + storagePosHash ^ System.identityHashCode(getChanneledNetwork());
+        this.capabilityProvider = capabilityProvider;
+        this.side = side;
         this.fluidStackMatcher = fluidStackMatcher;
+        this.partTarget = partTarget;
         this.properties = properties;
     }
 
@@ -42,37 +49,32 @@ public class FluidTargetCapabilityProvider extends ChanneledTarget<IFluidNetwork
     }
 
     @Override
-    public IFluidHandler getFluidHandler() {
-        return fluidHandler;
-    }
-
-    @Override
     public IIngredientComponentStorage<FluidStack, Integer> getFluidChannel() {
         return getChanneledNetwork().getChannel(getChannel());
     }
 
     @Override
-    public IFluidHandler getFluidChannelExternal() {
-        return getChanneledNetwork().getChannelExternal(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, getChannel());
+    public IIngredientComponentStorage<FluidStack, Integer> getFluidStorage() {
+        return IngredientComponent.FLUIDSTACK.getStorage(capabilityProvider, side);
     }
 
     @Override
-    public int getAmount() {
-        return amount;
-    }
-
-    @Override
-    public boolean isExactAmount() {
-        return exactAmount;
-    }
-
-    @Override
-    public Predicate<FluidStack> getFluidStackMatcher() {
+    public IngredientPredicate<FluidStack, Integer> getFluidStackMatcher() {
         return fluidStackMatcher;
     }
 
     @Override
     public IAspectProperties getProperties() {
         return properties;
+    }
+
+    @Override
+    public int getConnectionHash() {
+        return connectionHash;
+    }
+
+    @Override
+    public boolean hasValidTarget() {
+        return capabilityProvider != null;
     }
 }

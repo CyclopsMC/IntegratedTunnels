@@ -1,45 +1,43 @@
 package org.cyclops.integratedtunnels.part.aspect;
 
-import net.minecraft.item.ItemStack;
+import net.minecraftforge.fluids.FluidStack;
 import org.cyclops.commoncapabilities.api.ingredient.storage.IIngredientComponentStorage;
 import org.cyclops.integrateddynamics.api.network.INetwork;
 import org.cyclops.integrateddynamics.api.part.PartTarget;
 import org.cyclops.integrateddynamics.api.part.aspect.property.IAspectProperties;
-import org.cyclops.integratedtunnels.api.network.IItemNetwork;
-import org.cyclops.integratedtunnels.capability.network.ItemNetworkConfig;
+import org.cyclops.integratedtunnels.api.network.IFluidNetwork;
+import org.cyclops.integratedtunnels.capability.network.FluidNetworkConfig;
 import org.cyclops.integratedtunnels.core.IngredientPredicate;
 import org.cyclops.integratedtunnels.core.part.PartStateRoundRobin;
 
 /**
  * @author rubensworks
  */
-public class ItemTargetStorage extends ChanneledTarget<IItemNetwork> implements IItemTarget {
+public class FluidTargetStorage extends ChanneledTarget<IFluidNetwork> implements IFluidTarget {
 
     private final int connectionHash;
-    private final IIngredientComponentStorage<ItemStack, Integer> storage;
-    private final int slot;
-    private final IngredientPredicate<ItemStack, Integer> itemStackMatcher;
+    private final IIngredientComponentStorage<FluidStack, Integer> storage;
+    private final IngredientPredicate<FluidStack, Integer> fluidStackMatcher;
     private final PartTarget partTarget;
     private final IAspectProperties properties;
 
-    public ItemTargetStorage(int transferHash, INetwork network,
-                             IIngredientComponentStorage<ItemStack, Integer> storage, int slot,
-                             IngredientPredicate<ItemStack, Integer> itemStackMatcher, PartTarget partTarget,
-                             IAspectProperties properties, PartStateRoundRobin<?> partState) {
-        super(network.getCapability(ItemNetworkConfig.CAPABILITY), partState,
+    public FluidTargetStorage(int transferHash, INetwork network,
+                              IIngredientComponentStorage<FluidStack, Integer> storage,
+                              IngredientPredicate<FluidStack, Integer> fluidStackMatcher, PartTarget partTarget,
+                              IAspectProperties properties, PartStateRoundRobin<?> partState) {
+        super(network.getCapability(FluidNetworkConfig.CAPABILITY), partState,
                 properties.getValue(TunnelAspectWriteBuilders.PROP_CHANNEL).getRawValue(),
                 properties.getValue(TunnelAspectWriteBuilders.PROP_ROUNDROBIN).getRawValue());
         int storagePosHash = partTarget.getTarget().hashCode();
         this.connectionHash = transferHash << 4 + storagePosHash ^ System.identityHashCode(getChanneledNetwork());
         this.storage = storage;
-        this.slot = slot;
-        this.itemStackMatcher = itemStackMatcher;
+        this.fluidStackMatcher = fluidStackMatcher;
         this.partTarget = partTarget;
         this.properties = properties;
     }
 
     @Override
-    public IIngredientComponentStorage<ItemStack, Integer> getItemChannel() {
+    public IIngredientComponentStorage<FluidStack, Integer> getFluidChannel() {
         return getChanneledNetwork().getChannel(getChannel());
     }
 
@@ -49,18 +47,13 @@ public class ItemTargetStorage extends ChanneledTarget<IItemNetwork> implements 
     }
 
     @Override
-    public IIngredientComponentStorage<ItemStack, Integer> getItemStorage() {
+    public IIngredientComponentStorage<FluidStack, Integer> getFluidStorage() {
         return storage;
     }
 
     @Override
-    public int getSlot() {
-        return slot;
-    }
-
-    @Override
-    public IngredientPredicate<ItemStack, Integer> getItemStackMatcher() {
-        return itemStackMatcher;
+    public IngredientPredicate<FluidStack, Integer> getFluidStackMatcher() {
+        return fluidStackMatcher;
     }
 
     @Override
@@ -77,4 +70,5 @@ public class ItemTargetStorage extends ChanneledTarget<IItemNetwork> implements 
     public int getConnectionHash() {
         return connectionHash;
     }
+
 }

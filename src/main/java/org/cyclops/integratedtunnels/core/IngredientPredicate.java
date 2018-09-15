@@ -23,7 +23,7 @@ public abstract class IngredientPredicate<T, M> implements Predicate<T> {
     private final boolean exactQuantity;
 
     public IngredientPredicate(IngredientComponent<T, M> ingredientComponent,
-                               @Nonnull T instance, M matchFlags, boolean blacklist, boolean empty,
+                               T instance, M matchFlags, boolean blacklist, boolean empty,
                                int maxQuantity, boolean exactQuantity, EmptyBehaviour emptyBehaviour) {
         this.ingredientComponent = ingredientComponent;
         this.instance = instance;
@@ -55,7 +55,8 @@ public abstract class IngredientPredicate<T, M> implements Predicate<T> {
     }
 
     public boolean hasMatchFlags() {
-        return matchFlags != null && (emptyBehaviour == EmptyBehaviour.ANY || !getIngredientComponent().getMatcher().isEmpty(getInstance()));
+        return matchFlags != null && !blacklist
+                && (emptyBehaviour == EmptyBehaviour.ANY || !getIngredientComponent().getMatcher().isEmpty(getInstance()));
     }
 
     public boolean isBlacklist() {

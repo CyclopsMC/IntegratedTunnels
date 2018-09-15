@@ -22,8 +22,6 @@ public interface IItemTarget extends IChanneledTarget<IItemNetwork> {
 
     public IIngredientComponentStorage<ItemStack, Integer> getItemChannel();
 
-    public boolean hasItemStorage();
-
     public IIngredientComponentStorage<ItemStack, Integer> getItemStorage();
 
     public int getSlot();

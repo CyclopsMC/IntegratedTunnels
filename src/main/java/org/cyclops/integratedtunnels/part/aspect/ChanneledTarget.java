@@ -7,7 +7,7 @@ import org.cyclops.integratedtunnels.core.part.PartStateRoundRobin;
  * A helper class for movement targets with a certain network type.
  * @author rubensworks
  */
-public class ChanneledTarget<N extends IPositionedAddonsNetwork> implements IChanneledTarget<N> {
+public abstract class ChanneledTarget<N extends IPositionedAddonsNetwork> implements IChanneledTarget<N> {
 
     private final N channeledNetwork;
     private final PartStateRoundRobin<?> partState;
