@@ -1,5 +1,6 @@
 package org.cyclops.integratedtunnels.core.part;
 
+import org.cyclops.integrateddynamics.api.network.IPartPosIteratorHandler;
 import org.cyclops.integrateddynamics.api.network.IPositionedAddonsNetwork;
 import org.cyclops.integrateddynamics.api.part.write.IPartTypeWriter;
 import org.cyclops.integrateddynamics.core.part.write.PartStateWriterBase;
@@ -11,17 +12,17 @@ import org.cyclops.integrateddynamics.core.part.write.PartStateWriterBase;
  */
 public class PartStateRoundRobin<P extends IPartTypeWriter> extends PartStateWriterBase<P> {
 
-    private IPositionedAddonsNetwork.PositionsIterator positionsIterator = null;
+    private IPartPosIteratorHandler partPosIteratorHandler = null;
 
     public PartStateRoundRobin(int inventorySize) {
         super(inventorySize);
     }
 
-    public void setPositionsIterator(IPositionedAddonsNetwork.PositionsIterator positionsIterator) {
-        this.positionsIterator = positionsIterator;
+    public void setPartPosIteratorHandler(IPartPosIteratorHandler partPosIteratorHandler) {
+        this.partPosIteratorHandler = partPosIteratorHandler;
     }
 
-    public IPositionedAddonsNetwork.PositionsIterator getPositionsIterator() {
-        return positionsIterator;
+    public IPartPosIteratorHandler getPartPosIteratorHandler() {
+        return partPosIteratorHandler;
     }
 }

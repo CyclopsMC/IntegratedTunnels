@@ -1,6 +1,8 @@
 package org.cyclops.integratedtunnels.part.aspect;
 
+import org.cyclops.integrateddynamics.api.network.IPartPosIteratorHandler;
 import org.cyclops.integrateddynamics.api.network.IPositionedAddonsNetwork;
+import org.cyclops.integrateddynamics.core.network.PartPosIteratorHandlerRoundRobin;
 import org.cyclops.integratedtunnels.core.part.PartStateRoundRobin;
 
 /**
@@ -44,30 +46,27 @@ public abstract class ChanneledTarget<N extends IPositionedAddonsNetwork> implem
     @Override
     public void preTransfer() {
         if (isRoundRobin()) {
-            IPositionedAddonsNetwork.PositionsIterator positionsIterator = getPartState().getPositionsIterator();
+            IPartPosIteratorHandler handler = getPartState().getPartPosIteratorHandler();
 
-            if (positionsIterator == null || !positionsIterator.hasNext()) {
-                positionsIterator = getChanneledNetwork().createPositionIterator(getChannel());
-                getPartState().setPositionsIterator(positionsIterator);
+            if (handler == null) {
+                handler = new PartPosIteratorHandlerRoundRobin();
             }
 
-            getChanneledNetwork().setPositionIterator(positionsIterator, getChannel());
+            getChanneledNetwork().setPartPosIteratorHandler(handler);
         }
     }
 
     @Override
     public void postTransfer() {
         if (isRoundRobin()) {
-            IPositionedAddonsNetwork.PositionsIterator positionsIterator = getChanneledNetwork().getPositionIterator(getChannel());
-            if (positionsIterator != null) {
+            IPartPosIteratorHandler handler = getChanneledNetwork().getPartPosIteratorHandler();
+            if (handler != null) {
                 // Save the iterator state (as it may have changed) in the part state
-                getPartState().setPositionsIterator(positionsIterator);
+                getPartState().setPartPosIteratorHandler(handler);
 
                 // Reset the network's iterator, to avoid influencing other parts.
-                getChanneledNetwork().setPositionIterator(null, getChannel());
+                getChanneledNetwork().setPartPosIteratorHandler(null);
             }
-        } else {
-            getChanneledNetwork().setPositionIterator(null, getChannel());
         }
     }
 
