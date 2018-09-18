@@ -21,6 +21,7 @@ import org.cyclops.integrateddynamics.api.evaluate.EvaluationException;
 import org.cyclops.integrateddynamics.api.evaluate.operator.IOperator;
 import org.cyclops.integrateddynamics.api.evaluate.variable.IValue;
 import org.cyclops.integrateddynamics.api.evaluate.variable.IValueTypeListProxy;
+import org.cyclops.integrateddynamics.api.network.IPositionedAddonsNetworkIngredients;
 import org.cyclops.integrateddynamics.api.part.PartTarget;
 import org.cyclops.integrateddynamics.api.part.write.IPartStateWriter;
 import org.cyclops.integrateddynamics.core.evaluate.variable.ValueHelpers;
@@ -204,6 +205,7 @@ public class TunnelItemHelpers {
 
     /**
      * Place item blocks from the given source in the world.
+     * @param network The network in which the movement is happening.
      * @param source The source item storage.
      * @param world The destination world.
      * @param pos The destination position.
@@ -214,7 +216,8 @@ public class TunnelItemHelpers {
      * @param ignoreReplacable If replacable blocks should be overriden when placing blocks.
      * @return The placed item.
      */
-    public static ItemStack placeItems(int connectionHash,
+    public static ItemStack placeItems(IPositionedAddonsNetworkIngredients<ItemStack, Integer> network,
+                                       int connectionHash,
                                        IIngredientComponentStorage<ItemStack, Integer> source,
                                        World world, BlockPos pos, EnumFacing side,
                                        IngredientPredicate<ItemStack, Integer> itemStackMatcher, EnumHand hand,
@@ -230,11 +233,12 @@ public class TunnelItemHelpers {
 
         IIngredientComponentStorage<ItemStack, Integer> destinationBlock = new ItemStorageBlockWrapper(
                 true, (WorldServer) world, pos, side, hand, blockUpdate, 0, false, ignoreReplacable, true);
-        return TunnelHelpers.moveSingleStateOptimized(connectionHash, source, -1, destinationBlock, -1, itemStackMatcher);
+        return TunnelHelpers.moveSingleStateOptimized(network, connectionHash, source, -1, destinationBlock, -1, itemStackMatcher);
     }
 
     /**
      * Pick up item blocks from the given source in the world.
+     * @param network The network in which the movement is happening.
      * @param connectionHash The connection hash.
      * @param world The destination world.
      * @param pos The destination position.
@@ -249,7 +253,8 @@ public class TunnelItemHelpers {
      * @param breakOnNoDrops If the block should be broken if it produced no drops.
      * @return The picked-up items.
      */
-    public static List<ItemStack> pickUpItems(int connectionHash, World world, BlockPos pos, EnumFacing side,
+    public static List<ItemStack> pickUpItems(IPositionedAddonsNetworkIngredients<ItemStack, Integer> network,
+                                              int connectionHash, World world, BlockPos pos, EnumFacing side,
                                               IIngredientComponentStorage<ItemStack, Integer> destination,
                                               IngredientPredicate<ItemStack, Integer> itemStackMatcher, EnumHand hand, boolean blockUpdate,
                                               boolean ignoreReplacable, int fortune, boolean silkTouch,
@@ -266,7 +271,7 @@ public class TunnelItemHelpers {
                 false, (WorldServer) world, pos, side, hand, blockUpdate, fortune, silkTouch, ignoreReplacable, breakOnNoDrops);
         List<ItemStack> itemStacks = Lists.newArrayList();
         ItemStack itemStack;
-        while (!(itemStack = TunnelHelpers.moveSingleStateOptimized(connectionHash, sourceBlock, -1,
+        while (!(itemStack = TunnelHelpers.moveSingleStateOptimized(network, connectionHash, sourceBlock, -1,
                 destination, -1, itemStackMatcher)).isEmpty()) {
             itemStacks.add(itemStack);
         }

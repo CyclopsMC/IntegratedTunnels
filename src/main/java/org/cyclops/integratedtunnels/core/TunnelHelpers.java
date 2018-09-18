@@ -7,6 +7,7 @@ import org.cyclops.commoncapabilities.api.ingredient.IIngredientMatcher;
 import org.cyclops.commoncapabilities.api.ingredient.storage.IIngredientComponentStorage;
 import org.cyclops.cyclopscore.helper.MinecraftHelpers;
 import org.cyclops.cyclopscore.ingredient.storage.IngredientStorageHelpers;
+import org.cyclops.integrateddynamics.api.network.IPositionedAddonsNetworkIngredients;
 import org.cyclops.integratedtunnels.GeneralConfig;
 import org.cyclops.integratedtunnels.IntegratedTunnels;
 
@@ -54,6 +55,7 @@ public class TunnelHelpers {
 
     /**
      * Move ingredients from source to destination.
+     * @param network The network in which the movement is happening.
      * @param connectionHash The connection hash.
      * @param source The source ingredient storage.
      * @param sourceSlot The source slot.
@@ -65,7 +67,7 @@ public class TunnelHelpers {
      * @return The moved ingredientstack.
      */
     @Nonnull
-    public static <T, M> T moveSingleStateOptimized(int connectionHash,
+    public static <T, M> T moveSingleStateOptimized(IPositionedAddonsNetworkIngredients<T, M> network, int connectionHash,
                                                     IIngredientComponentStorage<T, M> source, int sourceSlot,
                                                     IIngredientComponentStorage<T, M> destination, int destinationSlot,
                                                     IngredientPredicate<T, M> ingredientPredicate) {
@@ -81,12 +83,16 @@ public class TunnelHelpers {
             return matcher.getEmptyInstance();
         }
 
-        //
+        // Do the actual movement
         T moved = moveSingle(source, sourceSlot, destination, destinationSlot, ingredientPredicate, false);
         if (matcher.isEmpty(moved)) {
             // Mark this connection as 'sleeping' if nothing was moved
             CACHE_INV_CHECKS.put(connectionHash, true);
         }
+
+        // Schedule a new observation for the network, as its contents may have changed
+        network.scheduleObservation();
+
         return moved;
     }
 }

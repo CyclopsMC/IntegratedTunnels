@@ -160,7 +160,7 @@ public class TunnelAspectWriteBuilders {
                 PROP_EXPORT = input -> {
             if (input.hasValidTarget() && input.getAmount() != 0) {
                 input.preTransfer();
-                TunnelEnergyHelpers.moveEnergy(input.getEnergyChannel(), input.getStorage(), input.getAmount(), input.isExactAmount());
+                TunnelEnergyHelpers.moveEnergy(input.getChanneledNetwork(), input.getEnergyChannel(), input.getStorage(), input.getAmount(), input.isExactAmount());
                 input.postTransfer();
             }
             return null;
@@ -169,7 +169,7 @@ public class TunnelAspectWriteBuilders {
                 PROP_IMPORT = input -> {
             if (input.hasValidTarget() && input.getAmount() != 0) {
                 input.preTransfer();
-                TunnelEnergyHelpers.moveEnergy(input.getStorage(), input.getEnergyChannel(), input.getAmount(), input.isExactAmount());
+                TunnelEnergyHelpers.moveEnergy(input.getChanneledNetwork(), input.getStorage(), input.getEnergyChannel(), input.getAmount(), input.isExactAmount());
                 input.postTransfer();
             }
             return null;
@@ -496,6 +496,7 @@ public class TunnelAspectWriteBuilders {
             if (input.hasValidTarget()) {
                 input.preTransfer();
                 TunnelHelpers.moveSingleStateOptimized(
+                        input.getChanneledNetwork(),
                         input.getConnectionHash(),
                         input.getItemChannel(), -1,
                         input.getStorage(), input.getSlot(),
@@ -509,6 +510,7 @@ public class TunnelAspectWriteBuilders {
             if (input.hasValidTarget()) {
                 input.preTransfer();
                 TunnelHelpers.moveSingleStateOptimized(
+                        input.getChanneledNetwork(),
                         input.getConnectionHash(),
                         input.getStorage(), input.getSlot(),
                         input.getItemChannel(), -1,
@@ -721,7 +723,7 @@ public class TunnelAspectWriteBuilders {
                 PROP_EXPORT = input -> {
             if (input.hasValidTarget()) {
                 input.preTransfer();
-                TunnelHelpers.moveSingleStateOptimized(input.getConnectionHash(), input.getFluidChannel(), -1, input.getStorage(), -1, input.getFluidStackMatcher());
+                TunnelHelpers.moveSingleStateOptimized(input.getChanneledNetwork(), input.getConnectionHash(), input.getFluidChannel(), -1, input.getStorage(), -1, input.getFluidStackMatcher());
                 input.postTransfer();
             }
             return null;
@@ -730,7 +732,7 @@ public class TunnelAspectWriteBuilders {
                 PROP_IMPORT = input -> {
             if (input.hasValidTarget()) {
                 input.preTransfer();
-                TunnelHelpers.moveSingleStateOptimized(input.getConnectionHash(), input.getStorage(), -1, input.getFluidChannel(), -1, input.getFluidStackMatcher());
+                TunnelHelpers.moveSingleStateOptimized(input.getChanneledNetwork(), input.getConnectionHash(), input.getStorage(), -1, input.getFluidChannel(), -1, input.getFluidStackMatcher());
                 input.postTransfer();
             }
             return null;
@@ -1240,7 +1242,7 @@ public class TunnelAspectWriteBuilders {
                 if (pos.isLoaded() && input.getChanneledNetwork() != null) {
                     IIngredientComponentStorage<FluidStack, Integer> fluidChannel = input.getFluidChannel();
                     input.preTransfer();
-                    TunnelFluidHelpers.placeFluids(input.getConnectionHash(), fluidChannel, pos.getWorld(), pos.getBlockPos(),
+                    TunnelFluidHelpers.placeFluids(input.getChanneledNetwork(), input.getConnectionHash(), fluidChannel, pos.getWorld(), pos.getBlockPos(),
                             input.getFluidStackMatcher(), input.getProperties().getValue(PROP_BLOCK_UPDATE).getRawValue(),
                             input.getProperties().getValue(PROP_IGNORE_REPLACABLE).getRawValue());
                     input.postTransfer();
@@ -1256,7 +1258,7 @@ public class TunnelAspectWriteBuilders {
                 if (pos.isLoaded() && input.getChanneledNetwork() != null) {
                     IIngredientComponentStorage<FluidStack, Integer> fluidChannel = input.getFluidChannel();
                     input.preTransfer();
-                    TunnelFluidHelpers.pickUpFluids(input.getConnectionHash(), target.getPos().getWorld(),
+                    TunnelFluidHelpers.pickUpFluids(input.getChanneledNetwork(), input.getConnectionHash(), target.getPos().getWorld(),
                             target.getPos().getBlockPos(), target.getSide(), fluidChannel, input.getFluidStackMatcher());
                     input.postTransfer();
                 }
@@ -1469,7 +1471,7 @@ public class TunnelAspectWriteBuilders {
                             ? EnumHand.MAIN_HAND : EnumHand.OFF_HAND;
                     boolean blockUpdate = input.getProperties().getValue(PROP_BLOCK_UPDATE).getRawValue();
                     boolean ignoreReplacable = input.getProperties().getValue(PROP_IGNORE_REPLACABLE).getRawValue();
-                    TunnelItemHelpers.placeItems(input.getConnectionHash(), input.getItemChannel(),
+                    TunnelItemHelpers.placeItems(input.getChanneledNetwork(), input.getConnectionHash(), input.getItemChannel(),
                             target.getPos().getWorld(), target.getPos().getBlockPos(), target.getSide(),
                             input.getItemStackMatcher(), hand, blockUpdate, ignoreReplacable);
                 }
@@ -1489,7 +1491,7 @@ public class TunnelAspectWriteBuilders {
                     int fortune = 0;
                     boolean silkTouch = input.getProperties().getValue(PROP_SILK_TOUCH).getRawValue();
                     boolean breakOnNoDrops = input.getProperties().getValue(PROP_BREAK_ON_NO_DROPS).getRawValue();
-                    TunnelItemHelpers.pickUpItems(input.getConnectionHash(),
+                    TunnelItemHelpers.pickUpItems(input.getChanneledNetwork(), input.getConnectionHash(),
                             target.getPos().getWorld(), target.getPos().getBlockPos(), target.getSide(),
                             input.getItemChannel(), input.getItemStackMatcher(), hand, blockUpdate, ignoreReplacable,
                             fortune, silkTouch, breakOnNoDrops);

@@ -21,6 +21,7 @@ import org.cyclops.integrateddynamics.api.evaluate.EvaluationException;
 import org.cyclops.integrateddynamics.api.evaluate.operator.IOperator;
 import org.cyclops.integrateddynamics.api.evaluate.variable.IValue;
 import org.cyclops.integrateddynamics.api.evaluate.variable.IValueTypeListProxy;
+import org.cyclops.integrateddynamics.api.network.IPositionedAddonsNetworkIngredients;
 import org.cyclops.integrateddynamics.api.part.PartTarget;
 import org.cyclops.integrateddynamics.api.part.write.IPartStateWriter;
 import org.cyclops.integrateddynamics.core.evaluate.variable.ValueHelpers;
@@ -146,6 +147,7 @@ public class TunnelFluidHelpers {
 
     /**
      * Place fluids from the given source in the world.
+     * @param network The network in which the movement is happening.
      * @param source The source fluid handler.
      * @param world The target world.
      * @param pos The target position.
@@ -154,7 +156,8 @@ public class TunnelFluidHelpers {
      * @param ignoreReplacable If replacable blocks should be overriden when placing blocks.
      * @return The placed fluid.
      */
-    public static FluidStack placeFluids(int connectionHash,
+    public static FluidStack placeFluids(IPositionedAddonsNetworkIngredients<FluidStack, Integer> network,
+                                         int connectionHash,
                                          IIngredientComponentStorage<FluidStack, Integer> source, final World world, final BlockPos pos,
                                          IngredientPredicate<FluidStack, Integer> fluidStackMatcher, boolean blockUpdate,
                                          boolean ignoreReplacable) {
@@ -168,11 +171,12 @@ public class TunnelFluidHelpers {
         }
 
         IIngredientComponentStorage<FluidStack, Integer> destination = new FluidStorageBlockWrapper((WorldServer) world, pos, null, blockUpdate);
-        return TunnelHelpers.moveSingleStateOptimized(connectionHash, source, -1, destination, -1, fluidStackMatcher);
+        return TunnelHelpers.moveSingleStateOptimized(network, connectionHash, source, -1, destination, -1, fluidStackMatcher);
     }
 
     /**
      * Place fluids from the given source in the world.
+     * @param network The network in which the movement is happening.
      * @param world The source world.
      * @param pos The source position.
      * @param side The source side.
@@ -180,14 +184,15 @@ public class TunnelFluidHelpers {
      * @param fluidStackMatcher The fluidstack match predicate.
      * @return The picked-up fluid.
      */
-    public static FluidStack pickUpFluids(int connectionHash, World world, BlockPos pos, EnumFacing side,
+    public static FluidStack pickUpFluids(IPositionedAddonsNetworkIngredients<FluidStack, Integer> network,
+                                          int connectionHash, World world, BlockPos pos, EnumFacing side,
                                           IIngredientComponentStorage<FluidStack, Integer> destination,
                                           IngredientPredicate<FluidStack, Integer> fluidStackMatcher) {
         IBlockState state = world.getBlockState(pos);
         Block block = state.getBlock();
         if (block instanceof IFluidBlock || block instanceof BlockLiquid) {
             IIngredientComponentStorage<FluidStack, Integer> source = new FluidStorageBlockWrapper((WorldServer) world, pos, side, false);
-            return TunnelHelpers.moveSingleStateOptimized(connectionHash, source, -1, destination, -1, fluidStackMatcher);
+            return TunnelHelpers.moveSingleStateOptimized(network, connectionHash, source, -1, destination, -1, fluidStackMatcher);
         }
         return null;
     }
