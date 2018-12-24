@@ -31,9 +31,10 @@ public class ItemTargetCapabilityProvider extends ChanneledTargetCapabilityProvi
                                         EnumFacing side, int slot,
                                         IngredientPredicate<ItemStack, Integer> itemStackMatcher, PartTarget partTarget,
                                         IAspectProperties properties, PartStateRoundRobin<?> partState) {
-        super(capabilityProvider, side, network.getCapability(ItemNetworkConfig.CAPABILITY), partState,
+        super(network, capabilityProvider, side, network.getCapability(ItemNetworkConfig.CAPABILITY), partState,
                 properties.getValue(TunnelAspectWriteBuilders.PROP_CHANNEL).getRawValue(),
-                properties.getValue(TunnelAspectWriteBuilders.PROP_ROUNDROBIN).getRawValue());
+                properties.getValue(TunnelAspectWriteBuilders.PROP_ROUNDROBIN).getRawValue(),
+                properties.getValue(TunnelAspectWriteBuilders.PROP_CRAFT).getRawValue());
         int storagePosHash = partTarget.getTarget().hashCode();
         this.connectionHash = transferHash << 4 + storagePosHash ^ System.identityHashCode(getChanneledNetwork());
         this.slot = slot;

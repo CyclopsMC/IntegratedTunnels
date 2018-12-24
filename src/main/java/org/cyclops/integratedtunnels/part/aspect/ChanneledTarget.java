@@ -1,5 +1,6 @@
 package org.cyclops.integratedtunnels.part.aspect;
 
+import org.cyclops.integrateddynamics.api.network.INetwork;
 import org.cyclops.integrateddynamics.api.network.IPartPosIteratorHandler;
 import org.cyclops.integrateddynamics.api.network.IPositionedAddonsNetwork;
 import org.cyclops.integrateddynamics.core.network.PartPosIteratorHandlerRoundRobin;
@@ -11,16 +12,26 @@ import org.cyclops.integratedtunnels.core.part.PartStateRoundRobin;
  */
 public abstract class ChanneledTarget<N extends IPositionedAddonsNetwork> implements IChanneledTarget<N> {
 
+    private final INetwork network;
     private final N channeledNetwork;
     private final PartStateRoundRobin<?> partState;
     private final int channel;
     private final boolean roundRobin;
+    private final boolean craftIfFailed;
 
-    public ChanneledTarget(N channeledNetwork, PartStateRoundRobin<?> partState, int channel, boolean roundRobin) {
+    public ChanneledTarget(INetwork network, N channeledNetwork, PartStateRoundRobin<?> partState, int channel,
+                           boolean roundRobin, boolean craftIfFailed) {
+        this.network = network;
         this.channeledNetwork = channeledNetwork;
         this.partState = partState;
         this.channel = channel;
         this.roundRobin = roundRobin;
+        this.craftIfFailed = craftIfFailed;
+    }
+
+    @Override
+    public INetwork getNetwork() {
+        return network;
     }
 
     @Override
@@ -41,6 +52,11 @@ public abstract class ChanneledTarget<N extends IPositionedAddonsNetwork> implem
     @Override
     public boolean isRoundRobin() {
         return roundRobin;
+    }
+
+    @Override
+    public boolean isCraftIfFailed() {
+        return craftIfFailed;
     }
 
     @Override

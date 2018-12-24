@@ -7,6 +7,9 @@ import org.cyclops.commoncapabilities.api.ingredient.IIngredientMatcher;
 import org.cyclops.commoncapabilities.api.ingredient.storage.IIngredientComponentStorage;
 import org.cyclops.cyclopscore.helper.MinecraftHelpers;
 import org.cyclops.cyclopscore.ingredient.storage.IngredientStorageHelpers;
+import org.cyclops.integrateddynamics.IntegratedDynamics;
+import org.cyclops.integrateddynamics.api.network.INetwork;
+import org.cyclops.integrateddynamics.api.network.INetworkCraftingHandlerRegistry;
 import org.cyclops.integrateddynamics.api.network.IPositionedAddonsNetworkIngredients;
 import org.cyclops.integratedtunnels.GeneralConfig;
 import org.cyclops.integratedtunnels.IntegratedTunnels;
@@ -56,21 +59,25 @@ public class TunnelHelpers {
     /**
      * Move ingredients from source to destination.
      * @param network The network in which the movement is happening.
+     * @param ingredientsNetwork The ingredients network in which the movement is happening.
+     * @param channel The channel.
      * @param connectionHash The connection hash.
      * @param source The source ingredient storage.
      * @param sourceSlot The source slot.
      * @param destination The destination ingredient storage.
      * @param destinationSlot The destination slot.
      * @param ingredientPredicate Only ingredientstack matching this predicate will be moved.
+     * @param craftIfFailed If the exact ingredient from ingredientPredicate should be crafted if transfer failed.
      * @param <T> The instance type.
      * @param <M> The matching condition parameter.
      * @return The moved ingredientstack.
      */
     @Nonnull
-    public static <T, M> T moveSingleStateOptimized(IPositionedAddonsNetworkIngredients<T, M> network, int connectionHash,
+    public static <T, M> T moveSingleStateOptimized(INetwork network, IPositionedAddonsNetworkIngredients<T, M> ingredientsNetwork,
+                                                    int channel, int connectionHash,
                                                     IIngredientComponentStorage<T, M> source, int sourceSlot,
                                                     IIngredientComponentStorage<T, M> destination, int destinationSlot,
-                                                    IngredientPredicate<T, M> ingredientPredicate) {
+                                                    IngredientPredicate<T, M> ingredientPredicate, boolean craftIfFailed) {
         IIngredientMatcher<T, M> matcher = source.getComponent().getMatcher();
 
         // Don't do any expensive transfers if the to-be-moved stack is empty
@@ -91,8 +98,31 @@ public class TunnelHelpers {
         }
 
         // Schedule a new observation for the network, as its contents may have changed
-        network.scheduleObservation();
+        ingredientsNetwork.scheduleObservation();
+
+        // Craft if we moved nothing, and the flag is enabled.
+        if (craftIfFailed && matcher.isEmpty(moved)) {
+            requestCrafting(network, ingredientsNetwork, channel,
+                    ingredientPredicate.getInstance(), ingredientPredicate.getMatchFlags());
+        }
 
         return moved;
+    }
+
+    /**
+     * Start a crafting job for the given instance.
+     * @param network The network to craft in.
+     * @param ingredientsNetwork The ingredients network.
+     * @param channel The channel.
+     * @param instance The instance to craft.
+     * @param matchCondition The match condition.
+     * @param <T> The instance type.
+     * @param <M> The matching condition parameter.
+     * @return If a crafting job could be started.
+     */
+    public static <T, M> boolean requestCrafting(INetwork network, IPositionedAddonsNetworkIngredients<T, M> ingredientsNetwork,
+                                                 int channel, T instance, M matchCondition) {
+        return IntegratedDynamics._instance.getRegistryManager().getRegistry(INetworkCraftingHandlerRegistry.class)
+                .craft(network, ingredientsNetwork, channel, ingredientsNetwork.getComponent(), instance, matchCondition, false);
     }
 }

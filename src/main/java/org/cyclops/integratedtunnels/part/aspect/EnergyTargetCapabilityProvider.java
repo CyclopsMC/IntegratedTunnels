@@ -6,6 +6,7 @@ import org.cyclops.commoncapabilities.api.ingredient.IngredientComponent;
 import org.cyclops.commoncapabilities.api.ingredient.storage.IIngredientComponentStorage;
 import org.cyclops.integrateddynamics.api.network.IEnergyNetwork;
 import org.cyclops.integrateddynamics.api.network.INetwork;
+import org.cyclops.integrateddynamics.api.part.aspect.property.IAspectProperties;
 import org.cyclops.integratedtunnels.Capabilities;
 import org.cyclops.integratedtunnels.core.part.PartStateRoundRobin;
 
@@ -20,12 +21,15 @@ public class EnergyTargetCapabilityProvider extends ChanneledTargetCapabilityPro
     private final int amount;
     private final boolean exactAmount;
 
-    public EnergyTargetCapabilityProvider(@Nullable ICapabilityProvider capabilityProvider, EnumFacing side, INetwork network, int channel,
-                                          int amount, boolean exactAmount,
-                                          boolean roundRobin, PartStateRoundRobin<?> partStateEnergy) {
-        super(capabilityProvider, side, network.getCapability(Capabilities.NETWORK_ENERGY), partStateEnergy, channel, roundRobin);
+    public EnergyTargetCapabilityProvider(@Nullable ICapabilityProvider capabilityProvider, EnumFacing side, INetwork network,
+                                          IAspectProperties properties,
+                                          int amount, PartStateRoundRobin<?> partStateEnergy) {
+        super(network, capabilityProvider, side, network.getCapability(Capabilities.NETWORK_ENERGY), partStateEnergy,
+                properties.getValue(TunnelAspectWriteBuilders.PROP_CHANNEL).getRawValue(),
+                properties.getValue(TunnelAspectWriteBuilders.PROP_ROUNDROBIN).getRawValue(),
+                properties.getValue(TunnelAspectWriteBuilders.PROP_CRAFT).getRawValue());
         this.amount = amount;
-        this.exactAmount = exactAmount;
+        this.exactAmount = properties.getValue(TunnelAspectWriteBuilders.PROP_EXACTAMOUNT).getRawValue();
     }
 
     @Override

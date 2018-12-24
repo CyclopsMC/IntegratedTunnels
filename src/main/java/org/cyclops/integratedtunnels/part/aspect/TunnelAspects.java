@@ -1,7 +1,6 @@
 package org.cyclops.integratedtunnels.part.aspect;
 
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
 import org.cyclops.integrateddynamics.api.part.aspect.IAspectWrite;
 import org.cyclops.integrateddynamics.core.evaluate.variable.*;
 
@@ -19,14 +18,14 @@ public class TunnelAspects {
 
             public static final IAspectWrite<ValueTypeBoolean.ValueBoolean, ValueTypeBoolean> BOOLEAN_EXPORT =
                     TunnelAspectWriteBuilders.Energy.BUILDER_BOOLEAN
-                            .withProperties(TunnelAspectWriteBuilders.Energy.PROPERTIES_RATE)
+                            .withProperties(TunnelAspectWriteBuilders.Energy.PROPERTIES_RATECRAFT)
                             .handle(TunnelAspectWriteBuilders.Energy.PROP_GETRATE)
                             .handle(TunnelAspectWriteBuilders.Energy.PROP_ENERGYTARGET)
                             .handle(TunnelAspectWriteBuilders.Energy.PROP_EXPORT)
                             .appendKind("export").buildWrite();
             public static final IAspectWrite<ValueTypeInteger.ValueInteger, ValueTypeInteger> INTEGER_EXPORT =
                     TunnelAspectWriteBuilders.Energy.BUILDER_INTEGER
-                            .withProperties(TunnelAspectWriteBuilders.Energy.PROPERTIES)
+                            .withProperties(TunnelAspectWriteBuilders.Energy.PROPERTIES_RATECRAFT)
                             .handle(TunnelAspectWriteBuilders.Energy.PROP_ENERGYTARGET)
                             .handle(TunnelAspectWriteBuilders.Energy.PROP_EXPORT)
                             .appendKind("export").buildWrite();
@@ -72,7 +71,7 @@ public class TunnelAspects {
                             .appendKind("slot").appendKind("export").buildWrite();
             public static final IAspectWrite<ValueObjectTypeItemStack.ValueItemStack, ValueObjectTypeItemStack> ITEMSTACK_EXPORT =
                     TunnelAspectWriteBuilders.Item.BUILDER_ITEMSTACK
-                            .withProperties(TunnelAspectWriteBuilders.Item.PROPERTIES_RATESLOTCHECKS)
+                            .withProperties(TunnelAspectWriteBuilders.Item.PROPERTIES_RATESLOTCHECKSCRAFT)
                             .handle(TunnelAspectWriteBuilders.Item.PROP_ITEMSTACK_ITEMPREDICATE)
                             .handle(TunnelAspectWriteBuilders.Item.PROP_ITEMTARGET)
                             .handle(TunnelAspectWriteBuilders.Item.PROP_EXPORT)
@@ -170,7 +169,7 @@ public class TunnelAspects {
                             .appendKind("export").buildWrite();
             public static final IAspectWrite<ValueObjectTypeFluidStack.ValueFluidStack, ValueObjectTypeFluidStack> FLUIDSTACK_EXPORT =
                     TunnelAspectWriteBuilders.Fluid.BUILDER_FLUIDSTACK
-                            .withProperties(TunnelAspectWriteBuilders.Fluid.PROPERTIES_RATECHECKS)
+                            .withProperties(TunnelAspectWriteBuilders.Fluid.PROPERTIES_RATECHECKSCRAFT)
                             .handle(TunnelAspectWriteBuilders.Fluid.PROP_FLUIDSTACK_FLUIDPREDICATE)
                             .handle(TunnelAspectWriteBuilders.Fluid.PROP_FLUIDTARGET)
                             .handle(TunnelAspectWriteBuilders.Fluid.PROP_EXPORT)
@@ -253,7 +252,7 @@ public class TunnelAspects {
                                 .appendKind("fluid").appendKind("export").buildWrite();
                 public static final IAspectWrite<ValueObjectTypeFluidStack.ValueFluidStack, ValueObjectTypeFluidStack> FLUID_FLUIDSTACK_EXPORT =
                         TunnelAspectWriteBuilders.World.BUILDER_FLUIDSTACK
-                                .withProperties(TunnelAspectWriteBuilders.World.Fluid.PROPERTIES_FLUID_UPDATE)
+                                .withProperties(TunnelAspectWriteBuilders.World.Fluid.PROPERTIES_FLUIDCRAFT_UPDATE)
                                 .handle(TunnelAspectWriteBuilders.World.Fluid.PROP_FLUIDSTACK_FLUIDTARGET)
                                 .handle(TunnelAspectWriteBuilders.World.Fluid.PROP_FLUIDSTACK_EXPORT)
                                 .appendKind("fluid").appendKind("export").buildWrite();
@@ -313,7 +312,7 @@ public class TunnelAspects {
                                 .appendKind("block").appendKind("export").buildWrite();
                 public static final IAspectWrite<ValueObjectTypeItemStack.ValueItemStack, ValueObjectTypeItemStack> BLOCK_ITEMSTACK_EXPORT =
                         TunnelAspectWriteBuilders.World.BUILDER_ITEMSTACK
-                                .withProperties(TunnelAspectWriteBuilders.World.Block.PROPERTIES_ITEM_PLACE)
+                                .withProperties(TunnelAspectWriteBuilders.World.Block.PROPERTIES_ITEMCRAFT_PLACE)
                                 .handle(TunnelAspectWriteBuilders.World.Item.<ItemStack>ignoreStackSize())
                                 .handle(TunnelAspectWriteBuilders.Item.PROP_ITEMSTACK_ITEMPREDICATE)
                                 .handle(TunnelAspectWriteBuilders.Item.PROP_ITEMTARGET)
@@ -345,7 +344,7 @@ public class TunnelAspects {
                                 .appendKind("item").appendKind("block").appendKind("export").buildWrite();
                 public static final IAspectWrite<ValueObjectTypeBlock.ValueBlock, ValueObjectTypeBlock> BLOCK_BLOCK_EXPORT =
                         TunnelAspectWriteBuilders.World.BUILDER_BLOCK
-                                .withProperties(TunnelAspectWriteBuilders.World.Block.PROPERTIES_BLOCK_PLACEBLOCK)
+                                .withProperties(TunnelAspectWriteBuilders.World.Block.PROPERTIES_BLOCKCRAFT_PLACEBLOCK)
                                 .handle(TunnelAspectWriteBuilders.Item.PROP_BLOCK_ITEMPREDICATE)
                                 .handle(TunnelAspectWriteBuilders.Item.PROP_ITEMTARGET)
                                 .handle(TunnelAspectWriteBuilders.World.Block.PROP_ITEMBLOCK_EXPORT)
@@ -484,7 +483,7 @@ public class TunnelAspects {
                                 .appendKind("entityitem").appendKind("export").buildWrite();
                 public static final IAspectWrite<ValueObjectTypeItemStack.ValueItemStack, ValueObjectTypeItemStack> ENTITYITEM_ITEMSTACK_EXPORT =
                         TunnelAspectWriteBuilders.World.BUILDER_ITEMSTACK
-                                .withProperties(TunnelAspectWriteBuilders.World.Item.PROPERTIES_ENTITYITEM_PLACE)
+                                .withProperties(TunnelAspectWriteBuilders.World.Item.PROPERTIES_ENTITYITEMCRAFT_PLACE)
                                 .handle(TunnelAspectWriteBuilders.Item.PROP_ITEMSTACK_ITEMPREDICATE)
                                 .handle(TunnelAspectWriteBuilders.World.Item.PROP_ENTITYITEM_ITEMTARGET_EXPORT)
                                 .handle(TunnelAspectWriteBuilders.Item.PROP_EXPORT)
@@ -527,7 +526,7 @@ public class TunnelAspects {
                                 .appendKind("entity").appendKind("item").appendKind("import").buildWrite();
                 public static final IAspectWrite<ValueObjectTypeItemStack.ValueItemStack, ValueObjectTypeItemStack> ENTITY_ITEM_ITEMSTACK_IMPORT =
                         TunnelAspectWriteBuilders.World.BUILDER_ITEMSTACK
-                                .withProperties(TunnelAspectWriteBuilders.World.Item.PROPERTIES_RATESLOTCHECKS)
+                                .withProperties(TunnelAspectWriteBuilders.World.Item.PROPERTIES_RATESLOTCHECKSCRAFT)
                                 .handle(TunnelAspectWriteBuilders.Item.PROP_ITEMSTACK_ITEMPREDICATE)
                                 .handle(TunnelAspectWriteBuilders.World.Item.PROP_ENTITY_ITEMTARGET)
                                 .handle(TunnelAspectWriteBuilders.Item.PROP_IMPORT)
@@ -570,7 +569,7 @@ public class TunnelAspects {
                                 .appendKind("entity").appendKind("item").appendKind("export").buildWrite();
                 public static final IAspectWrite<ValueObjectTypeItemStack.ValueItemStack, ValueObjectTypeItemStack> ENTITY_ITEM_ITEMSTACK_EXPORT =
                         TunnelAspectWriteBuilders.World.BUILDER_ITEMSTACK
-                                .withProperties(TunnelAspectWriteBuilders.World.Item.PROPERTIES_RATESLOTCHECKS)
+                                .withProperties(TunnelAspectWriteBuilders.World.Item.PROPERTIES_RATESLOTCHECKSCRAFT)
                                 .handle(TunnelAspectWriteBuilders.Item.PROP_ITEMSTACK_ITEMPREDICATE)
                                 .handle(TunnelAspectWriteBuilders.World.Item.PROP_ENTITY_ITEMTARGET)
                                 .handle(TunnelAspectWriteBuilders.Item.PROP_EXPORT)
@@ -656,7 +655,7 @@ public class TunnelAspects {
                                 .appendKind("entity").appendKind("fluid").appendKind("export").buildWrite();
                 public static final IAspectWrite<ValueObjectTypeFluidStack.ValueFluidStack, ValueObjectTypeFluidStack> ENTITY_FLUID_FLUIDSTACK_EXPORT =
                         TunnelAspectWriteBuilders.World.BUILDER_FLUIDSTACK
-                                .withProperties(TunnelAspectWriteBuilders.World.Fluid.PROPERTIES_RATECHECKS)
+                                .withProperties(TunnelAspectWriteBuilders.World.Fluid.PROPERTIES_RATECHECKSCRAFT)
                                 .handle(TunnelAspectWriteBuilders.Fluid.PROP_FLUIDSTACK_FLUIDPREDICATE)
                                 .handle(TunnelAspectWriteBuilders.World.Fluid.PROP_ENTITY_FLUIDTARGET)
                                 .handle(TunnelAspectWriteBuilders.Fluid.PROP_EXPORT)
@@ -692,7 +691,7 @@ public class TunnelAspects {
                                 .appendKind("entity").appendKind("energy").appendKind("export").buildWrite();
                 public static final IAspectWrite<ValueTypeInteger.ValueInteger, ValueTypeInteger> ENTITY_ENERGY_INTEGER_EXPORT =
                         TunnelAspectWriteBuilders.World.BUILDER_INTEGER
-                                .withProperties(TunnelAspectWriteBuilders.World.Energy.PROPERTIES_ENTITY)
+                                .withProperties(TunnelAspectWriteBuilders.World.Energy.PROPERTIES_ENTITYCRAFT)
                                 .handle(TunnelAspectWriteBuilders.World.Energy.PROP_ENTITY_ENERGYTARGET)
                                 .handle(TunnelAspectWriteBuilders.Energy.PROP_EXPORT)
                                 .appendKind("entity").appendKind("energy").appendKind("export").buildWrite();
@@ -736,7 +735,7 @@ public class TunnelAspects {
                                 .appendKind("click").buildWrite();
                 public static final IAspectWrite<ValueObjectTypeItemStack.ValueItemStack, ValueObjectTypeItemStack> CLICK_ITEM_ITEMSTACK =
                         TunnelAspectWriteBuilders.Player.BUILDER_ITEMSTACK
-                                .withProperties(TunnelAspectWriteBuilders.Player.PROPERTIES_CLICK)
+                                .withProperties(TunnelAspectWriteBuilders.Player.PROPERTIES_CLICKCRAFT)
                                 .handle(TunnelAspectWriteBuilders.Item.PROP_ITEMSTACK_ITEMPREDICATE)
                                 .handle(TunnelAspectWriteBuilders.Player.PROP_ITEMTARGET_CLICK)
                                 .handle(TunnelAspectWriteBuilders.Item.PROP_EXPORT)

@@ -15,6 +15,8 @@ import org.cyclops.integratedtunnels.core.part.PartStateRoundRobin;
  */
 public interface IChanneledTarget<N extends IPositionedAddonsNetwork> {
 
+    public INetwork getNetwork();
+
     public N getChanneledNetwork();
 
     public boolean hasValidTarget();
@@ -24,6 +26,8 @@ public interface IChanneledTarget<N extends IPositionedAddonsNetwork> {
     public int getChannel();
 
     public boolean isRoundRobin();
+
+    public boolean isCraftIfFailed();
 
     public void preTransfer();
 

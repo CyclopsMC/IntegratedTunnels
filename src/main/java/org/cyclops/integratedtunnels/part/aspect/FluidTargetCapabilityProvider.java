@@ -30,9 +30,10 @@ public class FluidTargetCapabilityProvider extends ChanneledTargetCapabilityProv
                                          EnumFacing side, IngredientPredicate<FluidStack, Integer> fluidStackMatcher,
                                          PartTarget partTarget, IAspectProperties properties,
                                          PartStateRoundRobin<?> partState) {
-        super(capabilityProvider, side, network.getCapability(FluidNetworkConfig.CAPABILITY), partState,
+        super(network, capabilityProvider, side, network.getCapability(FluidNetworkConfig.CAPABILITY), partState,
                 properties.getValue(TunnelAspectWriteBuilders.PROP_CHANNEL).getRawValue(),
-                properties.getValue(TunnelAspectWriteBuilders.PROP_ROUNDROBIN).getRawValue());
+                properties.getValue(TunnelAspectWriteBuilders.PROP_ROUNDROBIN).getRawValue(),
+                properties.getValue(TunnelAspectWriteBuilders.PROP_CRAFT).getRawValue());
         int storagePosHash = partTarget.getTarget().hashCode();
         this.connectionHash = transferHash << 4 + storagePosHash ^ System.identityHashCode(getChanneledNetwork());
         this.fluidStackMatcher = fluidStackMatcher;

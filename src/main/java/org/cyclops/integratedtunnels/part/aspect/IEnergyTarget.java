@@ -32,12 +32,7 @@ public interface IEnergyTarget extends IChanneledTarget<IEnergyNetwork> {
         INetwork network = IChanneledTarget.getNetworkChecked(center);
         TileEntity tile = target.getPos().getWorld().getTileEntity(target.getPos().getBlockPos());
         PartStateRoundRobin<?> partState = (PartStateRoundRobin<?>) PartHelpers.getPart(center).getState();
-        return new EnergyTargetCapabilityProvider(tile, target.getSide(), network,
-                properties.getValue(TunnelAspectWriteBuilders.PROP_CHANNEL).getRawValue(),
-                amount,
-                properties.getValue(TunnelAspectWriteBuilders.PROP_EXACTAMOUNT).getRawValue(),
-                properties.getValue(TunnelAspectWriteBuilders.PROP_ROUNDROBIN).getRawValue(),
-                partState);
+        return new EnergyTargetCapabilityProvider(tile, target.getSide(), network, properties, amount, partState);
     }
 
     public static EnergyTargetCapabilityProvider ofEntity(PartTarget partTarget, @Nullable Entity entity,
@@ -46,12 +41,7 @@ public interface IEnergyTarget extends IChanneledTarget<IEnergyNetwork> {
         PartPos target = partTarget.getTarget();
         INetwork network = IChanneledTarget.getNetworkChecked(center);
         PartStateRoundRobin<?> partState = (PartStateRoundRobin<?>) PartHelpers.getPart(center).getState();
-        return new EnergyTargetCapabilityProvider(entity, target.getSide(), network,
-                properties.getValue(TunnelAspectWriteBuilders.PROP_CHANNEL).getRawValue(),
-                amount,
-                properties.getValue(TunnelAspectWriteBuilders.PROP_EXACTAMOUNT).getRawValue(),
-                properties.getValue(TunnelAspectWriteBuilders.PROP_ROUNDROBIN).getRawValue(),
-                partState);
+        return new EnergyTargetCapabilityProvider(entity, target.getSide(), network, properties, amount, partState);
     }
 
 }

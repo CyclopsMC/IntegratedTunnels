@@ -4,6 +4,7 @@ import net.minecraft.util.EnumFacing;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import org.cyclops.commoncapabilities.api.ingredient.IngredientComponent;
 import org.cyclops.commoncapabilities.api.ingredient.storage.IIngredientComponentStorage;
+import org.cyclops.integrateddynamics.api.network.INetwork;
 import org.cyclops.integrateddynamics.api.network.IPositionedAddonsNetwork;
 import org.cyclops.integratedtunnels.core.part.PartStateRoundRobin;
 
@@ -20,10 +21,10 @@ public abstract class ChanneledTargetCapabilityProvider<N extends IPositionedAdd
 
     private IIngredientComponentStorage<T, M> storage = null;
 
-    public ChanneledTargetCapabilityProvider(@Nullable ICapabilityProvider capabilityProvider, EnumFacing side,
+    public ChanneledTargetCapabilityProvider(INetwork network, @Nullable ICapabilityProvider capabilityProvider, EnumFacing side,
                                              N channeledNetwork, PartStateRoundRobin<?> partState, int channel,
-                                             boolean roundRobin) {
-        super(channeledNetwork, partState, channel, roundRobin);
+                                             boolean roundRobin, boolean craftIfFailed) {
+        super(network, channeledNetwork, partState, channel, roundRobin, craftIfFailed);
         this.capabilityProvider = capabilityProvider;
         this.side = side;
     }
