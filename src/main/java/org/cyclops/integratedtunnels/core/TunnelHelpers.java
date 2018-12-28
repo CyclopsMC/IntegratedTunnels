@@ -5,6 +5,7 @@ import com.google.common.cache.CacheBuilder;
 import org.apache.logging.log4j.Level;
 import org.cyclops.commoncapabilities.api.ingredient.IIngredientMatcher;
 import org.cyclops.commoncapabilities.api.ingredient.storage.IIngredientComponentStorage;
+import org.cyclops.commoncapabilities.api.ingredient.storage.IIngredientComponentStorageSlotted;
 import org.cyclops.cyclopscore.helper.MinecraftHelpers;
 import org.cyclops.cyclopscore.ingredient.storage.IngredientStorageHelpers;
 import org.cyclops.integrateddynamics.IntegratedDynamics;
@@ -102,8 +103,20 @@ public class TunnelHelpers {
 
         // Craft if we moved nothing, and the flag is enabled.
         if (craftIfFailed && matcher.isEmpty(moved)) {
-            requestCrafting(network, ingredientsNetwork, channel,
-                    ingredientPredicate.getInstance(), ingredientPredicate.getMatchFlags());
+            // Only craft if the target accepts the crafting output completely
+            boolean targetAcceptsCraftingResult;
+            if (destinationSlot >= 0) {
+                targetAcceptsCraftingResult = destination instanceof IIngredientComponentStorageSlotted
+                        && matcher.isEmpty(((IIngredientComponentStorageSlotted<T, M>) destination)
+                        .insert(destinationSlot, ingredientPredicate.getInstance(), false));
+            } else {
+                targetAcceptsCraftingResult = matcher.isEmpty(destination.insert(ingredientPredicate.getInstance(), false));
+            }
+
+            if (targetAcceptsCraftingResult) {
+                requestCrafting(network, ingredientsNetwork, channel,
+                        ingredientPredicate.getInstance(), ingredientPredicate.getMatchFlags());
+            }
         }
 
         return moved;

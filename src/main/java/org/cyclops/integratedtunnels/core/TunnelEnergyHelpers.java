@@ -31,7 +31,7 @@ public class TunnelEnergyHelpers {
         // Schedule a new observation for the network, as its contents may have changed
         ingredientsNetwork.scheduleObservation();
 
-        if (craftIfFailed && moved == 0) {
+        if (craftIfFailed && moved == 0 && target.insert(amount, true) == amount) {
             TunnelHelpers.requestCrafting(network, ingredientsNetwork, channel, amount, exact);
         }
 
