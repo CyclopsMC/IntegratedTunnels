@@ -6,8 +6,8 @@ repositories {
         url "https://oss.jfrog.org/artifactory/simple/libs-release/"
     }
     maven {
-        name = "Dankhax"
-        url = "http://maven.epoxide.org"
+        name = "MCModDev"
+        url = "http://maven.mcmoddev.com"
     }
 }
 dependencies {
