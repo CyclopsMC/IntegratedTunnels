@@ -6,12 +6,12 @@ import net.minecraft.inventory.Container;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.common.capabilities.Capability;
-
 import net.minecraftforge.common.util.Constants;
 import org.cyclops.cyclopscore.helper.TileHelpers;
 import org.cyclops.integrateddynamics.api.network.INetwork;
 import org.cyclops.integrateddynamics.api.network.IPartNetwork;
 import org.cyclops.integrateddynamics.api.network.IPositionedAddonsNetwork;
+import org.cyclops.integrateddynamics.api.network.IPositionedAddonsNetworkIngredients;
 import org.cyclops.integrateddynamics.api.part.IPartType;
 import org.cyclops.integrateddynamics.api.part.PartPos;
 import org.cyclops.integrateddynamics.api.part.PartTarget;
@@ -50,9 +50,18 @@ public abstract class PartTypeInterfacePositionedAddon<N extends IPositionedAddo
         addTargetToNetwork(network, target.getTarget(), state.getPriority(), state.getChannelInterface(), state);
     }
 
+    protected void scheduleNetworkObservation(PartTarget target, S state) {
+        IPositionedAddonsNetwork positionedAddonsNetwork = state.getPositionedAddonsNetwork();
+        if (positionedAddonsNetwork instanceof IPositionedAddonsNetworkIngredients) {
+            ((IPositionedAddonsNetworkIngredients) positionedAddonsNetwork).scheduleObservationForced(
+                    state.getChannelInterface(), target.getCenter());
+        }
+    }
+
     @Override
     public void onNetworkRemoval(INetwork network, IPartNetwork partNetwork, PartTarget target, S state) {
         super.onNetworkRemoval(network, partNetwork, target, state);
+        scheduleNetworkObservation(target, state);
         removeTargetFromNetwork(network, target.getTarget(), state);
     }
 
@@ -60,6 +69,7 @@ public abstract class PartTypeInterfacePositionedAddon<N extends IPositionedAddo
     public void onNetworkAddition(INetwork network, IPartNetwork partNetwork, PartTarget target, S state) {
         super.onNetworkAddition(network, partNetwork, target, state);
         addTargetToNetwork(network, target.getTarget(), state.getPriority(), state.getChannelInterface(), state);
+        scheduleNetworkObservation(target, state);
     }
 
     @Override
