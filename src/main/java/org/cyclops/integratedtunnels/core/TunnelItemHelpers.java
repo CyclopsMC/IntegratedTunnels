@@ -209,6 +209,7 @@ public class TunnelItemHelpers {
      * @param network The network in which the movement is happening.
      * @param ingredientsNetwork The ingredients network in which the movement is happening.
      * @param channel The channel.
+     * @param connectionHash A semi-unique connection hash.
      * @param source The source item storage.
      * @param world The destination world.
      * @param pos The destination position.

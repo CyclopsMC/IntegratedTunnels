@@ -1399,8 +1399,7 @@ public class TunnelAspectWriteBuilders {
                             target.getPos().getBlockPos(),
                             target.getSide(),
                             fluidChannel,
-                            input.getFluidStackMatcher(),
-                            false
+                            input.getFluidStackMatcher()
                     );
                     input.postTransfer();
                 }

@@ -151,6 +151,7 @@ public class TunnelFluidHelpers {
      * @param network The network in which the movement is happening.
      * @param ingredientsNetwork The network in which the movement is happening.
      * @param channel The channel.
+     * @param connectionHash A semi-unique connection hash.
      * @param source The source fluid handler.
      * @param world The target world.
      * @param pos The target position.
@@ -183,6 +184,7 @@ public class TunnelFluidHelpers {
      * @param network The network in which the movement is happening.
      * @param ingredientsNetwork The ingredients network in which the movement is happening.
      * @param channel The channel.
+     * @param connectionHash A semi-unique connection hash.
      * @param world The source world.
      * @param pos The source position.
      * @param side The source side.
@@ -193,7 +195,7 @@ public class TunnelFluidHelpers {
     public static FluidStack pickUpFluids(INetwork network, IPositionedAddonsNetworkIngredients<FluidStack, Integer> ingredientsNetwork,
                                           int channel, int connectionHash, World world, BlockPos pos, EnumFacing side,
                                           IIngredientComponentStorage<FluidStack, Integer> destination,
-                                          IngredientPredicate<FluidStack, Integer> fluidStackMatcher, boolean craftIfFailed) {
+                                          IngredientPredicate<FluidStack, Integer> fluidStackMatcher) {
         IBlockState state = world.getBlockState(pos);
         Block block = state.getBlock();
         if (block instanceof IFluidBlock || block instanceof BlockLiquid) {
