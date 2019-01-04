@@ -12,6 +12,7 @@
         <paragraph>info_book.integratedtunnels.concepts.text4</paragraph>
         <paragraph>info_book.integratedtunnels.concepts.text5</paragraph>
         <paragraph>info_book.integratedtunnels.concepts.text6</paragraph>
+        <paragraph>info_book.integratedtunnels.concepts.text7</paragraph>
         <appendix type="image" width="120" height="44">integratedtunnels:textures/gui/infobook/importer.png</appendix>
         <appendix type="image" width="120" height="47">integratedtunnels:textures/gui/infobook/exporter.png</appendix>
         <appendix type="image" width="120" height="48">integratedtunnels:textures/gui/infobook/importerexporter.png</appendix>
