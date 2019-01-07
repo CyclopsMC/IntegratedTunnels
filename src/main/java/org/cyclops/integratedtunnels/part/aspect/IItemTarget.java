@@ -10,7 +10,7 @@ import org.cyclops.integrateddynamics.api.part.PartTarget;
 import org.cyclops.integrateddynamics.api.part.aspect.property.IAspectProperties;
 import org.cyclops.integrateddynamics.core.helper.PartHelpers;
 import org.cyclops.integratedtunnels.api.network.IItemNetwork;
-import org.cyclops.integratedtunnels.core.IngredientPredicate;
+import org.cyclops.integratedtunnels.core.predicate.IngredientPredicate;
 import org.cyclops.integratedtunnels.core.part.PartStateRoundRobin;
 
 import javax.annotation.Nullable;
@@ -32,46 +32,46 @@ public interface IItemTarget extends IChanneledTarget<IItemNetwork> {
 
     public IAspectProperties getProperties();
 
-    public int getConnectionHash();
+    public ITunnelConnection getConnection();
 
-    public static ItemTargetCapabilityProvider ofCapabilityProvider(int transferHash, PartTarget partTarget, IAspectProperties properties,
+    public static ItemTargetCapabilityProvider ofCapabilityProvider(ITunnelTransfer transfer, PartTarget partTarget, IAspectProperties properties,
                                                                     IngredientPredicate<ItemStack, Integer> itemStackMatcher, int slot) {
         PartPos center = partTarget.getCenter();
         PartPos target = partTarget.getTarget();
         INetwork network = IChanneledTarget.getNetworkChecked(center);
         TileEntity tile = target.getPos().getWorld().getTileEntity(target.getPos().getBlockPos());
         PartStateRoundRobin<?> partState = (PartStateRoundRobin<?>) PartHelpers.getPart(center).getState();
-        return new ItemTargetCapabilityProvider(transferHash, network, tile, target.getSide(),
+        return new ItemTargetCapabilityProvider(transfer, network, tile, target.getSide(),
                 slot, itemStackMatcher, partTarget, properties, partState);
     }
 
-    public static ItemTargetCapabilityProvider ofEntity(int transferHash, PartTarget partTarget,
+    public static ItemTargetCapabilityProvider ofEntity(ITunnelTransfer transfer, PartTarget partTarget,
                                                         @Nullable Entity entity, IAspectProperties properties,
                                                         IngredientPredicate<ItemStack, Integer> itemStackMatcher, int slot) {
         PartPos center = partTarget.getCenter();
         PartPos target = partTarget.getTarget();
         INetwork network = IChanneledTarget.getNetworkChecked(center);
         PartStateRoundRobin<?> partState = (PartStateRoundRobin<?>) PartHelpers.getPart(center).getState();
-        return new ItemTargetCapabilityProvider(transferHash, network, entity, target.getSide(),
+        return new ItemTargetCapabilityProvider(transfer, network, entity, target.getSide(),
                 slot, itemStackMatcher, partTarget, properties, partState);
     }
 
-    public static ItemTargetCapabilityProvider ofBlock(int transferHash, PartTarget partTarget, IAspectProperties properties,
-                                                                    IngredientPredicate<ItemStack, Integer> itemStackMatcher, int slot) {
+    public static ItemTargetCapabilityProvider ofBlock(ITunnelTransfer transfer, PartTarget partTarget, IAspectProperties properties,
+                                                       IngredientPredicate<ItemStack, Integer> itemStackMatcher, int slot) {
         PartPos center = partTarget.getCenter();
         PartPos target = partTarget.getTarget();
         INetwork network = IChanneledTarget.getNetworkChecked(center);
         PartStateRoundRobin<?> partState = (PartStateRoundRobin<?>) PartHelpers.getPart(center).getState();
-        return new ItemTargetCapabilityProvider(transferHash, network, null, target.getSide(),
+        return new ItemTargetCapabilityProvider(transfer, network, null, target.getSide(),
                 slot, itemStackMatcher, partTarget, properties, partState);
     }
 
-    public static ItemTargetStorage ofStorage(int transferHash, INetwork network, PartTarget partTarget,
+    public static ItemTargetStorage ofStorage(ITunnelTransfer transfer, INetwork network, PartTarget partTarget,
                                               IAspectProperties properties, IngredientPredicate<ItemStack, Integer> itemStackMatcher,
                                               IIngredientComponentStorage<ItemStack, Integer> storage, int slot) {
         PartPos center = partTarget.getCenter();
         PartStateRoundRobin<?> partState = (PartStateRoundRobin<?>) PartHelpers.getPart(center).getState();
-        return new ItemTargetStorage(transferHash, network, storage,
+        return new ItemTargetStorage(transfer, network, storage,
                 slot, itemStackMatcher, partTarget, properties, partState);
     }
 

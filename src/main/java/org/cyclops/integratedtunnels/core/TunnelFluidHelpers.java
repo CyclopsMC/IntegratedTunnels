@@ -16,20 +16,17 @@ import org.cyclops.commoncapabilities.api.capability.fluidhandler.FluidMatch;
 import org.cyclops.commoncapabilities.api.ingredient.IngredientComponent;
 import org.cyclops.commoncapabilities.api.ingredient.storage.IIngredientComponentStorage;
 import org.cyclops.cyclopscore.helper.FluidHelpers;
-import org.cyclops.cyclopscore.helper.L10NHelpers;
-import org.cyclops.integrateddynamics.api.evaluate.EvaluationException;
 import org.cyclops.integrateddynamics.api.evaluate.operator.IOperator;
-import org.cyclops.integrateddynamics.api.evaluate.variable.IValue;
 import org.cyclops.integrateddynamics.api.evaluate.variable.IValueTypeListProxy;
 import org.cyclops.integrateddynamics.api.network.INetwork;
 import org.cyclops.integrateddynamics.api.network.IPositionedAddonsNetworkIngredients;
 import org.cyclops.integrateddynamics.api.part.PartTarget;
-import org.cyclops.integrateddynamics.api.part.write.IPartStateWriter;
-import org.cyclops.integrateddynamics.core.evaluate.variable.ValueHelpers;
 import org.cyclops.integrateddynamics.core.evaluate.variable.ValueObjectTypeFluidStack;
-import org.cyclops.integrateddynamics.core.evaluate.variable.ValueTypeBoolean;
-import org.cyclops.integrateddynamics.core.helper.NbtHelpers;
-import org.cyclops.integrateddynamics.core.helper.PartHelpers;
+import org.cyclops.integratedtunnels.core.predicate.IngredientPredicate;
+import org.cyclops.integratedtunnels.core.predicate.IngredientPredicateFluidStackList;
+import org.cyclops.integratedtunnels.core.predicate.IngredientPredicateFluidStackNbt;
+import org.cyclops.integratedtunnels.core.predicate.IngredientPredicateFluidStackOperator;
+import org.cyclops.integratedtunnels.part.aspect.ITunnelConnection;
 
 import javax.annotation.Nullable;
 
@@ -77,61 +74,18 @@ public class TunnelFluidHelpers {
     public static IngredientPredicate<FluidStack, Integer> matchFluidStacks(final IValueTypeListProxy<ValueObjectTypeFluidStack, ValueObjectTypeFluidStack.ValueFluidStack> fluidStacks,
                                                                             final boolean checkFluid, final boolean checkAmount, final boolean checkNbt,
                                                                             final boolean blacklist, final int amount, final boolean exactAmount) {
-        return new IngredientPredicate<FluidStack, Integer>(IngredientComponent.FLUIDSTACK, blacklist, false, amount, exactAmount) {
-            @Override
-            public boolean test(@Nullable FluidStack input) {
-                for (ValueObjectTypeFluidStack.ValueFluidStack fluidStack : fluidStacks) {
-                    if (fluidStack.getRawValue().isPresent()
-                            && areFluidStackEqual(input, fluidStack.getRawValue().get(), checkFluid, checkAmount, checkNbt)) {
-                        return !blacklist;
-                    }
-                }
-                return blacklist;
-            }
-        };
+        return new IngredientPredicateFluidStackList(blacklist, amount, exactAmount, fluidStacks, checkFluid, checkAmount, checkNbt);
     }
 
     public static IngredientPredicate<FluidStack, Integer> matchPredicate(final PartTarget partTarget, final IOperator predicate,
                                                                           final int amount, final boolean exactAmount) {
-        return new IngredientPredicate<FluidStack, Integer>(IngredientComponent.FLUIDSTACK, false, false, amount, exactAmount) {
-            @Override
-            public boolean test(@Nullable FluidStack input) {
-                ValueObjectTypeFluidStack.ValueFluidStack valueFluidStack = ValueObjectTypeFluidStack.ValueFluidStack.of(input);
-                try {
-                    IValue result = ValueHelpers.evaluateOperator(predicate, valueFluidStack);
-                    ValueHelpers.validatePredicateOutput(predicate, result);
-                    return ((ValueTypeBoolean.ValueBoolean) result).getRawValue();
-                } catch (EvaluationException e) {
-                    PartHelpers.PartStateHolder<?, ?> partData = PartHelpers.getPart(partTarget.getCenter());
-                    if (partData != null) {
-                        IPartStateWriter partState = (IPartStateWriter) partData.getState();
-                        partState.addError(partState.getActiveAspect(), new L10NHelpers.UnlocalizedString(e.getMessage()));
-                        partState.setDeactivated(true);
-                    }
-                    return false;
-                }
-            }
-        };
+        return new IngredientPredicateFluidStackOperator(amount, exactAmount, predicate, partTarget);
     }
 
     public static IngredientPredicate<FluidStack, Integer> matchNbt(final NBTTagCompound tag, final boolean subset, final boolean superset, final boolean requireNbt, final boolean recursive,
                                                                     final boolean blacklist,
                                                                     final int amount, final boolean exactAmount) {
-        return new IngredientPredicate<FluidStack, Integer>(IngredientComponent.FLUIDSTACK, blacklist, false, amount, exactAmount) {
-            @Override
-            public boolean test(@Nullable FluidStack input) {
-                if (input.tag != null && requireNbt) {
-                    return isBlacklist();
-                }
-                NBTTagCompound itemTag = input.tag != null ? input.tag : new NBTTagCompound();
-                boolean ret = (!subset || NbtHelpers.nbtMatchesSubset(tag, itemTag, recursive))
-                        && (!superset || NbtHelpers.nbtMatchesSubset(itemTag, tag, recursive));
-                if (blacklist) {
-                    ret = !ret;
-                }
-                return ret;
-            }
-        };
+        return new IngredientPredicateFluidStackNbt(blacklist, amount, exactAmount, requireNbt, subset, tag, recursive, superset);
     }
 
     public static boolean areFluidStackEqual(FluidStack stackA, FluidStack stackB,
@@ -151,7 +105,7 @@ public class TunnelFluidHelpers {
      * @param network The network in which the movement is happening.
      * @param ingredientsNetwork The network in which the movement is happening.
      * @param channel The channel.
-     * @param connectionHash A semi-unique connection hash.
+     * @param connection The connection object.
      * @param source The source fluid handler.
      * @param world The target world.
      * @param pos The target position.
@@ -162,7 +116,7 @@ public class TunnelFluidHelpers {
      * @return The placed fluid.
      */
     public static FluidStack placeFluids(INetwork network, IPositionedAddonsNetworkIngredients<FluidStack, Integer> ingredientsNetwork,
-                                         int channel, int connectionHash,
+                                         int channel, ITunnelConnection connection,
                                          IIngredientComponentStorage<FluidStack, Integer> source, final World world, final BlockPos pos,
                                          IngredientPredicate<FluidStack, Integer> fluidStackMatcher, boolean blockUpdate,
                                          boolean ignoreReplacable, boolean craftIfFailed) {
@@ -176,7 +130,7 @@ public class TunnelFluidHelpers {
         }
 
         IIngredientComponentStorage<FluidStack, Integer> destination = new FluidStorageBlockWrapper((WorldServer) world, pos, null, blockUpdate);
-        return TunnelHelpers.moveSingleStateOptimized(network, ingredientsNetwork, channel, connectionHash, source, -1, destination, -1, fluidStackMatcher, craftIfFailed);
+        return TunnelHelpers.moveSingleStateOptimized(network, ingredientsNetwork, channel, connection, source, -1, destination, -1, fluidStackMatcher, craftIfFailed);
     }
 
     /**
@@ -184,7 +138,7 @@ public class TunnelFluidHelpers {
      * @param network The network in which the movement is happening.
      * @param ingredientsNetwork The ingredients network in which the movement is happening.
      * @param channel The channel.
-     * @param connectionHash A semi-unique connection hash.
+     * @param connection The connection object.
      * @param world The source world.
      * @param pos The source position.
      * @param side The source side.
@@ -193,14 +147,14 @@ public class TunnelFluidHelpers {
      * @return The picked-up fluid.
      */
     public static FluidStack pickUpFluids(INetwork network, IPositionedAddonsNetworkIngredients<FluidStack, Integer> ingredientsNetwork,
-                                          int channel, int connectionHash, World world, BlockPos pos, EnumFacing side,
+                                          int channel, ITunnelConnection connection, World world, BlockPos pos, EnumFacing side,
                                           IIngredientComponentStorage<FluidStack, Integer> destination,
                                           IngredientPredicate<FluidStack, Integer> fluidStackMatcher) {
         IBlockState state = world.getBlockState(pos);
         Block block = state.getBlock();
         if (block instanceof IFluidBlock || block instanceof BlockLiquid) {
             IIngredientComponentStorage<FluidStack, Integer> source = new FluidStorageBlockWrapper((WorldServer) world, pos, side, false);
-            return TunnelHelpers.moveSingleStateOptimized(network, ingredientsNetwork, channel, connectionHash, source, -1, destination, -1, fluidStackMatcher, false);
+            return TunnelHelpers.moveSingleStateOptimized(network, ingredientsNetwork, channel, connection, source, -1, destination, -1, fluidStackMatcher, false);
         }
         return null;
     }

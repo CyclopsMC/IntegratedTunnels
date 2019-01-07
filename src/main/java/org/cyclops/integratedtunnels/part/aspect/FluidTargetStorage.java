@@ -7,7 +7,7 @@ import org.cyclops.integrateddynamics.api.part.PartTarget;
 import org.cyclops.integrateddynamics.api.part.aspect.property.IAspectProperties;
 import org.cyclops.integratedtunnels.api.network.IFluidNetwork;
 import org.cyclops.integratedtunnels.capability.network.FluidNetworkConfig;
-import org.cyclops.integratedtunnels.core.IngredientPredicate;
+import org.cyclops.integratedtunnels.core.predicate.IngredientPredicate;
 import org.cyclops.integratedtunnels.core.part.PartStateRoundRobin;
 
 /**
@@ -15,13 +15,13 @@ import org.cyclops.integratedtunnels.core.part.PartStateRoundRobin;
  */
 public class FluidTargetStorage extends ChanneledTarget<IFluidNetwork> implements IFluidTarget {
 
-    private final int connectionHash;
+    private final ITunnelConnection connection;
     private final IIngredientComponentStorage<FluidStack, Integer> storage;
     private final IngredientPredicate<FluidStack, Integer> fluidStackMatcher;
     private final PartTarget partTarget;
     private final IAspectProperties properties;
 
-    public FluidTargetStorage(int transferHash, INetwork network,
+    public FluidTargetStorage(ITunnelTransfer transfer, INetwork network,
                               IIngredientComponentStorage<FluidStack, Integer> storage,
                               IngredientPredicate<FluidStack, Integer> fluidStackMatcher, PartTarget partTarget,
                               IAspectProperties properties, PartStateRoundRobin<?> partState) {
@@ -29,8 +29,7 @@ public class FluidTargetStorage extends ChanneledTarget<IFluidNetwork> implement
                 properties.getValue(TunnelAspectWriteBuilders.PROP_CHANNEL).getRawValue(),
                 properties.getValue(TunnelAspectWriteBuilders.PROP_ROUNDROBIN).getRawValue(),
                 properties.getValue(TunnelAspectWriteBuilders.PROP_CRAFT).getRawValue());
-        int storagePosHash = partTarget.getTarget().hashCode();
-        this.connectionHash = transferHash << 4 + storagePosHash ^ System.identityHashCode(getChanneledNetwork());
+        this.connection = new TunnelConnectionPositionedNetwork(network, getChannel(), partTarget.getTarget(), transfer);
         this.storage = storage;
         this.fluidStackMatcher = fluidStackMatcher;
         this.partTarget = partTarget;
@@ -68,8 +67,7 @@ public class FluidTargetStorage extends ChanneledTarget<IFluidNetwork> implement
     }
 
     @Override
-    public int getConnectionHash() {
-        return connectionHash;
+    public ITunnelConnection getConnection() {
+        return connection;
     }
-
 }

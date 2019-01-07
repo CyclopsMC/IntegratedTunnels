@@ -4,7 +4,6 @@ import com.google.common.collect.Lists;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Items;
-import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
@@ -15,22 +14,19 @@ import net.minecraft.world.WorldServer;
 import org.cyclops.commoncapabilities.api.capability.itemhandler.ItemMatch;
 import org.cyclops.commoncapabilities.api.ingredient.IngredientComponent;
 import org.cyclops.commoncapabilities.api.ingredient.storage.IIngredientComponentStorage;
-import org.cyclops.cyclopscore.helper.BlockHelpers;
-import org.cyclops.cyclopscore.helper.L10NHelpers;
-import org.cyclops.integrateddynamics.api.evaluate.EvaluationException;
 import org.cyclops.integrateddynamics.api.evaluate.operator.IOperator;
-import org.cyclops.integrateddynamics.api.evaluate.variable.IValue;
 import org.cyclops.integrateddynamics.api.evaluate.variable.IValueTypeListProxy;
 import org.cyclops.integrateddynamics.api.network.INetwork;
 import org.cyclops.integrateddynamics.api.network.IPositionedAddonsNetworkIngredients;
 import org.cyclops.integrateddynamics.api.part.PartTarget;
-import org.cyclops.integrateddynamics.api.part.write.IPartStateWriter;
-import org.cyclops.integrateddynamics.core.evaluate.variable.ValueHelpers;
 import org.cyclops.integrateddynamics.core.evaluate.variable.ValueObjectTypeBlock;
 import org.cyclops.integrateddynamics.core.evaluate.variable.ValueObjectTypeItemStack;
-import org.cyclops.integrateddynamics.core.evaluate.variable.ValueTypeBoolean;
-import org.cyclops.integrateddynamics.core.helper.NbtHelpers;
-import org.cyclops.integrateddynamics.core.helper.PartHelpers;
+import org.cyclops.integratedtunnels.core.predicate.IngredientPredicate;
+import org.cyclops.integratedtunnels.core.predicate.IngredientPredicateItemStackList;
+import org.cyclops.integratedtunnels.core.predicate.IngredientPredicateItemStackNbt;
+import org.cyclops.integratedtunnels.core.predicate.IngredientPredicateItemStackOperator;
+import org.cyclops.integratedtunnels.core.predicate.IngredientPredicateBlockList;
+import org.cyclops.integratedtunnels.part.aspect.ITunnelConnection;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -50,6 +46,16 @@ public class TunnelItemHelpers {
         @Override
         public boolean test(@Nullable ItemStack input) {
             return false;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            return obj == TunnelItemHelpers.MATCH_NONE;
+        }
+
+        @Override
+        public int hashCode() {
+            return 9991029;
         }
     };
 
@@ -91,103 +97,30 @@ public class TunnelItemHelpers {
                                                                           final boolean checkItem, final boolean checkStackSize,
                                                                           final boolean checkDamage, final boolean checkNbt,
                                                                           final boolean blacklist, final int amount, final boolean exactAmount) {
-        return new IngredientPredicate<ItemStack, Integer>(IngredientComponent.ITEMSTACK, blacklist, false, amount, exactAmount) {
-            @Override
-            public boolean test(@Nullable ItemStack input) {
-                for (ValueObjectTypeItemStack.ValueItemStack itemStack : itemStacks) {
-                    if (!itemStack.getRawValue().isEmpty()
-                            && areItemStackEqual(input, itemStack.getRawValue(), checkStackSize, checkItem, checkDamage, checkNbt)) {
-                        return !blacklist;
-                    }
-                }
-                return blacklist;
-            }
-        };
+        return new IngredientPredicateItemStackList(blacklist, amount, exactAmount, itemStacks, checkStackSize, checkItem, checkDamage, checkNbt);
     }
 
     public static IngredientPredicate<ItemStack, Integer> matchPredicateItem(final PartTarget partTarget, final IOperator predicate,
                                                                              final int amount, final boolean exactAmount) {
-        return new IngredientPredicate<ItemStack, Integer>(IngredientComponent.ITEMSTACK, false, false, amount, exactAmount) {
-            @Override
-            public boolean test(@Nullable ItemStack input) {
-                ValueObjectTypeItemStack.ValueItemStack valueItemStack = ValueObjectTypeItemStack.ValueItemStack.of(input);
-                try {
-                    IValue result = ValueHelpers.evaluateOperator(predicate, valueItemStack);
-                    ValueHelpers.validatePredicateOutput(predicate, result);
-                    return ((ValueTypeBoolean.ValueBoolean) result).getRawValue();
-                } catch (EvaluationException e) {
-                    PartHelpers.PartStateHolder<?, ?> partData = PartHelpers.getPart(partTarget.getCenter());
-                    if (partData != null) {
-                        IPartStateWriter partState = (IPartStateWriter) partData.getState();
-                        partState.addError(partState.getActiveAspect(), new L10NHelpers.UnlocalizedString(e.getMessage()));
-                        partState.setDeactivated(true);
-                    }
-                    return false;
-                }
-            }
-        };
+        return new IngredientPredicateItemStackOperator(amount, exactAmount, predicate, partTarget);
     }
 
     public static IngredientPredicate<ItemStack, Integer> matchBlocks(final IValueTypeListProxy<ValueObjectTypeBlock, ValueObjectTypeBlock.ValueBlock> blocks,
                                                                       final boolean checkItem, final boolean checkStackSize,
                                                                       final boolean checkDamage, final boolean checkNbt,
                                                                       final boolean blacklist, final int amount, final boolean exactAmount) {
-        return new IngredientPredicate<ItemStack, Integer>(IngredientComponent.ITEMSTACK, blacklist, false, amount, exactAmount) {
-            @Override
-            public boolean test(@Nullable ItemStack input) {
-                for (ValueObjectTypeBlock.ValueBlock block : blocks) {
-                    if (!block.getRawValue().isPresent()
-                            && areItemStackEqual(input, BlockHelpers.getItemStackFromBlockState(block.getRawValue().get()), checkStackSize, checkItem, checkDamage, checkNbt)) {
-                        return !blacklist;
-                    }
-                }
-                return blacklist;
-            }
-        };
+        return new IngredientPredicateBlockList(blacklist, amount, exactAmount, blocks, checkStackSize, checkItem, checkDamage, checkNbt);
     }
 
     public static IngredientPredicate<ItemStack, Integer> matchPredicateBlock(final PartTarget partTarget, final IOperator predicate,
                                                                               final int amount, final boolean exactAmount) {
-        return new IngredientPredicate<ItemStack, Integer>(IngredientComponent.ITEMSTACK, false, false, amount, exactAmount) {
-            @Override
-            public boolean test(@Nullable ItemStack input) {
-                ValueObjectTypeBlock.ValueBlock valueBlock = ValueObjectTypeBlock.ValueBlock.of(
-                        input.getItem() instanceof ItemBlock ? BlockHelpers.getBlockStateFromItemStack(input) : null);
-                try {
-                    IValue result = ValueHelpers.evaluateOperator(predicate, valueBlock);
-                    ValueHelpers.validatePredicateOutput(predicate, result);
-                    return ((ValueTypeBoolean.ValueBoolean) result).getRawValue();
-                } catch (EvaluationException e) {
-                    PartHelpers.PartStateHolder<?, ?> partData = PartHelpers.getPart(partTarget.getCenter());
-                    if (partData != null) {
-                        IPartStateWriter partState = (IPartStateWriter) partData.getState();
-                        partState.addError(partState.getActiveAspect(), new L10NHelpers.UnlocalizedString(e.getMessage()));
-                        partState.setDeactivated(true);
-                    }
-                    return false;
-                }
-            }
-        };
+        return new IngredientPredicateBlockOperator(amount, exactAmount, predicate, partTarget);
     }
 
     public static IngredientPredicate<ItemStack, Integer> matchNbt(final NBTTagCompound tag, final boolean subset, final boolean superset,
                                                                    final boolean requireNbt, final boolean recursive, final boolean blacklist,
                                                                    final int amount, final boolean exactAmount) {
-        return new IngredientPredicate<ItemStack, Integer>(IngredientComponent.ITEMSTACK, blacklist, false, amount, exactAmount) {
-            @Override
-            public boolean test(@Nullable ItemStack input) {
-                if (!input.hasTagCompound() && requireNbt) {
-                    return isBlacklist();
-                }
-                NBTTagCompound itemTag = input.hasTagCompound() ? input.getTagCompound() : new NBTTagCompound();
-                boolean ret = (!subset || NbtHelpers.nbtMatchesSubset(tag, itemTag, recursive))
-                        && (!superset || NbtHelpers.nbtMatchesSubset(itemTag, tag, recursive));
-                if (blacklist) {
-                    ret = !ret;
-                }
-                return ret;
-            }
-        };
+        return new IngredientPredicateItemStackNbt(blacklist, amount, exactAmount, requireNbt, subset, tag, recursive, superset);
     }
 
     public static boolean areItemStackEqual(ItemStack stackA, ItemStack stackB,
@@ -209,7 +142,7 @@ public class TunnelItemHelpers {
      * @param network The network in which the movement is happening.
      * @param ingredientsNetwork The ingredients network in which the movement is happening.
      * @param channel The channel.
-     * @param connectionHash A semi-unique connection hash.
+     * @param connection The connection object.
      * @param source The source item storage.
      * @param world The destination world.
      * @param pos The destination position.
@@ -222,7 +155,7 @@ public class TunnelItemHelpers {
      * @return The placed item.
      */
     public static ItemStack placeItems(INetwork network, IPositionedAddonsNetworkIngredients<ItemStack, Integer> ingredientsNetwork,
-                                       int channel, int connectionHash,
+                                       int channel, ITunnelConnection connection,
                                        IIngredientComponentStorage<ItemStack, Integer> source,
                                        World world, BlockPos pos, EnumFacing side,
                                        IngredientPredicate<ItemStack, Integer> itemStackMatcher, EnumHand hand,
@@ -238,7 +171,7 @@ public class TunnelItemHelpers {
 
         IIngredientComponentStorage<ItemStack, Integer> destinationBlock = new ItemStorageBlockWrapper(
                 true, (WorldServer) world, pos, side, hand, blockUpdate, 0, false, ignoreReplacable, true);
-        return TunnelHelpers.moveSingleStateOptimized(network, ingredientsNetwork, channel, connectionHash, source, -1, destinationBlock, -1, itemStackMatcher, craftIfFailed);
+        return TunnelHelpers.moveSingleStateOptimized(network, ingredientsNetwork, channel, connection, source, -1, destinationBlock, -1, itemStackMatcher, craftIfFailed);
     }
 
     /**
@@ -246,7 +179,7 @@ public class TunnelItemHelpers {
      * @param network The network in which the movement is happening.
      * @param ingredientsNetwork The ingredients network in which the movement is happening.
      * @param channel The channel.
-     * @param connectionHash The connection hash.
+     * @param connection The connection object.
      * @param world The destination world.
      * @param pos The destination position.
      * @param side The destination side.
@@ -261,7 +194,7 @@ public class TunnelItemHelpers {
      * @return The picked-up items.
      */
     public static List<ItemStack> pickUpItems(INetwork network, IPositionedAddonsNetworkIngredients<ItemStack, Integer> ingredientsNetwork,
-                                              int channel, int connectionHash, World world, BlockPos pos, EnumFacing side,
+                                              int channel, ITunnelConnection connection, World world, BlockPos pos, EnumFacing side,
                                               IIngredientComponentStorage<ItemStack, Integer> destination,
                                               IngredientPredicate<ItemStack, Integer> itemStackMatcher, EnumHand hand, boolean blockUpdate,
                                               boolean ignoreReplacable, int fortune, boolean silkTouch,
@@ -278,7 +211,7 @@ public class TunnelItemHelpers {
                 false, (WorldServer) world, pos, side, hand, blockUpdate, fortune, silkTouch, ignoreReplacable, breakOnNoDrops);
         List<ItemStack> itemStacks = Lists.newArrayList();
         ItemStack itemStack;
-        while (!(itemStack = TunnelHelpers.moveSingleStateOptimized(network, ingredientsNetwork, channel, connectionHash, sourceBlock, -1,
+        while (!(itemStack = TunnelHelpers.moveSingleStateOptimized(network, ingredientsNetwork, channel, connection, sourceBlock, -1,
                 destination, -1, itemStackMatcher, false)).isEmpty()) {
             itemStacks.add(itemStack);
         }

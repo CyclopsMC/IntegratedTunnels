@@ -41,6 +41,10 @@ public class ItemHandlerWorldEntityImportWrapper implements IIngredientComponent
                 input -> (ignorePickupDelay || !input.cannotPickup()) && !input.isDead);
     }
 
+    public List<EntityItem> getEntities() {
+        return entities;
+    }
+
     @Override
     public IngredientComponent<ItemStack, Integer> getComponent() {
         return IngredientComponent.ITEMSTACK;

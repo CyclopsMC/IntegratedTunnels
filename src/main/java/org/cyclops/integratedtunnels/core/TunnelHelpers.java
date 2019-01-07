@@ -14,6 +14,8 @@ import org.cyclops.integrateddynamics.api.network.INetworkCraftingHandlerRegistr
 import org.cyclops.integrateddynamics.api.network.IPositionedAddonsNetworkIngredients;
 import org.cyclops.integratedtunnels.GeneralConfig;
 import org.cyclops.integratedtunnels.IntegratedTunnels;
+import org.cyclops.integratedtunnels.core.predicate.IngredientPredicate;
+import org.cyclops.integratedtunnels.part.aspect.ITunnelConnection;
 
 import javax.annotation.Nonnull;
 import java.util.concurrent.TimeUnit;
@@ -23,7 +25,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class TunnelHelpers {
 
-    private static final Cache<Integer, Boolean> CACHE_INV_CHECKS = CacheBuilder.newBuilder()
+    private static final Cache<ITunnelConnection, Boolean> CACHE_INV_CHECKS = CacheBuilder.newBuilder()
             .expireAfterWrite(GeneralConfig.inventoryUnchangedTickTimeout * (1000 / MinecraftHelpers.SECOND_IN_TICKS),
                     TimeUnit.MILLISECONDS).build();
 
@@ -62,7 +64,7 @@ public class TunnelHelpers {
      * @param network The network in which the movement is happening.
      * @param ingredientsNetwork The ingredients network in which the movement is happening.
      * @param channel The channel.
-     * @param connectionHash The connection hash.
+     * @param connection The connection object.
      * @param source The source ingredient storage.
      * @param sourceSlot The source slot.
      * @param destination The destination ingredient storage.
@@ -75,7 +77,7 @@ public class TunnelHelpers {
      */
     @Nonnull
     public static <T, M> T moveSingleStateOptimized(INetwork network, IPositionedAddonsNetworkIngredients<T, M> ingredientsNetwork,
-                                                    int channel, int connectionHash,
+                                                    int channel, ITunnelConnection connection,
                                                     IIngredientComponentStorage<T, M> source, int sourceSlot,
                                                     IIngredientComponentStorage<T, M> destination, int destinationSlot,
                                                     IngredientPredicate<T, M> ingredientPredicate, boolean craftIfFailed) {
@@ -87,7 +89,7 @@ public class TunnelHelpers {
         }
 
         // Don't do anything if we are sleeping for this connection
-        if (CACHE_INV_CHECKS.getIfPresent(connectionHash) != null) {
+        if (CACHE_INV_CHECKS.getIfPresent(connection) != null) {
             return matcher.getEmptyInstance();
         }
 
@@ -95,7 +97,7 @@ public class TunnelHelpers {
         T moved = moveSingle(source, sourceSlot, destination, destinationSlot, ingredientPredicate, false);
         if (matcher.isEmpty(moved)) {
             // Mark this connection as 'sleeping' if nothing was moved
-            CACHE_INV_CHECKS.put(connectionHash, true);
+            CACHE_INV_CHECKS.put(connection, true);
         }
 
         // Schedule a new observation for the network, as its contents may have changed

@@ -10,7 +10,7 @@ import org.cyclops.integrateddynamics.api.part.PartTarget;
 import org.cyclops.integrateddynamics.api.part.aspect.property.IAspectProperties;
 import org.cyclops.integratedtunnels.api.network.IItemNetwork;
 import org.cyclops.integratedtunnels.capability.network.ItemNetworkConfig;
-import org.cyclops.integratedtunnels.core.IngredientPredicate;
+import org.cyclops.integratedtunnels.core.predicate.IngredientPredicate;
 import org.cyclops.integratedtunnels.core.part.PartStateRoundRobin;
 
 import javax.annotation.Nullable;
@@ -21,13 +21,13 @@ import javax.annotation.Nullable;
 public class ItemTargetCapabilityProvider extends ChanneledTargetCapabilityProvider<IItemNetwork, ItemStack, Integer>
         implements IItemTarget {
 
-    private final int connectionHash;
+    private final ITunnelConnection connection;
     private final int slot;
     private final IngredientPredicate<ItemStack, Integer> itemStackMatcher;
     private final PartTarget partTarget;
     private final IAspectProperties properties;
 
-    public ItemTargetCapabilityProvider(int transferHash, INetwork network, @Nullable ICapabilityProvider capabilityProvider,
+    public ItemTargetCapabilityProvider(ITunnelTransfer transfer, INetwork network, @Nullable ICapabilityProvider capabilityProvider,
                                         EnumFacing side, int slot,
                                         IngredientPredicate<ItemStack, Integer> itemStackMatcher, PartTarget partTarget,
                                         IAspectProperties properties, PartStateRoundRobin<?> partState) {
@@ -35,8 +35,7 @@ public class ItemTargetCapabilityProvider extends ChanneledTargetCapabilityProvi
                 properties.getValue(TunnelAspectWriteBuilders.PROP_CHANNEL).getRawValue(),
                 properties.getValue(TunnelAspectWriteBuilders.PROP_ROUNDROBIN).getRawValue(),
                 properties.getValue(TunnelAspectWriteBuilders.PROP_CRAFT).getRawValue());
-        int storagePosHash = partTarget.getTarget().hashCode();
-        this.connectionHash = transferHash << 4 + storagePosHash ^ System.identityHashCode(getChanneledNetwork());
+        this.connection = new TunnelConnectionPositionedNetworkCapabilityProvider(network, getChannel(), partTarget.getTarget(), transfer, capabilityProvider);
         this.slot = slot;
         this.itemStackMatcher = itemStackMatcher;
         this.partTarget = partTarget;
@@ -69,8 +68,8 @@ public class ItemTargetCapabilityProvider extends ChanneledTargetCapabilityProvi
     }
 
     @Override
-    public int getConnectionHash() {
-        return connectionHash;
+    public ITunnelConnection getConnection() {
+        return connection;
     }
 
     @Override
