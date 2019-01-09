@@ -419,12 +419,25 @@ public class TunnelAspectWriteBuilders {
             boolean checkDamage = properties.getValue(PROP_CHECK_DAMAGE).getRawValue();
             boolean checkNbt = properties.getValue(PROP_CHECK_NBT).getRawValue();
             boolean blacklist = properties.getValue(PROP_BLACKLIST).getRawValue();
-            IngredientPredicate.EmptyBehaviour emptyBehaviour = IngredientPredicate.EmptyBehaviour.fromBoolean(properties.getValue(PROP_EMPTYISANY).getRawValue());
             boolean exactAmount = properties.getValue(PROP_EXACTAMOUNT).getRawValue();
             int amount = properties.getValue(PROP_RATE).getRawValue();
             ItemStack prototype = TunnelItemHelpers.prototypeWithCount(input.getRight(), amount);
+            boolean checkItem = true;
 
-            IngredientPredicate<ItemStack, Integer> itemStackMatcher = TunnelItemHelpers.matchItemStack(prototype, true, checkStackSize, checkDamage, checkNbt, blacklist, exactAmount, emptyBehaviour);
+            // If the (original) prototype is empty, adjust match flags based on the empty behaviour
+            if (input.getRight().isEmpty()) {
+                IngredientPredicate.EmptyBehaviour emptyBehaviour = IngredientPredicate.EmptyBehaviour.fromBoolean(properties.getValue(PROP_EMPTYISANY).getRawValue());
+                if (emptyBehaviour == IngredientPredicate.EmptyBehaviour.ANY) {
+                    checkStackSize = false;
+                    checkDamage = false;
+                    checkNbt = false;
+                    checkItem = false;
+                } else {
+                    prototype = ItemStack.EMPTY;
+                }
+            }
+
+            IngredientPredicate<ItemStack, Integer> itemStackMatcher = TunnelItemHelpers.matchItemStack(prototype, checkItem, checkStackSize, checkDamage, checkNbt, blacklist, exactAmount);
             int slot = properties.getValue(PROP_SLOT).getRawValue();
             return Triple.of(input.getLeft(), input.getMiddle(), ChanneledTargetInformation.of(itemStackMatcher, itemStackMatcher, slot));
         };
@@ -486,11 +499,25 @@ public class TunnelAspectWriteBuilders {
             IAspectProperties properties = input.getMiddle();
 
             boolean blacklist = properties.getValue(PROP_BLACKLIST).getRawValue();
-            IngredientPredicate.EmptyBehaviour emptyBehaviour = IngredientPredicate.EmptyBehaviour.fromBoolean(properties.getValue(PROP_EMPTYISANY).getRawValue());
-            int amount = properties.getValue(PROP_RATE).getRawValue();
+            int amount = 1;
             boolean exactAmount = false;
-            ItemStack prototype = TunnelItemHelpers.prototypeWithCount(BlockHelpers.getItemStackFromBlockState(input.getRight()), amount);
-            IngredientPredicate<ItemStack, Integer> itemStackMatcher = TunnelItemHelpers.matchItemStack(prototype, true, false, true, false, blacklist, exactAmount, emptyBehaviour);
+            ItemStack itemBlock = input.getRight() == null ? ItemStack.EMPTY : BlockHelpers.getItemStackFromBlockState(input.getRight());
+            ItemStack prototype = TunnelItemHelpers.prototypeWithCount(itemBlock, amount);
+            boolean checkItem = true;
+            boolean checkDamage =  true;
+
+            // If the (original) prototype is empty, adjust match flags based on the empty behaviour
+            if (itemBlock.isEmpty()) {
+                IngredientPredicate.EmptyBehaviour emptyBehaviour = IngredientPredicate.EmptyBehaviour.fromBoolean(properties.getValue(PROP_EMPTYISANY).getRawValue());
+                if (emptyBehaviour == IngredientPredicate.EmptyBehaviour.ANY) {
+                    checkDamage = false;
+                    checkItem = false;
+                } else {
+                    prototype = ItemStack.EMPTY;
+                }
+            }
+
+            IngredientPredicate<ItemStack, Integer> itemStackMatcher = TunnelItemHelpers.matchItemStack(prototype, checkItem, false, checkDamage, false, blacklist, exactAmount);
             int slot = properties.getValue(PROP_SLOT).getRawValue();
             return Triple.of(input.getLeft(), input.getMiddle(), ChanneledTargetInformation.of(itemStackMatcher, itemStackMatcher, slot));
         };
@@ -638,6 +665,7 @@ public class TunnelAspectWriteBuilders {
                 PROP_CHANNEL,
                 PROP_ROUNDROBIN,
                 PROP_BLACKLIST,
+                PROP_EMPTYISANY,
                 PROP_RATE,
                 PROP_EXACTAMOUNT,
                 PROP_CHECK_AMOUNT,
@@ -647,6 +675,7 @@ public class TunnelAspectWriteBuilders {
                 PROP_CHANNEL,
                 PROP_ROUNDROBIN,
                 PROP_BLACKLIST,
+                PROP_EMPTYISANY,
                 PROP_RATE,
                 PROP_EXACTAMOUNT,
                 PROP_CHECK_AMOUNT,
@@ -682,6 +711,7 @@ public class TunnelAspectWriteBuilders {
             PROPERTIES_RATECHECKS.setValue(PROP_CHANNEL, ValueTypeInteger.ValueInteger.of(IPositionedAddonsNetworkIngredients.DEFAULT_CHANNEL));
             PROPERTIES_RATECHECKS.setValue(PROP_ROUNDROBIN, ValueTypeBoolean.ValueBoolean.of(false));
             PROPERTIES_RATECHECKS.setValue(PROP_BLACKLIST, ValueTypeBoolean.ValueBoolean.of(false));
+            PROPERTIES_RATECHECKS.setValue(PROP_EMPTYISANY, ValueTypeBoolean.ValueBoolean.of(true));
             PROPERTIES_RATECHECKS.setValue(PROP_RATE, ValueTypeInteger.ValueInteger.of(1000));
             PROPERTIES_RATECHECKS.setValue(PROP_EXACTAMOUNT, ValueTypeBoolean.ValueBoolean.of(false));
             PROPERTIES_RATECHECKS.setValue(PROP_CHECK_AMOUNT, ValueTypeBoolean.ValueBoolean.of(false));
@@ -690,6 +720,7 @@ public class TunnelAspectWriteBuilders {
             PROPERTIES_RATECHECKSCRAFT.setValue(PROP_CHANNEL, ValueTypeInteger.ValueInteger.of(IPositionedAddonsNetworkIngredients.DEFAULT_CHANNEL));
             PROPERTIES_RATECHECKSCRAFT.setValue(PROP_ROUNDROBIN, ValueTypeBoolean.ValueBoolean.of(false));
             PROPERTIES_RATECHECKSCRAFT.setValue(PROP_BLACKLIST, ValueTypeBoolean.ValueBoolean.of(false));
+            PROPERTIES_RATECHECKSCRAFT.setValue(PROP_EMPTYISANY, ValueTypeBoolean.ValueBoolean.of(true));
             PROPERTIES_RATECHECKSCRAFT.setValue(PROP_RATE, ValueTypeInteger.ValueInteger.of(1000));
             PROPERTIES_RATECHECKSCRAFT.setValue(PROP_EXACTAMOUNT, ValueTypeBoolean.ValueBoolean.of(false));
             PROPERTIES_RATECHECKSCRAFT.setValue(PROP_CHECK_AMOUNT, ValueTypeBoolean.ValueBoolean.of(false));
@@ -728,7 +759,22 @@ public class TunnelAspectWriteBuilders {
             boolean checkAmount = properties.getValue(PROP_CHECK_AMOUNT).getRawValue();
             boolean checkNbt = properties.getValue(PROP_CHECK_NBT).getRawValue();
             boolean blacklist = properties.getValue(PROP_BLACKLIST).getRawValue();
-            IngredientPredicate<FluidStack, Integer> ingredientPredicate = TunnelFluidHelpers.matchFluidStack(TunnelFluidHelpers.prototypeWithCount(input.getRight(), rate), true, checkAmount, checkNbt, blacklist, exactAmount);
+            boolean checkFluid = true;
+            FluidStack prototype = TunnelFluidHelpers.prototypeWithCount(input.getRight(), rate);
+
+            // If the (original) prototype is empty, adjust match flags based on the empty behaviour
+            if (input.getRight() == null) {
+                IngredientPredicate.EmptyBehaviour emptyBehaviour = IngredientPredicate.EmptyBehaviour.fromBoolean(properties.getValue(PROP_EMPTYISANY).getRawValue());
+                if (emptyBehaviour == IngredientPredicate.EmptyBehaviour.ANY) {
+                    checkAmount = false;
+                    checkNbt = false;
+                    checkFluid = false;
+                } else {
+                    prototype = null;
+                }
+            }
+
+            IngredientPredicate<FluidStack, Integer> ingredientPredicate = TunnelFluidHelpers.matchFluidStack(prototype, checkFluid, checkAmount, checkNbt, blacklist, exactAmount);
             return Triple.of(input.getLeft(), input.getMiddle(),
                     ChanneledTargetInformation.of(ingredientPredicate, ingredientPredicate, -1));
         };
@@ -1194,6 +1240,7 @@ public class TunnelAspectWriteBuilders {
                     PROP_CHANNEL,
                     PROP_ROUNDROBIN,
                     PROP_BLACKLIST,
+                    PROP_EMPTYISANY,
                     TunnelAspectWriteBuilders.Fluid.PROP_CHECK_NBT,
                     PROP_BLOCK_UPDATE,
                     PROP_IGNORE_REPLACABLE,
@@ -1210,6 +1257,7 @@ public class TunnelAspectWriteBuilders {
             public static final IAspectProperties PROPERTIES_FLUID = new AspectProperties(ImmutableList.<IAspectPropertyTypeInstance>of(
                     PROP_CHANNEL,
                     PROP_ROUNDROBIN,
+                    PROP_EMPTYISANY,
                     TunnelAspectWriteBuilders.Fluid.PROP_CHECK_NBT
             ));
             public static final IAspectProperties PROPERTIES_FLUIDLIST = new AspectProperties(ImmutableList.<IAspectPropertyTypeInstance>of(
@@ -1248,6 +1296,7 @@ public class TunnelAspectWriteBuilders {
                 PROPERTIES_FLUIDCRAFT_UPDATE.setValue(PROP_CHANNEL, ValueTypeInteger.ValueInteger.of(IPositionedAddonsNetworkIngredients.DEFAULT_CHANNEL));
                 PROPERTIES_FLUIDCRAFT_UPDATE.setValue(PROP_ROUNDROBIN, ValueTypeBoolean.ValueBoolean.of(false));
                 PROPERTIES_FLUIDCRAFT_UPDATE.setValue(PROP_BLACKLIST, ValueTypeBoolean.ValueBoolean.of(false));
+                PROPERTIES_FLUIDCRAFT_UPDATE.setValue(PROP_EMPTYISANY, ValueTypeBoolean.ValueBoolean.of(true));
                 PROPERTIES_FLUIDCRAFT_UPDATE.setValue(TunnelAspectWriteBuilders.Fluid.PROP_CHECK_NBT, ValueTypeBoolean.ValueBoolean.of(true));
                 PROPERTIES_FLUIDCRAFT_UPDATE.setValue(PROP_BLOCK_UPDATE, ValueTypeBoolean.ValueBoolean.of(false));
                 PROPERTIES_FLUIDCRAFT_UPDATE.setValue(PROP_IGNORE_REPLACABLE, ValueTypeBoolean.ValueBoolean.of(false));
@@ -1263,6 +1312,7 @@ public class TunnelAspectWriteBuilders {
                 PROPERTIES_FLUID.setValue(PROP_CHANNEL, ValueTypeInteger.ValueInteger.of(IPositionedAddonsNetworkIngredients.DEFAULT_CHANNEL));
                 PROPERTIES_FLUID.setValue(PROP_ROUNDROBIN, ValueTypeBoolean.ValueBoolean.of(false));
                 PROPERTIES_FLUID.setValue(PROP_BLACKLIST, ValueTypeBoolean.ValueBoolean.of(false));
+                PROPERTIES_FLUID.setValue(PROP_EMPTYISANY, ValueTypeBoolean.ValueBoolean.of(true));
                 PROPERTIES_FLUID.setValue(TunnelAspectWriteBuilders.Fluid.PROP_CHECK_NBT, ValueTypeBoolean.ValueBoolean.of(true));
 
                 PROPERTIES_FLUIDLIST.setValue(PROP_CHANNEL, ValueTypeInteger.ValueInteger.of(IPositionedAddonsNetworkIngredients.DEFAULT_CHANNEL));
@@ -1311,7 +1361,22 @@ public class TunnelAspectWriteBuilders {
                 IAspectProperties properties = input.getMiddle();
                 boolean checkNbt = properties.getValue(TunnelAspectWriteBuilders.Fluid.PROP_CHECK_NBT).getRawValue();
                 boolean blacklist = properties.getValue(PROP_BLACKLIST).getRawValue();
-                IngredientPredicate<FluidStack, Integer> fluidStackPredicate = TunnelFluidHelpers.matchFluidStack(input.getRight(), true, false, checkNbt, blacklist, true);
+                int amount = 1;
+                FluidStack prototype = TunnelFluidHelpers.prototypeWithCount(input.getRight(), amount);
+                boolean checkFluid = true;
+
+                // If the (original) prototype is empty, adjust match flags based on the empty behaviour
+                if (input.getRight() == null) {
+                    IngredientPredicate.EmptyBehaviour emptyBehaviour = IngredientPredicate.EmptyBehaviour.fromBoolean(properties.getValue(PROP_EMPTYISANY).getRawValue());
+                    if (emptyBehaviour == IngredientPredicate.EmptyBehaviour.ANY) {
+                        checkNbt = false;
+                        checkFluid = false;
+                    } else {
+                        prototype = null;
+                    }
+                }
+
+                IngredientPredicate<FluidStack, Integer> fluidStackPredicate = TunnelFluidHelpers.matchFluidStack(prototype, checkFluid, false, checkNbt, blacklist, true);
                 return IFluidTarget.ofBlock(fluidStackPredicate, input.getLeft(), input.getMiddle(), fluidStackPredicate);
             };
             public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, ValueTypeList.ValueList>, IFluidTarget>

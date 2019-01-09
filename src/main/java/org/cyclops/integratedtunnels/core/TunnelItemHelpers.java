@@ -22,10 +22,10 @@ import org.cyclops.integrateddynamics.api.part.PartTarget;
 import org.cyclops.integrateddynamics.core.evaluate.variable.ValueObjectTypeBlock;
 import org.cyclops.integrateddynamics.core.evaluate.variable.ValueObjectTypeItemStack;
 import org.cyclops.integratedtunnels.core.predicate.IngredientPredicate;
+import org.cyclops.integratedtunnels.core.predicate.IngredientPredicateBlockList;
 import org.cyclops.integratedtunnels.core.predicate.IngredientPredicateItemStackList;
 import org.cyclops.integratedtunnels.core.predicate.IngredientPredicateItemStackNbt;
 import org.cyclops.integratedtunnels.core.predicate.IngredientPredicateItemStackOperator;
-import org.cyclops.integratedtunnels.core.predicate.IngredientPredicateBlockList;
 import org.cyclops.integratedtunnels.part.aspect.ITunnelConnection;
 
 import javax.annotation.Nullable;
@@ -36,13 +36,7 @@ import java.util.List;
  */
 public class TunnelItemHelpers {
 
-    public static final IngredientPredicate<ItemStack, Integer> MATCH_ALL = new IngredientPredicate<ItemStack, Integer>(IngredientComponent.ITEMSTACK, ItemStack.EMPTY, ItemMatch.EXACT, false, true, 0, false, IngredientPredicate.EmptyBehaviour.NONE) {
-        @Override
-        public boolean test(@Nullable ItemStack input) {
-            return true;
-        }
-    };
-    public static final IngredientPredicate<ItemStack, Integer> MATCH_NONE = new IngredientPredicate<ItemStack, Integer>(IngredientComponent.ITEMSTACK, ItemStack.EMPTY, ItemMatch.EXACT, false, true, 0, false, IngredientPredicate.EmptyBehaviour.NONE) {
+    public static final IngredientPredicate<ItemStack, Integer> MATCH_NONE = new IngredientPredicate<ItemStack, Integer>(IngredientComponent.ITEMSTACK, ItemStack.EMPTY, ItemMatch.EXACT, false, true, 0, false) {
         @Override
         public boolean test(@Nullable ItemStack input) {
             return false;
@@ -60,7 +54,7 @@ public class TunnelItemHelpers {
     };
 
     public static IngredientPredicate<ItemStack, Integer> matchAll(final int amount, final boolean exactAmount) {
-        return new IngredientPredicate<ItemStack, Integer>(IngredientComponent.ITEMSTACK, new ItemStack(Items.APPLE, amount), exactAmount ? ItemMatch.STACKSIZE : ItemMatch.ANY, false, false, amount, exactAmount, IngredientPredicate.EmptyBehaviour.NONE) {
+        return new IngredientPredicate<ItemStack, Integer>(IngredientComponent.ITEMSTACK, new ItemStack(Items.APPLE, amount), exactAmount ? ItemMatch.STACKSIZE : ItemMatch.ANY, false, false, amount, exactAmount) {
             @Override
             public boolean test(ItemStack input) {
                 return true;
@@ -71,19 +65,16 @@ public class TunnelItemHelpers {
     public static IngredientPredicate<ItemStack, Integer> matchItemStack(final ItemStack itemStack, final boolean checkItem,
                                                                          final boolean checkStackSize, final boolean checkDamage,
                                                                          final boolean checkNbt, final boolean blacklist,
-                                                                         final boolean exactAmount, final IngredientPredicate.EmptyBehaviour emptyBehaviour) {
+                                                                         final boolean exactAmount) {
         int matchFlags = ItemMatch.ANY;
         if (checkItem)      matchFlags = matchFlags | ItemMatch.ITEM;
         if (checkDamage)    matchFlags = matchFlags | ItemMatch.DAMAGE;
         if (checkNbt)       matchFlags = matchFlags | ItemMatch.NBT;
         if (checkStackSize) matchFlags = matchFlags | ItemMatch.STACKSIZE;
         return new IngredientPredicate<ItemStack, Integer>(IngredientComponent.ITEMSTACK, itemStack.copy(), matchFlags, blacklist, itemStack.isEmpty() && !blacklist,
-                itemStack.getCount(), exactAmount, emptyBehaviour) {
+                itemStack.getCount(), exactAmount) {
             @Override
             public boolean test(@Nullable ItemStack input) {
-                if (getInstance().isEmpty()) {
-                    return emptyBehaviour == EmptyBehaviour.ANY;
-                }
                 boolean result = areItemStackEqual(input, itemStack, checkStackSize, true, checkDamage, checkNbt);
                 if (blacklist) {
                     result = !result;

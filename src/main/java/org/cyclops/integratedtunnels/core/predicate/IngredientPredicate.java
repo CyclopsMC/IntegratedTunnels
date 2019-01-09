@@ -19,19 +19,17 @@ public abstract class IngredientPredicate<T, M> implements Predicate<T>, ITunnel
     private final T instance;
     private final M matchFlags;
     private final boolean blacklist;
-    private final EmptyBehaviour emptyBehaviour;
     private final boolean empty;
     private final int maxQuantity;
     private final boolean exactQuantity;
 
     public IngredientPredicate(IngredientComponent<T, M> ingredientComponent,
                                T instance, M matchFlags, boolean blacklist, boolean empty,
-                               int maxQuantity, boolean exactQuantity, EmptyBehaviour emptyBehaviour) {
+                               int maxQuantity, boolean exactQuantity) {
         this.ingredientComponent = ingredientComponent;
         this.instance = instance;
         this.matchFlags = matchFlags;
         this.blacklist = blacklist;
-        this.emptyBehaviour = emptyBehaviour;
         this.empty = empty;
         this.maxQuantity = maxQuantity;
         this.exactQuantity = exactQuantity;
@@ -41,7 +39,7 @@ public abstract class IngredientPredicate<T, M> implements Predicate<T>, ITunnel
     public IngredientPredicate(IngredientComponent<T, M> ingredientComponent,
                                boolean blacklist, boolean empty, int maxQuantity, boolean exactQuantity) {
         this(ingredientComponent, ingredientComponent.getMatcher().getEmptyInstance(), null,
-                blacklist, empty, maxQuantity, exactQuantity, IngredientPredicate.EmptyBehaviour.NONE);
+                blacklist, empty, maxQuantity, exactQuantity);
     }
 
     public IngredientComponent<T, M> getIngredientComponent() {
@@ -58,8 +56,7 @@ public abstract class IngredientPredicate<T, M> implements Predicate<T>, ITunnel
     }
 
     public boolean hasMatchFlags() {
-        return matchFlags != null && !blacklist
-                && (emptyBehaviour == EmptyBehaviour.ANY || !getIngredientComponent().getMatcher().isEmpty(getInstance()));
+        return matchFlags != null && !blacklist;
     }
 
     public boolean isBlacklist() {

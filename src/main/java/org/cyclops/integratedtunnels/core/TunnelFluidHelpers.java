@@ -40,6 +40,16 @@ public class TunnelFluidHelpers {
         public boolean test(FluidStack input) {
             return false;
         }
+
+        @Override
+        public boolean equals(Object obj) {
+            return obj == TunnelFluidHelpers.MATCH_NONE;
+        }
+
+        @Override
+        public int hashCode() {
+            return 9991029;
+        }
     };
 
     public static IngredientPredicate<FluidStack, Integer> matchAll(final int amount, final boolean exactAmount) {
