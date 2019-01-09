@@ -206,17 +206,17 @@ public abstract class PartTypeInterfacePositionedAddon<N extends IPositionedAddo
         }
 
         @Override
-        public boolean hasCapability(Capability<?> capability) {
+        public boolean hasCapability(Capability<?> capability, IPartNetwork network, PartTarget target) {
             return (getPositionedAddonsNetwork() != null && capability == getTargetCapability())
-                    || super.hasCapability(capability);
+                    || super.hasCapability(capability, network, target);
         }
 
         @Override
-        public <T2> T2 getCapability(Capability<T2> capability) {
+        public <T2> T2 getCapability(Capability<T2> capability, IPartNetwork network, PartTarget target) {
             if (getPositionedAddonsNetwork() != null && capability == getTargetCapability()) {
                 return (T2) this;
             }
-            return super.getCapability(capability);
+            return super.getCapability(capability, network, target);
         }
     }
 
