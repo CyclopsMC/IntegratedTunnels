@@ -110,9 +110,9 @@ public class TunnelHelpers {
             if (destinationSlot >= 0) {
                 targetAcceptsCraftingResult = destination instanceof IIngredientComponentStorageSlotted
                         && matcher.isEmpty(((IIngredientComponentStorageSlotted<T, M>) destination)
-                        .insert(destinationSlot, ingredientPredicate.getInstance(), false));
+                        .insert(destinationSlot, ingredientPredicate.getInstance(), true));
             } else {
-                targetAcceptsCraftingResult = matcher.isEmpty(destination.insert(ingredientPredicate.getInstance(), false));
+                targetAcceptsCraftingResult = matcher.isEmpty(destination.insert(ingredientPredicate.getInstance(), true));
             }
 
             if (targetAcceptsCraftingResult) {
