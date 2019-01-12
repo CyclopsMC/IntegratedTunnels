@@ -220,7 +220,7 @@ public class TunnelItemHelpers {
             if (prototype.isEmpty()) {
                 return new ItemStack(Items.APPLE, count);
             } else {
-                prototype.copy();
+                prototype = prototype.copy();
                 prototype.setCount(count);
             }
         }
