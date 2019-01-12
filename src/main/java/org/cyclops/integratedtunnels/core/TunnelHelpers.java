@@ -105,19 +105,26 @@ public class TunnelHelpers {
 
         // Craft if we moved nothing, and the flag is enabled.
         if (craftIfFailed && matcher.isEmpty(moved)) {
+            // If we don't have to move exact instances,
+            // only request the crafting of 1.
+            T craftInstance = ingredientPredicate.getInstance();
+            if (!ingredientPredicate.isExactQuantity()) {
+                craftInstance = matcher.withQuantity(craftInstance, 1);
+            }
+
             // Only craft if the target accepts the crafting output completely
             boolean targetAcceptsCraftingResult;
             if (destinationSlot >= 0) {
                 targetAcceptsCraftingResult = destination instanceof IIngredientComponentStorageSlotted
                         && matcher.isEmpty(((IIngredientComponentStorageSlotted<T, M>) destination)
-                        .insert(destinationSlot, ingredientPredicate.getInstance(), true));
+                        .insert(destinationSlot, craftInstance, true));
             } else {
-                targetAcceptsCraftingResult = matcher.isEmpty(destination.insert(ingredientPredicate.getInstance(), true));
+                targetAcceptsCraftingResult = matcher.isEmpty(destination.insert(craftInstance, true));
             }
 
             if (targetAcceptsCraftingResult) {
                 requestCrafting(network, ingredientsNetwork, channel,
-                        ingredientPredicate.getInstance(), ingredientPredicate.getMatchFlags());
+                        craftInstance, ingredientPredicate.getMatchFlags());
             }
         }
 
