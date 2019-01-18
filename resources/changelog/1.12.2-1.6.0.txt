@@ -1,0 +1,16 @@
+As always, don't forget to backup your world before updating!
+Requires CyclopsCore version 1.0.0 or higher.
+
+Additions:
+* Add aspect properties to craft instance during export when not present (requires a mod like Integrated Crafting)
+* Create sv_se.lang
+
+Changes:
+* Rewrite storage networks using new Integrated Dynamics ingredient-based network abstraction.
+* Rewrite item, fluid and energy movement using CyclopsCore's ingredient storage helpers: https://github.com/CyclopsMC/CyclopsCore/wiki/Ingredient-Collections
+* Update round-robin mode implementation to new IPartPosIteratorHandler
+* Don't retrieve tile entities when not needed during fluid/item transfer
+
+Fixes:
+* Fix ingredient transfer cache clashing
+  Closes #138, #134
