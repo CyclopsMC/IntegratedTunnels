@@ -94,7 +94,7 @@ public abstract class IngredientPredicate<T, M> implements Predicate<T>, ITunnel
     public int hashCode() {
         return ingredientComponent.hashCode()
                 ^ ingredientComponent.getMatcher().hash(instance)
-                ^ matchFlags.hashCode()
+                ^ Objects.hashCode(matchFlags)
                 ^ (blacklist ? 1 : 0)
                 ^ (empty ? 2 : 4)
                 ^ maxQuantity
