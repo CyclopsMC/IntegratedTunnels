@@ -979,9 +979,7 @@ public class TunnelAspectWriteBuilders {
                 int amount = input.getRight();
                 int entityIndex = properties.getValue(World.PROPERTY_ENTITYINDEX).getRawValue();
 
-                PartPos target = partTarget.getTarget();
-                Entity entity = Iterables.get(target.getPos().getWorld().getEntitiesWithinAABB(Entity.class,
-                        new AxisAlignedBB(target.getPos().getBlockPos())), entityIndex, null);
+                Entity entity = getEntity(partTarget.getTarget(), entityIndex);
                 return IEnergyTarget.ofEntity(partTarget, entity, properties, amount);
             };
         }
@@ -1216,9 +1214,7 @@ public class TunnelAspectWriteBuilders {
                 IngredientPredicate<ItemStack, Integer> itemStackMatcher = input.getRight().getIngredientPredicate();
                 int entityIndex = properties.getValue(World.PROPERTY_ENTITYINDEX).getRawValue();
 
-                PartPos target = partTarget.getTarget();
-                Entity entity = Iterables.get(target.getPos().getWorld().getEntitiesWithinAABB(Entity.class,
-                        new AxisAlignedBB(target.getPos().getBlockPos())), entityIndex, null);
+                Entity entity = getEntity(partTarget.getTarget(), entityIndex);
                 ITunnelTransfer transfer = new TunnelTransferComposite(
                         input.getRight().getTransfer(),
                         new TunnelTransferEntity(entity)
@@ -1476,9 +1472,7 @@ public class TunnelAspectWriteBuilders {
                 IngredientPredicate<FluidStack, Integer> fluidStackPredicate = input.getRight().getIngredientPredicate();
                 int entityIndex = properties.getValue(World.PROPERTY_ENTITYINDEX).getRawValue();
 
-                PartPos target = partTarget.getTarget();
-                Entity entity = Iterables.get(target.getPos().getWorld().getEntitiesWithinAABB(Entity.class,
-                        new AxisAlignedBB(target.getPos().getBlockPos())), entityIndex, null);
+                Entity entity = getEntity(partTarget.getTarget(), entityIndex);
                 return IFluidTarget.ofEntity(fluidStackPredicate, partTarget, entity, properties, fluidStackPredicate);
             };
 
