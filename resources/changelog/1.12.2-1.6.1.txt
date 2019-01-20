@@ -1,0 +1,7 @@
+As always, don't forget to backup your world before updating!
+Requires CyclopsCore version 1.0.0 or higher.
+
+Fixes:
+* Fix crash when using operator-based aspects, Closes #142
+* Fix handling entities with index -1 crashing, Closes #143
+  Instead, this now picks a random entity.
