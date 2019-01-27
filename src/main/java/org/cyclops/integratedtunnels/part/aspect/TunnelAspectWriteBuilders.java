@@ -746,7 +746,7 @@ public class TunnelAspectWriteBuilders {
 
         public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, Integer>, Triple<PartTarget, IAspectProperties, ChanneledTargetInformation<FluidStack, Integer>>>
                 PROP_INTEGER_FLUIDPREDICATE = input -> {
-            IngredientPredicate<FluidStack, Integer> fluidStackMatcher = TunnelFluidHelpers.matchAll(input.getRight(), false);
+            IngredientPredicate<FluidStack, Integer> fluidStackMatcher = TunnelFluidHelpers.matchAll(input.getRight(), input.getMiddle().getValue(PROP_EXACTAMOUNT).getRawValue());
             return Triple.of(input.getLeft(), input.getMiddle(), ChanneledTargetInformation.of(fluidStackMatcher, fluidStackMatcher, -1));
         };
         public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, FluidStack>, Triple<PartTarget, IAspectProperties, ChanneledTargetInformation<FluidStack, Integer>>>
