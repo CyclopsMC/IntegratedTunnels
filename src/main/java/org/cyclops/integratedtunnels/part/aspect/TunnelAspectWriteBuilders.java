@@ -1,7 +1,6 @@
 package org.cyclops.integratedtunnels.part.aspect;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Iterables;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
@@ -12,7 +11,6 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.energy.CapabilityEnergy;
-import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.items.CapabilityItemHandler;
@@ -51,7 +49,6 @@ import org.cyclops.integratedtunnels.IntegratedTunnels;
 import org.cyclops.integratedtunnels.api.network.IItemNetwork;
 import org.cyclops.integratedtunnels.capability.network.FluidNetworkConfig;
 import org.cyclops.integratedtunnels.capability.network.ItemNetworkConfig;
-import org.cyclops.integratedtunnels.core.predicate.IngredientPredicate;
 import org.cyclops.integratedtunnels.core.ItemHandlerWorldEntityExportWrapper;
 import org.cyclops.integratedtunnels.core.ItemHandlerWorldEntityImportWrapper;
 import org.cyclops.integratedtunnels.core.ItemStoragePlayerWrapper;
@@ -60,6 +57,7 @@ import org.cyclops.integratedtunnels.core.TunnelFluidHelpers;
 import org.cyclops.integratedtunnels.core.TunnelHelpers;
 import org.cyclops.integratedtunnels.core.TunnelItemHelpers;
 import org.cyclops.integratedtunnels.core.part.PartStatePositionedAddon;
+import org.cyclops.integratedtunnels.core.predicate.IngredientPredicate;
 import org.cyclops.integratedtunnels.part.PartStatePlayerSimulator;
 
 import javax.annotation.Nullable;
@@ -1357,7 +1355,7 @@ public class TunnelAspectWriteBuilders {
                 IAspectProperties properties = input.getMiddle();
                 boolean checkNbt = properties.getValue(TunnelAspectWriteBuilders.Fluid.PROP_CHECK_NBT).getRawValue();
                 boolean blacklist = properties.getValue(PROP_BLACKLIST).getRawValue();
-                int amount = 1;
+                int amount = net.minecraftforge.fluids.Fluid.BUCKET_VOLUME;
                 FluidStack prototype = TunnelFluidHelpers.prototypeWithCount(input.getRight(), amount);
                 boolean checkFluid = true;
 
