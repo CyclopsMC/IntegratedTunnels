@@ -1,0 +1,6 @@
+As always, don't forget to backup your world before updating!
+Requires CyclopsCore version 1.0.0 or higher.
+
+Fixes:
+* Fix boolean and integer-based fluid transfer ignoring exact amount, Closes #145
+* Fix fluid world transfer not working when given a specific fluid filter, Closes #146
