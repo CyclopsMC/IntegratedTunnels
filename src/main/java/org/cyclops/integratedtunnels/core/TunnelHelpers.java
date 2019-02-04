@@ -83,6 +83,12 @@ public class TunnelHelpers {
                                                     IngredientPredicate<T, M> ingredientPredicate, boolean craftIfFailed) {
         IIngredientMatcher<T, M> matcher = source.getComponent().getMatcher();
 
+        // Don't craft if we still have a running crafting job for the instance.
+        if (craftIfFailed && isCrafting(network, ingredientsNetwork, channel,
+                ingredientPredicate.getInstance(), ingredientPredicate.getMatchFlags())) {
+            return matcher.getEmptyInstance();
+        }
+
         // Don't do any expensive transfers if the to-be-moved stack is empty
         if (ingredientPredicate.isEmpty()) {
             return matcher.getEmptyInstance();
@@ -146,5 +152,22 @@ public class TunnelHelpers {
                                                  int channel, T instance, M matchCondition) {
         return IntegratedDynamics._instance.getRegistryManager().getRegistry(INetworkCraftingHandlerRegistry.class)
                 .craft(network, ingredientsNetwork, channel, ingredientsNetwork.getComponent(), instance, matchCondition, false);
+    }
+
+    /**
+     * Check if the given instance is being crafted.
+     * @param network The network to craft in.
+     * @param ingredientsNetwork The ingredients network.
+     * @param channel The channel.
+     * @param instance The instance to craft.
+     * @param matchCondition The match condition.
+     * @param <T> The instance type.
+     * @param <M> The matching condition parameter.
+     * @return If a crafting job exists for the given instance.
+     */
+    public static <T, M> boolean isCrafting(INetwork network, IPositionedAddonsNetworkIngredients<T, M> ingredientsNetwork,
+                                            int channel, T instance, M matchCondition) {
+        return IntegratedDynamics._instance.getRegistryManager().getRegistry(INetworkCraftingHandlerRegistry.class)
+                .isCrafting(network, ingredientsNetwork, channel, ingredientsNetwork.getComponent(), instance, matchCondition);
     }
 }
