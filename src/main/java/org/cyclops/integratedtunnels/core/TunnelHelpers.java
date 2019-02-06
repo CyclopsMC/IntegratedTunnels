@@ -9,6 +9,7 @@ import org.cyclops.commoncapabilities.api.ingredient.storage.IIngredientComponen
 import org.cyclops.cyclopscore.helper.MinecraftHelpers;
 import org.cyclops.cyclopscore.ingredient.storage.IngredientStorageHelpers;
 import org.cyclops.integrateddynamics.IntegratedDynamics;
+import org.cyclops.integrateddynamics.api.ingredient.IIngredientPositionsIndex;
 import org.cyclops.integrateddynamics.api.network.INetwork;
 import org.cyclops.integrateddynamics.api.network.INetworkCraftingHandlerRegistry;
 import org.cyclops.integrateddynamics.api.network.IPositionedAddonsNetworkIngredients;
@@ -116,6 +117,15 @@ public class TunnelHelpers {
             T craftInstance = ingredientPredicate.getInstance();
             if (!ingredientPredicate.isExactQuantity()) {
                 craftInstance = matcher.withQuantity(craftInstance, 1);
+            }
+
+            // Don't allow crafting jobs to be started if we detect a case where movement failed,
+            // but the required ingredient is in fact present in the network.
+            // This is to avoid cases where crafting jobs would be started before a previous movement was observed,
+            // and the crafting job output thereby not being detected upon the next observement.
+            IIngredientPositionsIndex<T, M> index = ingredientsNetwork.getChannelIndex(channel);
+            if (index.getQuantity(ingredientPredicate.getInstance()) >= matcher.getQuantity(craftInstance)) {
+                return moved;
             }
 
             // Only craft if the target accepts the crafting output completely
