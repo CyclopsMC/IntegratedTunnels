@@ -50,7 +50,7 @@ dependencies {
     deobfCompile "net.darkhax.tesla:Tesla-${config.teslaapi_version}" // http://maven.epoxide.org/net/darkhax/tesla/Tesla/
 
     // Project lombok
-    provided "org.projectlombok:lombok:1.14.4"
+    provided "org.projectlombok:lombok:1.16.8"
     testCompile "junit:junit:4.12"
 }
 
