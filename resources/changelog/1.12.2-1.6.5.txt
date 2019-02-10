@@ -1,0 +1,10 @@
+As always, don't forget to backup your world before updating!
+Requires CyclopsCore version 1.0.0 or higher.
+
+Fixes:
+* Fix lombok being included as dependency
+  This fixes the issue where recent releases would not be published on CurseForge
+
+Fixes from 1.6.3:
+* Fix craft jobs requesting before extraction from last tick was observed, CyclopsMC/IntegratedCrafting#11
+* Don't move ingredients if crafting and a crafting job already exists, CyclopsMC/IntegratedCrafting#11
