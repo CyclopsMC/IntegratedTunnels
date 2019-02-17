@@ -129,7 +129,7 @@ public class FluidStorageBlockWrapper implements IIngredientComponentStorage<Flu
             postInsert(stack);
         }
 
-        if (filled == 0) {
+        if (remaining == 0) {
             return null;
         } else {
             return new FluidStack(stack, remaining);
