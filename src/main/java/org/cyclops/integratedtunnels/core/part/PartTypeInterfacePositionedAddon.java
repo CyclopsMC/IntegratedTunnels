@@ -205,15 +205,27 @@ public abstract class PartTypeInterfacePositionedAddon<N extends IPositionedAddo
             }
         }
 
+        protected boolean isPositionEnabled() {
+            N positionedNetwork = getPositionedAddonsNetwork();
+            PartPos pos = getPos();
+            if (positionedNetwork != null) {
+                return !positionedNetwork.isPositionDisabled(pos);
+            }
+            return true;
+        }
+
         @Override
         public boolean hasCapability(Capability<?> capability, IPartNetwork network, PartTarget target) {
-            return (getPositionedAddonsNetwork() != null && capability == getTargetCapability())
+            return (getPositionedAddonsNetwork() != null && capability == getTargetCapability() && isPositionEnabled())
                     || super.hasCapability(capability, network, target);
         }
 
         @Override
         public <T2> T2 getCapability(Capability<T2> capability, IPartNetwork network, PartTarget target) {
             if (getPositionedAddonsNetwork() != null && capability == getTargetCapability()) {
+                if (!isPositionEnabled()) {
+                    return null;
+                }
                 return (T2) this;
             }
             return super.getCapability(capability, network, target);
