@@ -54,7 +54,7 @@ public abstract class PartTypeInterfacePositionedAddon<N extends IPositionedAddo
         IPositionedAddonsNetwork positionedAddonsNetwork = state.getPositionedAddonsNetwork();
         if (positionedAddonsNetwork instanceof IPositionedAddonsNetworkIngredients) {
             ((IPositionedAddonsNetworkIngredients) positionedAddonsNetwork).scheduleObservationForced(
-                    state.getChannelInterface(), target.getCenter());
+                    state.getChannelInterface(), target.getTarget());
         }
     }
 
