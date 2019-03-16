@@ -33,10 +33,10 @@ public class Reference {
     // MOD ID's
     public static final String MOD_FORGE = "forge";
     public static final String MOD_FORGE_VERSION = "@FORGE_VERSION@";
-    public static final String MOD_FORGE_VERSION_MIN = "14.23.1.2555";
+    public static final String MOD_FORGE_VERSION_MIN = "14.23.5.2768";
     public static final String MOD_CYCLOPSCORE = "cyclopscore";
     public static final String MOD_CYCLOPSCORE_VERSION = "@CYCLOPSCORE_VERSION@";
-    public static final String MOD_CYCLOPSCORE_VERSION_MIN = "1.0.0";
+    public static final String MOD_CYCLOPSCORE_VERSION_MIN = "1.0.6";
     public static final String MOD_INTEGRATEDDYNAMICS = "integrateddynamics";
     public static final String MOD_INTEGRATEDDYNAMICS_VERSION_MIN = "1.0.4";
     public static final String MOD_TESLA = "tesla";

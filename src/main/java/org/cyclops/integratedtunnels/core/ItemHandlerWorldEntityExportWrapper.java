@@ -178,7 +178,7 @@ public class ItemHandlerWorldEntityExportWrapper implements IIngredientComponent
 
             if (GeneralConfig.worldInteractionEvents) {
                 world.playEvent(1000, pos, 0); // Sound
-                world.playEvent(2000, pos.offset(facing.getOpposite()), facing.getFrontOffsetX() + 1 + (facing.getFrontOffsetZ() + 1) * 3); // Particles
+                world.playEvent(2000, pos.offset(facing.getOpposite()), facing.getXOffset() + 1 + (facing.getZOffset() + 1) * 3); // Particles
             }
         } else if (this.dispense) {
             stack = stack.copy();
