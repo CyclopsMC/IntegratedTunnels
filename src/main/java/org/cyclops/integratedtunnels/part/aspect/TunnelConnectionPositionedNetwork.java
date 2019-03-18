@@ -27,7 +27,7 @@ public class TunnelConnectionPositionedNetwork implements ITunnelConnection {
             return false;
         }
         TunnelConnectionPositionedNetwork that = (TunnelConnectionPositionedNetwork) obj;
-        return this.network.equals(that.network) && this.channel == that.channel
+        return this.network == that.network && this.channel == that.channel
                 && this.pos.equals(that.pos) && this.transfer.equals(that.transfer);
     }
 
