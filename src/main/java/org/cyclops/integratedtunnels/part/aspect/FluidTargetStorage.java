@@ -10,6 +10,8 @@ import org.cyclops.integratedtunnels.capability.network.FluidNetworkConfig;
 import org.cyclops.integratedtunnels.core.predicate.IngredientPredicate;
 import org.cyclops.integratedtunnels.core.part.PartStateRoundRobin;
 
+import javax.annotation.Nullable;
+
 /**
  * @author rubensworks
  */
@@ -24,7 +26,7 @@ public class FluidTargetStorage extends ChanneledTarget<IFluidNetwork> implement
     public FluidTargetStorage(ITunnelTransfer transfer, INetwork network,
                               IIngredientComponentStorage<FluidStack, Integer> storage,
                               IngredientPredicate<FluidStack, Integer> fluidStackMatcher, PartTarget partTarget,
-                              IAspectProperties properties, PartStateRoundRobin<?> partState) {
+                              IAspectProperties properties, @Nullable PartStateRoundRobin<?> partState) {
         super(network, network.getCapability(FluidNetworkConfig.CAPABILITY), partState,
                 properties.getValue(TunnelAspectWriteBuilders.PROP_CHANNEL).getRawValue(),
                 properties.getValue(TunnelAspectWriteBuilders.PROP_ROUNDROBIN).getRawValue(),

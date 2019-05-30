@@ -22,7 +22,7 @@ public abstract class ChanneledTargetCapabilityProvider<N extends IPositionedAdd
     private IIngredientComponentStorage<T, M> storage = null;
 
     public ChanneledTargetCapabilityProvider(INetwork network, @Nullable ICapabilityProvider capabilityProvider, EnumFacing side,
-                                             N channeledNetwork, PartStateRoundRobin<?> partState, int channel,
+                                             N channeledNetwork, @Nullable PartStateRoundRobin<?> partState, int channel,
                                              boolean roundRobin, boolean craftIfFailed) {
         super(network, channeledNetwork, partState, channel, roundRobin, craftIfFailed);
         this.capabilityProvider = capabilityProvider;
@@ -31,7 +31,7 @@ public abstract class ChanneledTargetCapabilityProvider<N extends IPositionedAdd
 
     @Override
     public boolean hasValidTarget() {
-        return capabilityProvider != null;
+        return capabilityProvider != null && getPartState() != null;
     }
 
     protected abstract IngredientComponent<T, M> getComponent();

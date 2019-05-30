@@ -23,7 +23,7 @@ public class EnergyTargetCapabilityProvider extends ChanneledTargetCapabilityPro
 
     public EnergyTargetCapabilityProvider(@Nullable ICapabilityProvider capabilityProvider, EnumFacing side, INetwork network,
                                           IAspectProperties properties,
-                                          int amount, PartStateRoundRobin<?> partStateEnergy) {
+                                          int amount, @Nullable PartStateRoundRobin<?> partStateEnergy) {
         super(network, capabilityProvider, side, network.getCapability(Capabilities.NETWORK_ENERGY), partStateEnergy,
                 properties.getValue(TunnelAspectWriteBuilders.PROP_CHANNEL).getRawValue(),
                 properties.getValue(TunnelAspectWriteBuilders.PROP_ROUNDROBIN).getRawValue(),

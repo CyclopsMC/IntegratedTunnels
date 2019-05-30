@@ -10,8 +10,8 @@ import org.cyclops.integrateddynamics.api.part.PartTarget;
 import org.cyclops.integrateddynamics.api.part.aspect.property.IAspectProperties;
 import org.cyclops.integratedtunnels.api.network.IItemNetwork;
 import org.cyclops.integratedtunnels.capability.network.ItemNetworkConfig;
-import org.cyclops.integratedtunnels.core.predicate.IngredientPredicate;
 import org.cyclops.integratedtunnels.core.part.PartStateRoundRobin;
+import org.cyclops.integratedtunnels.core.predicate.IngredientPredicate;
 
 import javax.annotation.Nullable;
 
@@ -30,7 +30,7 @@ public class ItemTargetCapabilityProvider extends ChanneledTargetCapabilityProvi
     public ItemTargetCapabilityProvider(ITunnelTransfer transfer, INetwork network, @Nullable ICapabilityProvider capabilityProvider,
                                         EnumFacing side, int slot,
                                         IngredientPredicate<ItemStack, Integer> itemStackMatcher, PartTarget partTarget,
-                                        IAspectProperties properties, PartStateRoundRobin<?> partState) {
+                                        IAspectProperties properties, @Nullable PartStateRoundRobin<?> partState) {
         super(network, capabilityProvider, side, network.getCapability(ItemNetworkConfig.CAPABILITY), partState,
                 properties.getValue(TunnelAspectWriteBuilders.PROP_CHANNEL).getRawValue(),
                 properties.getValue(TunnelAspectWriteBuilders.PROP_ROUNDROBIN).getRawValue(),

@@ -29,7 +29,7 @@ public class FluidTargetCapabilityProvider extends ChanneledTargetCapabilityProv
     public FluidTargetCapabilityProvider(ITunnelTransfer transfer, INetwork network, @Nullable ICapabilityProvider capabilityProvider,
                                          EnumFacing side, IngredientPredicate<FluidStack, Integer> fluidStackMatcher,
                                          PartTarget partTarget, IAspectProperties properties,
-                                         PartStateRoundRobin<?> partState) {
+                                         @Nullable PartStateRoundRobin<?> partState) {
         super(network, capabilityProvider, side, network.getCapability(FluidNetworkConfig.CAPABILITY), partState,
                 properties.getValue(TunnelAspectWriteBuilders.PROP_CHANNEL).getRawValue(),
                 properties.getValue(TunnelAspectWriteBuilders.PROP_ROUNDROBIN).getRawValue(),

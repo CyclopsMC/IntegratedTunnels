@@ -7,7 +7,10 @@ import org.cyclops.integrateddynamics.api.network.INetwork;
 import org.cyclops.integrateddynamics.api.network.IPositionedAddonsNetwork;
 import org.cyclops.integrateddynamics.api.part.PartPos;
 import org.cyclops.integrateddynamics.core.helper.NetworkHelpers;
+import org.cyclops.integrateddynamics.core.helper.PartHelpers;
 import org.cyclops.integratedtunnels.core.part.PartStateRoundRobin;
+
+import javax.annotation.Nullable;
 
 /**
  * A helper class for movement targets with a certain network type.
@@ -40,6 +43,15 @@ public interface IChanneledTarget<N extends IPositionedAddonsNetwork> {
             throw new PartStateException(pos.getPos(), pos.getSide());
         }
         return network;
+    }
+
+    @Nullable
+    public static PartStateRoundRobin<?> getPartState(PartPos center) {
+        PartHelpers.PartStateHolder<?, ?> partStateHolder = PartHelpers.getPart(center);
+        if (partStateHolder == null) {
+            return null;
+        }
+        return (PartStateRoundRobin<?>) partStateHolder.getState();
     }
 
 }

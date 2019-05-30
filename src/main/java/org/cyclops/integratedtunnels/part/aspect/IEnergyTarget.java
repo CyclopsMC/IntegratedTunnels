@@ -8,7 +8,6 @@ import org.cyclops.integrateddynamics.api.network.INetwork;
 import org.cyclops.integrateddynamics.api.part.PartPos;
 import org.cyclops.integrateddynamics.api.part.PartTarget;
 import org.cyclops.integrateddynamics.api.part.aspect.property.IAspectProperties;
-import org.cyclops.integrateddynamics.core.helper.PartHelpers;
 import org.cyclops.integratedtunnels.core.part.PartStateRoundRobin;
 
 import javax.annotation.Nullable;
@@ -26,21 +25,21 @@ public interface IEnergyTarget extends IChanneledTarget<IEnergyNetwork> {
 
     public boolean isExactAmount();
 
-    public static EnergyTargetCapabilityProvider ofTile(PartTarget partTarget, IAspectProperties properties, int amount) {
+    public static IEnergyTarget ofTile(PartTarget partTarget, IAspectProperties properties, int amount) {
         PartPos center = partTarget.getCenter();
         PartPos target = partTarget.getTarget();
         INetwork network = IChanneledTarget.getNetworkChecked(center);
         TileEntity tile = target.getPos().getWorld().getTileEntity(target.getPos().getBlockPos());
-        PartStateRoundRobin<?> partState = (PartStateRoundRobin<?>) PartHelpers.getPart(center).getState();
+        PartStateRoundRobin<?> partState = IChanneledTarget.getPartState(center);
         return new EnergyTargetCapabilityProvider(tile, target.getSide(), network, properties, amount, partState);
     }
 
-    public static EnergyTargetCapabilityProvider ofEntity(PartTarget partTarget, @Nullable Entity entity,
+    public static IEnergyTarget ofEntity(PartTarget partTarget, @Nullable Entity entity,
                                                           IAspectProperties properties, int amount) {
         PartPos center = partTarget.getCenter();
         PartPos target = partTarget.getTarget();
         INetwork network = IChanneledTarget.getNetworkChecked(center);
-        PartStateRoundRobin<?> partState = (PartStateRoundRobin<?>) PartHelpers.getPart(center).getState();
+        PartStateRoundRobin<?> partState = IChanneledTarget.getPartState(center);
         return new EnergyTargetCapabilityProvider(entity, target.getSide(), network, properties, amount, partState);
     }
 
