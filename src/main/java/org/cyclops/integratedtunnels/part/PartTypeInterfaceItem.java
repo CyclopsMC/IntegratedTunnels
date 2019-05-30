@@ -51,98 +51,124 @@ public class PartTypeInterfaceItem extends PartTypeInterfacePositionedAddon<IIte
 
         @Override
         public int getSlots() {
+            if (!isNetworkAndPositionValid()) {
+                return 0;
+            }
             disablePosition();
-            int ret = getPositionedAddonsNetwork() != null ? getItemHandler().getSlots() : 0;
+            int ret = getItemHandler().getSlots();
             enablePosition();
             return ret;
         }
 
         @Override
         public ItemStack getStackInSlot(int slot) {
+            if (!isNetworkAndPositionValid()) {
+                return ItemStack.EMPTY;
+            }
             disablePosition();
-            ItemStack ret = getPositionedAddonsNetwork() != null ? getItemHandler().getStackInSlot(slot) : ItemStack.EMPTY;
+            ItemStack ret = getItemHandler().getStackInSlot(slot);
             enablePosition();
             return ret;
         }
 
         @Override
         public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
+            if (!isNetworkAndPositionValid()) {
+                return stack;
+            }
             disablePosition();
-            ItemStack ret = getPositionedAddonsNetwork() != null ? getItemHandler().insertItem(slot, stack, simulate) : stack;
+            ItemStack ret = getItemHandler().insertItem(slot, stack, simulate);
             enablePosition();
             return ret;
         }
 
         @Override
         public ItemStack extractItem(int slot, int amount, boolean simulate) {
+            if (!isNetworkAndPositionValid()) {
+                return ItemStack.EMPTY;
+            }
             disablePosition();
-            ItemStack ret = getPositionedAddonsNetwork() != null ? getItemHandler().extractItem(slot, amount, simulate) : ItemStack.EMPTY;
+            ItemStack ret = getItemHandler().extractItem(slot, amount, simulate);
             enablePosition();
             return ret;
         }
 
         @Override
         public int getSlotLimit(int slot) {
+            if (!isNetworkAndPositionValid()) {
+                return 0;
+            }
             disablePosition();
-            int ret = getPositionedAddonsNetwork() != null ? getItemHandler().getSlotLimit(slot) : 0;
+            int ret = getItemHandler().getSlotLimit(slot);
             enablePosition();
             return ret;
         }
 
         @Override
         public Iterator<ItemStack> getItems() {
+            if (!isNetworkAndPositionValid()) {
+                return Iterators.forArray();
+            }
             disablePosition();
-            Iterator<ItemStack> ret = getPositionedAddonsNetwork() != null
-                    ? getPositionedAddonsNetwork().getChannel(getChannelInterface()).iterator() : Iterators.forArray();
+            Iterator<ItemStack> ret = getPositionedAddonsNetwork().getChannel(getChannelInterface()).iterator();
             enablePosition();
             return ret;
         }
 
         @Override
         public Iterator<ItemStack> findItems(@Nonnull ItemStack stack, int matchFlags) {
+            if (!isNetworkAndPositionValid()) {
+                return Iterators.forArray();
+            }
             disablePosition();
-            Iterator<ItemStack> ret = getPositionedAddonsNetwork() != null
-                    ? getPositionedAddonsNetwork().getChannel(getChannelInterface()).iterator(stack, matchFlags) : Iterators.forArray();
+            Iterator<ItemStack> ret = getPositionedAddonsNetwork().getChannel(getChannelInterface()).iterator(stack, matchFlags);
             enablePosition();
             return ret;
         }
 
         @Override
         public ItemStack insertItem(ItemStack stack, boolean simulate) {
+            if (!isNetworkAndPositionValid()) {
+                return stack;
+            }
             disablePosition();
-            ItemStack ret = getPositionedAddonsNetwork() != null
-                    ? getPositionedAddonsNetwork().getChannel(getChannelInterface()).insert(stack, simulate) : stack;
+            ItemStack ret = getPositionedAddonsNetwork().getChannel(getChannelInterface()).insert(stack, simulate);
             enablePosition();
             return ret;
         }
 
         @Override
         public ItemStack extractItem(int amount, boolean simulate) {
+            if (!isNetworkAndPositionValid()) {
+                return ItemStack.EMPTY;
+            }
             disablePosition();
-            ItemStack ret = getPositionedAddonsNetwork() != null
-                    ? getPositionedAddonsNetwork().getChannel(getChannelInterface()).extract(amount, simulate) : ItemStack.EMPTY;
+            ItemStack ret = getPositionedAddonsNetwork().getChannel(getChannelInterface()).extract(amount, simulate);
             enablePosition();
             return ret;
         }
 
         @Override
         public ItemStack extractItem(ItemStack matchStack, int matchFlags, boolean simulate) {
+            if (!isNetworkAndPositionValid()) {
+                return ItemStack.EMPTY;
+            }
             disablePosition();
-            ItemStack ret = getPositionedAddonsNetwork() != null
-                    ? getPositionedAddonsNetwork().getChannel(getChannelInterface()).extract(matchStack, matchFlags, simulate) : ItemStack.EMPTY;
+            ItemStack ret = getPositionedAddonsNetwork().getChannel(getChannelInterface()).extract(matchStack, matchFlags, simulate);
             enablePosition();
             return ret;
         }
 
         @Override
         public int getLimit() {
+            if (!isNetworkAndPositionValid()) {
+                return 0;
+            }
             disablePosition();
             int limit = 0;
-            if (getPositionedAddonsNetwork() != null) {
-                IItemHandler itemHandler = getItemHandler();
-                for (int i = 0; i < itemHandler.getSlots(); i++) {
-                    limit += itemHandler.getSlotLimit(i);
-                }
+            IItemHandler itemHandler = getItemHandler();
+            for (int i = 0; i < itemHandler.getSlots(); i++) {
+                limit += itemHandler.getSlotLimit(i);
             }
             enablePosition();
             return limit;
@@ -150,13 +176,13 @@ public class PartTypeInterfaceItem extends PartTypeInterfacePositionedAddon<IIte
 
         @Override
         public boolean hasCapability(Capability<?> capability) {
-            return (getPositionedAddonsNetwork() != null && capability == Capabilities.SLOTLESS_ITEMHANDLER)
+            return (isNetworkAndPositionValid() && capability == Capabilities.SLOTLESS_ITEMHANDLER)
                     || super.hasCapability(capability);
         }
 
         @Override
         public <T> T getCapability(Capability<T> capability) {
-            if (getPositionedAddonsNetwork() != null && capability == Capabilities.SLOTLESS_ITEMHANDLER) {
+            if (isNetworkAndPositionValid() && capability == Capabilities.SLOTLESS_ITEMHANDLER) {
                 return (T) this;
             }
             return super.getCapability(capability);

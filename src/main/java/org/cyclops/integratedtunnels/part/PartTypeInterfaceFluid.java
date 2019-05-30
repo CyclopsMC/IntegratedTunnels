@@ -48,16 +48,22 @@ public class PartTypeInterfaceFluid extends PartTypeInterfacePositionedAddon<IFl
 
         @Override
         public IFluidTankProperties[] getTankProperties() {
+            if (!isNetworkAndPositionValid()) {
+                return new IFluidTankProperties[0];
+            }
             disablePosition();
-            IFluidTankProperties[] ret = getPositionedAddonsNetwork() != null ? getFluidHandler().getTankProperties() : new IFluidTankProperties[0];
+            IFluidTankProperties[] ret = getFluidHandler().getTankProperties();
             enablePosition();
             return ret;
         }
 
         @Override
         public int fill(FluidStack resource, boolean doFill) {
+            if (!isNetworkAndPositionValid()) {
+                return 0;
+            }
             disablePosition();
-            int ret = getPositionedAddonsNetwork() != null ? getFluidHandler().fill(resource, doFill) : 0;
+            int ret = getFluidHandler().fill(resource, doFill);
             enablePosition();
             return ret;
         }
@@ -65,8 +71,11 @@ public class PartTypeInterfaceFluid extends PartTypeInterfacePositionedAddon<IFl
         @Nullable
         @Override
         public FluidStack drain(FluidStack resource, boolean doDrain) {
+            if (!isNetworkAndPositionValid()) {
+                return null;
+            }
             disablePosition();
-            FluidStack ret = getPositionedAddonsNetwork() != null ? getFluidHandler().drain(resource, doDrain) : null;
+            FluidStack ret = getFluidHandler().drain(resource, doDrain);
             enablePosition();
             return ret;
         }
@@ -74,8 +83,11 @@ public class PartTypeInterfaceFluid extends PartTypeInterfacePositionedAddon<IFl
         @Nullable
         @Override
         public FluidStack drain(int maxDrain, boolean doDrain) {
+            if (!isNetworkAndPositionValid()) {
+                return null;
+            }
             disablePosition();
-            FluidStack ret = getPositionedAddonsNetwork() != null ? getFluidHandler().drain(maxDrain, doDrain) : null;
+            FluidStack ret = getFluidHandler().drain(maxDrain, doDrain);
             enablePosition();
             return ret;
         }

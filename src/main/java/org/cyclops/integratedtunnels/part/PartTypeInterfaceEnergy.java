@@ -51,48 +51,66 @@ public class PartTypeInterfaceEnergy extends PartTypeInterfacePositionedAddon<IE
 
         @Override
         public int receiveEnergy(int maxReceive, boolean simulate) {
+            if (!isNetworkAndPositionValid()) {
+                return 0;
+            }
             disablePosition();
-            int ret = getPositionedAddonsNetwork() != null ? getEnergyStorage().receiveEnergy(maxReceive, simulate) : 0;
+            int ret = getEnergyStorage().receiveEnergy(maxReceive, simulate);
             enablePosition();
             return ret;
         }
 
         @Override
         public int extractEnergy(int maxExtract, boolean simulate) {
+            if (!isNetworkAndPositionValid()) {
+                return 0;
+            }
             disablePosition();
-            int ret = getPositionedAddonsNetwork() != null ? getEnergyStorage().extractEnergy(maxExtract, simulate) : 0;
+            int ret = getEnergyStorage().extractEnergy(maxExtract, simulate);
             enablePosition();
             return ret;
         }
 
         @Override
         public int getEnergyStored() {
+            if (!isNetworkAndPositionValid()) {
+                return 0;
+            }
             disablePosition();
-            int ret = getPositionedAddonsNetwork() != null ? getEnergyStorage().getEnergyStored() : 0;
+            int ret = getEnergyStorage().getEnergyStored();
             enablePosition();
             return ret;
         }
 
         @Override
         public int getMaxEnergyStored() {
+            if (!isNetworkAndPositionValid()) {
+                return 0;
+            }
             disablePosition();
-            int ret = getPositionedAddonsNetwork() != null ? getEnergyStorage().getMaxEnergyStored() : 0;
+            int ret = getEnergyStorage().getMaxEnergyStored();
             enablePosition();
             return ret;
         }
 
         @Override
         public boolean canExtract() {
+            if (!isNetworkAndPositionValid()) {
+                return false;
+            }
             disablePosition();
-            boolean ret = getPositionedAddonsNetwork() != null && getEnergyStorage().canExtract();
+            boolean ret = getEnergyStorage().canExtract();
             enablePosition();
             return ret;
         }
 
         @Override
         public boolean canReceive() {
+            if (!isNetworkAndPositionValid()) {
+                return false;
+            }
             disablePosition();
-            boolean ret = getPositionedAddonsNetwork() != null && getEnergyStorage().canReceive();
+            boolean ret = getEnergyStorage().canReceive();
             enablePosition();
             return ret;
         }
