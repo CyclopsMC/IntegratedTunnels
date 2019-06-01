@@ -1,0 +1,10 @@
+As always, don't forget to backup your world before updating!
+Requires CyclopsCore version 1.1.0 or higher.
+
+Fixes:
+* Make interface state target lookup safer in unloaded chunks
+  This could cause crashes when used on SpongeForge servers.
+  Related to #165
+* Fix positions being enabled again while they were disabled
+  Potential fix for stack overflow error in self-referencing network.
+  CyclopsMC/IntegratedDynamics#734
