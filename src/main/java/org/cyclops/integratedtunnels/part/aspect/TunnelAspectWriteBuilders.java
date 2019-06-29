@@ -571,6 +571,7 @@ public class TunnelAspectWriteBuilders {
                         input.getItemChannel(), -1,
                         input.getStorage(), input.getSlot(),
                         input.getItemStackMatcher(),
+                        input.getPartTarget().getCenter(),
                         input.isCraftIfFailed());
                 input.postTransfer();
             }
@@ -588,6 +589,7 @@ public class TunnelAspectWriteBuilders {
                         input.getStorage(), input.getSlot(),
                         input.getItemChannel(), -1,
                         input.getItemStackMatcher(),
+                        input.getPartTarget().getCenter(),
                         false);
                 input.postTransfer();
             }
@@ -844,6 +846,7 @@ public class TunnelAspectWriteBuilders {
                         input.getStorage(),
                         -1,
                         input.getFluidStackMatcher(),
+                        input.getPartTarget().getCenter(),
                         input.isCraftIfFailed()
                 );
                 input.postTransfer();
@@ -864,6 +867,7 @@ public class TunnelAspectWriteBuilders {
                         input.getFluidChannel(),
                         -1,
                         input.getFluidStackMatcher(),
+                        input.getPartTarget().getCenter(),
                         false
                 );
                 input.postTransfer();

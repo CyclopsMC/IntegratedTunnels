@@ -71,6 +71,12 @@ public class GeneralConfig extends DummyConfig {
     public static boolean worldInteractionEvents = true;
 
     /**
+     * If items should be ejected into the world when item movement failed due to item handlers declaring inconsistent movement in simulation mode. If disabled, items can be voided.
+     */
+    @ConfigurableProperty(category = ConfigurableTypeCategory.CORE, comment = "If items should be ejected into the world when item movement failed due to item handlers declaring inconsistent movement in simulation mode. If disabled, items can be voided.", isCommandable = true)
+    public static boolean ejectItemsOnInconsistentSimulationMovement = true;
+
+    /**
      * The type of this config.
      */
     public static ConfigurableType TYPE = ConfigurableType.DUMMY;

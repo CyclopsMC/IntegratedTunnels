@@ -16,10 +16,12 @@ import org.cyclops.commoncapabilities.api.capability.fluidhandler.FluidMatch;
 import org.cyclops.commoncapabilities.api.ingredient.IngredientComponent;
 import org.cyclops.commoncapabilities.api.ingredient.storage.IIngredientComponentStorage;
 import org.cyclops.cyclopscore.helper.FluidHelpers;
+import org.cyclops.integrateddynamics.api.evaluate.EvaluationException;
 import org.cyclops.integrateddynamics.api.evaluate.operator.IOperator;
 import org.cyclops.integrateddynamics.api.evaluate.variable.IValueTypeListProxy;
 import org.cyclops.integrateddynamics.api.network.INetwork;
 import org.cyclops.integrateddynamics.api.network.IPositionedAddonsNetworkIngredients;
+import org.cyclops.integrateddynamics.api.part.PartPos;
 import org.cyclops.integrateddynamics.api.part.PartTarget;
 import org.cyclops.integrateddynamics.core.evaluate.variable.ValueObjectTypeFluidStack;
 import org.cyclops.integratedtunnels.core.predicate.IngredientPredicate;
@@ -124,12 +126,13 @@ public class TunnelFluidHelpers {
      * @param ignoreReplacable If replacable blocks should be overriden when placing blocks.
      * @param craftIfFailed If the exact ingredient from ingredientPredicate should be crafted if transfer failed.
      * @return The placed fluid.
+     * @throws EvaluationException If illegal movement occured and further movement should stop.
      */
     public static FluidStack placeFluids(INetwork network, IPositionedAddonsNetworkIngredients<FluidStack, Integer> ingredientsNetwork,
                                          int channel, ITunnelConnection connection,
                                          IIngredientComponentStorage<FluidStack, Integer> source, final World world, final BlockPos pos,
                                          IngredientPredicate<FluidStack, Integer> fluidStackMatcher, boolean blockUpdate,
-                                         boolean ignoreReplacable, boolean craftIfFailed) {
+                                         boolean ignoreReplacable, boolean craftIfFailed) throws EvaluationException {
         IBlockState destBlockState = world.getBlockState(pos);
         final Material destMaterial = destBlockState.getMaterial();
         final boolean isDestNonSolid = !destMaterial.isSolid();
@@ -140,7 +143,8 @@ public class TunnelFluidHelpers {
         }
 
         IIngredientComponentStorage<FluidStack, Integer> destination = new FluidStorageBlockWrapper((WorldServer) world, pos, null, blockUpdate);
-        return TunnelHelpers.moveSingleStateOptimized(network, ingredientsNetwork, channel, connection, source, -1, destination, -1, fluidStackMatcher, craftIfFailed);
+        return TunnelHelpers.moveSingleStateOptimized(network, ingredientsNetwork, channel, connection, source,
+                -1, destination, -1, fluidStackMatcher, PartPos.of(world, pos, null), craftIfFailed);
     }
 
     /**
@@ -155,16 +159,18 @@ public class TunnelFluidHelpers {
      * @param destination The target fluid handler.
      * @param fluidStackMatcher The fluidstack match predicate.
      * @return The picked-up fluid.
+     * @throws EvaluationException If illegal movement occured and further movement should stop.
      */
     public static FluidStack pickUpFluids(INetwork network, IPositionedAddonsNetworkIngredients<FluidStack, Integer> ingredientsNetwork,
                                           int channel, ITunnelConnection connection, World world, BlockPos pos, EnumFacing side,
                                           IIngredientComponentStorage<FluidStack, Integer> destination,
-                                          IngredientPredicate<FluidStack, Integer> fluidStackMatcher) {
+                                          IngredientPredicate<FluidStack, Integer> fluidStackMatcher) throws EvaluationException {
         IBlockState state = world.getBlockState(pos);
         Block block = state.getBlock();
         if (block instanceof IFluidBlock || block instanceof BlockLiquid) {
             IIngredientComponentStorage<FluidStack, Integer> source = new FluidStorageBlockWrapper((WorldServer) world, pos, side, false);
-            return TunnelHelpers.moveSingleStateOptimized(network, ingredientsNetwork, channel, connection, source, -1, destination, -1, fluidStackMatcher, false);
+            return TunnelHelpers.moveSingleStateOptimized(network, ingredientsNetwork, channel, connection, source,
+                    -1, destination, -1, fluidStackMatcher, PartPos.of(world, pos, side), false);
         }
         return null;
     }

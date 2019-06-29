@@ -14,10 +14,12 @@ import net.minecraft.world.WorldServer;
 import org.cyclops.commoncapabilities.api.capability.itemhandler.ItemMatch;
 import org.cyclops.commoncapabilities.api.ingredient.IngredientComponent;
 import org.cyclops.commoncapabilities.api.ingredient.storage.IIngredientComponentStorage;
+import org.cyclops.integrateddynamics.api.evaluate.EvaluationException;
 import org.cyclops.integrateddynamics.api.evaluate.operator.IOperator;
 import org.cyclops.integrateddynamics.api.evaluate.variable.IValueTypeListProxy;
 import org.cyclops.integrateddynamics.api.network.INetwork;
 import org.cyclops.integrateddynamics.api.network.IPositionedAddonsNetworkIngredients;
+import org.cyclops.integrateddynamics.api.part.PartPos;
 import org.cyclops.integrateddynamics.api.part.PartTarget;
 import org.cyclops.integrateddynamics.core.evaluate.variable.ValueObjectTypeBlock;
 import org.cyclops.integrateddynamics.core.evaluate.variable.ValueObjectTypeItemStack;
@@ -144,13 +146,14 @@ public class TunnelItemHelpers {
      * @param ignoreReplacable If replacable blocks should be overriden when placing blocks.
      * @param craftIfFailed If the exact ingredient from ingredientPredicate should be crafted if transfer failed.
      * @return The placed item.
+     * @throws EvaluationException If illegal movement occured and further movement should stop.
      */
     public static ItemStack placeItems(INetwork network, IPositionedAddonsNetworkIngredients<ItemStack, Integer> ingredientsNetwork,
                                        int channel, ITunnelConnection connection,
                                        IIngredientComponentStorage<ItemStack, Integer> source,
                                        World world, BlockPos pos, EnumFacing side,
                                        IngredientPredicate<ItemStack, Integer> itemStackMatcher, EnumHand hand,
-                                       boolean blockUpdate, boolean ignoreReplacable, boolean craftIfFailed) {
+                                       boolean blockUpdate, boolean ignoreReplacable, boolean craftIfFailed) throws EvaluationException {
         IBlockState destBlockState = world.getBlockState(pos);
         final Material destMaterial = destBlockState.getMaterial();
         final boolean isDestNonSolid = !destMaterial.isSolid();
@@ -162,7 +165,8 @@ public class TunnelItemHelpers {
 
         IIngredientComponentStorage<ItemStack, Integer> destinationBlock = new ItemStorageBlockWrapper(
                 true, (WorldServer) world, pos, side, hand, blockUpdate, 0, false, ignoreReplacable, true);
-        return TunnelHelpers.moveSingleStateOptimized(network, ingredientsNetwork, channel, connection, source, -1, destinationBlock, -1, itemStackMatcher, craftIfFailed);
+        return TunnelHelpers.moveSingleStateOptimized(network, ingredientsNetwork, channel, connection, source,
+                -1, destinationBlock, -1, itemStackMatcher, PartPos.of(world, pos, side), craftIfFailed);
     }
 
     /**
@@ -183,13 +187,14 @@ public class TunnelItemHelpers {
      * @param silkTouch If the block should be broken with silk touch.
      * @param breakOnNoDrops If the block should be broken if it produced no drops.
      * @return The picked-up items.
+     * @throws EvaluationException If illegal movement occured and further movement should stop.
      */
     public static List<ItemStack> pickUpItems(INetwork network, IPositionedAddonsNetworkIngredients<ItemStack, Integer> ingredientsNetwork,
                                               int channel, ITunnelConnection connection, World world, BlockPos pos, EnumFacing side,
                                               IIngredientComponentStorage<ItemStack, Integer> destination,
                                               IngredientPredicate<ItemStack, Integer> itemStackMatcher, EnumHand hand, boolean blockUpdate,
                                               boolean ignoreReplacable, int fortune, boolean silkTouch,
-                                              boolean breakOnNoDrops) {
+                                              boolean breakOnNoDrops) throws EvaluationException {
         IBlockState destBlockState = world.getBlockState(pos);
         final Material destMaterial = destBlockState.getMaterial();
         final boolean isDestReplaceable = destBlockState.getBlock().isReplaceable(world, pos);
@@ -203,7 +208,7 @@ public class TunnelItemHelpers {
         List<ItemStack> itemStacks = Lists.newArrayList();
         ItemStack itemStack;
         while (!(itemStack = TunnelHelpers.moveSingleStateOptimized(network, ingredientsNetwork, channel, connection, sourceBlock, -1,
-                destination, -1, itemStackMatcher, false)).isEmpty()) {
+                destination, -1, itemStackMatcher, PartPos.of(world, pos, side), false)).isEmpty()) {
             itemStacks.add(itemStack);
         }
         return itemStacks;
