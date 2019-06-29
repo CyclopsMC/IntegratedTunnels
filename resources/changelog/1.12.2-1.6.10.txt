@@ -1,0 +1,17 @@
+As always, don't forget to backup your world before updating!
+Requires CyclopsCore version 1.4.0 or higher.
+
+Fixes:
+* Improve handling of inconsistent simulation-mode transfer failures
+
+  No more console warning will be logged.
+  Instead, the error will be shown in the respective part.
+
+  Items will be emitted into the world (disableable),
+  and other ingredient types will be voided
+  upon such errors.
+
+  Parts will now go in error-mode once such an error occurs
+  to avoid ingredients continuously going lost.
+
+  Related to #169
