@@ -910,7 +910,7 @@ public class TunnelAspectWriteBuilders {
         public static final Predicate<ValueTypeDouble.ValueDouble> VALIDATOR_DOUBLE_ANGLE =
                 input -> input.getRawValue() >= -180D && input.getRawValue() <= 180F;
         public static final Predicate<ValueTypeDouble.ValueDouble> VALIDATOR_DOUBLE_OFFSET =
-                input -> input.getRawValue() >= 0D && input.getRawValue() <= 1F;
+                input -> input.getRawValue() >= 0.01D && input.getRawValue() <= 1.01F;
 
         public static final IAspectPropertyTypeInstance<ValueTypeBoolean, ValueTypeBoolean.ValueBoolean> PROP_BLOCK_UPDATE =
                 new AspectPropertyTypeInstance<>(ValueTypes.BOOLEAN, "aspect.aspecttypes.integratedtunnels.boolean.world.blockupdate.name");
