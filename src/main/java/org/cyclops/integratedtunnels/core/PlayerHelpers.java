@@ -35,6 +35,7 @@ public class PlayerHelpers {
         player.prevPosZ = player.posZ;
         player.rotationYaw = side.getOpposite().getHorizontalAngle();
         player.rotationPitch = side == EnumFacing.UP ? 90F : (side == EnumFacing.DOWN ? -90F : 0F);
+        player.eyeHeight = 0F;
         player.setSneaking(sneaking);
         setHeldItemSilent(player, hand, ItemStack.EMPTY);
         player.onUpdate();
