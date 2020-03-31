@@ -27,9 +27,10 @@ public class PlayerHelpers {
         return fakePlayer;
     }
 
-    public static void setPlayerState(EntityPlayer player, EnumHand hand, BlockPos pos, EnumFacing side, boolean sneaking) {
+    public static void setPlayerState(EntityPlayer player, EnumHand hand, BlockPos pos,
+                                      float offsetX, float offsetY, float offsetZ, EnumFacing side, boolean sneaking) {
         BlockPos playerPos = side == EnumFacing.UP || side == EnumFacing.DOWN ? pos.offset(side, 2) : pos;
-        player.setPosition(playerPos.getX(), playerPos.getY(), playerPos.getZ());
+        player.setPosition(playerPos.getX() + offsetX, playerPos.getY() + offsetY, playerPos.getZ() + offsetZ);
         player.prevPosX = player.posX;
         player.prevPosY = player.posY;
         player.prevPosZ = player.posZ;

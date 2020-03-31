@@ -123,7 +123,7 @@ public class ItemStoragePlayerWrapper implements IIngredientComponentStorage<Ite
             return stack;
         }
 
-        PlayerHelpers.setPlayerState(player, hand, pos, side, sneaking);
+        PlayerHelpers.setPlayerState(player, hand, pos, offsetX, offsetY, offsetZ, side, sneaking);
         PlayerHelpers.setHeldItemSilent(player, hand, stack);
 
         if (!continuousClick) {

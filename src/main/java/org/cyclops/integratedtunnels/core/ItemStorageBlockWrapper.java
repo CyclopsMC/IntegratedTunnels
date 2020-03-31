@@ -112,7 +112,7 @@ public class ItemStorageBlockWrapper implements IIngredientComponentStorage<Item
                 IBlockState blockState = world.getBlockState(pos);
 
                 EntityPlayer player = PlayerHelpers.getFakePlayer(world);
-                PlayerHelpers.setPlayerState(player, hand, pos, side, false);
+                PlayerHelpers.setPlayerState(player, hand, pos, 0, 0, 0, side, false);
 
                 blockBreakHandler = getBlockBreakHandler(blockState, world, pos, player);
                 if (blockBreakHandler != null) {
@@ -168,7 +168,7 @@ public class ItemStorageBlockWrapper implements IIngredientComponentStorage<Item
                 ItemBlock itemBlock = (ItemBlock) item;
 
                 EntityPlayer player = PlayerHelpers.getFakePlayer(world);
-                PlayerHelpers.setPlayerState(player, hand, pos, side, false);
+                PlayerHelpers.setPlayerState(player, hand, pos, 0, 0, 0, side, false);
 
                 IBlockPlaceHandler blockPlaceHandler = getBlockPlaceHandler(itemStack, world, pos, side.getOpposite(),
                         0, 0, 0, player);
