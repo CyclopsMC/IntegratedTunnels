@@ -317,6 +317,7 @@ public class TunnelAspectWriteBuilders {
                 PROP_CHECK_STACKSIZE,
                 PROP_CHECK_DAMAGE,
                 PROP_CHECK_NBT,
+                PROP_EMPTYISANY,
                 PROP_CRAFT
         ));
         public static final IAspectProperties PROPERTIES_RATESLOTCHECKSLIST = new AspectProperties(ImmutableList.<IAspectPropertyTypeInstance>of(
@@ -379,6 +380,7 @@ public class TunnelAspectWriteBuilders {
             PROPERTIES_RATESLOTCHECKSCRAFT.setValue(PROP_CHECK_STACKSIZE, ValueTypeBoolean.ValueBoolean.of(false));
             PROPERTIES_RATESLOTCHECKSCRAFT.setValue(PROP_CHECK_DAMAGE, ValueTypeBoolean.ValueBoolean.of(true));
             PROPERTIES_RATESLOTCHECKSCRAFT.setValue(PROP_CHECK_NBT, ValueTypeBoolean.ValueBoolean.of(true));
+            PROPERTIES_RATESLOTCHECKSCRAFT.setValue(PROP_EMPTYISANY, ValueTypeBoolean.ValueBoolean.of(true));
             PROPERTIES_RATESLOTCHECKSCRAFT.setValue(PROP_CRAFT, ValueTypeBoolean.ValueBoolean.of(false));
 
             PROPERTIES_RATESLOTCHECKSLIST.setValue(PROP_CHANNEL, ValueTypeInteger.ValueInteger.of(IPositionedAddonsNetworkIngredients.DEFAULT_CHANNEL));
