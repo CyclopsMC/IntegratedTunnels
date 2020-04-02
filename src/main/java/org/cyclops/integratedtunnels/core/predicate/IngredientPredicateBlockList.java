@@ -33,7 +33,7 @@ public class IngredientPredicateBlockList extends IngredientPredicate<ItemStack,
     @Override
     public boolean test(@Nullable ItemStack input) {
         for (ValueObjectTypeBlock.ValueBlock block : blocks) {
-            if (!block.getRawValue().isPresent()
+            if (block.getRawValue().isPresent()
                     && TunnelItemHelpers.areItemStackEqual(input, BlockHelpers.getItemStackFromBlockState(block.getRawValue().get()), checkStackSize, checkItem, checkDamage, checkNbt)) {
                 return !blacklist;
             }
