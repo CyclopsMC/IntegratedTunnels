@@ -21,7 +21,9 @@ import org.cyclops.cyclopscore.helper.BlockHelpers;
 import org.cyclops.cyclopscore.helper.L10NHelpers;
 import org.cyclops.integrateddynamics.api.evaluate.EvaluationException;
 import org.cyclops.integrateddynamics.api.evaluate.operator.IOperator;
+import org.cyclops.integrateddynamics.api.evaluate.variable.IValue;
 import org.cyclops.integrateddynamics.api.evaluate.variable.IValueType;
+import org.cyclops.integrateddynamics.api.evaluate.variable.IValueTypeListProxy;
 import org.cyclops.integrateddynamics.api.network.INetwork;
 import org.cyclops.integrateddynamics.api.network.IPositionedAddonsNetwork;
 import org.cyclops.integrateddynamics.api.network.IPositionedAddonsNetworkIngredients;
@@ -84,6 +86,24 @@ public class TunnelAspectWriteBuilders {
             }
         }
         return entity;
+    }
+
+    public static void validateListValues(ValueTypeList.ValueList list, IValueType<?> expectedValueType) throws EvaluationException {
+        // For typed lists, just check if they correspond to the expected type
+        if (!ValueHelpers.correspondsTo(list.getRawValue().getValueType(), expectedValueType)) {
+            throw new EvaluationException(new L10NHelpers.UnlocalizedString(L10NValues.VALUETYPE_ERROR_INVALIDLISTVALUETYPE,
+                    expectedValueType, list.getRawValue().getValueType()).localize());
+        }
+
+        // If we have an ANY list, strictly check each value in the list
+        if (list.getRawValue().getValueType() == ValueTypes.CATEGORY_ANY) {
+            for (IValue value : (IValueTypeListProxy<ValueTypeCategoryAny, IValue>) list.getRawValue()) {
+                if (value.getType() != expectedValueType) {
+                    throw new EvaluationException(new L10NHelpers.UnlocalizedString(L10NValues.VALUETYPE_ERROR_INVALIDLISTVALUETYPE,
+                            expectedValueType, value.getType()).localize());
+                }
+            }
+        }
     }
 
     public static final IAspectPropertyTypeInstance<ValueTypeBoolean, ValueTypeBoolean.ValueBoolean> PROP_BLACKLIST =
@@ -442,10 +462,8 @@ public class TunnelAspectWriteBuilders {
         public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, ValueTypeList.ValueList>, Triple<PartTarget, IAspectProperties, ChanneledTargetInformation<ItemStack, Integer>>>
                 PROP_ITEMSTACKLIST_ITEMPREDICATE = input -> {
             ValueTypeList.ValueList list = input.getRight();
-            if (list.getRawValue().getValueType() != ValueTypes.OBJECT_ITEMSTACK) {
-                throw new EvaluationException(new L10NHelpers.UnlocalizedString(L10NValues.VALUETYPE_ERROR_INVALIDLISTVALUETYPE,
-                        ValueTypes.OBJECT_ITEMSTACK, list.getRawValue().getValueType()).localize());
-            }
+            validateListValues(list, ValueTypes.OBJECT_ITEMSTACK);
+
             IAspectProperties properties = input.getMiddle();
             boolean checkStackSize = properties.getValue(PROP_CHECK_STACKSIZE).getRawValue();
             boolean checkDamage = properties.getValue(PROP_CHECK_DAMAGE).getRawValue();
@@ -522,10 +540,8 @@ public class TunnelAspectWriteBuilders {
         public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, ValueTypeList.ValueList>, Triple<PartTarget, IAspectProperties, ChanneledTargetInformation<ItemStack, Integer>>>
                 PROP_BLOCKLIST_ITEMPREDICATE = input -> {
             ValueTypeList.ValueList list = input.getRight();
-            if (list.getRawValue().getValueType() != ValueTypes.OBJECT_BLOCK) {
-                throw new EvaluationException(new L10NHelpers.UnlocalizedString(L10NValues.VALUETYPE_ERROR_INVALIDLISTVALUETYPE,
-                        ValueTypes.OBJECT_BLOCK, list.getRawValue().getValueType()).localize());
-            }
+            validateListValues(list, ValueTypes.OBJECT_BLOCK);
+
             IAspectProperties properties = input.getMiddle();
             boolean blacklist = properties.getValue(PROP_BLACKLIST).getRawValue();
             int amount = 1;
@@ -781,10 +797,8 @@ public class TunnelAspectWriteBuilders {
         public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, ValueTypeList.ValueList>, Triple<PartTarget, IAspectProperties, ChanneledTargetInformation<FluidStack, Integer>>>
                 PROP_FLUIDSTACKLIST_FLUIDPREDICATE = input -> {
             ValueTypeList.ValueList<ValueObjectTypeFluidStack, ValueObjectTypeFluidStack.ValueFluidStack> list = input.getRight();
-            if (list.getRawValue().getValueType() != ValueTypes.OBJECT_FLUIDSTACK) {
-                throw new EvaluationException(new L10NHelpers.UnlocalizedString(L10NValues.VALUETYPE_ERROR_INVALIDLISTVALUETYPE,
-                        ValueTypes.OBJECT_FLUIDSTACK, list.getRawValue().getValueType()).localize());
-            }
+            validateListValues(list, ValueTypes.OBJECT_FLUIDSTACK);
+
             IAspectProperties properties = input.getMiddle();
             int rate = properties.getValue(PROP_RATE).getRawValue();
             boolean exactAmount = properties.getValue(PROP_EXACTAMOUNT).getRawValue();
@@ -1380,10 +1394,8 @@ public class TunnelAspectWriteBuilders {
             public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, ValueTypeList.ValueList>, IFluidTarget>
                     PROP_FLUIDSTACKLIST_FLUIDTARGET = input -> {
                 ValueTypeList.ValueList list = input.getRight();
-                if (list.getRawValue().getValueType() != ValueTypes.OBJECT_FLUIDSTACK) {
-                    throw new EvaluationException(new L10NHelpers.UnlocalizedString(L10NValues.VALUETYPE_ERROR_INVALIDLISTVALUETYPE,
-                            ValueTypes.OBJECT_FLUIDSTACK, list.getRawValue().getValueType()).localize());
-                }
+                validateListValues(list, ValueTypes.OBJECT_FLUIDSTACK);
+
                 IAspectProperties properties = input.getMiddle();
                 boolean checkNbt = properties.getValue(TunnelAspectWriteBuilders.Fluid.PROP_CHECK_NBT).getRawValue();
                 boolean blacklist = properties.getValue(PROP_BLACKLIST).getRawValue();
