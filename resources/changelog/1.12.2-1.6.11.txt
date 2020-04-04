@@ -1,0 +1,14 @@
+As always, don't forget to backup your world before updating!
+Requires CyclopsCore version 1.4.0 or higher.
+
+Changes:
+* Update zh_cn.lang
+
+Fixes:
+* Fix missing "Empty is wildcard" setting on item export aspect, Closes #187
+* Fix block lists never being importable/exportable, Closes CyclopsMC/IntegratedDynamics#832
+* Fix list import/export aspects not handling ANY lists, Closes #181
+* Fix player simulator not taking offsets into account for certain items such as bucket usage, Closes #178
+* Incorporate floating rounding errors in offset property validation, #178
+* Fix player simulator having incorrect eye height, #178
+  This caused bugs such as incorrect bucket placement/pickup targets.
