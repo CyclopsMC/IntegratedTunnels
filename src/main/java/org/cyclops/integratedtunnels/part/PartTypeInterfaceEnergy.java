@@ -6,7 +6,10 @@ import net.minecraftforge.energy.IEnergyStorage;
 import org.cyclops.integrateddynamics.api.network.IEnergyNetwork;
 import org.cyclops.integrateddynamics.api.part.PartPos;
 import org.cyclops.integrateddynamics.core.helper.EnergyHelpers;
+import org.cyclops.integrateddynamics.core.part.write.PartStateWriterBase;
+import org.cyclops.integrateddynamics.part.PartTypeEffectWriter;
 import org.cyclops.integratedtunnels.Capabilities;
+import org.cyclops.integratedtunnels.GeneralConfig;
 import org.cyclops.integratedtunnels.core.part.PartTypeInterfacePositionedAddon;
 
 /**
@@ -36,6 +39,11 @@ public class PartTypeInterfaceEnergy extends PartTypeInterfacePositionedAddon<IE
     @Override
     protected PartTypeInterfaceEnergy.State constructDefaultState() {
         return new PartTypeInterfaceEnergy.State();
+    }
+    
+    @Override
+    public int getConsumptionRate(State state) {
+        return GeneralConfig.interfaceEnergyBaseConsumption;
     }
 
     public static class State extends PartTypeInterfacePositionedAddon.State<PartTypeInterfaceEnergy, IEnergyNetwork, IEnergyStorage> implements IEnergyStorage {

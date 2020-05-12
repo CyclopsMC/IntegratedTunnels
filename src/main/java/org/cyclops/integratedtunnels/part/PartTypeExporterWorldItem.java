@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import org.cyclops.integrateddynamics.api.part.aspect.IAspect;
 import org.cyclops.integrateddynamics.core.part.aspect.AspectRegistry;
 import org.cyclops.integrateddynamics.part.aspect.Aspects;
+import org.cyclops.integratedtunnels.GeneralConfig;
 import org.cyclops.integratedtunnels.core.part.PartTypeTunnelAspectsWorld;
 import org.cyclops.integratedtunnels.part.aspect.TunnelAspects;
 
@@ -34,5 +35,10 @@ public class PartTypeExporterWorldItem extends PartTypeTunnelAspectsWorld<PartTy
     @Override
     protected PartStateWorld<PartTypeExporterWorldItem> constructDefaultState() {
         return new PartStateWorld<PartTypeExporterWorldItem>(Aspects.REGISTRY.getWriteAspects(this).size());
+    }
+    
+    @Override
+    public int getConsumptionRate(PartStateWorld<PartTypeExporterWorldItem> state) {
+        return state.hasVariable() ? GeneralConfig.exporterWorldItemBaseConsumptionEnabled : GeneralConfig.exporterWorldItemBaseConsumptionDisabled;
     }
 }

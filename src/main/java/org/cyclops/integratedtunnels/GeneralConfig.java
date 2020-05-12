@@ -75,6 +75,170 @@ public class GeneralConfig extends DummyConfig {
      */
     @ConfigurableProperty(category = ConfigurableTypeCategory.CORE, comment = "If items should be ejected into the world when item movement failed due to item handlers declaring inconsistent movement in simulation mode. If disabled, items can be voided.", isCommandable = true)
     public static boolean ejectItemsOnInconsistentSimulationMovement = true;
+    
+    /**
+     * The base energy usage for the energy exporter.
+     */
+    @ConfigurableProperty(category = ConfigurableTypeCategory.GENERAL, comment = "The base energy usage for the energy exporter.", minimalValue = 0)
+    public static int exporterEnergyBaseConsumption = 1;
+    
+    /**
+     * The base energy usage for the fluid exporter.
+     */
+    @ConfigurableProperty(category = ConfigurableTypeCategory.GENERAL, comment = "The base energy usage for the fluid exporter.", minimalValue = 0)
+    public static int exporterFluidBaseConsumption = 1;
+    
+    /**
+     * The base energy usage for the item exporter.
+     */
+    @ConfigurableProperty(category = ConfigurableTypeCategory.GENERAL, comment = "The base energy usage for the item exporter.", minimalValue = 0)
+    public static int exporterItemBaseConsumption = 1;
+    
+    /**
+     * The base energy usage for the world block exporter when it has a variable.
+     */
+    @ConfigurableProperty(category = ConfigurableTypeCategory.GENERAL, comment = "The base energy usage for the world block exporter when it has a variable.", minimalValue = 0)
+    public static int exporterWorldBlockBaseConsumptionEnabled = 32;
+    
+    /**
+     * The base energy usage for the world block exporter when it does not have a variable.
+     */
+    @ConfigurableProperty(category = ConfigurableTypeCategory.GENERAL, comment = "The base energy usage for the world block exporter when it does not have a variable.", minimalValue = 0)
+    public static int exporterWorldBlockBaseConsumptionDisabled = 1;
+    
+    /**
+     * The base energy usage for the world energy exporter when it has a variable.
+     */
+    @ConfigurableProperty(category = ConfigurableTypeCategory.GENERAL, comment = "The base energy usage for the world energy exporter when it has a variable.", minimalValue = 0)
+    public static int exporterWorldEnergyBaseConsumptionEnabled = 32;
+    
+    /**
+     * The base energy usage for the world energy exporter when it does not have a variable.
+     */
+    @ConfigurableProperty(category = ConfigurableTypeCategory.GENERAL, comment = "The base energy usage for the world energy exporter when it does not have a variable.", minimalValue = 0)
+    public static int exporterWorldEnergyBaseConsumptionDisabled = 1;
+    
+    /**
+     * The base energy usage for the world fluid exporter when it has a variable.
+     */
+    @ConfigurableProperty(category = ConfigurableTypeCategory.GENERAL, comment = "The base energy usage for the world fluid exporter when it has a variable.", minimalValue = 0)
+    public static int exporterWorldFluidBaseConsumptionEnabled = 32;
+    
+    /**
+     * The base energy usage for the world fluid exporter when it does not have a variable.
+     */
+    @ConfigurableProperty(category = ConfigurableTypeCategory.GENERAL, comment = "The base energy usage for the world fluid exporter when it does not have a variable.", minimalValue = 0)
+    public static int exporterWorldFluidBaseConsumptionDisabled = 1;
+    
+    /**
+     * The base energy usage for the world item exporter when it has a variable.
+     */
+    @ConfigurableProperty(category = ConfigurableTypeCategory.GENERAL, comment = "The base energy usage for the world item exporter when it has a variable.", minimalValue = 0)
+    public static int exporterWorldItemBaseConsumptionEnabled = 32;
+    
+    /**
+     * The base energy usage for the world item exporter when it does not have a variable.
+     */
+    @ConfigurableProperty(category = ConfigurableTypeCategory.GENERAL, comment = "The base energy usage for the world item exporter when it does not have a variable.", minimalValue = 0)
+    public static int exporterWorldItemBaseConsumptionDisabled = 1;
+    
+    /**
+     * The base energy usage for the energy importer.
+     */
+    @ConfigurableProperty(category = ConfigurableTypeCategory.GENERAL, comment = "The base energy usage for the energy importer.", minimalValue = 0)
+    public static int importerEnergyBaseConsumption = 1;
+    
+    /**
+     * The base energy usage for the fluid importer.
+     */
+    @ConfigurableProperty(category = ConfigurableTypeCategory.GENERAL, comment = "The base energy usage for the fluid importer.", minimalValue = 0)
+    public static int importerFluidBaseConsumption = 1;
+    
+    /**
+     * The base energy usage for the item importer.
+     */
+    @ConfigurableProperty(category = ConfigurableTypeCategory.GENERAL, comment = "The base energy usage for the item importer.", minimalValue = 0)
+    public static int importerItemBaseConsumption = 1;
+    
+    /**
+     * The base energy usage for the world block importer when it has a variable.
+     */
+    @ConfigurableProperty(category = ConfigurableTypeCategory.GENERAL, comment = "The base energy usage for the world block importer when it has a variable.", minimalValue = 0)
+    public static int importerWorldBlockBaseConsumptionEnabled = 32;
+    
+    /**
+     * The base energy usage for the world block importer when it does not have a variable.
+     */
+    @ConfigurableProperty(category = ConfigurableTypeCategory.GENERAL, comment = "The base energy usage for the world block importer when it does not have a variable.", minimalValue = 0)
+    public static int importerWorldBlockBaseConsumptionDisabled = 1;
+    
+    /**
+     * The base energy usage for the world energy importer when it has a variable.
+     */
+    @ConfigurableProperty(category = ConfigurableTypeCategory.GENERAL, comment = "The base energy usage for the world energy importer when it has a variable.", minimalValue = 0)
+    public static int importerWorldEnergyBaseConsumptionEnabled = 32;
+    
+    /**
+     * The base energy usage for the world energy importer when it does not have a variable.
+     */
+    @ConfigurableProperty(category = ConfigurableTypeCategory.GENERAL, comment = "The base energy usage for the world energy importer when it does not have a variable.", minimalValue = 0)
+    public static int importerWorldEnergyBaseConsumptionDisabled = 1;
+    
+    /**
+     * The base energy usage for the world fluid importer when it has a variable.
+     */
+    @ConfigurableProperty(category = ConfigurableTypeCategory.GENERAL, comment = "The base energy usage for the world fluid importer when it has a variable.", minimalValue = 0)
+    public static int importerWorldFluidBaseConsumptionEnabled = 32;
+    
+    /**
+     * The base energy usage for the world fluid importer when it does not have a variable.
+     */
+    @ConfigurableProperty(category = ConfigurableTypeCategory.GENERAL, comment = "The base energy usage for the world fluid importer when it does not have a variable.", minimalValue = 0)
+    public static int importerWorldFluidBaseConsumptionDisabled = 1;
+    
+    /**
+     * The base energy usage for the world item importer when it has a variable.
+     */
+    @ConfigurableProperty(category = ConfigurableTypeCategory.GENERAL, comment = "The base energy usage for the world item importer when it has a variable.", minimalValue = 0)
+    public static int importerWorldItemBaseConsumptionEnabled = 32;
+    
+    /**
+     * The base energy usage for the world item importer when it does not have a variable.
+     */
+    @ConfigurableProperty(category = ConfigurableTypeCategory.GENERAL, comment = "The base energy usage for the world item importer when it does not have a variable.", minimalValue = 0)
+    public static int importerWorldItemBaseConsumptionDisabled = 1;
+    
+    /**
+     * The base energy usage for the energy interface.
+     */
+    @ConfigurableProperty(category = ConfigurableTypeCategory.GENERAL, comment = "The base energy usage for the energy interface.", minimalValue = 0)
+    public static int interfaceEnergyBaseConsumption = 0;
+    
+    /**
+     * The base energy usage for the fluid interface.
+     */
+    @ConfigurableProperty(category = ConfigurableTypeCategory.GENERAL, comment = "The base energy usage for the fluid interface.", minimalValue = 0)
+    public static int interfaceFluidBaseConsumption = 0;
+    
+    /**
+     * The base energy usage for the item interface.
+     */
+    @ConfigurableProperty(category = ConfigurableTypeCategory.GENERAL, comment = "The base energy usage for the item interface.", minimalValue = 0)
+    public static int interfaceItemBaseConsumption = 0;
+    
+    /**
+     * The base energy usage for the player simulator when it has a variable.
+     */
+    @ConfigurableProperty(category = ConfigurableTypeCategory.GENERAL, comment = "The base energy usage for the player simulator when it has a variable.", minimalValue = 0)
+    public static int playerSimulatorBaseConsumptionEnabled = 64;
+    
+    /**
+     * The base energy usage for the player simulator when it does not have a variable.
+     */
+    @ConfigurableProperty(category = ConfigurableTypeCategory.GENERAL, comment = "The base energy usage for the player simulator when it does not have a variable.", minimalValue = 0)
+    public static int playerSimulatorBaseConsumptionDisabled = 1;
+    
+    
 
     /**
      * The type of this config.
