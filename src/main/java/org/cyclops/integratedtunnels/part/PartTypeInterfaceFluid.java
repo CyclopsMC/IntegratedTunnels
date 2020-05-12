@@ -5,12 +5,10 @@ import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidTankProperties;
-
 import org.cyclops.integratedtunnels.GeneralConfig;
 import org.cyclops.integratedtunnels.api.network.IFluidNetwork;
 import org.cyclops.integratedtunnels.capability.network.FluidNetworkConfig;
 import org.cyclops.integratedtunnels.core.part.PartTypeInterfacePositionedAddon;
-import org.cyclops.integratedtunnels.part.PartTypeInterfaceEnergy.State;
 
 import javax.annotation.Nullable;
 

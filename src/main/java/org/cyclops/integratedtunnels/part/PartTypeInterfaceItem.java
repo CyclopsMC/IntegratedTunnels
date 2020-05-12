@@ -11,7 +11,6 @@ import org.cyclops.integratedtunnels.GeneralConfig;
 import org.cyclops.integratedtunnels.api.network.IItemNetwork;
 import org.cyclops.integratedtunnels.capability.network.ItemNetworkConfig;
 import org.cyclops.integratedtunnels.core.part.PartTypeInterfacePositionedAddon;
-import org.cyclops.integratedtunnels.part.PartTypeInterfaceFluid.State;
 
 import javax.annotation.Nonnull;
 import java.util.Iterator;
