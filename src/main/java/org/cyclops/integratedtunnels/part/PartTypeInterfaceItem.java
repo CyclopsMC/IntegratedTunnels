@@ -7,6 +7,7 @@ import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import org.cyclops.commoncapabilities.api.capability.itemhandler.ISlotlessItemHandler;
 import org.cyclops.integratedtunnels.Capabilities;
+import org.cyclops.integratedtunnels.GeneralConfig;
 import org.cyclops.integratedtunnels.api.network.IItemNetwork;
 import org.cyclops.integratedtunnels.capability.network.ItemNetworkConfig;
 import org.cyclops.integratedtunnels.core.part.PartTypeInterfacePositionedAddon;
@@ -36,6 +37,11 @@ public class PartTypeInterfaceItem extends PartTypeInterfacePositionedAddon<IIte
     @Override
     protected PartTypeInterfaceItem.State constructDefaultState() {
         return new PartTypeInterfaceItem.State();
+    }
+    
+    @Override
+    public int getConsumptionRate(State state) {
+        return GeneralConfig.interfaceItemBaseConsumption;
     }
 
     public static class State extends PartTypeInterfacePositionedAddon.State<PartTypeInterfaceItem, IItemNetwork, IItemHandler> implements IItemHandler, ISlotlessItemHandler {

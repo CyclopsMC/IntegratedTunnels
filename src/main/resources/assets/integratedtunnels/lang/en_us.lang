@@ -395,6 +395,35 @@ config.integratedtunnels.general.inventoryUnchangedTickTimeout=Timeout for uncha
 config.integratedtunnels.general.version=Version
 config.integratedtunnels.general.versionChecker=Version check
 
+## General settings
+config.integratedtunnels.general.exporterEnergyBaseConsumption=Energy exporter base consumption
+config.integratedtunnels.general.exporterFluidBaseConsumption=Fluid exporter base consumption
+config.integratedtunnels.general.exporterItemBaseConsumption=Item exporter base consumption
+config.integratedtunnels.general.exporterWorldBlockBaseConsumptionEnabled=World block exporter base consumption (enabled)
+config.integratedtunnels.general.exporterWorldBlockBaseConsumptionDisabled=World block exporter base consumption (disabled)
+config.integratedtunnels.general.exporterWorldEnergyBaseConsumptionEnabled=World energy exporter base consumption (enabled)
+config.integratedtunnels.general.exporterWorldEnergyBaseConsumptionDisabled=World energy exporter base consumption (disabled)
+config.integratedtunnels.general.exporterWorldFluidBaseConsumptionEnabled=World fluid exporter base consumption (enabled)
+config.integratedtunnels.general.exporterWorldFluidBaseConsumptionDisabled=World fluid exporter base consumption (disabled)
+config.integratedtunnels.general.exporterWorldItemBaseConsumptionEnabled=World item exporter base consumption (enabled)
+config.integratedtunnels.general.exporterWorldItemBaseConsumptionDisabled=World item exporter base consumption (disabled)
+config.integratedtunnels.general.importerEnergyBaseConsumption=Energy importer base consumption
+config.integratedtunnels.general.importerFluidBaseConsumption=Fluid importer base consumption
+config.integratedtunnels.general.importerItemBaseConsumption=Item importer base consumption
+config.integratedtunnels.general.importerWorldBlockBaseConsumptionEnabled=World block importer base consumption (enabled)
+config.integratedtunnels.general.importerWorldBlockBaseConsumptionDisabled=World block importer base consumption (disabled)
+config.integratedtunnels.general.importerWorldEnergyBaseConsumptionEnabled=World energy importer base consumption (enabled)
+config.integratedtunnels.general.importerWorldEnergyBaseConsumptionDisabled=World energy importer base consumption (disabled)
+config.integratedtunnels.general.importerWorldFluidBaseConsumptionEnabled=World fluid importer base consumption (enabled)
+config.integratedtunnels.general.importerWorldFluidBaseConsumptionDisabled=World fluid importer base consumption (disabled)
+config.integratedtunnels.general.importerWorldItemBaseConsumptionEnabled=World item importer base consumption (enabled)
+config.integratedtunnels.general.importerWorldItemBaseConsumptionDisabled=World item importer base consumption (disabled)
+config.integratedtunnels.general.interfaceEnergyBaseConsumption=Energy interface base consumption
+config.integratedtunnels.general.interfaceFluidBaseConsumption=Fluid interface base consumption
+config.integratedtunnels.general.interfaceItemBaseConsumption=Item interface base consumption
+config.integratedtunnels.general.playerSimulatorBaseConsumptionEnabled=Player simulator base consumption (enabled)
+config.integratedtunnels.general.playerSimulatorBaseConsumptionDisabled=Player simulator base consumption (disabled)
+
 ## Mod compatibility settings
 config.integratedtunnels.tesla=Tesla
 

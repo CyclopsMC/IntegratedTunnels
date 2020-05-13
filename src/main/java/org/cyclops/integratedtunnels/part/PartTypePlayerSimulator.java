@@ -7,6 +7,7 @@ import org.cyclops.integrateddynamics.api.part.PartTarget;
 import org.cyclops.integrateddynamics.api.part.aspect.IAspect;
 import org.cyclops.integrateddynamics.core.part.aspect.AspectRegistry;
 import org.cyclops.integrateddynamics.part.aspect.Aspects;
+import org.cyclops.integratedtunnels.GeneralConfig;
 import org.cyclops.integratedtunnels.core.part.PartTypeTunnelAspectsWorld;
 import org.cyclops.integratedtunnels.part.aspect.TunnelAspects;
 
@@ -35,7 +36,7 @@ public class PartTypePlayerSimulator extends PartTypeTunnelAspectsWorld<PartType
 
     @Override
     public int getConsumptionRate(PartStatePlayerSimulator state) {
-        return state.hasVariable() ? 64 : super.getConsumptionRate(state);
+        return state.hasVariable() ? GeneralConfig.playerSimulatorBaseConsumptionEnabled : GeneralConfig.playerSimulatorBaseConsumptionDisabled;
     }
 
     @Override
