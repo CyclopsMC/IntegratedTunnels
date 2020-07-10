@@ -115,7 +115,9 @@ public class FluidStorageBlockWrapper implements IIngredientComponentStorage<Flu
 
         Block block = fluid.getBlock();
         IFluidHandler handler;
-        if (block instanceof IFluidBlock) {
+        if (block == null) {
+            return stack;
+        } else if (block instanceof IFluidBlock) {
             handler = new FluidBlockWrapper((IFluidBlock) block, world, pos);
         } else if (block instanceof BlockLiquid) {
             handler = new BlockLiquidWrapper((BlockLiquid) block, world, pos);
