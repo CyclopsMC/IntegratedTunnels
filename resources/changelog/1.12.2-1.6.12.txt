@@ -1,0 +1,12 @@
+As always, don't forget to backup your world before updating!
+Requires CyclopsCore version 1.4.0 or higher.
+
+Additions:
+* Added base energy consumption config options to all network parts
+
+Fixes:
+* Fix incorrect player simulator position
+  This caused problems with ray tracing that broke TCon's Scythe.
+  Closes #195
+* Fix crash when placing fluids in the world without block
+  Closes #193
