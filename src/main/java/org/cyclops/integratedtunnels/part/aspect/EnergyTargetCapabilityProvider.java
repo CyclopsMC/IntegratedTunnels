@@ -1,6 +1,6 @@
 package org.cyclops.integratedtunnels.part.aspect;
 
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import org.cyclops.commoncapabilities.api.ingredient.IngredientComponent;
 import org.cyclops.commoncapabilities.api.ingredient.storage.IIngredientComponentStorage;
@@ -21,10 +21,10 @@ public class EnergyTargetCapabilityProvider extends ChanneledTargetCapabilityPro
     private final int amount;
     private final boolean exactAmount;
 
-    public EnergyTargetCapabilityProvider(@Nullable ICapabilityProvider capabilityProvider, EnumFacing side, INetwork network,
+    public EnergyTargetCapabilityProvider(@Nullable ICapabilityProvider capabilityProvider, Direction side, INetwork network,
                                           IAspectProperties properties,
                                           int amount, @Nullable PartStateRoundRobin<?> partStateEnergy) {
-        super(network, capabilityProvider, side, network.getCapability(Capabilities.NETWORK_ENERGY), partStateEnergy,
+        super(network, capabilityProvider, side, network.getCapability(Capabilities.NETWORK_ENERGY).orElse(null), partStateEnergy,
                 properties.getValue(TunnelAspectWriteBuilders.PROP_CHANNEL).getRawValue(),
                 properties.getValue(TunnelAspectWriteBuilders.PROP_ROUNDROBIN).getRawValue(),
                 properties.getValue(TunnelAspectWriteBuilders.PROP_CRAFT).getRawValue());

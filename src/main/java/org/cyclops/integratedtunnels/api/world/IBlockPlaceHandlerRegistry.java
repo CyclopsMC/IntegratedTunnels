@@ -1,9 +1,9 @@
 package org.cyclops.integratedtunnels.api.world;
 
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.cyclops.cyclopscore.init.IRegistry;
@@ -50,7 +50,7 @@ public interface IBlockPlaceHandlerRegistry extends IRegistry {
      * @return A block placement handler or null.
      */
     @Nullable
-    public IBlockPlaceHandler getHandler(ItemStack itemStack, World world, BlockPos pos, EnumFacing side,
-                                         float hitX, float hitY, float hitZ, EntityPlayer player);
+    public IBlockPlaceHandler getHandler(ItemStack itemStack, World world, BlockPos pos, Direction side,
+                                         float hitX, float hitY, float hitZ, PlayerEntity player);
 
 }

@@ -1,6 +1,6 @@
 package org.cyclops.integratedtunnels.core.world;
 
-import net.minecraft.init.Blocks;
+import net.minecraft.block.Blocks;
 import org.cyclops.integratedtunnels.IntegratedTunnels;
 import org.cyclops.integratedtunnels.api.world.IBlockBreakHandler;
 import org.cyclops.integratedtunnels.api.world.IBlockBreakHandlerRegistry;
@@ -24,7 +24,7 @@ public class BlockBreakHandlers {
         REGISTRY.register(Blocks.LIME_SHULKER_BOX, blockBreakHandlerShulkerBox);
         REGISTRY.register(Blocks.PINK_SHULKER_BOX, blockBreakHandlerShulkerBox);
         REGISTRY.register(Blocks.GRAY_SHULKER_BOX, blockBreakHandlerShulkerBox);
-        REGISTRY.register(Blocks.SILVER_SHULKER_BOX, blockBreakHandlerShulkerBox);
+        REGISTRY.register(Blocks.LIGHT_GRAY_SHULKER_BOX, blockBreakHandlerShulkerBox);
         REGISTRY.register(Blocks.CYAN_SHULKER_BOX, blockBreakHandlerShulkerBox);
         REGISTRY.register(Blocks.PURPLE_SHULKER_BOX, blockBreakHandlerShulkerBox);
         REGISTRY.register(Blocks.BLUE_SHULKER_BOX, blockBreakHandlerShulkerBox);

@@ -1,0 +1,6 @@
+{
+    "parent": "integratedtunnels:block/connector",
+    "textures": {
+        "texture" : "integratedtunnels:part/importer_item_active"
+    }
+}

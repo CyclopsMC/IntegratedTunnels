@@ -24,7 +24,7 @@ public class TunnelIngredientComponentCapabilities {
         IngredientComponentCapabilityAttacherManager attacherManager = new IngredientComponentCapabilityAttacherManager();
 
         // Network handler
-        ResourceLocation networkHandler = new ResourceLocation(Reference.MOD_ID, "networkHandler");
+        ResourceLocation networkHandler = new ResourceLocation(Reference.MOD_ID, "network_handler");
         attacherManager.addAttacher(new IngredientComponentCapabilityAttacherAdapter<ItemStack, Integer>(IngredientComponentCapabilities.INGREDIENT_ITEMSTACK_NAME, networkHandler) {
             @Override
             public ICapabilityProvider createCapabilityProvider(IngredientComponent<ItemStack, Integer> ingredientComponent) {

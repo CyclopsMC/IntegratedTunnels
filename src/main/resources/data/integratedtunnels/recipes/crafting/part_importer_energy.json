@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "item": "integratedtunnels:part_interface_energy"
+    },
+    {
+      "item": "integrateddynamics:variable_transformer_input"
+    }
+  ],
+  "result": {
+    "item": "integratedtunnels:part_importer_energy"
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "A B",
+    "CXD"
+  ],
+  "key": {
+    "A": {
+      "item": "integratedtunnels:part_exporter_world_item"
+    },
+    "B": {
+      "item": "integratedtunnels:part_importer_world_block"
+    },
+    "C": {
+      "item": "integratedtunnels:part_importer_world_item"
+    },
+    "D": {
+      "item": "integratedtunnels:part_exporter_world_block"
+    },
+    "X": {
+      "tag": "forge:gems/emerald"
+    }
+  },
+  "result": {
+    "item": "integratedtunnels:part_player_simulator"
+  }
+}

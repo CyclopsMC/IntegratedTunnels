@@ -1,0 +1,51 @@
+{
+  "display": {
+    "icon": {
+      "item": "integratedtunnels:part_interface_item"
+    },
+    "title": {
+      "translate": "itemGroup.integratedtunnels"
+    },
+    "description": {
+      "translate": "general.integratedtunnels.description"
+    },
+    "show_toast": false,
+    "announce_to_chat": false
+  },
+  "parent": "integrateddynamics:network_foundations/variables",
+  "rewards": {
+    "recipes": [
+      "integratedtunnels:part_interface_item",
+      "integratedtunnels:part_interface_fluid",
+      "integratedtunnels:part_interface_energy",
+      "integratedtunnels:part_exporter_item",
+      "integratedtunnels:part_exporter_fluid",
+      "integratedtunnels:part_exporter_energy",
+      "integratedtunnels:part_importer_item",
+      "integratedtunnels:part_importer_fluid",
+      "integratedtunnels:part_importer_energy",
+      "integratedtunnels:part_exporter_world_item",
+      "integratedtunnels:part_exporter_world_fluid",
+      "integratedtunnels:part_exporter_world_energy",
+      "integratedtunnels:part_exporter_world_block",
+      "integratedtunnels:part_importer_world_item",
+      "integratedtunnels:part_importer_world_fluid",
+      "integratedtunnels:part_importer_world_energy",
+      "integratedtunnels:part_importer_world_block",
+      "integratedtunnels:part_player_simulator"
+
+    ]
+  },
+  "criteria": {
+    "criteria_0": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "item": "integrateddynamics:variable"
+          }
+        ]
+      }
+    }
+  }
+}

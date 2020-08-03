@@ -1,7 +1,0 @@
-{
-  "forge_marker": 1,
-  "parent": "integratedtunnels:block/world_interface",
-  "textures": {
-    "texture": "integratedtunnels:parts/importer_world_block_active"
-  }
-}

@@ -17,16 +17,14 @@ public class IngredientPredicateBlockList extends IngredientPredicate<ItemStack,
     private final IValueTypeListProxy<ValueObjectTypeBlock, ValueObjectTypeBlock.ValueBlock> blocks;
     private final boolean checkStackSize;
     private final boolean checkItem;
-    private final boolean checkDamage;
     private final boolean checkNbt;
 
-    public IngredientPredicateBlockList(boolean blacklist, int amount, boolean exactAmount, IValueTypeListProxy<ValueObjectTypeBlock, ValueObjectTypeBlock.ValueBlock> blocks, boolean checkStackSize, boolean checkItem, boolean checkDamage, boolean checkNbt) {
+    public IngredientPredicateBlockList(boolean blacklist, int amount, boolean exactAmount, IValueTypeListProxy<ValueObjectTypeBlock, ValueObjectTypeBlock.ValueBlock> blocks, boolean checkStackSize, boolean checkItem, boolean checkNbt) {
         super(IngredientComponent.ITEMSTACK, blacklist, false, amount, exactAmount);
         this.blacklist = blacklist;
         this.blocks = blocks;
         this.checkStackSize = checkStackSize;
         this.checkItem = checkItem;
-        this.checkDamage = checkDamage;
         this.checkNbt = checkNbt;
     }
 
@@ -34,7 +32,7 @@ public class IngredientPredicateBlockList extends IngredientPredicate<ItemStack,
     public boolean test(@Nullable ItemStack input) {
         for (ValueObjectTypeBlock.ValueBlock block : blocks) {
             if (block.getRawValue().isPresent()
-                    && TunnelItemHelpers.areItemStackEqual(input, BlockHelpers.getItemStackFromBlockState(block.getRawValue().get()), checkStackSize, checkItem, checkDamage, checkNbt)) {
+                    && TunnelItemHelpers.areItemStackEqual(input, BlockHelpers.getItemStackFromBlockState(block.getRawValue().get()), checkStackSize, checkItem, checkNbt)) {
                 return !blacklist;
             }
         }
@@ -51,7 +49,6 @@ public class IngredientPredicateBlockList extends IngredientPredicate<ItemStack,
                 && this.blacklist == that.blacklist
                 && this.checkItem == that.checkItem
                 && this.checkStackSize == that.checkStackSize
-                && this.checkDamage == that.checkDamage
                 && this.checkNbt == that.checkNbt
                 && this.blocks.equals(that.blocks);
     }
@@ -62,8 +59,7 @@ public class IngredientPredicateBlockList extends IngredientPredicate<ItemStack,
                 ^ (this.blacklist ? 1 : 0) << 1
                 ^ (this.checkItem ? 1 : 0) << 2
                 ^ (this.checkStackSize ? 1 : 0) << 3
-                ^ (this.checkDamage ? 1 : 0) << 4
-                ^ (this.checkNbt ? 1 : 0) << 5
+                ^ (this.checkNbt ? 1 : 0) << 4
                 ^ this.blocks.hashCode();
     }
 }

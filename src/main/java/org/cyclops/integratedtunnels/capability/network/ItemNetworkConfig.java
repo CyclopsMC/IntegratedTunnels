@@ -15,32 +15,17 @@ import org.cyclops.integratedtunnels.core.network.ItemNetwork;
  */
 public class ItemNetworkConfig extends CapabilityConfig<IItemNetwork> {
 
-    /**
-     * The unique instance.
-     */
-    public static ItemNetworkConfig _instance;
-
     @CapabilityInject(IItemNetwork.class)
     public static Capability<IItemNetwork> CAPABILITY = null;
 
-    /**
-     * Make a new instance.
-     */
     public ItemNetworkConfig() {
         super(
                 CommonCapabilities._instance,
-                true,
                 "itemNetwork",
-                "A capability for networks that can hold items.",
                 IItemNetwork.class,
                 new DefaultCapabilityStorage<IItemNetwork>(),
-                ItemNetwork.class
+                () -> new ItemNetwork(null)
         );
-    }
-
-    @Override
-    public boolean isDisableable() {
-        return false;
     }
 
 }

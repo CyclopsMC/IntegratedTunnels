@@ -31,8 +31,8 @@ public class IngredientPredicateFluidStackList extends IngredientPredicate<Fluid
     @Override
     public boolean test(@Nullable FluidStack input) {
         for (ValueObjectTypeFluidStack.ValueFluidStack fluidStack : fluidStacks) {
-            if (fluidStack.getRawValue().isPresent()
-                    && TunnelFluidHelpers.areFluidStackEqual(input, fluidStack.getRawValue().get(), checkFluid, checkAmount, checkNbt)) {
+            if (!fluidStack.getRawValue().isEmpty()
+                    && TunnelFluidHelpers.areFluidStackEqual(input, fluidStack.getRawValue(), checkFluid, checkAmount, checkNbt)) {
                 return !blacklist;
             }
         }

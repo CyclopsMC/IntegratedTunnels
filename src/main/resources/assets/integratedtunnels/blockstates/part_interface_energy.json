@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "facing=north":   { "model": "integratedtunnels:block/part_interface_energy", "y": 180 },
+    "facing=east":    { "model": "integratedtunnels:block/part_interface_energy", "y": 270 },
+    "facing=south":   { "model": "integratedtunnels:block/part_interface_energy"           },
+    "facing=west":    { "model": "integratedtunnels:block/part_interface_energy", "y": 90  },
+    "facing=up":      { "model": "integratedtunnels:block/part_interface_energy", "x": 90  },
+    "facing=down":    { "model": "integratedtunnels:block/part_interface_energy", "x": 270 }
+  }
+}

@@ -1,8 +1,8 @@
 package org.cyclops.integratedtunnels.api.world;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.block.BlockState;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.cyclops.cyclopscore.init.IRegistry;
@@ -45,6 +45,6 @@ public interface IBlockBreakHandlerRegistry extends IRegistry {
      * @return A block breaking handler or null.
      */
     @Nullable
-    public IBlockBreakHandler getHandler(IBlockState blockState, World world, BlockPos pos, EntityPlayer player);
+    public IBlockBreakHandler getHandler(BlockState blockState, World world, BlockPos pos, PlayerEntity player);
 
 }

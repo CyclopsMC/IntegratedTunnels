@@ -3,9 +3,13 @@ package org.cyclops.integratedtunnels.part;
 import com.google.common.collect.Iterators;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import org.cyclops.commoncapabilities.api.capability.itemhandler.ISlotlessItemHandler;
+import org.cyclops.integrateddynamics.api.network.INetwork;
+import org.cyclops.integrateddynamics.api.network.IPartNetwork;
+import org.cyclops.integrateddynamics.api.part.PartTarget;
 import org.cyclops.integratedtunnels.Capabilities;
 import org.cyclops.integratedtunnels.GeneralConfig;
 import org.cyclops.integratedtunnels.api.network.IItemNetwork;
@@ -111,6 +115,17 @@ public class PartTypeInterfaceItem extends PartTypeInterfacePositionedAddon<IIte
         }
 
         @Override
+        public boolean isItemValid(int slot, @Nonnull ItemStack stack) {
+            if (!isNetworkAndPositionValid()) {
+                return false;
+            }
+            disablePosition();
+            boolean ret = getItemHandler().isItemValid(slot, stack);
+            enablePosition();
+            return ret;
+        }
+
+        @Override
         public Iterator<ItemStack> getItems() {
             if (!isNetworkAndPositionValid()) {
                 return Iterators.forArray();
@@ -181,17 +196,11 @@ public class PartTypeInterfaceItem extends PartTypeInterfacePositionedAddon<IIte
         }
 
         @Override
-        public boolean hasCapability(Capability<?> capability) {
-            return (isNetworkAndPositionValid() && capability == Capabilities.SLOTLESS_ITEMHANDLER)
-                    || super.hasCapability(capability);
-        }
-
-        @Override
-        public <T> T getCapability(Capability<T> capability) {
+        public <T2> LazyOptional<T2> getCapability(Capability<T2> capability, INetwork network, IPartNetwork partNetwork, PartTarget target) {
             if (isNetworkAndPositionValid() && capability == Capabilities.SLOTLESS_ITEMHANDLER) {
-                return (T) this;
+                return LazyOptional.of(() -> this).cast();
             }
-            return super.getCapability(capability);
+            return super.getCapability(capability, network, partNetwork, target);
         }
     }
 }

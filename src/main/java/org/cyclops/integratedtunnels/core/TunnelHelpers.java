@@ -2,6 +2,16 @@ package org.cyclops.integratedtunnels.core;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.BlockItemUseContext;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.Direction;
+import net.minecraft.util.Hand;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.BlockRayTraceResult;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.world.World;
 import org.apache.logging.log4j.Level;
 import org.cyclops.commoncapabilities.api.ingredient.IIngredientMatcher;
 import org.cyclops.commoncapabilities.api.ingredient.IngredientComponent;
@@ -24,6 +34,7 @@ import org.cyclops.integratedtunnels.core.predicate.IngredientPredicate;
 import org.cyclops.integratedtunnels.part.aspect.ITunnelConnection;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -68,16 +79,16 @@ public class TunnelHelpers {
                 // Handle movement errors due to inconsistent simulation.
                 // If we are moving items, emit them in the world, otherwise they go lost.
                 if (GeneralConfig.ejectItemsOnInconsistentSimulationMovement && e.getIngredientComponent().equals(IngredientComponent.ITEMSTACK)) {
-                    ItemStackHelpers.spawnItemStack(movementPosition.getPos().getWorld(), movementPosition.getPos().getBlockPos(), e.getRemainder());
-                    throw new EvaluationException("Ingredient movement failed " +
+                    ItemStackHelpers.spawnItemStack(movementPosition.getPos().getWorld(true), movementPosition.getPos().getBlockPos(), e.getRemainder());
+                    throw new EvaluationException(new StringTextComponent("Ingredient movement failed " +
                             "due to inconsistent insertion behaviour by destination in simulation " +
                             "and non-simulation mode. This can be caused by invalid network setups. " +
-                            "Ejected failed item in world.");
+                            "Ejected failed item in world."));
                 }
-                throw new EvaluationException("Ingredient movement failed " +
+                throw new EvaluationException(new StringTextComponent("Ingredient movement failed " +
                         "due to inconsistent insertion behaviour by destination in simulation " +
                         "and non-simulation mode. This can be caused by invalid network setups. Lost " +
-                        e.getIngredientComponent().getMatcher().localize(e.getRemainder()) + ".");
+                        e.getIngredientComponent().getMatcher().localize(e.getRemainder()) + "."));
             }
         } catch (IllegalStateException e) {
             IntegratedTunnels.clog(Level.WARN, e.getMessage());
@@ -208,5 +219,21 @@ public class TunnelHelpers {
                                             int channel, T instance, M matchCondition) {
         return IntegratedDynamics._instance.getRegistryManager().getRegistry(INetworkCraftingHandlerRegistry.class)
                 .isCrafting(network, ingredientsNetwork, channel, ingredientsNetwork.getComponent(), instance, matchCondition);
+    }
+
+    /**
+     * Create a new block item use context for use during tunnel movement.
+     * @param world The world.
+     * @param playerEntity The optional player.
+     * @param pos The position.
+     * @param side The side.
+     * @param hand A hand.
+     * @return A new BlockItemUseContext
+     */
+    public static BlockItemUseContext createBlockItemUseContext(World world, @Nullable PlayerEntity playerEntity, BlockPos pos, Direction side, Hand hand) {
+        return new BlockItemUseContext(world, playerEntity, hand, ItemStack.EMPTY,
+                new BlockRayTraceResult(new Vec3d((double)pos.getX() + 0.5D + (double)side.getXOffset() * 0.5D,
+                        (double)pos.getY() + 0.5D + (double)side.getYOffset() * 0.5D,
+                        (double)pos.getZ() + 0.5D + (double)side.getZOffset() * 0.5D), side, pos, false));
     }
 }

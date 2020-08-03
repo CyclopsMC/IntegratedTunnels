@@ -4,13 +4,12 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
-import net.minecraftforge.fluids.capability.IFluidTankProperties;
 import org.cyclops.integratedtunnels.GeneralConfig;
 import org.cyclops.integratedtunnels.api.network.IFluidNetwork;
 import org.cyclops.integratedtunnels.capability.network.FluidNetworkConfig;
 import org.cyclops.integratedtunnels.core.part.PartTypeInterfacePositionedAddon;
 
-import javax.annotation.Nullable;
+import javax.annotation.Nonnull;
 
 /**
  * Interface for fluid handlers.
@@ -53,50 +52,81 @@ public class PartTypeInterfaceFluid extends PartTypeInterfacePositionedAddon<IFl
         }
 
         @Override
-        public IFluidTankProperties[] getTankProperties() {
-            if (!isNetworkAndPositionValid()) {
-                return new IFluidTankProperties[0];
-            }
-            disablePosition();
-            IFluidTankProperties[] ret = getFluidHandler().getTankProperties();
-            enablePosition();
-            return ret;
-        }
-
-        @Override
-        public int fill(FluidStack resource, boolean doFill) {
+        public int getTanks() {
             if (!isNetworkAndPositionValid()) {
                 return 0;
             }
             disablePosition();
-            int ret = getFluidHandler().fill(resource, doFill);
+            int ret = getFluidHandler().getTanks();
             enablePosition();
             return ret;
         }
 
-        @Nullable
+        @Nonnull
         @Override
-        public FluidStack drain(FluidStack resource, boolean doDrain) {
+        public FluidStack getFluidInTank(int tank) {
             if (!isNetworkAndPositionValid()) {
-                return null;
+                return FluidStack.EMPTY;
             }
             disablePosition();
-            FluidStack ret = getFluidHandler().drain(resource, doDrain);
+            FluidStack ret = getFluidHandler().getFluidInTank(tank);
             enablePosition();
             return ret;
         }
 
-        @Nullable
         @Override
-        public FluidStack drain(int maxDrain, boolean doDrain) {
+        public int getTankCapacity(int tank) {
             if (!isNetworkAndPositionValid()) {
-                return null;
+                return 0;
             }
             disablePosition();
-            FluidStack ret = getFluidHandler().drain(maxDrain, doDrain);
+            int ret = getFluidHandler().getTankCapacity(tank);
             enablePosition();
             return ret;
         }
 
+        @Override
+        public boolean isFluidValid(int tank, @Nonnull FluidStack stack) {
+            if (!isNetworkAndPositionValid()) {
+                return false;
+            }
+            disablePosition();
+            boolean ret = getFluidHandler().isFluidValid(tank, stack);
+            enablePosition();
+            return ret;
+        }
+
+        @Override
+        public int fill(FluidStack resource, FluidAction action) {
+            if (!isNetworkAndPositionValid()) {
+                return 0;
+            }
+            disablePosition();
+            int ret = getFluidHandler().fill(resource, action);
+            enablePosition();
+            return ret;
+        }
+
+        @Override
+        public FluidStack drain(FluidStack resource, FluidAction action) {
+            if (!isNetworkAndPositionValid()) {
+                return FluidStack.EMPTY;
+            }
+            disablePosition();
+            FluidStack ret = getFluidHandler().drain(resource, action);
+            enablePosition();
+            return ret;
+        }
+
+        @Override
+        public FluidStack drain(int maxDrain, FluidAction action) {
+            if (!isNetworkAndPositionValid()) {
+                return FluidStack.EMPTY;
+            }
+            disablePosition();
+            FluidStack ret = getFluidHandler().drain(maxDrain, action);
+            enablePosition();
+            return ret;
+        }
     }
 }

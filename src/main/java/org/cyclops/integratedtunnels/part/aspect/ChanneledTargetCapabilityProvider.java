@@ -1,6 +1,6 @@
 package org.cyclops.integratedtunnels.part.aspect;
 
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import org.cyclops.commoncapabilities.api.ingredient.IngredientComponent;
 import org.cyclops.commoncapabilities.api.ingredient.storage.IIngredientComponentStorage;
@@ -17,11 +17,11 @@ import javax.annotation.Nullable;
 public abstract class ChanneledTargetCapabilityProvider<N extends IPositionedAddonsNetwork, T, M> extends ChanneledTarget<N> {
 
     private final ICapabilityProvider capabilityProvider;
-    private final EnumFacing side;
+    private final Direction side;
 
     private IIngredientComponentStorage<T, M> storage = null;
 
-    public ChanneledTargetCapabilityProvider(INetwork network, @Nullable ICapabilityProvider capabilityProvider, EnumFacing side,
+    public ChanneledTargetCapabilityProvider(INetwork network, @Nullable ICapabilityProvider capabilityProvider, Direction side,
                                              N channeledNetwork, @Nullable PartStateRoundRobin<?> partState, int channel,
                                              boolean roundRobin, boolean craftIfFailed) {
         super(network, channeledNetwork, partState, channel, roundRobin, craftIfFailed);

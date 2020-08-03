@@ -1,16 +1,16 @@
 package org.cyclops.integratedtunnels.core;
 
 import com.google.common.collect.Lists;
+import net.minecraft.block.BlockState;
 import net.minecraft.block.material.Material;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
+import net.minecraft.item.Items;
+import net.minecraft.nbt.INBT;
+import net.minecraft.util.Direction;
+import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldServer;
+import net.minecraft.world.server.ServerWorld;
 import org.cyclops.commoncapabilities.api.capability.itemhandler.ItemMatch;
 import org.cyclops.commoncapabilities.api.ingredient.IngredientComponent;
 import org.cyclops.commoncapabilities.api.ingredient.storage.IIngredientComponentStorage;
@@ -32,6 +32,7 @@ import org.cyclops.integratedtunnels.part.aspect.ITunnelConnection;
 
 import javax.annotation.Nullable;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author rubensworks
@@ -65,19 +66,18 @@ public class TunnelItemHelpers {
     }
 
     public static IngredientPredicate<ItemStack, Integer> matchItemStack(final ItemStack itemStack, final boolean checkItem,
-                                                                         final boolean checkStackSize, final boolean checkDamage,
+                                                                         final boolean checkStackSize,
                                                                          final boolean checkNbt, final boolean blacklist,
                                                                          final boolean exactAmount) {
         int matchFlags = ItemMatch.ANY;
         if (checkItem)      matchFlags = matchFlags | ItemMatch.ITEM;
-        if (checkDamage)    matchFlags = matchFlags | ItemMatch.DAMAGE;
         if (checkNbt)       matchFlags = matchFlags | ItemMatch.NBT;
         if (checkStackSize) matchFlags = matchFlags | ItemMatch.STACKSIZE;
         return new IngredientPredicate<ItemStack, Integer>(IngredientComponent.ITEMSTACK, itemStack.copy(), matchFlags, blacklist, itemStack.isEmpty() && !blacklist,
                 itemStack.getCount(), exactAmount) {
             @Override
             public boolean test(@Nullable ItemStack input) {
-                boolean result = areItemStackEqual(input, itemStack, checkStackSize, true, checkDamage, checkNbt);
+                boolean result = areItemStackEqual(input, itemStack, checkStackSize, true, checkNbt);
                 if (blacklist) {
                     result = !result;
                 }
@@ -88,9 +88,9 @@ public class TunnelItemHelpers {
 
     public static IngredientPredicate<ItemStack, Integer> matchItemStacks(final IValueTypeListProxy<ValueObjectTypeItemStack, ValueObjectTypeItemStack.ValueItemStack> itemStacks,
                                                                           final boolean checkItem, final boolean checkStackSize,
-                                                                          final boolean checkDamage, final boolean checkNbt,
+                                                                          final boolean checkNbt,
                                                                           final boolean blacklist, final int amount, final boolean exactAmount) {
-        return new IngredientPredicateItemStackList(blacklist, amount, exactAmount, itemStacks, checkStackSize, checkItem, checkDamage, checkNbt);
+        return new IngredientPredicateItemStackList(blacklist, amount, exactAmount, itemStacks, checkStackSize, checkItem, checkNbt);
     }
 
     public static IngredientPredicate<ItemStack, Integer> matchPredicateItem(final PartTarget partTarget, final IOperator predicate,
@@ -100,9 +100,9 @@ public class TunnelItemHelpers {
 
     public static IngredientPredicate<ItemStack, Integer> matchBlocks(final IValueTypeListProxy<ValueObjectTypeBlock, ValueObjectTypeBlock.ValueBlock> blocks,
                                                                       final boolean checkItem, final boolean checkStackSize,
-                                                                      final boolean checkDamage, final boolean checkNbt,
+                                                                      final boolean checkNbt,
                                                                       final boolean blacklist, final int amount, final boolean exactAmount) {
-        return new IngredientPredicateBlockList(blacklist, amount, exactAmount, blocks, checkStackSize, checkItem, checkDamage, checkNbt);
+        return new IngredientPredicateBlockList(blacklist, amount, exactAmount, blocks, checkStackSize, checkItem, checkNbt);
     }
 
     public static IngredientPredicate<ItemStack, Integer> matchPredicateBlock(final PartTarget partTarget, final IOperator predicate,
@@ -110,7 +110,7 @@ public class TunnelItemHelpers {
         return new IngredientPredicateBlockOperator(amount, exactAmount, predicate, partTarget);
     }
 
-    public static IngredientPredicate<ItemStack, Integer> matchNbt(final NBTTagCompound tag, final boolean subset, final boolean superset,
+    public static IngredientPredicate<ItemStack, Integer> matchNbt(final Optional<INBT> tag, final boolean subset, final boolean superset,
                                                                    final boolean requireNbt, final boolean recursive, final boolean blacklist,
                                                                    final int amount, final boolean exactAmount) {
         return new IngredientPredicateItemStackNbt(blacklist, amount, exactAmount, requireNbt, subset, tag, recursive, superset);
@@ -118,12 +118,11 @@ public class TunnelItemHelpers {
 
     public static boolean areItemStackEqual(ItemStack stackA, ItemStack stackB,
                                             boolean checkStackSize, boolean checkItem,
-                                            boolean checkDamage, boolean checkNbt) {
+                                            boolean checkNbt) {
         if (stackA == null && stackB == null) return true;
         if (stackA != null && stackB != null) {
             if (checkStackSize && stackA.getCount() != stackB.getCount()) return false;
             if (checkItem && stackA.getItem() != stackB.getItem()) return false;
-            if (checkDamage && stackA.getItemDamage() != stackB.getItemDamage()) return false;
             if (checkNbt && !ItemStack.areItemStackTagsEqual(stackA, stackB)) return false;
             return true;
         }
@@ -151,20 +150,20 @@ public class TunnelItemHelpers {
     public static ItemStack placeItems(INetwork network, IPositionedAddonsNetworkIngredients<ItemStack, Integer> ingredientsNetwork,
                                        int channel, ITunnelConnection connection,
                                        IIngredientComponentStorage<ItemStack, Integer> source,
-                                       World world, BlockPos pos, EnumFacing side,
-                                       IngredientPredicate<ItemStack, Integer> itemStackMatcher, EnumHand hand,
+                                       World world, BlockPos pos, Direction side,
+                                       IngredientPredicate<ItemStack, Integer> itemStackMatcher, Hand hand,
                                        boolean blockUpdate, boolean ignoreReplacable, boolean craftIfFailed) throws EvaluationException {
-        IBlockState destBlockState = world.getBlockState(pos);
+        BlockState destBlockState = world.getBlockState(pos);
         final Material destMaterial = destBlockState.getMaterial();
         final boolean isDestNonSolid = !destMaterial.isSolid();
-        final boolean isDestReplaceable = destBlockState.getBlock().isReplaceable(world, pos);
+        final boolean isDestReplaceable = destBlockState.isReplaceable(TunnelHelpers.createBlockItemUseContext(world, null, pos, side, hand));
         if (!world.isAirBlock(pos)
                 && (!isDestNonSolid || !(ignoreReplacable && isDestReplaceable))) {
             return null;
         }
 
         IIngredientComponentStorage<ItemStack, Integer> destinationBlock = new ItemStorageBlockWrapper(
-                true, (WorldServer) world, pos, side, hand, blockUpdate, 0, false, ignoreReplacable, true);
+                true, (ServerWorld) world, pos, side, hand, blockUpdate, 0, false, ignoreReplacable, true);
         return TunnelHelpers.moveSingleStateOptimized(network, ingredientsNetwork, channel, connection, source,
                 -1, destinationBlock, -1, itemStackMatcher, PartPos.of(world, pos, side), craftIfFailed);
     }
@@ -190,21 +189,21 @@ public class TunnelItemHelpers {
      * @throws EvaluationException If illegal movement occured and further movement should stop.
      */
     public static List<ItemStack> pickUpItems(INetwork network, IPositionedAddonsNetworkIngredients<ItemStack, Integer> ingredientsNetwork,
-                                              int channel, ITunnelConnection connection, World world, BlockPos pos, EnumFacing side,
+                                              int channel, ITunnelConnection connection, World world, BlockPos pos, Direction side,
                                               IIngredientComponentStorage<ItemStack, Integer> destination,
-                                              IngredientPredicate<ItemStack, Integer> itemStackMatcher, EnumHand hand, boolean blockUpdate,
+                                              IngredientPredicate<ItemStack, Integer> itemStackMatcher, Hand hand, boolean blockUpdate,
                                               boolean ignoreReplacable, int fortune, boolean silkTouch,
                                               boolean breakOnNoDrops) throws EvaluationException {
-        IBlockState destBlockState = world.getBlockState(pos);
+        BlockState destBlockState = world.getBlockState(pos);
         final Material destMaterial = destBlockState.getMaterial();
-        final boolean isDestReplaceable = destBlockState.getBlock().isReplaceable(world, pos);
+        final boolean isDestReplaceable = destBlockState.isReplaceable(TunnelHelpers.createBlockItemUseContext(world, null, pos, side, hand));
         if (world.isAirBlock(pos)
                 || ((ignoreReplacable && isDestReplaceable) || destMaterial.isLiquid())) {
             return null;
         }
 
         IIngredientComponentStorage<ItemStack, Integer> sourceBlock = new ItemStorageBlockWrapper(
-                false, (WorldServer) world, pos, side, hand, blockUpdate, fortune, silkTouch, ignoreReplacable, breakOnNoDrops);
+                false, (ServerWorld) world, pos, side, hand, blockUpdate, fortune, silkTouch, ignoreReplacable, breakOnNoDrops);
         List<ItemStack> itemStacks = Lists.newArrayList();
         ItemStack itemStack;
         while (!(itemStack = TunnelHelpers.moveSingleStateOptimized(network, ingredientsNetwork, channel, connection, sourceBlock, -1,

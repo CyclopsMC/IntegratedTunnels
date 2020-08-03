@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "facing=north":   { "model": "integratedtunnels:block/part_interface_fluid", "y": 180 },
+    "facing=east":    { "model": "integratedtunnels:block/part_interface_fluid", "y": 270 },
+    "facing=south":   { "model": "integratedtunnels:block/part_interface_fluid"           },
+    "facing=west":    { "model": "integratedtunnels:block/part_interface_fluid", "y": 90  },
+    "facing=up":      { "model": "integratedtunnels:block/part_interface_fluid", "x": 90  },
+    "facing=down":    { "model": "integratedtunnels:block/part_interface_fluid", "x": 270 }
+  }
+}

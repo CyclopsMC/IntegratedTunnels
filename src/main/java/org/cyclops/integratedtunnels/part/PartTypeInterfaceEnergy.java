@@ -1,6 +1,7 @@
 package org.cyclops.integratedtunnels.part;
 
 import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
 import org.cyclops.integrateddynamics.api.network.IEnergyNetwork;
@@ -30,7 +31,7 @@ public class PartTypeInterfaceEnergy extends PartTypeInterfacePositionedAddon<IE
     }
 
     @Override
-    protected IEnergyStorage getTargetCapabilityInstance(PartPos pos) {
+    protected LazyOptional<IEnergyStorage> getTargetCapabilityInstance(PartPos pos) {
         return EnergyHelpers.getEnergyStorage(pos);
     }
 

@@ -1,25 +1,20 @@
 package org.cyclops.integratedtunnels.core;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockLiquid;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.fluid.Fluid;
+import net.minecraft.util.Direction;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldServer;
-import net.minecraftforge.fluids.Fluid;
+import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidUtil;
-import net.minecraftforge.fluids.IFluidBlock;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
-import net.minecraftforge.fluids.capability.wrappers.BlockLiquidWrapper;
 import net.minecraftforge.fluids.capability.wrappers.BlockWrapper;
-import net.minecraftforge.fluids.capability.wrappers.FluidBlockWrapper;
 import org.cyclops.commoncapabilities.api.ingredient.IngredientComponent;
 import org.cyclops.commoncapabilities.api.ingredient.storage.IIngredientComponentStorage;
 import org.cyclops.cyclopscore.helper.FluidHelpers;
@@ -29,6 +24,7 @@ import org.cyclops.integratedtunnels.api.world.IBlockBreakHandler;
 import org.cyclops.integratedtunnels.api.world.IBlockBreakHandlerRegistry;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.Iterator;
 
 /**
@@ -37,20 +33,21 @@ import java.util.Iterator;
  */
 public class FluidStorageBlockWrapper implements IIngredientComponentStorage<FluidStack, Integer> {
 
-    private final WorldServer world;
+    private final ServerWorld world;
     private final BlockPos pos;
-    private final EnumFacing side;
+    private final Direction side;
     private final boolean blockUpdate;
 
+    @Nullable
     private final IIngredientComponentStorage<FluidStack, Integer> targetStorage;
 
-    public FluidStorageBlockWrapper(WorldServer world, BlockPos pos, EnumFacing side, boolean blockUpdate) {
+    public FluidStorageBlockWrapper(ServerWorld world, BlockPos pos, Direction side, boolean blockUpdate) {
         this.world = world;
         this.pos = pos;
         this.side = side;
         this.blockUpdate = blockUpdate;
 
-        IFluidHandler fluidHandler = FluidUtil.getFluidHandler(world, pos, side);
+        IFluidHandler fluidHandler = FluidUtil.getFluidHandler(world, pos, side).orElse(null); // TODO: does this work? copy FluidHandlerBlock from Flopper?
         this.targetStorage = fluidHandler != null ? getComponent()
                 .getStorageWrapperHandler(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY)
                 .wrapComponentStorage(fluidHandler) : null;
@@ -60,14 +57,14 @@ public class FluidStorageBlockWrapper implements IIngredientComponentStorage<Flu
         world.neighborChanged(pos, Blocks.AIR, pos);
     }
 
-    protected IBlockBreakHandler getBlockBreakHandler(IBlockState blockState, World world, BlockPos pos, EntityPlayer player) {
+    protected IBlockBreakHandler getBlockBreakHandler(BlockState blockState, World world, BlockPos pos, PlayerEntity player) {
         return IntegratedTunnels._instance.getRegistryManager().getRegistry(IBlockBreakHandlerRegistry.class)
                 .getHandler(blockState, world, pos, player);
     }
 
     protected void postInsert(FluidStack moved) {
         if (moved != null && GeneralConfig.worldInteractionEvents) {
-            SoundEvent soundevent = moved.getFluid().getEmptySound(moved);
+            SoundEvent soundevent = moved.getFluid().getAttributes().getEmptySound(moved);
             world.playSound(null, pos, soundevent, SoundCategory.BLOCKS, 1.0F, 1.0F);
         }
         if (blockUpdate) {
@@ -77,7 +74,7 @@ public class FluidStorageBlockWrapper implements IIngredientComponentStorage<Flu
 
     protected void postExtract(FluidStack moved) {
         if (moved != null && GeneralConfig.worldInteractionEvents) {
-            SoundEvent soundevent = moved.getFluid().getFillSound(moved);
+            SoundEvent soundevent = moved.getFluid().getAttributes().getFillSound(moved);
             world.playSound(null, pos, soundevent, SoundCategory.BLOCKS, 1.0F, 1.0F);
         }
     }
@@ -99,7 +96,7 @@ public class FluidStorageBlockWrapper implements IIngredientComponentStorage<Flu
 
     @Override
     public long getMaxQuantity() {
-        return Fluid.BUCKET_VOLUME;
+        return FluidHelpers.BUCKET_VOLUME;
     }
 
     @Override
@@ -108,31 +105,22 @@ public class FluidStorageBlockWrapper implements IIngredientComponentStorage<Flu
             return stack;
         }
 
-        net.minecraftforge.fluids.Fluid fluid = stack.getFluid();
-        if (world.provider.doesWaterVaporize() && fluid.doesVaporize(stack)) {
+        Fluid fluid = stack.getFluid();
+        if (world.getDimension().doesWaterVaporize() && fluid.getAttributes().doesVaporize(world, pos, stack)) {
             return null;
         }
 
-        Block block = fluid.getBlock();
-        IFluidHandler handler;
-        if (block == null) {
-            return stack;
-        } else if (block instanceof IFluidBlock) {
-            handler = new FluidBlockWrapper((IFluidBlock) block, world, pos);
-        } else if (block instanceof BlockLiquid) {
-            handler = new BlockLiquidWrapper((BlockLiquid) block, world, pos);
-        } else {
-            handler = new BlockWrapper(block, world, pos);
-        }
+        BlockState block = fluid.getAttributes().getBlock(world, pos, fluid.getDefaultState());
+        IFluidHandler handler = new BlockWrapper(block, world, pos);
 
-        int filled = handler.fill(stack, !simulate);
+        int filled = handler.fill(stack, FluidHelpers.simulateBooleanToAction(simulate));
         int remaining = FluidHelpers.getAmount(stack) - filled;
         if (!simulate && filled > 0) {
             postInsert(stack);
         }
 
         if (remaining == 0) {
-            return null;
+            return FluidStack.EMPTY;
         } else {
             return new FluidStack(stack, remaining);
         }

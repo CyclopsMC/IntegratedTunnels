@@ -1,11 +1,11 @@
 package org.cyclops.integratedtunnels.core;
 
-import net.minecraft.entity.item.EntityItem;
+import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.WorldServer;
+import net.minecraft.world.server.ServerWorld;
 import org.cyclops.commoncapabilities.api.ingredient.IIngredientMatcher;
 import org.cyclops.commoncapabilities.api.ingredient.IngredientComponent;
 import org.cyclops.commoncapabilities.api.ingredient.storage.IIngredientComponentStorage;
@@ -16,7 +16,6 @@ import org.cyclops.integratedtunnels.GeneralConfig;
 import javax.annotation.Nonnull;
 import java.util.Iterator;
 import java.util.List;
-import java.util.ListIterator;
 
 /**
  * An item handler for importing item entities from the world.
@@ -24,24 +23,24 @@ import java.util.ListIterator;
  */
 public class ItemHandlerWorldEntityImportWrapper implements IIngredientComponentStorage<ItemStack, Integer> {
 
-    private final WorldServer world;
+    private final ServerWorld world;
     private final BlockPos pos;
-    private final EnumFacing facing;
-    private final List<EntityItem> entities;
+    private final Direction facing;
+    private final List<ItemEntity> entities;
 
-    public ItemHandlerWorldEntityImportWrapper(WorldServer world, BlockPos pos, EnumFacing facing, final boolean ignorePickupDelay) {
+    public ItemHandlerWorldEntityImportWrapper(ServerWorld world, BlockPos pos, Direction facing, final boolean ignorePickupDelay) {
         this(world, pos, facing, new AxisAlignedBB(pos), ignorePickupDelay);
     }
 
-    public ItemHandlerWorldEntityImportWrapper(WorldServer world, BlockPos pos, EnumFacing facing, AxisAlignedBB area, final boolean ignorePickupDelay) {
+    public ItemHandlerWorldEntityImportWrapper(ServerWorld world, BlockPos pos, Direction facing, AxisAlignedBB area, final boolean ignorePickupDelay) {
         this.world = world;
         this.pos = pos;
         this.facing = facing;
-        this.entities = world.getEntitiesWithinAABB(EntityItem.class, area,
-                input -> (ignorePickupDelay || !input.cannotPickup()) && !input.isDead);
+        this.entities = world.getEntitiesWithinAABB(ItemEntity.class, area,
+                input -> (ignorePickupDelay || !input.cannotPickup()) && input.isAlive());
     }
 
-    public List<EntityItem> getEntities() {
+    public List<ItemEntity> getEntities() {
         return entities;
     }
 
@@ -52,7 +51,7 @@ public class ItemHandlerWorldEntityImportWrapper implements IIngredientComponent
 
     @Override
     public Iterator<ItemStack> iterator() {
-        return this.entities.stream().map(EntityItem::getItem).iterator();
+        return this.entities.stream().map(ItemEntity::getItem).iterator();
     }
 
     @Override
@@ -70,9 +69,9 @@ public class ItemHandlerWorldEntityImportWrapper implements IIngredientComponent
         return ItemStack.EMPTY;
     }
 
-    protected void postExtract(EntityItem entity, ItemStack itemStack) {
+    protected void postExtract(ItemEntity entity, ItemStack itemStack) {
         if (itemStack.isEmpty()) {
-            entity.setDead();
+            entity.remove();
         } else {
             entity.setItem(itemStack);
         }
@@ -88,17 +87,17 @@ public class ItemHandlerWorldEntityImportWrapper implements IIngredientComponent
         Integer quantityFlag = getComponent().getPrimaryQuantifier().getMatchCondition();
         Integer subMatchCondition = matcher.withoutCondition(matchCondition,
                 getComponent().getPrimaryQuantifier().getMatchCondition());
-        List<EntityItem> entities = this.entities;
+        List<ItemEntity> entities = this.entities;
         if (entities.isEmpty()) {
             return ItemStack.EMPTY;
         }
 
-        for (EntityItem entity : entities) {
+        for (ItemEntity entity : entities) {
             ItemStack itemStack = entity.getItem();
             if (matcher.matches(prototype, itemStack, subMatchCondition)
                     && (!matcher.hasCondition(matchCondition, quantityFlag) || itemStack.getCount() >= prototype.getCount())) {
                 itemStack = itemStack.copy();
-                ItemStack ret = itemStack.splitStack(Helpers.castSafe(prototype.getCount()));
+                ItemStack ret = itemStack.split(Helpers.castSafe(prototype.getCount()));
 
                 // Check if all items have been extracted, if so, remove block
                 if (!simulate) {
@@ -118,10 +117,10 @@ public class ItemHandlerWorldEntityImportWrapper implements IIngredientComponent
             return ItemStack.EMPTY;
         }
 
-        EntityItem entity = this.entities.get(0);
+        ItemEntity entity = this.entities.get(0);
         ItemStack itemStack = entity.getItem();
         itemStack = itemStack.copy();
-        ItemStack ret = itemStack.splitStack(Helpers.castSafe(maxQuantity));
+        ItemStack ret = itemStack.split(Helpers.castSafe(maxQuantity));
         if (!simulate) {
             postExtract(entity, itemStack);
         }

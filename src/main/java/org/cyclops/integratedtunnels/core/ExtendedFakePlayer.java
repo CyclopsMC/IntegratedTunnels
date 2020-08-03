@@ -1,8 +1,9 @@
 package org.cyclops.integratedtunnels.core;
 
 import com.mojang.authlib.GameProfile;
+import net.minecraft.item.ItemStack;
 import net.minecraft.world.GameType;
-import net.minecraft.world.WorldServer;
+import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.common.util.FakePlayer;
 
 import java.util.UUID;
@@ -19,53 +20,59 @@ public class ExtendedFakePlayer extends FakePlayer {
     private long lastSwingUpdateTick = 0;
     private int ticksSinceLastTick = 0;
 
-    public ExtendedFakePlayer(WorldServer world) {
+    public ExtendedFakePlayer(ServerWorld world) {
         super(world, PROFILE);
         this.interactionManager.setGameType(GameType.SURVIVAL);
-        this.connection = new FakeNetHandlerPlayServer(world.getMinecraftServer(), this);
+        this.connection = new FakeNetHandlerPlayServer(world.getServer(), this);
     }
 
     @Override
-    public void onUpdate() {
-        super.onUpdate();
+    public void tick() {
+        super.tick();
 
-        int toTick = (int) (world.getTotalWorldTime() - this.lastUpdateTick);
+        int toTick = (int) (world.getGameTime() - this.lastUpdateTick);
         if (toTick > 0) {
             this.ticksSinceLastTick = toTick;
         }
-        this.lastUpdateTick = world.getTotalWorldTime();
+        this.lastUpdateTick = world.getGameTime();
 
-        this.ticksSinceLastSwing = (int) (world.getTotalWorldTime() - lastSwingUpdateTick);
-        this.inventory.decrementAnimations();
+        this.ticksSinceLastSwing = (int) (world.getGameTime() - lastSwingUpdateTick);
+        this.inventory.tick();
     }
 
     @Override
     public void resetCooldown() {
         super.resetCooldown();
-        lastSwingUpdateTick = world.getTotalWorldTime();
+        lastSwingUpdateTick = world.getGameTime();
     }
 
     public void updateActiveHandSimulated() {
         if (this.isHandActive()) {
             for (int i = 0; i < this.ticksSinceLastTick; i++) {
                 if (this.isHandActive()) {
-                    if (!this.activeItemStack.isEmpty()) {
-                        activeItemStackUseCount = net.minecraftforge.event.ForgeEventFactory.onItemUseTick(this, activeItemStack, activeItemStackUseCount);
-                        if (activeItemStackUseCount > 0)
-                            activeItemStack.getItem().onUsingTick(activeItemStack, this, activeItemStackUseCount);
+                    ItemStack itemstack = this.getHeldItem(this.getActiveHand());
+                    if (net.minecraftforge.common.ForgeHooks.canContinueUsing(this.activeItemStack, itemstack)) {
+                        this.activeItemStack = itemstack;
                     }
+                    if (itemstack == this.activeItemStack) {
+                        if (!this.activeItemStack.isEmpty()) {
+                            activeItemStackUseCount = net.minecraftforge.event.ForgeEventFactory.onItemUseTick(this, activeItemStack, activeItemStackUseCount);
+                            if (activeItemStackUseCount > 0)
+                                activeItemStack.getItem().onUsingTick(activeItemStack, this, activeItemStackUseCount);
+                        }
 
-                    if (this.getItemInUseCount() <= 25 && this.getItemInUseCount() % 4 == 0) {
-                        this.updateItemUse(this.activeItemStack, 5);
-                    }
+                        if (this.getItemInUseCount() <= 25 && this.getItemInUseCount() % 4 == 0) {
+                            this.func_226293_b_(this.activeItemStack, 5); // MCP: was updateItemUse
+                        }
 
-                    if (--this.activeItemStackUseCount <= 0 && !this.world.isRemote) {
-                        this.onItemUseFinish();
+                        if (--this.activeItemStackUseCount <= 0 && !this.world.isRemote() && !this.activeItemStack.isCrossbowStack()) {
+                            this.onItemUseFinish();
+                            break;
+                        }
+                    } else {
+                        this.resetActiveHand();
                         break;
                     }
-                } else {
-                    this.resetActiveHand();
-                    break;
                 }
             }
         } else {

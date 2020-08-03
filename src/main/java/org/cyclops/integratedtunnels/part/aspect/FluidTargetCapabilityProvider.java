@@ -1,6 +1,6 @@
 package org.cyclops.integratedtunnels.part.aspect;
 
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.fluids.FluidStack;
 import org.cyclops.commoncapabilities.api.ingredient.IngredientComponent;
@@ -27,10 +27,10 @@ public class FluidTargetCapabilityProvider extends ChanneledTargetCapabilityProv
     private final IAspectProperties properties;
 
     public FluidTargetCapabilityProvider(ITunnelTransfer transfer, INetwork network, @Nullable ICapabilityProvider capabilityProvider,
-                                         EnumFacing side, IngredientPredicate<FluidStack, Integer> fluidStackMatcher,
+                                         Direction side, IngredientPredicate<FluidStack, Integer> fluidStackMatcher,
                                          PartTarget partTarget, IAspectProperties properties,
                                          @Nullable PartStateRoundRobin<?> partState) {
-        super(network, capabilityProvider, side, network.getCapability(FluidNetworkConfig.CAPABILITY), partState,
+        super(network, capabilityProvider, side, network.getCapability(FluidNetworkConfig.CAPABILITY).orElse(null), partState,
                 properties.getValue(TunnelAspectWriteBuilders.PROP_CHANNEL).getRawValue(),
                 properties.getValue(TunnelAspectWriteBuilders.PROP_ROUNDROBIN).getRawValue(),
                 properties.getValue(TunnelAspectWriteBuilders.PROP_CRAFT).getRawValue());

@@ -1,17 +1,17 @@
 package org.cyclops.integratedtunnels.core;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockLiquid;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.FlowingFluidBlock;
 import net.minecraft.block.material.Material;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.fluid.Fluids;
+import net.minecraft.nbt.INBT;
+import net.minecraft.util.Direction;
+import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldServer;
-import net.minecraftforge.fluids.FluidRegistry;
+import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.IFluidBlock;
 import org.cyclops.commoncapabilities.api.capability.fluidhandler.FluidMatch;
 import org.cyclops.commoncapabilities.api.ingredient.IngredientComponent;
 import org.cyclops.commoncapabilities.api.ingredient.storage.IIngredientComponentStorage;
@@ -31,6 +31,7 @@ import org.cyclops.integratedtunnels.core.predicate.IngredientPredicateFluidStac
 import org.cyclops.integratedtunnels.part.aspect.ITunnelConnection;
 
 import javax.annotation.Nullable;
+import java.util.Optional;
 
 /**
  * @author rubensworks
@@ -55,7 +56,7 @@ public class TunnelFluidHelpers {
     };
 
     public static IngredientPredicate<FluidStack, Integer> matchAll(final int amount, final boolean exactAmount) {
-        return new IngredientPredicate<FluidStack, Integer>(IngredientComponent.FLUIDSTACK, new FluidStack(FluidRegistry.WATER, amount), exactAmount ? FluidMatch.AMOUNT : FluidMatch.ANY, false, false, amount, exactAmount) {
+        return new IngredientPredicate<FluidStack, Integer>(IngredientComponent.FLUIDSTACK, new FluidStack(Fluids.WATER, amount), exactAmount ? FluidMatch.AMOUNT : FluidMatch.ANY, false, false, amount, exactAmount) {
             @Override
             public boolean test(FluidStack input) {
                 return true;
@@ -94,7 +95,7 @@ public class TunnelFluidHelpers {
         return new IngredientPredicateFluidStackOperator(amount, exactAmount, predicate, partTarget);
     }
 
-    public static IngredientPredicate<FluidStack, Integer> matchNbt(final NBTTagCompound tag, final boolean subset, final boolean superset, final boolean requireNbt, final boolean recursive,
+    public static IngredientPredicate<FluidStack, Integer> matchNbt(final Optional<INBT> tag, final boolean subset, final boolean superset, final boolean requireNbt, final boolean recursive,
                                                                     final boolean blacklist,
                                                                     final int amount, final boolean exactAmount) {
         return new IngredientPredicateFluidStackNbt(blacklist, amount, exactAmount, requireNbt, subset, tag, recursive, superset);
@@ -104,7 +105,7 @@ public class TunnelFluidHelpers {
                                              boolean checkFluid, boolean checkAmount, boolean checkNbt) {
         if (stackA == null && stackB == null) return true;
         if (stackA != null && stackB != null) {
-            if (checkAmount && stackA.amount != stackB.amount) return false;
+            if (checkAmount && stackA.getAmount() != stackB.getAmount()) return false;
             if (checkFluid && stackA.getFluid() != stackB.getFluid()) return false;
             if (checkNbt && !FluidStack.areFluidStackTagsEqual(stackA, stackB)) return false;
             return true;
@@ -133,16 +134,16 @@ public class TunnelFluidHelpers {
                                          IIngredientComponentStorage<FluidStack, Integer> source, final World world, final BlockPos pos,
                                          IngredientPredicate<FluidStack, Integer> fluidStackMatcher, boolean blockUpdate,
                                          boolean ignoreReplacable, boolean craftIfFailed) throws EvaluationException {
-        IBlockState destBlockState = world.getBlockState(pos);
+        BlockState destBlockState = world.getBlockState(pos);
         final Material destMaterial = destBlockState.getMaterial();
         final boolean isDestNonSolid = !destMaterial.isSolid();
-        final boolean isDestReplaceable = destBlockState.getBlock().isReplaceable(world, pos);
+        final boolean isDestReplaceable = destBlockState.isReplaceable(TunnelHelpers.createBlockItemUseContext(world, null, pos, Direction.UP, Hand.MAIN_HAND));
         if (!world.isAirBlock(pos)
                 && (!isDestNonSolid || !(ignoreReplacable && isDestReplaceable) || destMaterial.isLiquid())) {
             return null;
         }
 
-        IIngredientComponentStorage<FluidStack, Integer> destination = new FluidStorageBlockWrapper((WorldServer) world, pos, null, blockUpdate);
+        IIngredientComponentStorage<FluidStack, Integer> destination = new FluidStorageBlockWrapper((ServerWorld) world, pos, null, blockUpdate);
         return TunnelHelpers.moveSingleStateOptimized(network, ingredientsNetwork, channel, connection, source,
                 -1, destination, -1, fluidStackMatcher, PartPos.of(world, pos, null), craftIfFailed);
     }
@@ -162,13 +163,13 @@ public class TunnelFluidHelpers {
      * @throws EvaluationException If illegal movement occured and further movement should stop.
      */
     public static FluidStack pickUpFluids(INetwork network, IPositionedAddonsNetworkIngredients<FluidStack, Integer> ingredientsNetwork,
-                                          int channel, ITunnelConnection connection, World world, BlockPos pos, EnumFacing side,
+                                          int channel, ITunnelConnection connection, World world, BlockPos pos, Direction side,
                                           IIngredientComponentStorage<FluidStack, Integer> destination,
                                           IngredientPredicate<FluidStack, Integer> fluidStackMatcher) throws EvaluationException {
-        IBlockState state = world.getBlockState(pos);
+        BlockState state = world.getBlockState(pos);
         Block block = state.getBlock();
-        if (block instanceof IFluidBlock || block instanceof BlockLiquid) {
-            IIngredientComponentStorage<FluidStack, Integer> source = new FluidStorageBlockWrapper((WorldServer) world, pos, side, false);
+        if (block instanceof FlowingFluidBlock) {
+            IIngredientComponentStorage<FluidStack, Integer> source = new FluidStorageBlockWrapper((ServerWorld) world, pos, side, false);
             return TunnelHelpers.moveSingleStateOptimized(network, ingredientsNetwork, channel, connection, source,
                     -1, destination, -1, fluidStackMatcher, PartPos.of(world, pos, side), false);
         }
@@ -182,9 +183,9 @@ public class TunnelFluidHelpers {
      * @return A copy of the given fluidstack with the given count.
      */
     public static FluidStack prototypeWithCount(FluidStack prototype, int count) {
-        if (prototype == null || prototype.amount != count) {
+        if (prototype == null || prototype.getAmount() != count) {
             if (prototype == null) {
-                return count == 0 ? null : new FluidStack(FluidRegistry.WATER, count);
+                return count == 0 ? null : new FluidStack(Fluids.WATER, count);
             } else {
                 prototype = new FluidStack(prototype, count);
             }

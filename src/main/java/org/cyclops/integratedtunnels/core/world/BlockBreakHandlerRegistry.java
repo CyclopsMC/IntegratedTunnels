@@ -5,8 +5,8 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
 import com.google.common.collect.Sets;
 import net.minecraft.block.Block;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.block.BlockState;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.cyclops.integratedtunnels.api.world.IBlockBreakHandler;
@@ -55,7 +55,7 @@ public class BlockBreakHandlerRegistry implements IBlockBreakHandlerRegistry {
 
     @Nullable
     @Override
-    public IBlockBreakHandler getHandler(IBlockState blockState, World world, BlockPos pos, EntityPlayer player) {
+    public IBlockBreakHandler getHandler(BlockState blockState, World world, BlockPos pos, PlayerEntity player) {
         for (IBlockBreakHandler breakHandler : getHandlers(blockState.getBlock())) {
             if (breakHandler.shouldApply(blockState, world, pos, player)) {
                 return breakHandler;

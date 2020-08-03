@@ -1,8 +1,8 @@
 package org.cyclops.integratedtunnels.api.world;
 
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
@@ -24,7 +24,7 @@ public interface IBlockPlaceHandler {
      * @param player The placing player.
      * @return If this can handle the given item placement as block.
      */
-    public boolean shouldApply(ItemStack itemStack, World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ, EntityPlayer player);
+    public boolean shouldApply(ItemStack itemStack, World world, BlockPos pos, Direction side, float hitX, float hitY, float hitZ, PlayerEntity player);
 
     /**
      * Place the given item as block.
@@ -37,6 +37,6 @@ public interface IBlockPlaceHandler {
      * @param hitZ The Z position that is being targeted.
      * @param player The placing player.
      */
-    public void placeBlock(ItemStack itemStack, World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ, EntityPlayer player);
+    public void placeBlock(ItemStack itemStack, World world, BlockPos pos, Direction side, float hitX, float hitY, float hitZ, PlayerEntity player);
 
 }

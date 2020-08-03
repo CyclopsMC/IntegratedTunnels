@@ -1,7 +1,7 @@
 package org.cyclops.integratedtunnels.part.aspect;
 
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import org.cyclops.commoncapabilities.api.ingredient.IngredientComponent;
 import org.cyclops.commoncapabilities.api.ingredient.storage.IIngredientComponentStorage;
@@ -28,10 +28,10 @@ public class ItemTargetCapabilityProvider extends ChanneledTargetCapabilityProvi
     private final IAspectProperties properties;
 
     public ItemTargetCapabilityProvider(ITunnelTransfer transfer, INetwork network, @Nullable ICapabilityProvider capabilityProvider,
-                                        EnumFacing side, int slot,
+                                        Direction side, int slot,
                                         IngredientPredicate<ItemStack, Integer> itemStackMatcher, PartTarget partTarget,
                                         IAspectProperties properties, @Nullable PartStateRoundRobin<?> partState) {
-        super(network, capabilityProvider, side, network.getCapability(ItemNetworkConfig.CAPABILITY), partState,
+        super(network, capabilityProvider, side, network.getCapability(ItemNetworkConfig.CAPABILITY).orElse(null), partState,
                 properties.getValue(TunnelAspectWriteBuilders.PROP_CHANNEL).getRawValue(),
                 properties.getValue(TunnelAspectWriteBuilders.PROP_ROUNDROBIN).getRawValue(),
                 properties.getValue(TunnelAspectWriteBuilders.PROP_CRAFT).getRawValue());

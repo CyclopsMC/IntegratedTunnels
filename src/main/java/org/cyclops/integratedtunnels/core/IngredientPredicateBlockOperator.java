@@ -1,6 +1,6 @@
 package org.cyclops.integratedtunnels.core;
 
-import net.minecraft.item.ItemBlock;
+import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
 import org.cyclops.commoncapabilities.api.ingredient.IngredientComponent;
 import org.cyclops.cyclopscore.helper.BlockHelpers;
@@ -34,7 +34,7 @@ public class IngredientPredicateBlockOperator extends IngredientPredicate<ItemSt
     @Override
     public boolean test(@Nullable ItemStack input) {
         ValueObjectTypeBlock.ValueBlock valueBlock = ValueObjectTypeBlock.ValueBlock.of(
-                input.getItem() instanceof ItemBlock ? BlockHelpers.getBlockStateFromItemStack(input) : null);
+                input.getItem() instanceof BlockItem ? BlockHelpers.getBlockStateFromItemStack(input) : null);
         try {
             IValue result = ValueHelpers.evaluateOperator(predicate, valueBlock);
             ValueHelpers.validatePredicateOutput(predicate, result);
@@ -43,7 +43,7 @@ public class IngredientPredicateBlockOperator extends IngredientPredicate<ItemSt
             PartHelpers.PartStateHolder<?, ?> partData = PartHelpers.getPart(partTarget.getCenter());
             if (partData != null) {
                 IPartStateWriter partState = (IPartStateWriter) partData.getState();
-                partState.addError(partState.getActiveAspect(), new L10NHelpers.UnlocalizedString(e.getMessage()));
+                partState.addError(partState.getActiveAspect(), e.getErrorMessage());
                 partState.setDeactivated(true);
             }
             return false;

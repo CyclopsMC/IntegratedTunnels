@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="utf-8"?>
+<section name="info_book.integratedtunnels.section.tutorials">
+    <section name="info_book.integratedtunnels.tutorials.introduction">
+        <paragraph>info_book.integratedtunnels.tutorials.introduction.text1</paragraph>
+    </section>
+
+    <section name="info_book.integratedtunnels.tutorials.interfaces">
+        <paragraph>info_book.integratedtunnels.tutorials.interfaces.text1</paragraph>
+        <appendix type="minecraft:crafting">integratedtunnels:crafting/part_interface_item</appendix>
+        <appendix type="minecraft:crafting">integratedtunnels:crafting/part_interface_fluid</appendix>
+        <appendix type="minecraft:crafting">integratedtunnels:crafting/part_interface_energy</appendix>
+        <appendix type="advancement_rewards" id="integratedtunnels:interfaces">
+            <advancements>
+                <advancement id="integratedtunnels:interfaces/interface_item" />
+                <advancement id="integratedtunnels:interfaces/interface_fluid" />
+                <advancement id="integratedtunnels:interfaces/interface_energy" />
+            </advancements>
+            <rewards>
+                <reward type="item" amount="2">integratedtunnels:part_interface_item</reward>
+                <reward type="item" amount="2">integratedtunnels:part_interface_fluid</reward>
+                <reward type="item" amount="2">integratedtunnels:part_interface_energy</reward>
+            </rewards>
+        </appendix>
+    </section>
+
+    <section name="info_book.integratedtunnels.tutorials.importer_exporter">
+        <paragraph>info_book.integratedtunnels.tutorials.importer_exporter.text1</paragraph>
+        <appendix type="minecraft:crafting">integratedtunnels:crafting/part_exporter_item</appendix>
+        <appendix type="minecraft:crafting">integratedtunnels:crafting/part_importer_item</appendix>
+        <appendix type="advancement_rewards" id="integratedtunnels:importer_exporter">
+            <advancements>
+                <advancement id="integratedtunnels:importer_exporter/exporter_item" />
+                <advancement id="integratedtunnels:importer_exporter/importer_item" />
+            </advancements>
+            <rewards>
+                <reward type="item" amount="2">integratedtunnels:part_exporter_item</reward>
+                <reward type="item" amount="2">integratedtunnels:part_importer_item</reward>
+            </rewards>
+        </appendix>
+    </section>
+
+    <section name="info_book.integratedtunnels.tutorials.import_all_items">
+        <paragraph>info_book.integratedtunnels.tutorials.import_all_items.text1</paragraph>
+        <appendix type="integrateddynamics:aspect">integratedtunnels:write_boolean_item_import</appendix>
+        <appendix type="advancement_rewards" id="integratedtunnels:import_all_items">
+            <advancements>
+                <advancement id="integratedtunnels:import_all_items/import_all_items" />
+            </advancements>
+            <rewards>
+                <reward type="item" amount="5">integratedtunnels:part_interface_item</reward>
+            </rewards>
+        </appendix>
+    </section>
+
+    <section name="info_book.integratedtunnels.tutorials.export_items_limit">
+        <paragraph>info_book.integratedtunnels.tutorials.export_items_limit.text1</paragraph>
+        <appendix type="minecraft:crafting">integrateddynamics:crafting/part_inventory_reader</appendix>
+        <appendix type="integrateddynamics:aspect">integrateddynamics:read_integer_inventory_count</appendix>
+        <appendix type="integrateddynamics:operator">integrateddynamics:relational_lt</appendix>
+        <appendix type="integrateddynamics:aspect">integratedtunnels:write_boolean_item_export</appendix>
+        <appendix type="advancement_rewards" id="integratedtunnels:export_items_limit">
+            <advancements>
+                <advancement id="integratedtunnels:export_items_limit/export_items_limit" />
+            </advancements>
+            <rewards>
+                <reward type="item" amount="5">integratedtunnels:part_interface_item</reward>
+            </rewards>
+        </appendix>
+    </section>
+
+    <section name="info_book.integratedtunnels.tutorials.import_items_list">
+        <paragraph>info_book.integratedtunnels.tutorials.import_items_list.text1</paragraph>
+        <appendix type="minecraft:crafting">integrateddynamics:crafting/part_inventory_reader</appendix>
+        <appendix type="integrateddynamics:aspect">integrateddynamics:read_list_inventory_itemstacks</appendix>
+        <appendix type="integrateddynamics:aspect">integratedtunnels:write_list_item_import</appendix>
+        <appendix type="advancement_rewards" id="integratedtunnels:import_items_list">
+            <advancements>
+                <advancement id="integratedtunnels:import_items_list/import_items_list" />
+            </advancements>
+            <rewards>
+                <reward type="item" amount="5">integratedtunnels:part_exporter_item</reward>
+            </rewards>
+        </appendix>
+    </section>
+
+    <section name="info_book.integratedtunnels.tutorials.export_enchantable_items">
+        <paragraph>info_book.integratedtunnels.tutorials.export_enchantable_items.text1</paragraph>
+        <appendix type="integrateddynamics:operator">integrateddynamics:itemstack_enchantable</appendix>
+        <appendix type="integrateddynamics:aspect">integratedtunnels:write_operator_item_import</appendix>
+        <appendix type="advancement_rewards" id="integratedtunnels:export_enchantable_items">
+            <advancements>
+                <advancement id="integratedtunnels:export_enchantable_items/export_enchantable_items" />
+            </advancements>
+            <rewards>
+                <reward type="item" amount="5">integratedtunnels:part_interface_item</reward>
+            </rewards>
+        </appendix>
+    </section>
+
+    <section name="info_book.integratedtunnels.tutorials.world_item_importer_exporter">
+        <paragraph>info_book.integratedtunnels.tutorials.world_item_importer_exporter.text1</paragraph>
+        <appendix type="minecraft:crafting">integratedtunnels:crafting/part_exporter_world_item</appendix>
+        <appendix type="minecraft:crafting">integratedtunnels:crafting/part_importer_world_item</appendix>
+        <appendix type="advancement_rewards" id="integratedtunnels:world_item_importer_exporter">
+            <advancements>
+                <advancement id="integratedtunnels:world_importer_exporter/exporter_item" />
+                <advancement id="integratedtunnels:world_importer_exporter/importer_item" />
+            </advancements>
+            <rewards>
+                <reward type="item" amount="2">integratedtunnels:part_exporter_world_item</reward>
+                <reward type="item" amount="2">integratedtunnels:part_importer_world_item</reward>
+            </rewards>
+        </appendix>
+    </section>
+
+    <section name="info_book.integratedtunnels.tutorials.drop_all_items">
+        <paragraph>info_book.integratedtunnels.tutorials.drop_all_items.text1</paragraph>
+        <appendix type="integrateddynamics:aspect">integratedtunnels:write_boolean_world_entityitem_export</appendix>
+        <appendix type="advancement_rewards" id="integratedtunnels:drop_all_items">
+            <advancements>
+                <advancement id="integratedtunnels:drop_all_items/drop_all_items" />
+            </advancements>
+            <rewards>
+                <reward type="item" amount="5">integratedtunnels:part_exporter_item</reward>
+            </rewards>
+        </appendix>
+    </section>
+
+    <section name="info_book.integratedtunnels.tutorials.pickup_items_limit">
+        <paragraph>info_book.integratedtunnels.tutorials.pickup_items_limit.text1</paragraph>
+        <appendix type="integrateddynamics:aspect">integratedtunnels:write_integer_world_entityitem_import</appendix>
+        <appendix type="advancement_rewards" id="integratedtunnels:pickup_items_limit">
+            <advancements>
+                <advancement id="integratedtunnels:pickup_items_limit/pickup_items_limit" />
+            </advancements>
+            <rewards>
+                <reward type="item" amount="5">integratedtunnels:part_importer_item</reward>
+            </rewards>
+        </appendix>
+    </section>
+
+    <section name="info_book.integratedtunnels.tutorials.world_block_importer_exporter">
+        <paragraph>info_book.integratedtunnels.tutorials.world_block_importer_exporter.text1</paragraph>
+        <appendix type="minecraft:crafting">integratedtunnels:crafting/part_exporter_world_block</appendix>
+        <appendix type="minecraft:crafting">integratedtunnels:crafting/part_importer_world_block</appendix>
+        <appendix type="advancement_rewards" id="integratedtunnels:world_block_importer_exporter">
+            <advancements>
+                <advancement id="integratedtunnels:world_importer_exporter/exporter_block" />
+                <advancement id="integratedtunnels:world_importer_exporter/importer_block" />
+            </advancements>
+            <rewards>
+                <reward type="item" amount="2">integratedtunnels:part_exporter_world_block</reward>
+                <reward type="item" amount="2">integratedtunnels:part_importer_world_block</reward>
+            </rewards>
+        </appendix>
+    </section>
+
+    <section name="info_book.integratedtunnels.tutorials.break_stone">
+        <paragraph>info_book.integratedtunnels.tutorials.break_stone.text1</paragraph>
+        <appendix type="integrateddynamics:aspect">integratedtunnels:write_block_world_block_block_import</appendix>
+        <appendix type="advancement_rewards" id="integratedtunnels:break_stone">
+            <advancements>
+                <advancement id="integratedtunnels:break_stone/break_stone" />
+            </advancements>
+            <rewards>
+                <reward type="item" amount="5">integratedtunnels:part_importer_world_block</reward>
+            </rewards>
+        </appendix>
+    </section>
+
+    <section name="info_book.integratedtunnels.tutorials.place_logwood">
+        <paragraph>info_book.integratedtunnels.tutorials.place_logwood.text1</paragraph>
+        <appendix type="integrateddynamics:operator">integrateddynamics:string_tag</appendix>
+        <appendix type="integrateddynamics:aspect">integratedtunnels:write_list_world_item_block_export</appendix>
+        <appendix type="advancement_rewards" id="integratedtunnels:place_logwood">
+            <advancements>
+                <advancement id="integratedtunnels:place_logwood/place_logwood" />
+            </advancements>
+            <rewards>
+                <reward type="item" amount="5">integratedtunnels:part_exporter_world_block</reward>
+            </rewards>
+        </appendix>
+    </section>
+
+    <section name="info_book.integratedtunnels.tutorials.click_sword">
+        <paragraph>info_book.integratedtunnels.tutorials.click_sword.text1</paragraph>
+        <appendix type="minecraft:crafting">integratedtunnels:crafting/part_player_simulator</appendix>
+        <appendix type="integrateddynamics:aspect">integratedtunnels:write_itemstack_player_click</appendix>
+        <appendix type="advancement_rewards" id="integratedtunnels:click_sword">
+            <advancements>
+                <advancement id="integratedtunnels:click_sword/player_simulator" />
+                <advancement id="integratedtunnels:click_sword/click_sword" />
+            </advancements>
+            <rewards>
+                <reward type="item" amount="5">integratedtunnels:part_player_simulator</reward>
+            </rewards>
+        </appendix>
+    </section>
+</section>

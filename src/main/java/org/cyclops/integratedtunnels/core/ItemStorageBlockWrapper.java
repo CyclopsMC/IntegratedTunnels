@@ -2,21 +2,24 @@ package org.cyclops.integratedtunnels.core;
 
 import com.google.common.collect.Lists;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.block.SoundType;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.BlockItem;
+import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.Direction;
+import net.minecraft.util.Hand;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldServer;
+import net.minecraft.world.server.ServerWorld;
+import net.minecraft.world.storage.loot.LootContext;
+import net.minecraft.world.storage.loot.LootParameters;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.event.world.BlockEvent;
 import org.cyclops.commoncapabilities.api.ingredient.IIngredientMatcher;
 import org.cyclops.commoncapabilities.api.ingredient.IngredientComponent;
@@ -30,9 +33,10 @@ import org.cyclops.integratedtunnels.api.world.IBlockBreakHandler;
 import org.cyclops.integratedtunnels.api.world.IBlockBreakHandlerRegistry;
 import org.cyclops.integratedtunnels.api.world.IBlockPlaceHandler;
 import org.cyclops.integratedtunnels.api.world.IBlockPlaceHandlerRegistry;
-import org.cyclops.integratedtunnels.core.helper.obfuscation.ObfuscationHelpers;
+import org.cyclops.integratedtunnels.item.ItemDummyPickAxe;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
@@ -44,10 +48,10 @@ import java.util.ListIterator;
 public class ItemStorageBlockWrapper implements IIngredientComponentStorage<ItemStack, Integer> {
 
     private final boolean writeOnly;
-    private final WorldServer world;
+    private final ServerWorld world;
     private final BlockPos pos;
-    private final EnumFacing side;
-    private final EnumHand hand;
+    private final Direction side;
+    private final Hand hand;
     private final boolean blockUpdate;
     private final int fortune;
     private final boolean silkTouch;
@@ -57,7 +61,7 @@ public class ItemStorageBlockWrapper implements IIngredientComponentStorage<Item
     private IBlockBreakHandler blockBreakHandler = null;
     private List<ItemStack> cachedDrops = null;
 
-    public ItemStorageBlockWrapper(boolean writeOnly, WorldServer world, BlockPos pos, EnumFacing side, EnumHand hand,
+    public ItemStorageBlockWrapper(boolean writeOnly, ServerWorld world, BlockPos pos, Direction side, Hand hand,
                                    boolean blockUpdate, int fortune, boolean silkTouch, boolean ignoreReplacable,
                                    boolean breakOnNoDrops) {
         this.writeOnly = writeOnly;
@@ -76,16 +80,16 @@ public class ItemStorageBlockWrapper implements IIngredientComponentStorage<Item
         world.neighborChanged(pos, Blocks.AIR, pos);
     }
 
-    protected IBlockBreakHandler getBlockBreakHandler(IBlockState blockState, World world, BlockPos pos, EntityPlayer player) {
+    protected IBlockBreakHandler getBlockBreakHandler(BlockState blockState, World world, BlockPos pos, PlayerEntity player) {
         return IntegratedTunnels._instance.getRegistryManager().getRegistry(IBlockBreakHandlerRegistry.class)
                 .getHandler(blockState, world, pos, player);
     }
 
-    protected void removeBlock(IBlockState blockState, EntityPlayer player) {
+    protected void removeBlock(BlockState blockState, PlayerEntity player) {
         if (blockBreakHandler != null) {
             blockBreakHandler.breakBlock(blockState, world, pos, player);
         } else {
-            blockState.getBlock().removedByPlayer(blockState, world, pos, player, false);
+            blockState.getBlock().removedByPlayer(blockState, world, pos, player, false, world.getFluidState(pos));
         }
         if (GeneralConfig.worldInteractionEvents) {
             world.playEvent(2001, pos, Block.getStateId(blockState)); // Particles + Sound
@@ -95,12 +99,23 @@ public class ItemStorageBlockWrapper implements IIngredientComponentStorage<Item
         }
     }
 
+    // Modified from Block#getDrops
+    public static List<ItemStack> getDrops(BlockState state, ServerWorld worldIn, BlockPos pos, @Nullable TileEntity tileEntityIn) {
+        LootContext.Builder lootcontext$builder = (new LootContext.Builder(worldIn))
+                .withRandom(worldIn.rand)
+                .withParameter(LootParameters.POSITION, pos)
+                .withParameter(LootParameters.TOOL, ItemStack.EMPTY)
+                .withParameter(LootParameters.TOOL, ItemStack.EMPTY)
+                .withNullableParameter(LootParameters.BLOCK_ENTITY, tileEntityIn);
+        return state.getDrops(lootcontext$builder);
+    }
+
     protected List<ItemStack> getItemStacks() {
         if (writeOnly) {
             if (!world.isAirBlock(pos)) {
-                boolean isDestReplaceable = world.getBlockState(pos).getBlock().isReplaceable(world, pos);
+                boolean isDestReplaceable = world.getBlockState(pos).isReplaceable(TunnelHelpers.createBlockItemUseContext(world, null, pos, side, hand));
                 if (!isDestReplaceable || !ignoreReplacable) {
-                    IBlockState blockState = world.getBlockState(pos);
+                    BlockState blockState = world.getBlockState(pos);
                     return Lists.newArrayList(BlockHelpers.getItemStackFromBlockState(blockState));
                 }
             }
@@ -109,9 +124,9 @@ public class ItemStorageBlockWrapper implements IIngredientComponentStorage<Item
                 return cachedDrops;
             }
             if (!world.isAirBlock(pos)) {
-                IBlockState blockState = world.getBlockState(pos);
+                BlockState blockState = world.getBlockState(pos);
 
-                EntityPlayer player = PlayerHelpers.getFakePlayer(world);
+                PlayerEntity player = PlayerHelpers.getFakePlayer(world);
                 PlayerHelpers.setPlayerState(player, hand, pos, 0, 0, 0, side, false);
 
                 blockBreakHandler = getBlockBreakHandler(blockState, world, pos, player);
@@ -120,16 +135,7 @@ public class ItemStorageBlockWrapper implements IIngredientComponentStorage<Item
                 } else {
                     BlockEvent.BreakEvent blockBreakEvent = new BlockEvent.BreakEvent(world, pos, blockState, player);
                     if (!MinecraftForge.EVENT_BUS.post(blockBreakEvent)) {
-                        boolean doSilkTouch = silkTouch && blockState.getBlock().canSilkHarvest(world, pos, blockState, player);
-                        List<ItemStack> drops;
-                        if (doSilkTouch) {
-                            drops = Lists.newArrayList(ObfuscationHelpers.getSilkTouchDrop(blockState));
-                        } else {
-                            // Create a mutable arraylist, because the given one may not be mutable.
-                            drops = Lists.newArrayList(blockState.getBlock().getDrops(world, pos, blockState, fortune));
-                        }
-                        float dropChance = ForgeEventFactory.fireBlockHarvesting(drops, world, pos, blockState, fortune,
-                                1, doSilkTouch, player);
+                        List<ItemStack> drops = Block.getDrops(blockState, world, pos, null, null, ItemDummyPickAxe.getItemStack(silkTouch, fortune));
                         if (drops.size() == 0) {
                             // Remove the block if it dropped nothing (and will drop nothing)
                             if (breakOnNoDrops) {
@@ -138,16 +144,9 @@ public class ItemStorageBlockWrapper implements IIngredientComponentStorage<Item
                             drops = Lists.newArrayList(ItemStack.EMPTY);
                         } else {
                             // Make sure there are no empty stacks in the list
-                            Iterator<ItemStack> it = drops.iterator();
-                            while (it.hasNext()) {
-                                if (it.next().isEmpty()) {
-                                    it.remove();
-                                }
-                            }
+                            drops.removeIf(ItemStack::isEmpty);
                         }
-                        if (world.rand.nextFloat() <= dropChance) {
-                            return cachedDrops = drops;
-                        }
+                        return cachedDrops = drops;
                     }
                 }
             }
@@ -155,8 +154,8 @@ public class ItemStorageBlockWrapper implements IIngredientComponentStorage<Item
         return Lists.newArrayList(ItemStack.EMPTY);
     }
 
-    protected IBlockPlaceHandler getBlockPlaceHandler(ItemStack itemStack, World world, BlockPos pos, EnumFacing side,
-                                                      float hitX, float hitY, float hitZ, EntityPlayer player) {
+    protected IBlockPlaceHandler getBlockPlaceHandler(ItemStack itemStack, World world, BlockPos pos, Direction side,
+                                                      float hitX, float hitY, float hitZ, PlayerEntity player) {
         return IntegratedTunnels._instance.getRegistryManager().getRegistry(IBlockPlaceHandlerRegistry.class)
                 .getHandler(itemStack, world, pos, side, hitX, hitY, hitZ, player);
     }
@@ -164,10 +163,10 @@ public class ItemStorageBlockWrapper implements IIngredientComponentStorage<Item
     protected ItemStack setItemStack(ItemStack itemStack, boolean simulate) {
         if (!itemStack.isEmpty() && itemStack.getCount() == 1) {
             Item item = itemStack.getItem();
-            if (item instanceof ItemBlock) {
-                ItemBlock itemBlock = (ItemBlock) item;
+            if (item instanceof BlockItem) {
+                BlockItem itemBlock = (BlockItem) item;
 
-                EntityPlayer player = PlayerHelpers.getFakePlayer(world);
+                PlayerEntity player = PlayerHelpers.getFakePlayer(world);
                 PlayerHelpers.setPlayerState(player, hand, pos, 0, 0, 0, side, false);
 
                 IBlockPlaceHandler blockPlaceHandler = getBlockPlaceHandler(itemStack, world, pos, side.getOpposite(),
@@ -175,11 +174,9 @@ public class ItemStorageBlockWrapper implements IIngredientComponentStorage<Item
                 if (blockPlaceHandler != null) {
                     blockPlaceHandler.placeBlock(itemStack, world, pos, side.getOpposite(), 0, 0, 0, player);
                 } else {
-                    IBlockState blockState = itemBlock.getBlock().getStateForPlacement(world, pos, side.getOpposite(),
-                            0, 0, 0, itemStack.getMetadata(), player, hand);
-                    if (world.mayPlace(itemBlock.getBlock(), pos, false, side.getOpposite(), null)
-                            && (simulate || itemBlock
-                            .placeBlockAt(itemStack, player, world, pos, side.getOpposite(), 0, 0, 0, blockState))) {
+                    BlockItemUseContext blockItemUseContext = TunnelHelpers.createBlockItemUseContext(world, player, pos, side.getOpposite(), hand);
+                    BlockState blockState = itemBlock.getBlock().getStateForPlacement(blockItemUseContext);
+                    if (blockState != null && (simulate || itemBlock.placeBlock(blockItemUseContext, blockState))) {
                         if (!simulate) {
                             itemBlock.getBlock().onBlockPlacedBy(world, pos, blockState, player, itemStack);
                             if (GeneralConfig.worldInteractionEvents) {
@@ -233,7 +230,7 @@ public class ItemStorageBlockWrapper implements IIngredientComponentStorage<Item
         }
 
         ItemStack remaining = stack.copy();
-        if (!setItemStack(remaining.splitStack(1), simulate).isEmpty()) {
+        if (!setItemStack(remaining.split(1), simulate).isEmpty()) {
             return stack;
         }
 
@@ -249,8 +246,8 @@ public class ItemStorageBlockWrapper implements IIngredientComponentStorage<Item
             }
         }
         if (allEmpty) {
-            IBlockState blockState = world.getBlockState(pos);
-            EntityPlayer player = PlayerHelpers.getFakePlayer(world);
+            BlockState blockState = world.getBlockState(pos);
+            PlayerEntity player = PlayerHelpers.getFakePlayer(world);
             player.setActiveHand(hand);
             removeBlock(blockState, player);
         }
@@ -272,7 +269,7 @@ public class ItemStorageBlockWrapper implements IIngredientComponentStorage<Item
             if (matcher.matches(prototype, itemStack, subMatchCondition)
                     && (!matcher.hasCondition(matchCondition, quantityFlag) || itemStack.getCount() >= prototype.getCount())) {
                 itemStack = itemStack.copy();
-                ItemStack ret = itemStack.splitStack(Helpers.castSafe(prototype.getCount()));
+                ItemStack ret = itemStack.split(Helpers.castSafe(prototype.getCount()));
                 if (!simulate) {
                     if (itemStack.isEmpty()) {
                         it.remove();
@@ -301,7 +298,7 @@ public class ItemStorageBlockWrapper implements IIngredientComponentStorage<Item
         }
         ItemStack itemStack = itemStacks.get(0);
         itemStack = itemStack.copy();
-        ItemStack ret = itemStack.splitStack(Helpers.castSafe(maxQuantity));
+        ItemStack ret = itemStack.split(Helpers.castSafe(maxQuantity));
         if (!simulate) {
             if (itemStack.isEmpty()) {
                 itemStacks.remove(0);

@@ -27,7 +27,7 @@ public class FluidTargetStorage extends ChanneledTarget<IFluidNetwork> implement
                               IIngredientComponentStorage<FluidStack, Integer> storage,
                               IngredientPredicate<FluidStack, Integer> fluidStackMatcher, PartTarget partTarget,
                               IAspectProperties properties, @Nullable PartStateRoundRobin<?> partState) {
-        super(network, network.getCapability(FluidNetworkConfig.CAPABILITY), partState,
+        super(network, network.getCapability(FluidNetworkConfig.CAPABILITY).orElse(null), partState,
                 properties.getValue(TunnelAspectWriteBuilders.PROP_CHANNEL).getRawValue(),
                 properties.getValue(TunnelAspectWriteBuilders.PROP_ROUNDROBIN).getRawValue(),
                 properties.getValue(TunnelAspectWriteBuilders.PROP_CRAFT).getRawValue());

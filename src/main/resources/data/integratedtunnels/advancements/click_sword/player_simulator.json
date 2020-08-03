@@ -1,0 +1,26 @@
+{
+  "display": {
+    "icon": {
+      "item": "integratedtunnels:part_player_simulator"
+    },
+    "title": {
+      "translate": "advancement.integratedtunnels.player_simulator"
+    },
+    "description": {
+      "translate": "advancement.integratedtunnels.player_simulator.desc"
+    }
+  },
+  "parent": "integratedtunnels:interfaces/interface_item",
+  "criteria": {
+    "criteria_0": {
+      "trigger": "cyclopscore:item_crafted",
+      "conditions": {
+        "items": [
+          {
+            "item": "integratedtunnels:part_player_simulator"
+          }
+        ]
+      }
+    }
+  }
+}

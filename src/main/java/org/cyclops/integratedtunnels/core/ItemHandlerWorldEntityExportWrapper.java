@@ -1,22 +1,22 @@
 package org.cyclops.integratedtunnels.core;
 
 import com.google.common.collect.Iterators;
-import net.minecraft.block.BlockDispenser;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.dispenser.BehaviorDefaultDispenseItem;
-import net.minecraft.dispenser.IBehaviorDispenseItem;
+import net.minecraft.block.Blocks;
+import net.minecraft.block.DispenserBlock;
+import net.minecraft.block.BlockState;
+import net.minecraft.dispenser.DefaultDispenseItemBehavior;
+import net.minecraft.dispenser.IDispenseItemBehavior;
 import net.minecraft.dispenser.IBlockSource;
-import net.minecraft.entity.item.EntityItem;
-import net.minecraft.init.Blocks;
+import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntityDispenser;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.tileentity.DispenserTileEntity;
+import net.minecraft.util.Direction;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldServer;
-import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraft.world.server.ServerWorld;
 import org.cyclops.commoncapabilities.api.ingredient.IngredientComponent;
 import org.cyclops.commoncapabilities.api.ingredient.storage.IIngredientComponentStorage;
 import org.cyclops.integratedtunnels.GeneralConfig;
@@ -30,14 +30,14 @@ import java.util.Iterator;
  */
 public class ItemHandlerWorldEntityExportWrapper implements IIngredientComponentStorage<ItemStack, Integer>, IBlockSource {
 
-    private final WorldServer world;
+    private final ServerWorld world;
     private final BlockPos pos;
     private final double offsetX;
     private final double offsetY;
     private final double offsetZ;
     private final int lifespan;
     private final int delayBeforePickup;
-    private final EnumFacing facing;
+    private final Direction facing;
     private final double velocity;
     private final float yawOffset;
     private final float pitchOffset;
@@ -45,12 +45,12 @@ public class ItemHandlerWorldEntityExportWrapper implements IIngredientComponent
 
     private final IIngredientComponentStorage<ItemStack, Integer> dispenseResultHandler;
 
-    private static final BehaviorDefaultDispenseItem DISPENSE_ITEM_DIRECTLY = new BehaviorDefaultDispenseItem();
+    private static final DefaultDispenseItemBehavior DISPENSE_ITEM_DIRECTLY = new DefaultDispenseItemBehavior();
 
-    public ItemHandlerWorldEntityExportWrapper(WorldServer world, BlockPos pos,
+    public ItemHandlerWorldEntityExportWrapper(ServerWorld world, BlockPos pos,
                                                double offsetX, double offsetY, double offsetZ,
                                                int lifespan, int delayBeforePickup,
-                                               EnumFacing facing, double velocity,
+                                               Direction facing, double velocity,
                                                double yawOffset, double pitchOffset,
                                                boolean dispense, IIngredientComponentStorage<ItemStack, Integer> dispenseResultHandler) {
         this.world = world;
@@ -68,7 +68,7 @@ public class ItemHandlerWorldEntityExportWrapper implements IIngredientComponent
         this.dispenseResultHandler = dispenseResultHandler;
     }
 
-    protected void setThrowableHeading(EntityItem entity, double x, double y, double z, double velocity) {
+    protected void setThrowableHeading(ItemEntity entity, double x, double y, double z, double velocity) {
         float f = MathHelper.sqrt(x * x + y * y + z * z);
         x = x / (double)f;
         y = y / (double)f;
@@ -76,9 +76,7 @@ public class ItemHandlerWorldEntityExportWrapper implements IIngredientComponent
         x = x * velocity;
         y = y * velocity;
         z = z * velocity;
-        entity.motionX = x;
-        entity.motionY = y;
-        entity.motionZ = z;
+        entity.setMotion(new Vec3d(x, y, z));
         float f1 = MathHelper.sqrt(x * x + z * z);
         entity.rotationYaw = (float)(MathHelper.atan2(x, z) * (180D / Math.PI));
         entity.rotationPitch = (float)(MathHelper.atan2(y, (double)f1) * (180D / Math.PI));
@@ -115,20 +113,20 @@ public class ItemHandlerWorldEntityExportWrapper implements IIngredientComponent
     }
 
     @Override
-    public IBlockState getBlockState() {
+    public BlockState getBlockState() {
         return Blocks.DISPENSER.getDefaultState()
-                .withProperty(BlockDispenser.TRIGGERED, false)
-                .withProperty(BlockDispenser.FACING, this.facing);
+                .with(DispenserBlock.TRIGGERED, false)
+                .with(DispenserBlock.FACING, this.facing);
     }
 
     @Override
-    public TileEntityDispenser getBlockTileEntity() {
+    public DispenserTileEntity getBlockTileEntity() {
         return new SimulatedTileEntityDispenser(dispenseResultHandler, this);
     }
 
     @Override
     public World getWorld() {
-        return FMLCommonHandler.instance().getMinecraftServerInstance().getEntityWorld();
+        return world;
     }
 
     @Override
@@ -155,8 +153,8 @@ public class ItemHandlerWorldEntityExportWrapper implements IIngredientComponent
     public ItemStack insert(@Nonnull ItemStack stack, boolean simulate) {
         if (!simulate) {
             if (this.dispense) {
-                IBehaviorDispenseItem behaviorDispenseItem = BlockDispenser.DISPENSE_BEHAVIOR_REGISTRY.getObject(stack.getItem());
-                if (behaviorDispenseItem.getClass() != BehaviorDefaultDispenseItem.class) {
+                IDispenseItemBehavior behaviorDispenseItem = DispenserBlock.DISPENSE_BEHAVIOR_REGISTRY.get(stack.getItem());
+                if (behaviorDispenseItem.getClass() != DefaultDispenseItemBehavior.class) {
                     ItemStack result = behaviorDispenseItem.dispense(this, stack.copy());
                     if (!result.isEmpty()) {
                         handleDispenseResult(this.dispenseResultHandler, this, result);
@@ -164,17 +162,17 @@ public class ItemHandlerWorldEntityExportWrapper implements IIngredientComponent
                     return ItemStack.EMPTY;
                 }
             }
-            EntityItem entity = new EntityItem(world, pos.getX() + offsetX, pos.getY() + offsetY, pos.getZ() + offsetZ, stack.copy());
+            ItemEntity entity = new ItemEntity(world, pos.getX() + offsetX, pos.getY() + offsetY, pos.getZ() + offsetZ, stack.copy());
             entity.lifespan = lifespan <= 0 ? stack.getItem().getEntityLifespan(stack, world) : lifespan;
             float yaw = facing.getHorizontalAngle() + yawOffset;
-            float pitch = (facing == EnumFacing.UP ? -90F : (facing == EnumFacing.DOWN ? 90F : 0)) - pitchOffset;
+            float pitch = (facing == Direction.UP ? -90F : (facing == Direction.DOWN ? 90F : 0)) - pitchOffset;
             this.setThrowableHeading(entity,
                     -MathHelper.sin(yaw * 0.017453292F) * MathHelper.cos(pitch * 0.017453292F),
                     -MathHelper.sin((pitch) * 0.017453292F),
                     MathHelper.cos(yaw * 0.017453292F) * MathHelper.cos(pitch * 0.017453292F),
                     this.velocity);
             entity.setPickupDelay(delayBeforePickup);
-            world.spawnEntity(entity);
+            world.addEntity(entity);
 
             if (GeneralConfig.worldInteractionEvents) {
                 world.playEvent(1000, pos, 0); // Sound
@@ -182,7 +180,7 @@ public class ItemHandlerWorldEntityExportWrapper implements IIngredientComponent
             }
         } else if (this.dispense) {
             stack = stack.copy();
-            stack.splitStack(1);
+            stack.split(1);
             return stack;
         }
         return ItemStack.EMPTY;
@@ -198,7 +196,7 @@ public class ItemHandlerWorldEntityExportWrapper implements IIngredientComponent
         return ItemStack.EMPTY;
     }
 
-    protected static class SimulatedTileEntityDispenser extends TileEntityDispenser {
+    protected static class SimulatedTileEntityDispenser extends DispenserTileEntity {
 
         private final IIngredientComponentStorage<ItemStack, Integer> dispenseResultHandler;
         private final IBlockSource blockSource;

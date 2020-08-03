@@ -1,7 +1,7 @@
 package org.cyclops.integratedtunnels.api.world;
 
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.block.BlockState;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
@@ -21,7 +21,7 @@ public interface IBlockBreakHandler {
      * @param player The breaking player.
      * @return If this can handle the given block state.
      */
-    public boolean shouldApply(IBlockState blockState, World world, BlockPos pos, EntityPlayer player);
+    public boolean shouldApply(BlockState blockState, World world, BlockPos pos, PlayerEntity player);
 
     /**
      * Get the dropping items of the given block.
@@ -31,7 +31,7 @@ public interface IBlockBreakHandler {
      * @param player The breaking player.
      * @return A list of itemstacks where each element must be removable.
      */
-    public NonNullList<ItemStack> getDrops(IBlockState blockState, World world, BlockPos pos, EntityPlayer player);
+    public NonNullList<ItemStack> getDrops(BlockState blockState, World world, BlockPos pos, PlayerEntity player);
 
     /**
      * Break the given block.
@@ -40,6 +40,6 @@ public interface IBlockBreakHandler {
      * @param pos The block position.
      * @param player The breaking player.
      */
-    public void breakBlock(IBlockState blockState, World world, BlockPos pos, EntityPlayer player);
+    public void breakBlock(BlockState blockState, World world, BlockPos pos, PlayerEntity player);
 
 }

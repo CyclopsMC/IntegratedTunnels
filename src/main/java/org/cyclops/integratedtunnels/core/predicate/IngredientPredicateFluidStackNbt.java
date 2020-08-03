@@ -1,12 +1,13 @@
 package org.cyclops.integratedtunnels.core.predicate;
 
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.INBT;
 import net.minecraftforge.fluids.FluidStack;
 import org.cyclops.commoncapabilities.api.ingredient.IngredientComponent;
 import org.cyclops.integrateddynamics.core.helper.NbtHelpers;
-import org.cyclops.integratedtunnels.core.predicate.IngredientPredicate;
 
 import javax.annotation.Nullable;
+import java.util.Optional;
 
 /**
  * @author rubensworks
@@ -15,28 +16,28 @@ public class IngredientPredicateFluidStackNbt extends IngredientPredicate<FluidS
     private final boolean blacklist;
     private final boolean requireNbt;
     private final boolean subset;
-    private final NBTTagCompound tag;
+    private final Optional<CompoundNBT> tag;
     private final boolean recursive;
     private final boolean superset;
 
-    public IngredientPredicateFluidStackNbt(boolean blacklist, int amount, boolean exactAmount, boolean requireNbt, boolean subset, NBTTagCompound tag, boolean recursive, boolean superset) {
+    public IngredientPredicateFluidStackNbt(boolean blacklist, int amount, boolean exactAmount, boolean requireNbt, boolean subset, Optional<INBT> tag, boolean recursive, boolean superset) {
         super(IngredientComponent.FLUIDSTACK, blacklist, false, amount, exactAmount);
         this.blacklist = blacklist;
         this.requireNbt = requireNbt;
         this.subset = subset;
-        this.tag = tag;
+        this.tag = tag.filter(t -> t instanceof CompoundNBT).map(t -> (CompoundNBT) t);
         this.recursive = recursive;
         this.superset = superset;
     }
 
     @Override
     public boolean test(@Nullable FluidStack input) {
-        if (input.tag != null && requireNbt) {
+        if (input.hasTag() && requireNbt) {
             return isBlacklist();
         }
-        NBTTagCompound itemTag = input.tag != null ? input.tag : new NBTTagCompound();
-        boolean ret = (!subset || NbtHelpers.nbtMatchesSubset(tag, itemTag, recursive))
-                && (!superset || NbtHelpers.nbtMatchesSubset(itemTag, tag, recursive));
+        CompoundNBT itemTag = input.hasTag() ? input.getTag() : new CompoundNBT();
+        boolean ret = (!subset || tag.map(t -> NbtHelpers.nbtMatchesSubset(t, itemTag, recursive)).orElse(false)
+                && (!superset || tag.map(t -> NbtHelpers.nbtMatchesSubset(itemTag, t, recursive)).orElse(false)));
         if (blacklist) {
             ret = !ret;
         }

@@ -1,26 +1,28 @@
 package org.cyclops.integratedtunnels.core;
 
 import com.google.common.collect.Iterators;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.ItemUseContext;
 import net.minecraft.util.ActionResult;
-import net.minecraft.util.EnumActionResult;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
+import net.minecraft.util.ActionResultType;
+import net.minecraft.util.Direction;
+import net.minecraft.util.Hand;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.WorldServer;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.event.ForgeEventFactory;
 import org.cyclops.commoncapabilities.api.ingredient.IngredientComponent;
 import org.cyclops.commoncapabilities.api.ingredient.storage.IIngredientComponentStorage;
 import org.cyclops.cyclopscore.helper.ItemStackHelpers;
 import org.cyclops.cyclopscore.inventory.PlayerInventoryIterator;
-import org.cyclops.integratedtunnels.core.helper.obfuscation.ObfuscationHelpers;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -37,21 +39,21 @@ public class ItemStoragePlayerWrapper implements IIngredientComponentStorage<Ite
     private static final Predicate<Entity> CAN_BE_ATTACKED = Entity::canBeAttackedWithItem;
 
     private final ExtendedFakePlayer player;
-    private final WorldServer world;
+    private final ServerWorld world;
     private final BlockPos pos;
-    private final float offsetX;
-    private final float offsetY;
-    private final float offsetZ;
-    private final EnumFacing side;
-    private final EnumHand hand;
+    private final double offsetX;
+    private final double offsetY;
+    private final double offsetZ;
+    private final Direction side;
+    private final Hand hand;
     private final boolean rightClick;
     private final boolean sneaking;
     private final boolean continuousClick;
     private final int entityIndex;
     private final IIngredientComponentStorage<ItemStack, Integer> playerReturnHandler;
 
-    public ItemStoragePlayerWrapper(@Nullable ExtendedFakePlayer player, WorldServer world, BlockPos pos,
-                                    double offsetX, double offsetY, double offsetZ, EnumFacing side, EnumHand hand,
+    public ItemStoragePlayerWrapper(@Nullable ExtendedFakePlayer player, ServerWorld world, BlockPos pos,
+                                    double offsetX, double offsetY, double offsetZ, Direction side, Hand hand,
                                     boolean rightClick, boolean sneaking, boolean continuousClick, int entityIndex,
                                     IIngredientComponentStorage<ItemStack, Integer> playerReturnHandler) {
         this.player = player;
@@ -59,9 +61,9 @@ public class ItemStoragePlayerWrapper implements IIngredientComponentStorage<Ite
         this.pos = pos;
         this.continuousClick = continuousClick;
         this.entityIndex = entityIndex;
-        this.offsetX = (float) offsetX;
-        this.offsetY = (float) offsetY;
-        this.offsetZ = (float) offsetZ;
+        this.offsetX = offsetX;
+        this.offsetY = offsetY;
+        this.offsetZ = offsetZ;
         this.side = side;
         this.hand = hand;
         this.rightClick = rightClick;
@@ -69,9 +71,9 @@ public class ItemStoragePlayerWrapper implements IIngredientComponentStorage<Ite
         this.playerReturnHandler = playerReturnHandler;
     }
 
-    public static void cancelDestroyingBlock(EntityPlayerMP player) {
-        player.interactionManager.cancelDestroyingBlock();
-        ObfuscationHelpers.setDurabilityRemaining(player.interactionManager, -1);
+    public static void cancelDestroyingBlock(ServerPlayerEntity player) {
+        player.interactionManager.isDestroyingBlock = false;
+        player.interactionManager.durabilityRemainingOnBlock = -1;
     }
 
     protected Entity getEntity(List<Entity> entities) {
@@ -81,7 +83,7 @@ public class ItemStoragePlayerWrapper implements IIngredientComponentStorage<Ite
         return entities.get(Math.min(this.entityIndex, entities.size() - 1));
     }
 
-    private void returnPlayerInventory(EntityPlayer player) {
+    private void returnPlayerInventory(PlayerEntity player) {
         PlayerInventoryIterator it = new PlayerInventoryIterator(player);
         while (it.hasNext()) {
             ItemStack itemStack = it.next();
@@ -132,12 +134,13 @@ public class ItemStoragePlayerWrapper implements IIngredientComponentStorage<Ite
 
         if (rightClick) {
             // Use item first
+            BlockRayTraceResult blockRayTraceResult = new BlockRayTraceResult(new Vec3d(offsetX, offsetY, offsetZ), side, pos, false);
             if (!stack.isEmpty()) {
-                EnumActionResult actionResult = stack.getItem().onItemUseFirst(player, world, pos, side,
-                        offsetX, offsetY, offsetZ, hand);
-                if (actionResult == EnumActionResult.FAIL) {
+                ItemUseContext itemUseContext = new ItemUseContext(player, hand, blockRayTraceResult);
+                ActionResultType actionResult = stack.getItem().onItemUseFirst(stack, itemUseContext);
+                if (actionResult == ActionResultType.FAIL) {
                     return stack;
-                } else if (actionResult == EnumActionResult.SUCCESS) {
+                } else if (actionResult == ActionResultType.SUCCESS) {
                     returnPlayerInventory(player);
                     return ItemStack.EMPTY;
                 }
@@ -145,10 +148,9 @@ public class ItemStoragePlayerWrapper implements IIngredientComponentStorage<Ite
             }
 
             // Activate block
-            IBlockState blockState = world.getBlockState(pos);
-            if (!player.isSneaking() || stack.isEmpty()) {
-                if (blockState.getBlock().onBlockActivated(world, pos, blockState, player, hand, side,
-                        offsetX, offsetY, offsetZ)) {
+            BlockState blockState = world.getBlockState(pos);
+            if (!player.isCrouching() || stack.isEmpty()) {
+                if (blockState.onBlockActivated(world, player, hand, blockRayTraceResult).isSuccess()) {
                     returnPlayerInventory(player);
                     return ItemStack.EMPTY;
                 }
@@ -156,11 +158,11 @@ public class ItemStoragePlayerWrapper implements IIngredientComponentStorage<Ite
 
             // Use itemstack
             if (!stack.isEmpty()) {
-                EnumActionResult cancelResult = ForgeHooks.onItemRightClick(player, hand);
+                ActionResultType cancelResult = ForgeHooks.onItemRightClick(player, hand);
                 if (cancelResult != null)  {
-                    if (cancelResult == EnumActionResult.FAIL) {
+                    if (cancelResult == ActionResultType.FAIL) {
                         return stack;
-                    } else if (cancelResult == EnumActionResult.SUCCESS) {
+                    } else if (cancelResult == ActionResultType.SUCCESS) {
                         returnPlayerInventory(player);
                         return ItemStack.EMPTY;
                     }
@@ -168,7 +170,7 @@ public class ItemStoragePlayerWrapper implements IIngredientComponentStorage<Ite
                 } else {
                     ItemStack copyBeforeUse = stack.copy();
                     ActionResult<ItemStack> actionresult = stack.useItemRightClick(world, player, hand);
-                    if (actionresult.getType() == EnumActionResult.FAIL) {
+                    if (actionresult.getType() == ActionResultType.FAIL) {
                         return stack;
                     }
                     if (actionresult.getResult().isEmpty()) {
@@ -177,7 +179,7 @@ public class ItemStoragePlayerWrapper implements IIngredientComponentStorage<Ite
                     } else {
                         PlayerHelpers.setHeldItemSilent(player, hand, actionresult.getResult());
                     }
-                    if (actionresult.getType() == EnumActionResult.SUCCESS) {
+                    if (actionresult.getType() == ActionResultType.SUCCESS) {
                         // If the hand was activated, simulate the activated hand for a number of ticks, and deactivate.
                         if (player.isHandActive()) {
                             player.updateActiveHandSimulated();
@@ -193,17 +195,18 @@ public class ItemStoragePlayerWrapper implements IIngredientComponentStorage<Ite
             if (!stack.isEmpty()) {
                 // Increase reach position.
                 BlockPos targetPos = pos;
-                int reachDistance = MathHelper.clamp((int) player.interactionManager.getBlockReachDistance(), 0, 10);
+                double reachDistance = player.getAttribute(net.minecraft.entity.player.PlayerEntity.REACH_DISTANCE).getValue() + 3;
                 int i = 0;
                 while (i++ < reachDistance && world.isAirBlock(targetPos)) {
                     targetPos = targetPos.offset(side.getOpposite());
                 }
 
-                EnumActionResult actionResult = stack.getItem().onItemUse(player, world, targetPos, hand, side,
-                        offsetX, offsetY, offsetZ);
-                if (actionResult == EnumActionResult.FAIL) {
+                ItemUseContext itemUseContextReach = new ItemUseContext(player, hand,
+                        new BlockRayTraceResult(new Vec3d(offsetX, offsetY, offsetZ), side, targetPos, false));
+                ActionResultType actionResult = stack.onItemUse(itemUseContextReach);
+                if (actionResult == ActionResultType.FAIL) {
                     return stack;
-                } else if (actionResult == EnumActionResult.SUCCESS) {
+                } else if (actionResult == ActionResultType.SUCCESS) {
                     returnPlayerInventory(player);
                     return ItemStack.EMPTY;
                 }
@@ -214,10 +217,10 @@ public class ItemStoragePlayerWrapper implements IIngredientComponentStorage<Ite
             List<Entity> entities = world.getEntitiesWithinAABB(Entity.class, new AxisAlignedBB(pos));
             if (entities.size() > 0) {
                 Entity entity = getEntity(entities);
-                EnumActionResult actionResult = player.interactOn(entity, hand);
-                if (actionResult == EnumActionResult.FAIL) {
+                ActionResultType actionResult = player.interactOn(entity, hand);
+                if (actionResult == ActionResultType.FAIL) {
                     return stack;
-                } else if (actionResult == EnumActionResult.SUCCESS) {
+                } else if (actionResult == ActionResultType.SUCCESS) {
                     returnPlayerInventory(player);
                     return ItemStack.EMPTY;
                 }
@@ -227,14 +230,14 @@ public class ItemStoragePlayerWrapper implements IIngredientComponentStorage<Ite
         } else {
             if (!world.isAirBlock(pos)) {
                 // Break block
-                int durabilityRemaining = ObfuscationHelpers.getDurabilityRemaining(player.interactionManager);
+                int durabilityRemaining = player.interactionManager.durabilityRemainingOnBlock;
                 if (durabilityRemaining < 0) {
-                    player.interactionManager.onBlockClicked(pos, side);
+                    world.getBlockState(pos).onBlockClicked(world, pos, player);
                 } else if (durabilityRemaining >= 9) {
                     player.interactionManager.tryHarvestBlock(pos);
                     cancelDestroyingBlock(player);
                 } else {
-                    player.interactionManager.updateBlockRemoving();
+                    player.interactionManager.tick();
                 }
                 returnPlayerInventory(player);
                 return ItemStack.EMPTY;

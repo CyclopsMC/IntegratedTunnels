@@ -28,7 +28,7 @@ public class ItemTargetStorage extends ChanneledTarget<IItemNetwork> implements 
                              IIngredientComponentStorage<ItemStack, Integer> storage, int slot,
                              IngredientPredicate<ItemStack, Integer> itemStackMatcher, PartTarget partTarget,
                              IAspectProperties properties, @Nullable PartStateRoundRobin<?> partState) {
-        super(network, network.getCapability(ItemNetworkConfig.CAPABILITY), partState,
+        super(network, network.getCapability(ItemNetworkConfig.CAPABILITY).orElse(null), partState,
                 properties.getValue(TunnelAspectWriteBuilders.PROP_CHANNEL).getRawValue(),
                 properties.getValue(TunnelAspectWriteBuilders.PROP_ROUNDROBIN).getRawValue(),
                 properties.getValue(TunnelAspectWriteBuilders.PROP_CRAFT).getRawValue());

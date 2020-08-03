@@ -2,7 +2,6 @@ package org.cyclops.integratedtunnels.core.predicate;
 
 import net.minecraft.item.ItemStack;
 import org.cyclops.commoncapabilities.api.ingredient.IngredientComponent;
-import org.cyclops.cyclopscore.helper.L10NHelpers;
 import org.cyclops.integrateddynamics.api.evaluate.EvaluationException;
 import org.cyclops.integrateddynamics.api.evaluate.operator.IOperator;
 import org.cyclops.integrateddynamics.api.evaluate.variable.IValue;
@@ -39,7 +38,7 @@ public class IngredientPredicateItemStackOperator extends IngredientPredicate<It
             PartHelpers.PartStateHolder<?, ?> partData = PartHelpers.getPart(partTarget.getCenter());
             if (partData != null) {
                 IPartStateWriter partState = (IPartStateWriter) partData.getState();
-                partState.addError(partState.getActiveAspect(), new L10NHelpers.UnlocalizedString(e.getMessage()));
+                partState.addError(partState.getActiveAspect(), e.getErrorMessage());
                 partState.setDeactivated(true);
             }
             return false;

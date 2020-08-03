@@ -7,6 +7,8 @@ import org.cyclops.integrateddynamics.api.part.write.IPartTypeWriter;
 import org.cyclops.integratedtunnels.api.network.IItemNetwork;
 import org.cyclops.integratedtunnels.core.part.PartStatePositionedAddon;
 
+import javax.annotation.Nonnull;
+
 /**
  * A part state for handling item import and export.
  * It also acts as an item capability that can be added to itself.
@@ -45,5 +47,10 @@ public class PartStateItem<P extends IPartTypeWriter> extends PartStatePositione
     @Override
     public int getSlotLimit(int slot) {
         return getPositionedAddonsNetwork() != null ? getItemHandler().getSlotLimit(slot) : 0;
+    }
+
+    @Override
+    public boolean isItemValid(int slot, @Nonnull ItemStack stack) {
+        return getPositionedAddonsNetwork() != null && getItemHandler().isItemValid(slot, stack);
     }
 }

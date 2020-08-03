@@ -1,12 +1,16 @@
 package org.cyclops.integratedtunnels.core.part;
 
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.inventory.IInventory;
+import net.minecraft.network.PacketBuffer;
 import org.cyclops.cyclopscore.helper.ValueNotifierHelpers;
 import org.cyclops.integrateddynamics.api.part.IPartContainer;
 import org.cyclops.integrateddynamics.api.part.IPartType;
 import org.cyclops.integrateddynamics.api.part.PartTarget;
 import org.cyclops.integrateddynamics.core.inventory.container.ContainerPartSettings;
+import org.cyclops.integratedtunnels.RegistryEntries;
+
+import java.util.Optional;
 
 /**
  * @author rubensworks
@@ -15,8 +19,14 @@ public class ContainerInterfaceSettings extends ContainerPartSettings {
 
     private final int lastChannelInterfaceValueId;
 
-    public ContainerInterfaceSettings(EntityPlayer player, PartTarget target, IPartContainer partContainer, IPartType partType) {
-        super(player, target, partContainer, partType);
+    public ContainerInterfaceSettings(int id, PlayerInventory playerInventory, PacketBuffer packetBuffer) {
+        super(id, playerInventory, packetBuffer);
+        lastChannelInterfaceValueId = getNextValueId();
+    }
+
+    public ContainerInterfaceSettings(int id, PlayerInventory playerInventory, IInventory inventory,
+                                      PartTarget target, Optional<IPartContainer> partContainer, IPartType partType) {
+        super(RegistryEntries.CONTAINER_INTERFACE_SETTINGS, id, playerInventory, inventory, target, partContainer, partType);
         lastChannelInterfaceValueId = getNextValueId();
     }
 

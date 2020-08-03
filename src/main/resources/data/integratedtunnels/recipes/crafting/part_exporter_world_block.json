@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "item": "integratedtunnels:part_exporter_item"
+    },
+    {
+      "item": "integrateddynamics:logic_director"
+    },
+    {
+      "item": "minecraft:diamond_pickaxe"
+    }
+  ],
+  "result": {
+    "item": "integratedtunnels:part_exporter_world_block"
+  }
+}

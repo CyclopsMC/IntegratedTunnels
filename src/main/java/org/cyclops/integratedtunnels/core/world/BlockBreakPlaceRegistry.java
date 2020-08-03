@@ -4,10 +4,10 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
 import com.google.common.collect.Sets;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.cyclops.integratedtunnels.api.world.IBlockPlaceHandler;
@@ -56,8 +56,8 @@ public class BlockBreakPlaceRegistry implements IBlockPlaceHandlerRegistry {
 
     @Nullable
     @Override
-    public IBlockPlaceHandler getHandler(ItemStack itemStack, World world, BlockPos pos, EnumFacing side,
-                                         float hitX, float hitY, float hitZ, EntityPlayer player) {
+    public IBlockPlaceHandler getHandler(ItemStack itemStack, World world, BlockPos pos, Direction side,
+                                         float hitX, float hitY, float hitZ, PlayerEntity player) {
         for (IBlockPlaceHandler placeHandler : getHandlers(itemStack.getItem())) {
             if (placeHandler.shouldApply(itemStack, world, pos, side, hitX, hitY, hitZ, player)) {
                 return placeHandler;

@@ -1,7 +1,6 @@
 package org.cyclops.integratedtunnels.core.part;
 
 import org.cyclops.cyclopscore.init.ModBase;
-import org.cyclops.integrateddynamics.IntegratedDynamics;
 import org.cyclops.integrateddynamics.api.part.PartRenderPosition;
 import org.cyclops.integrateddynamics.api.part.write.IPartStateWriter;
 import org.cyclops.integrateddynamics.api.part.write.IPartTypeWriter;
@@ -25,11 +24,6 @@ public abstract class PartTypeTunnelAspects<P extends IPartTypeWriter<P, S>, S e
     @Override
     public ModBase getMod() {
         return IntegratedTunnels._instance;
-    }
-
-    @Override
-    public ModBase getModGui() {
-        return IntegratedDynamics._instance;
     }
 
 }
