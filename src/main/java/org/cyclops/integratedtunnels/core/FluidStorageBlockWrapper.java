@@ -1,30 +1,20 @@
 package org.cyclops.integratedtunnels.core;
 
-import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.fluid.Fluid;
 import net.minecraft.util.Direction;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.FluidUtil;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
-import net.minecraftforge.fluids.capability.wrappers.BlockWrapper;
 import org.cyclops.commoncapabilities.api.ingredient.IngredientComponent;
 import org.cyclops.commoncapabilities.api.ingredient.storage.IIngredientComponentStorage;
 import org.cyclops.cyclopscore.helper.FluidHelpers;
 import org.cyclops.integratedtunnels.GeneralConfig;
-import org.cyclops.integratedtunnels.IntegratedTunnels;
-import org.cyclops.integratedtunnels.api.world.IBlockBreakHandler;
-import org.cyclops.integratedtunnels.api.world.IBlockBreakHandlerRegistry;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.Iterator;
 
 /**
@@ -38,7 +28,6 @@ public class FluidStorageBlockWrapper implements IIngredientComponentStorage<Flu
     private final Direction side;
     private final boolean blockUpdate;
 
-    @Nullable
     private final IIngredientComponentStorage<FluidStack, Integer> targetStorage;
 
     public FluidStorageBlockWrapper(ServerWorld world, BlockPos pos, Direction side, boolean blockUpdate) {
@@ -47,19 +36,14 @@ public class FluidStorageBlockWrapper implements IIngredientComponentStorage<Flu
         this.side = side;
         this.blockUpdate = blockUpdate;
 
-        IFluidHandler fluidHandler = FluidUtil.getFluidHandler(world, pos, side).orElse(null); // TODO: does this work? copy FluidHandlerBlock from Flopper?
-        this.targetStorage = fluidHandler != null ? getComponent()
+        IFluidHandler fluidHandler = new FluidHandlerBlock(world.getBlockState(pos), world, pos);
+        this.targetStorage = getComponent()
                 .getStorageWrapperHandler(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY)
-                .wrapComponentStorage(fluidHandler) : null;
+                .wrapComponentStorage(fluidHandler);
     }
 
     protected void sendBlockUpdate() {
         world.neighborChanged(pos, Blocks.AIR, pos);
-    }
-
-    protected IBlockBreakHandler getBlockBreakHandler(BlockState blockState, World world, BlockPos pos, PlayerEntity player) {
-        return IntegratedTunnels._instance.getRegistryManager().getRegistry(IBlockBreakHandlerRegistry.class)
-                .getHandler(blockState, world, pos, player);
     }
 
     protected void postInsert(FluidStack moved) {
@@ -101,29 +85,16 @@ public class FluidStorageBlockWrapper implements IIngredientComponentStorage<Flu
 
     @Override
     public FluidStack insert(@Nonnull FluidStack stack, boolean simulate) {
-        if (targetStorage != null) {
-            return stack;
+        if (world.getDimension().doesWaterVaporize()
+                && stack.getFluid().getAttributes().doesVaporize(world, pos, stack)) {
+            return FluidStack.EMPTY;
         }
 
-        Fluid fluid = stack.getFluid();
-        if (world.getDimension().doesWaterVaporize() && fluid.getAttributes().doesVaporize(world, pos, stack)) {
-            return null;
-        }
-
-        BlockState block = fluid.getAttributes().getBlock(world, pos, fluid.getDefaultState());
-        IFluidHandler handler = new BlockWrapper(block, world, pos);
-
-        int filled = handler.fill(stack, FluidHelpers.simulateBooleanToAction(simulate));
-        int remaining = FluidHelpers.getAmount(stack) - filled;
-        if (!simulate && filled > 0) {
+        FluidStack remaining = this.targetStorage.insert(stack, simulate);
+        if (!simulate && stack.getAmount() != remaining.getAmount()) {
             postInsert(stack);
         }
-
-        if (remaining == 0) {
-            return FluidStack.EMPTY;
-        } else {
-            return new FluidStack(stack, remaining);
-        }
+        return remaining;
     }
 
     @Override
