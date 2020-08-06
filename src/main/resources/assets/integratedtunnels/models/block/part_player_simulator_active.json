@@ -1,5 +1,5 @@
 {
-    "parent": "integratedtunnels:block/connector",
+    "parent": "integratedtunnels:block/world_interface",
     "textures": {
         "texture" : "integratedtunnels:part/player_simulator_active"
     }

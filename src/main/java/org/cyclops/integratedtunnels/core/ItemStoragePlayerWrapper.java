@@ -14,11 +14,11 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.event.ForgeEventFactory;
+import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import org.cyclops.commoncapabilities.api.ingredient.IngredientComponent;
 import org.cyclops.commoncapabilities.api.ingredient.storage.IIngredientComponentStorage;
 import org.cyclops.cyclopscore.helper.ItemStackHelpers;
@@ -228,11 +228,32 @@ public class ItemStoragePlayerWrapper implements IIngredientComponentStorage<Ite
                 return stack;
             }
         } else {
+            /* Inspired by PlayerInteractionManager#func_225416_a (line 120) */
+
+            // Check if left clicking is allowed
+            PlayerInteractEvent.LeftClickBlock event = net.minecraftforge.common.ForgeHooks.onLeftClickBlock(player, pos, side);
+            BlockState blockState = world.getBlockState(pos);
+            if (event.isCanceled() || (event.getUseItem() == net.minecraftforge.eventbus.api.Event.Result.DENY)) { // Restore block and te data
+                world.notifyBlockUpdate(pos, blockState, world.getBlockState(pos), 3);
+                return stack;
+            }
+
             if (!world.isAirBlock(pos)) {
                 // Break block
                 int durabilityRemaining = player.interactionManager.durabilityRemainingOnBlock;
                 if (durabilityRemaining < 0) {
                     world.getBlockState(pos).onBlockClicked(world, pos, player);
+                    float relativeBlockHardness = blockState.getPlayerRelativeBlockHardness(this.player, this.player.world, pos);
+                    if (relativeBlockHardness >= 1.0F) {
+                        // Insta-mine
+                        player.interactionManager.tryHarvestBlock(pos);
+                    } else {
+                        // Initiate break progress
+                        player.interactionManager.initialDamage = player.interactionManager.ticks;
+                        player.interactionManager.isDestroyingBlock = true;
+                        player.interactionManager.destroyPos = pos.toImmutable();
+                        player.interactionManager.durabilityRemainingOnBlock = (int) (relativeBlockHardness * 10.0F);
+                    }
                 } else if (durabilityRemaining >= 9) {
                     player.interactionManager.tryHarvestBlock(pos);
                     cancelDestroyingBlock(player);
