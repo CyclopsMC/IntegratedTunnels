@@ -135,7 +135,7 @@ public class ItemStorageBlockWrapper implements IIngredientComponentStorage<Item
                 } else {
                     BlockEvent.BreakEvent blockBreakEvent = new BlockEvent.BreakEvent(world, pos, blockState, player);
                     if (!MinecraftForge.EVENT_BUS.post(blockBreakEvent)) {
-                        List<ItemStack> drops = Block.getDrops(blockState, world, pos, null, null, ItemDummyPickAxe.getItemStack(silkTouch, fortune));
+                        List<ItemStack> drops = Block.getDrops(blockState, world, pos, world.getTileEntity(pos), null, ItemDummyPickAxe.getItemStack(silkTouch, fortune));
                         if (drops.size() == 0) {
                             // Remove the block if it dropped nothing (and will drop nothing)
                             if (breakOnNoDrops) {
