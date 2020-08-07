@@ -14,13 +14,13 @@ Transfer other stuff over Integrated Dynamics networks.
 [[dependencies.integratedtunnels]]
     modId="cyclopscore"
     mandatory=true
-    versionRange="[1.8.0,)"
+    versionRange="[1.8.1,)"
     ordering="NONE"
     side="BOTH"
 [[dependencies.integratedtunnels]]
     modId="integrateddynamics"
     mandatory=true
-    versionRange="[1.1.13,)"
+    versionRange="[1.1.14,)"
     ordering="NONE"
     side="BOTH"
 [[dependencies.integratedtunnels]]
