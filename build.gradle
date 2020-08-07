@@ -100,7 +100,7 @@ dependencies {
     }
 	
     // Add something like 'integratedtunnelscompat_version_local=0.1.0-DEV' to your gradle.properties if you want to use a custom local Integrated Tunnels Compat version.
-    /*if(project.hasProperty("integratedtunnelscompat_version_local")) {
+    if(project.hasProperty("integratedtunnelscompat_version_local")) {
         shadow("org.cyclops.integratedtunnelscompat:IntegratedTunnelsCompat:${project.integratedtunnelscompat_version_local}") {
             transitive = false
         }
@@ -108,7 +108,7 @@ dependencies {
         shadow("org.cyclops.integratedtunnelscompat:IntegratedTunnelsCompat:${config.integratedtunnelscompat_version}") {
             transitive = false
         }
-    }*/
+    }
 
     if(project.hasProperty("commoncapabilities_version_local")) {
         compile "org.cyclops.commoncapabilities:CommonCapabilities:${project.commoncapabilities_version_local}:deobf"
