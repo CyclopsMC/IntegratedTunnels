@@ -32,8 +32,8 @@ import net.minecraftforge.gradle.common.task.SignJar
 loadProperties()
 
 version = config.mod_version
-group = "org.cyclops.integrateddynamics"
-archivesBaseName = "IntegratedDynamics"
+group = "org.cyclops.integratedtunnels"
+archivesBaseName = "IntegratedTunnels"
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
@@ -137,7 +137,7 @@ minecraft {
             //property 'forge.logging.markers', 'REGISTRIES,REGISTRYDUMP'
             property 'forge.logging.console.level', 'debug'
             mods {
-                integrateddynamics {
+                integratedtunnels {
                     source sourceSets.main
                 }
             }
@@ -147,7 +147,7 @@ minecraft {
             workingDirectory project.file('run')
             property 'forge.logging.console.level', 'debug'
             mods {
-                integrateddynamics {
+                integratedtunnels {
                     source sourceSets.main
                 }
             }
@@ -156,9 +156,9 @@ minecraft {
         data {
             workingDirectory project.file('run')
             property 'forge.logging.console.level', 'debug'
-            args '--mod', 'integrateddynamics', '--all', '--output', file('src/generated/resources/')
+            args '--mod', 'integratedtunnels', '--all', '--output', file('src/generated/resources/')
             mods {
-                integrateddynamics {
+                integratedtunnels {
                     source sourceSets.main
                 }
             }
@@ -217,15 +217,6 @@ task deobfJar(type: Jar) {
     }
 }
 
-task apiJar(type: Jar) {
-    from (sourceSets.main.output) {
-        include "**/api/**/*"
-    }
-    includeEmptyDirs = false
-    version = "${project.config.api_version}"
-    classifier = "api"
-}
-
 task sourceJar(type: Jar) {
     classifier = "sources"
     from sourceSets.main.allJava
@@ -249,7 +240,6 @@ reobf {
 
 artifacts {
     archives deobfJar
-	archives apiJar
     archives sourceJar
     archives javadocJar
 }
