@@ -23,7 +23,8 @@ public class ContainerScreenInterfaceSettings extends ContainerScreenPartSetting
         super(container, inventory, title);
     }
 
-    protected ResourceLocation constructResourceLocation() {
+    @Override
+    protected ResourceLocation constructGuiTexture() {
         return new ResourceLocation(Reference.MOD_ID, "textures/gui/part_interface_settings.png");
     }
 
@@ -53,7 +54,7 @@ public class ContainerScreenInterfaceSettings extends ContainerScreenPartSetting
 
     @Override
     public boolean charTyped(char typedChar, int keyCode) {
-        if (!(isFieldUpdateIntervalEnabled() && this.numberFieldChannelInterface.charTyped(typedChar, keyCode))) {
+        if (!this.numberFieldChannelInterface.charTyped(typedChar, keyCode)) {
             return super.charTyped(typedChar, keyCode);
         }
         return true;
@@ -93,8 +94,8 @@ public class ContainerScreenInterfaceSettings extends ContainerScreenPartSetting
     @Override
     public void onUpdate(int valueId, CompoundNBT value) {
         super.onUpdate(valueId, value);
-        if (valueId == ((ContainerInterfaceSettings) getContainer()).getLastChannelInterfaceValueId()) {
-            numberFieldChannelInterface.setText(Integer.toString(((ContainerInterfaceSettings) getContainer()).getLastChannelInterfaceValue()));
+        if (valueId == getContainer().getLastChannelInterfaceValueId()) {
+            numberFieldChannelInterface.setText(Integer.toString(getContainer().getLastChannelInterfaceValue()));
         }
     }
 }

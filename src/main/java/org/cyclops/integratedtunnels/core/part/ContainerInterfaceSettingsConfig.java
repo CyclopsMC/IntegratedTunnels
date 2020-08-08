@@ -19,7 +19,7 @@ public class ContainerInterfaceSettingsConfig extends GuiConfig<ContainerInterfa
 
     public ContainerInterfaceSettingsConfig() {
         super(IntegratedTunnels._instance,
-                "interface_settings",
+                "part_interface_settings",
                 eConfig -> new ContainerTypeData<>(ContainerInterfaceSettings::new));
     }
 

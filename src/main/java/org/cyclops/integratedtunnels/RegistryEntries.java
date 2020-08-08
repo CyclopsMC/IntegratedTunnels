@@ -16,7 +16,7 @@ public class RegistryEntries {
     @ObjectHolder("integratedtunnels:dummy_pickaxe")
     public static final Item ITEM_DUMMY_PICKAXE = null;
 
-    @ObjectHolder("integrateddynamics:part_settings")
+    @ObjectHolder("integratedtunnels:part_interface_settings")
     public static final ContainerType<ContainerInterfaceSettings> CONTAINER_INTERFACE_SETTINGS = null;
 
 }
