@@ -1,6 +1,5 @@
 package org.cyclops.integratedtunnels;
 
-import net.minecraft.block.Block;
 import net.minecraft.item.ItemGroup;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
