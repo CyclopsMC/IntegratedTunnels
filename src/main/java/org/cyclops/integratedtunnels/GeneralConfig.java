@@ -75,6 +75,12 @@ public class GeneralConfig extends DummyConfig {
      */
     @ConfigurableProperty(category = ConfigurableTypeCategory.CORE, comment = "If items should be ejected into the world when item movement failed due to item handlers declaring inconsistent movement in simulation mode. If disabled, items can be voided.", isCommandable = true)
     public static boolean ejectItemsOnInconsistentSimulationMovement = true;
+
+    /**
+     * If items should be ejected into the world when a block is broken and not all items fit into the target. Will be voided otherwise.
+     */
+    @ConfigurableProperty(category = ConfigurableTypeCategory.CORE, comment = "If items should be ejected into the world when a block is broken and not all items fit into the target. Will be voided otherwise.", isCommandable = true)
+    public static boolean ejectItemsOnBlockDropOverflow = true;
     
     /**
      * The base energy usage for the energy exporter.

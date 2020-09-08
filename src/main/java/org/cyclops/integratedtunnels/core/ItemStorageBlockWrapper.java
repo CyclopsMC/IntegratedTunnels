@@ -33,6 +33,7 @@ import org.cyclops.integratedtunnels.api.world.IBlockPlaceHandlerRegistry;
 import org.cyclops.integratedtunnels.core.helper.obfuscation.ObfuscationHelpers;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
@@ -56,6 +57,7 @@ public class ItemStorageBlockWrapper implements IIngredientComponentStorage<Item
 
     private IBlockBreakHandler blockBreakHandler = null;
     private List<ItemStack> cachedDrops = null;
+    private boolean extracted = false;
 
     public ItemStorageBlockWrapper(boolean writeOnly, WorldServer world, BlockPos pos, EnumFacing side, EnumHand hand,
                                    boolean blockUpdate, int fortune, boolean silkTouch, boolean ignoreReplacable,
@@ -93,6 +95,15 @@ public class ItemStorageBlockWrapper implements IIngredientComponentStorage<Item
         if (blockUpdate) {
             sendBlockUpdate();
         }
+    }
+
+    public boolean isExtracted() {
+        return extracted;
+    }
+
+    @Nullable
+    public List<ItemStack> getCachedDrops() {
+        return cachedDrops;
     }
 
     protected List<ItemStack> getItemStacks() {
@@ -240,7 +251,7 @@ public class ItemStorageBlockWrapper implements IIngredientComponentStorage<Item
         return remaining;
     }
 
-    protected void postExtract() {
+    public void postExtract() {
         boolean allEmpty = true;
         for (ItemStack stack : getItemStacks()) {
             if (!stack.isEmpty()) {
@@ -283,6 +294,7 @@ public class ItemStorageBlockWrapper implements IIngredientComponentStorage<Item
 
                 // Check if all items have been extracted, if so, remove block
                 if (!simulate) {
+                    this.extracted = true;
                     postExtract();
                 }
 
@@ -312,6 +324,7 @@ public class ItemStorageBlockWrapper implements IIngredientComponentStorage<Item
 
         // Check if all items have been extracted, if so, remove block
         if (!simulate) {
+            this.extracted = true;
             postExtract();
         }
 

@@ -14,6 +14,7 @@ import net.minecraft.world.WorldServer;
 import org.cyclops.commoncapabilities.api.capability.itemhandler.ItemMatch;
 import org.cyclops.commoncapabilities.api.ingredient.IngredientComponent;
 import org.cyclops.commoncapabilities.api.ingredient.storage.IIngredientComponentStorage;
+import org.cyclops.cyclopscore.helper.ItemStackHelpers;
 import org.cyclops.integrateddynamics.api.evaluate.EvaluationException;
 import org.cyclops.integrateddynamics.api.evaluate.operator.IOperator;
 import org.cyclops.integrateddynamics.api.evaluate.variable.IValueTypeListProxy;
@@ -23,6 +24,7 @@ import org.cyclops.integrateddynamics.api.part.PartPos;
 import org.cyclops.integrateddynamics.api.part.PartTarget;
 import org.cyclops.integrateddynamics.core.evaluate.variable.ValueObjectTypeBlock;
 import org.cyclops.integrateddynamics.core.evaluate.variable.ValueObjectTypeItemStack;
+import org.cyclops.integratedtunnels.GeneralConfig;
 import org.cyclops.integratedtunnels.core.predicate.IngredientPredicate;
 import org.cyclops.integratedtunnels.core.predicate.IngredientPredicateBlockList;
 import org.cyclops.integratedtunnels.core.predicate.IngredientPredicateItemStackList;
@@ -31,6 +33,7 @@ import org.cyclops.integratedtunnels.core.predicate.IngredientPredicateItemStack
 import org.cyclops.integratedtunnels.part.aspect.ITunnelConnection;
 
 import javax.annotation.Nullable;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -203,7 +206,7 @@ public class TunnelItemHelpers {
             return null;
         }
 
-        IIngredientComponentStorage<ItemStack, Integer> sourceBlock = new ItemStorageBlockWrapper(
+        ItemStorageBlockWrapper sourceBlock = new ItemStorageBlockWrapper(
                 false, (WorldServer) world, pos, side, hand, blockUpdate, fortune, silkTouch, ignoreReplacable, breakOnNoDrops);
         List<ItemStack> itemStacks = Lists.newArrayList();
         ItemStack itemStack;
@@ -211,6 +214,25 @@ public class TunnelItemHelpers {
                 destination, -1, itemStackMatcher, PartPos.of(world, pos, side), false)).isEmpty()) {
             itemStacks.add(itemStack);
         }
+
+        // In some cases, the storage may still have cached drop.
+        // In that case, make sure we insert or drop them, and DESTROY the block.
+        List<ItemStack> cachedDrops = sourceBlock.getCachedDrops();
+        if (sourceBlock.isExtracted() && cachedDrops != null) {
+            Iterator<ItemStack> it = cachedDrops.iterator();
+            while (it.hasNext()) {
+                ItemStack cachedStack = it.next();
+                if (!cachedStack.isEmpty()) {
+                    ItemStack remaining = destination.insert(cachedStack, false);
+                    if (GeneralConfig.ejectItemsOnBlockDropOverflow) {
+                        ItemStackHelpers.spawnItemStack(world, pos, remaining);
+                    }
+                    it.remove();
+                }
+            }
+            sourceBlock.postExtract();
+        }
+
         return itemStacks;
     }
 
