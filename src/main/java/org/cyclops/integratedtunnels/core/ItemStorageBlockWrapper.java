@@ -205,7 +205,7 @@ public class ItemStorageBlockWrapper implements IIngredientComponentStorage<Item
 
     @Override
     public Iterator<ItemStack> iterator() {
-        return getItemStacks().iterator();
+        return Lists.newArrayList(getItemStacks()).iterator();
     }
 
     @Override
