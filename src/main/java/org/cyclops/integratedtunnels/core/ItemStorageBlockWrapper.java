@@ -60,6 +60,7 @@ public class ItemStorageBlockWrapper implements IIngredientComponentStorage<Item
 
     private IBlockBreakHandler blockBreakHandler = null;
     private List<ItemStack> cachedDrops = null;
+    private boolean extracted = false;
 
     public ItemStorageBlockWrapper(boolean writeOnly, ServerWorld world, BlockPos pos, Direction side, Hand hand,
                                    boolean blockUpdate, int fortune, boolean silkTouch, boolean ignoreReplacable,
@@ -108,6 +109,15 @@ public class ItemStorageBlockWrapper implements IIngredientComponentStorage<Item
                 .withParameter(LootParameters.TOOL, ItemStack.EMPTY)
                 .withNullableParameter(LootParameters.BLOCK_ENTITY, tileEntityIn);
         return state.getDrops(lootcontext$builder);
+    }
+
+    public boolean isExtracted() {
+        return extracted;
+    }
+
+    @Nullable
+    public List<ItemStack> getCachedDrops() {
+        return cachedDrops;
     }
 
     protected List<ItemStack> getItemStacks() {
@@ -202,7 +212,7 @@ public class ItemStorageBlockWrapper implements IIngredientComponentStorage<Item
 
     @Override
     public Iterator<ItemStack> iterator() {
-        return getItemStacks().iterator();
+        return Lists.newArrayList(getItemStacks()).iterator();
     }
 
     @Override
@@ -237,7 +247,7 @@ public class ItemStorageBlockWrapper implements IIngredientComponentStorage<Item
         return remaining;
     }
 
-    protected void postExtract() {
+    public void postExtract() {
         boolean allEmpty = true;
         for (ItemStack stack : getItemStacks()) {
             if (!stack.isEmpty()) {
@@ -280,6 +290,7 @@ public class ItemStorageBlockWrapper implements IIngredientComponentStorage<Item
 
                 // Check if all items have been extracted, if so, remove block
                 if (!simulate) {
+                    this.extracted = true;
                     postExtract();
                 }
 
@@ -309,6 +320,7 @@ public class ItemStorageBlockWrapper implements IIngredientComponentStorage<Item
 
         // Check if all items have been extracted, if so, remove block
         if (!simulate) {
+            this.extracted = true;
             postExtract();
         }
 

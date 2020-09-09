@@ -31,6 +31,9 @@ public class GeneralConfig extends DummyConfig {
     @ConfigurableProperty(category = "core", comment = "If items should be ejected into the world when item movement failed due to item handlers declaring inconsistent movement in simulation mode. If disabled, items can be voided.", isCommandable = true, configLocation = ModConfig.Type.SERVER)
     public static boolean ejectItemsOnInconsistentSimulationMovement = true;
 
+    @ConfigurableProperty(category = "core", comment = "If items should be ejected into the world when a block is broken and not all items fit into the target. Will be voided otherwise.", isCommandable = true)
+    public static boolean ejectItemsOnBlockDropOverflow = true;
+
     @ConfigurableProperty(category = "general", comment = "The base energy usage for the energy exporter.", minimalValue = 0, configLocation = ModConfig.Type.SERVER)
     public static int exporterEnergyBaseConsumption = 1;
     @ConfigurableProperty(category = "general", comment = "The base energy usage for the fluid exporter.", minimalValue = 0, configLocation = ModConfig.Type.SERVER)
