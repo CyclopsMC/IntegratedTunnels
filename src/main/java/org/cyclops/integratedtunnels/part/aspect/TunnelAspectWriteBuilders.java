@@ -96,7 +96,8 @@ public class TunnelAspectWriteBuilders {
         // For typed lists, just check if they correspond to the expected type
         if (!ValueHelpers.correspondsTo(list.getRawValue().getValueType(), expectedValueType)) {
             throw new EvaluationException(new TranslationTextComponent(L10NValues.VALUETYPE_ERROR_INVALIDLISTVALUETYPE,
-                    expectedValueType, list.getRawValue().getValueType()));
+                    new TranslationTextComponent(expectedValueType.getTranslationKey()),
+                    new TranslationTextComponent(list.getRawValue().getValueType().getTranslationKey())));
         }
 
         // If we have an ANY list, strictly check each value in the list
@@ -104,7 +105,8 @@ public class TunnelAspectWriteBuilders {
             for (IValue value : (IValueTypeListProxy<ValueTypeCategoryAny, IValue>) list.getRawValue()) {
                 if (value.getType() != expectedValueType) {
                     throw new EvaluationException(new TranslationTextComponent(L10NValues.VALUETYPE_ERROR_INVALIDLISTVALUETYPE,
-                            expectedValueType, value.getType()));
+                            new TranslationTextComponent(expectedValueType.getTranslationKey()),
+                            new TranslationTextComponent(value.getType().getTranslationKey())));
                 }
             }
         }
