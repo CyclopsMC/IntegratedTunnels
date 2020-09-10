@@ -1,0 +1,8 @@
+As always, don't forget to backup your world before updating!
+Requires CyclopsCore version 1.8.2 or higher.
+
+Fixes:
+* Fix server crash while producing invalid value type errors, Closes CyclopsMC/IntegratedDynamics#911
+* Fix player sim inventory voiding when blocks don't confirm activation, Closes #199
+* Fix world block importer duplication for blocks dropping +1 items, Closes #179
+* Fix CME when block importing into certain types of inventories, Closes #197
