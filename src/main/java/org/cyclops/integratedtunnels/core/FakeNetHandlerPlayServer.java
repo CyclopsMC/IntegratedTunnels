@@ -17,7 +17,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.text.ITextComponent;
 
 import javax.annotation.Nullable;
-import javax.crypto.SecretKey;
+import javax.crypto.Cipher;
 import java.net.SocketAddress;
 import java.util.Set;
 
@@ -75,7 +75,7 @@ public class FakeNetHandlerPlayServer extends ServerPlayNetHandler {
             }
 
             @Override
-            public void enableEncryption(SecretKey key) {
+            public void func_244777_a(Cipher p_244777_1_, Cipher p_244777_2_) {
 
             }
 

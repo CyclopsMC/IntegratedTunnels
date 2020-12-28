@@ -1,9 +1,11 @@
 package org.cyclops.integratedtunnels.core.part;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TranslationTextComponent;
 import org.cyclops.cyclopscore.client.gui.component.input.WidgetNumberField;
 import org.cyclops.cyclopscore.helper.Helpers;
 import org.cyclops.cyclopscore.helper.L10NHelpers;
@@ -42,7 +44,7 @@ public class ContainerScreenInterfaceSettings extends ContainerScreenPartSetting
     public void init() {
         super.init();
 
-        numberFieldChannelInterface = new WidgetNumberField(font, guiLeft + 106, guiTop + 109, 70, 14, true, L10NHelpers.localize("gui.integratedtunnels.partsettings.channel.interface"), true);
+        numberFieldChannelInterface = new WidgetNumberField(font, guiLeft + 106, guiTop + 109, 70, 14, true, new TranslationTextComponent("gui.integratedtunnels.partsettings.channel.interface"), true);
         numberFieldChannelInterface.setPositiveOnly(false);
         numberFieldChannelInterface.setMaxStringLength(15);
         numberFieldChannelInterface.setVisible(true);
@@ -79,11 +81,11 @@ public class ContainerScreenInterfaceSettings extends ContainerScreenPartSetting
     }
 
     @Override
-    protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
-        super.drawGuiContainerBackgroundLayer(partialTicks, mouseX, mouseY);
-        font.drawString(L10NHelpers.localize("gui.integratedtunnels.partsettings.channel.interface"),
+    protected void drawGuiContainerBackgroundLayer(MatrixStack matrixStack, float partialTicks, int mouseX, int mouseY) {
+        super.drawGuiContainerBackgroundLayer(matrixStack, partialTicks, mouseX, mouseY);
+        font.drawString(matrixStack, L10NHelpers.localize("gui.integratedtunnels.partsettings.channel.interface"),
                 guiLeft + 8, guiTop + 112, Helpers.RGBToInt(0, 0, 0));
-        numberFieldChannelInterface.render(mouseX, mouseY, partialTicks);
+        numberFieldChannelInterface.render(matrixStack, mouseX, mouseY, partialTicks);
     }
 
     @Override

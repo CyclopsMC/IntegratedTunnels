@@ -40,7 +40,7 @@ public class PlayerHelpers {
         player.setSneaking(sneaking);
         setHeldItemSilent(player, hand, ItemStack.EMPTY);
         player.tick();
-        player.onGround = true;
+        player.setOnGround(true);
     }
 
     public static void setHeldItemSilent(PlayerEntity player, Hand hand, ItemStack itemStack) {

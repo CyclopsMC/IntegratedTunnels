@@ -1,5 +1,6 @@
 package org.cyclops.integratedtunnels.core.predicate;
 
+import net.minecraft.util.text.IFormattableTextComponent;
 import net.minecraftforge.fluids.FluidStack;
 import org.cyclops.commoncapabilities.api.ingredient.IngredientComponent;
 import org.cyclops.integrateddynamics.api.evaluate.EvaluationException;
@@ -38,7 +39,7 @@ public class IngredientPredicateFluidStackOperator extends IngredientPredicate<F
             PartHelpers.PartStateHolder<?, ?> partData = PartHelpers.getPart(partTarget.getCenter());
             if (partData != null) {
                 IPartStateWriter partState = (IPartStateWriter) partData.getState();
-                partState.addError(partState.getActiveAspect(), e.getErrorMessage());
+                partState.addError(partState.getActiveAspect(), (IFormattableTextComponent) e.getErrorMessage());
                 partState.setDeactivated(true);
             }
             return false;

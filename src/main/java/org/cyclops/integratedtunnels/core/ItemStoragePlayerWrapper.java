@@ -14,9 +14,10 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.common.ForgeHooks;
+import net.minecraftforge.common.ForgeMod;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import org.cyclops.commoncapabilities.api.ingredient.IngredientComponent;
@@ -134,7 +135,7 @@ public class ItemStoragePlayerWrapper implements IIngredientComponentStorage<Ite
 
         if (rightClick) {
             // Use item first
-            BlockRayTraceResult blockRayTraceResult = new BlockRayTraceResult(new Vec3d(offsetX, offsetY, offsetZ), side, pos, false);
+            BlockRayTraceResult blockRayTraceResult = new BlockRayTraceResult(new Vector3d(offsetX, offsetY, offsetZ), side, pos, false);
             if (!stack.isEmpty()) {
                 ItemUseContext itemUseContext = new ItemUseContext(player, hand, blockRayTraceResult);
                 ActionResultType actionResult = stack.getItem().onItemUseFirst(stack, itemUseContext);
@@ -195,14 +196,14 @@ public class ItemStoragePlayerWrapper implements IIngredientComponentStorage<Ite
             if (!stack.isEmpty()) {
                 // Increase reach position.
                 BlockPos targetPos = pos;
-                double reachDistance = player.getAttribute(net.minecraft.entity.player.PlayerEntity.REACH_DISTANCE).getValue() + 3;
+                double reachDistance = player.getAttribute(ForgeMod.REACH_DISTANCE.get()).getValue() + 3;
                 int i = 0;
                 while (i++ < reachDistance && world.isAirBlock(targetPos)) {
                     targetPos = targetPos.offset(side.getOpposite());
                 }
 
                 ItemUseContext itemUseContextReach = new ItemUseContext(player, hand,
-                        new BlockRayTraceResult(new Vec3d(offsetX, offsetY, offsetZ), side, targetPos, false));
+                        new BlockRayTraceResult(new Vector3d(offsetX, offsetY, offsetZ), side, targetPos, false));
                 ActionResultType actionResult = stack.onItemUse(itemUseContextReach);
                 if (actionResult == ActionResultType.FAIL) {
                     return stack;

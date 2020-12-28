@@ -15,10 +15,11 @@ import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
-import net.minecraft.world.storage.loot.LootContext;
-import net.minecraft.world.storage.loot.LootParameters;
+import net.minecraft.loot.LootContext;
+import net.minecraft.loot.LootParameters;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.world.BlockEvent;
 import org.cyclops.commoncapabilities.api.ingredient.IIngredientMatcher;
@@ -104,7 +105,7 @@ public class ItemStorageBlockWrapper implements IIngredientComponentStorage<Item
     public static List<ItemStack> getDrops(BlockState state, ServerWorld worldIn, BlockPos pos, @Nullable TileEntity tileEntityIn) {
         LootContext.Builder lootcontext$builder = (new LootContext.Builder(worldIn))
                 .withRandom(worldIn.rand)
-                .withParameter(LootParameters.POSITION, pos)
+                .withParameter(LootParameters.field_237457_g_, new Vector3d(pos.getX(), pos.getY(), pos.getZ()))
                 .withParameter(LootParameters.TOOL, ItemStack.EMPTY)
                 .withParameter(LootParameters.TOOL, ItemStack.EMPTY)
                 .withNullableParameter(LootParameters.BLOCK_ENTITY, tileEntityIn);

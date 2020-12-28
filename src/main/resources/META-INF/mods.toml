@@ -1,29 +1,30 @@
 modLoader="javafml"
-loaderVersion="[31.2,)"
+loaderVersion="[34,)"
 issueTrackerURL="https://github.com/CyclopsMC/IntegratedTunnels/issues"
+displayURL="https://www.curseforge.com/minecraft/mc-mods/integrated-tunnels"
+license="MIT"
+logoFile="logo.png"
+authors="rubensworks (aka kroeser)"
 [[mods]]
 modId="integratedtunnels"
 version="${file.jarVersion}"
 displayName="IntegratedTunnels"
-displayURL="https://www.curseforge.com/minecraft/mc-mods/integrated-tunnels"
-logoFile="logo.png"
-authors="rubensworks (aka kroeser)"
 description='''
 Transfer other stuff over Integrated Dynamics networks.
 '''
 [[dependencies.integratedtunnels]]
     modId="cyclopscore"
     mandatory=true
-    versionRange="[1.8.2,)"
+    versionRange="[1.9.0,)"
     ordering="NONE"
     side="BOTH"
 [[dependencies.integratedtunnels]]
     modId="integrateddynamics"
     mandatory=true
-    versionRange="[1.1.15,)"
+    versionRange="[1.1.20,)"
     ordering="NONE"
     side="BOTH"
-[[dependencies.integratedterminals]]
+[[dependencies.integratedtunnels]]
     modId="commoncapabilities"
     mandatory=true
     versionRange="[2.5.3,)"
@@ -32,12 +33,12 @@ Transfer other stuff over Integrated Dynamics networks.
 [[dependencies.integratedtunnels]]
     modId="forge"
     mandatory=true
-    versionRange="[31.2,)"
+    versionRange="[34,)"
     ordering="NONE"
     side="BOTH"
 [[dependencies.integratedtunnels]]
     modId="minecraft"
     mandatory=true
-    versionRange="[1.15.2]"
+    versionRange="[1.16.2,]"
     ordering="NONE"
     side="BOTH"

@@ -14,7 +14,7 @@ import net.minecraft.util.Direction;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 import org.cyclops.commoncapabilities.api.ingredient.IngredientComponent;
@@ -76,7 +76,7 @@ public class ItemHandlerWorldEntityExportWrapper implements IIngredientComponent
         x = x * velocity;
         y = y * velocity;
         z = z * velocity;
-        entity.setMotion(new Vec3d(x, y, z));
+        entity.setMotion(new Vector3d(x, y, z));
         float f1 = MathHelper.sqrt(x * x + z * z);
         entity.rotationYaw = (float)(MathHelper.atan2(x, z) * (180D / Math.PI));
         entity.rotationPitch = (float)(MathHelper.atan2(y, (double)f1) * (180D / Math.PI));
@@ -125,7 +125,7 @@ public class ItemHandlerWorldEntityExportWrapper implements IIngredientComponent
     }
 
     @Override
-    public World getWorld() {
+    public ServerWorld getWorld() {
         return world;
     }
 

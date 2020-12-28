@@ -54,6 +54,7 @@ public class ExtendedFakePlayer extends FakePlayer {
                     if (net.minecraftforge.common.ForgeHooks.canContinueUsing(this.activeItemStack, itemstack)) {
                         this.activeItemStack = itemstack;
                     }
+                    // Based on LivingEntity#updateActiveHand
                     if (itemstack == this.activeItemStack) {
                         if (!this.activeItemStack.isEmpty()) {
                             activeItemStackUseCount = net.minecraftforge.event.ForgeEventFactory.onItemUseTick(this, activeItemStack, activeItemStackUseCount);
@@ -62,7 +63,7 @@ public class ExtendedFakePlayer extends FakePlayer {
                         }
 
                         if (this.getItemInUseCount() <= 25 && this.getItemInUseCount() % 4 == 0) {
-                            this.func_226293_b_(this.activeItemStack, 5); // MCP: was updateItemUse
+                            this.triggerItemUseEffects(this.activeItemStack, 5);
                         }
 
                         if (--this.activeItemStackUseCount <= 0 && !this.world.isRemote() && !this.activeItemStack.isCrossbowStack()) {

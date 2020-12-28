@@ -9,7 +9,7 @@ import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.world.World;
 import org.apache.logging.log4j.Level;
@@ -232,7 +232,7 @@ public class TunnelHelpers {
      */
     public static BlockItemUseContext createBlockItemUseContext(World world, @Nullable PlayerEntity playerEntity, BlockPos pos, Direction side, Hand hand) {
         return new BlockItemUseContext(world, playerEntity, hand, ItemStack.EMPTY,
-                new BlockRayTraceResult(new Vec3d((double)pos.getX() + 0.5D + (double)side.getXOffset() * 0.5D,
+                new BlockRayTraceResult(new Vector3d((double)pos.getX() + 0.5D + (double)side.getXOffset() * 0.5D,
                         (double)pos.getY() + 0.5D + (double)side.getYOffset() * 0.5D,
                         (double)pos.getZ() + 0.5D + (double)side.getZOffset() * 0.5D), side, pos, false));
     }

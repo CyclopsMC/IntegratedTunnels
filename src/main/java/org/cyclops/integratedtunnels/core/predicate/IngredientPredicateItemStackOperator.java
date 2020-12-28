@@ -1,6 +1,7 @@
 package org.cyclops.integratedtunnels.core.predicate;
 
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.text.IFormattableTextComponent;
 import org.cyclops.commoncapabilities.api.ingredient.IngredientComponent;
 import org.cyclops.integrateddynamics.api.evaluate.EvaluationException;
 import org.cyclops.integrateddynamics.api.evaluate.operator.IOperator;
@@ -38,7 +39,7 @@ public class IngredientPredicateItemStackOperator extends IngredientPredicate<It
             PartHelpers.PartStateHolder<?, ?> partData = PartHelpers.getPart(partTarget.getCenter());
             if (partData != null) {
                 IPartStateWriter partState = (IPartStateWriter) partData.getState();
-                partState.addError(partState.getActiveAspect(), e.getErrorMessage());
+                partState.addError(partState.getActiveAspect(), (IFormattableTextComponent) e.getErrorMessage());
                 partState.setDeactivated(true);
             }
             return false;
