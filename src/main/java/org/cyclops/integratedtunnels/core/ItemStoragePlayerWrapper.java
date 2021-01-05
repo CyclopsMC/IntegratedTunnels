@@ -223,7 +223,7 @@ public class ItemStoragePlayerWrapper implements IIngredientComponentStorage<Ite
                 }
             } else {
                 returnPlayerInventory(player);
-                return stack;
+                return ItemStack.EMPTY;
             }
         } else {
             if (!world.isAirBlock(pos)) {
