@@ -5,10 +5,6 @@ repositories {
         name "Cyclops Repo"
         url "https://oss.jfrog.org/artifactory/simple/libs-release/"
     }
-    maven {
-        name = "MCModDev"
-        url = "http://maven.mcmoddev.com"
-    }
 }
 dependencies {
     // Add something like 'integrateddynamics_version_local=0.1.0-DEV' to your gradle.properties if you want to use a custom local Integrated Dynamics version.
@@ -47,7 +43,6 @@ dependencies {
             exclude group: 'org.cyclops.cyclopscore', module: 'CyclopsCore'
         }
     }
-    deobfCompile "net.darkhax.tesla:Tesla-${config.teslaapi_version}" // http://maven.epoxide.org/net/darkhax/tesla/Tesla/
 
     // Project lombok
     provided "org.projectlombok:lombok:1.16.8"

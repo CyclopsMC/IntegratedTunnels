@@ -21,7 +21,6 @@ import org.cyclops.cyclopscore.init.IObjectReference;
 import org.cyclops.cyclopscore.init.ItemCreativeTab;
 import org.cyclops.cyclopscore.init.ModBaseVersionable;
 import org.cyclops.cyclopscore.init.RecipeHandler;
-import org.cyclops.cyclopscore.modcompat.ModCompatLoader;
 import org.cyclops.cyclopscore.proxy.ICommonProxy;
 import org.cyclops.integrateddynamics.IntegratedDynamics;
 import org.cyclops.integrateddynamics.infobook.OnTheDynamicsOfIntegrationBook;
@@ -35,7 +34,6 @@ import org.cyclops.integratedtunnels.core.world.BlockBreakHandlerRegistry;
 import org.cyclops.integratedtunnels.core.world.BlockBreakHandlers;
 import org.cyclops.integratedtunnels.core.world.BlockBreakPlaceRegistry;
 import org.cyclops.integratedtunnels.core.world.BlockPlaceHandlers;
-import org.cyclops.integratedtunnels.modcompat.tesla.TeslaModCompat;
 import org.cyclops.integratedtunnels.part.PartTypes;
 import org.cyclops.integratedtunnels.part.aspect.TunnelAspects;
 
@@ -78,12 +76,6 @@ public class IntegratedTunnels extends ModBaseVersionable {
                 "shaped.xml",
                 "shapeless.xml"
         );
-    }
-
-    @Override
-    protected void loadModCompats(ModCompatLoader modCompatLoader) {
-        super.loadModCompats(modCompatLoader);
-        modCompatLoader.addModCompat(new TeslaModCompat());
     }
 
     /**
