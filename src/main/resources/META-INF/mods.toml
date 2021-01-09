@@ -15,7 +15,7 @@ Transfer other stuff over Integrated Dynamics networks.
 [[dependencies.integratedtunnels]]
     modId="cyclopscore"
     mandatory=true
-    versionRange="[1.9.0,)"
+    versionRange="[1.9.5,)"
     ordering="NONE"
     side="BOTH"
 [[dependencies.integratedtunnels]]
