@@ -189,6 +189,7 @@ public class ItemStorageBlockWrapper implements IIngredientComponentStorage<Item
                     BlockState blockState = itemBlock.getBlock().getStateForPlacement(blockItemUseContext);
                     if (blockState != null && (simulate || itemBlock.placeBlock(blockItemUseContext, blockState))) {
                         if (!simulate) {
+                            itemBlock.onBlockPlaced(pos, world, blockItemUseContext.getPlayer(), itemStack, blockState);
                             itemBlock.getBlock().onBlockPlacedBy(world, pos, blockState, player, itemStack);
                             if (GeneralConfig.worldInteractionEvents) {
                                 SoundType soundtype = world.getBlockState(pos).getBlock().getSoundType(world.getBlockState(pos), world, pos, player);
