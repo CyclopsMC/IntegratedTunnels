@@ -9,6 +9,7 @@ authors="rubensworks (aka kroeser)"
 modId="integratedtunnels"
 version="${file.jarVersion}"
 displayName="IntegratedTunnels"
+updateJSONURL="https://raw.githubusercontent.com/CyclopsMC/Versions/master/forge_update/integrated-tunnels.json"
 description='''
 Transfer other stuff over Integrated Dynamics networks.
 '''
