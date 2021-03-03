@@ -118,6 +118,7 @@ public class TunnelAspectWriteBuilders {
             new AspectPropertyTypeInstance<>(ValueTypes.INTEGER, "aspect.aspecttypes.integrateddynamics.integer.channel");
     public static final IAspectPropertyTypeInstance<ValueTypeBoolean, ValueTypeBoolean.ValueBoolean> PROP_ROUNDROBIN =
             new AspectPropertyTypeInstance<>(ValueTypes.BOOLEAN, "aspect.aspecttypes.integratedtunnels.boolean.roundrobin");
+    // TODO: restore exact amount (their usages in AspectProperties and value inits are commented out; their getValue's are still in-place)
     public static final IAspectPropertyTypeInstance<ValueTypeBoolean, ValueTypeBoolean.ValueBoolean> PROP_EXACTAMOUNT =
             new AspectPropertyTypeInstance<>(ValueTypes.BOOLEAN, "aspect.aspecttypes.integratedtunnels.boolean.exactamount");
     public static final IAspectPropertyTypeInstance<ValueTypeBoolean, ValueTypeBoolean.ValueBoolean> PROP_EMPTYISANY =
@@ -158,34 +159,34 @@ public class TunnelAspectWriteBuilders {
         public static final IAspectProperties PROPERTIES_RATE = new AspectProperties(ImmutableList.<IAspectPropertyTypeInstance>of(
                 PROP_CHANNEL,
                 PROP_ROUNDROBIN,
-                PROP_RATE,
-                PROP_EXACTAMOUNT
+                PROP_RATE
+                //PROP_EXACTAMOUNT
         ));
         public static final IAspectProperties PROPERTIES_RATECRAFT = new AspectProperties(ImmutableList.<IAspectPropertyTypeInstance>of(
                 PROP_CHANNEL,
                 PROP_RATE,
-                PROP_EXACTAMOUNT,
+                //PROP_EXACTAMOUNT,
                 PROP_CRAFT
         ));
         public static final IAspectProperties PROPERTIES = new AspectProperties(ImmutableList.<IAspectPropertyTypeInstance>of(
                 PROP_CHANNEL,
-                PROP_ROUNDROBIN,
-                PROP_EXACTAMOUNT
+                PROP_ROUNDROBIN
+                //PROP_EXACTAMOUNT
         ));
         static {
             PROPERTIES_RATE.setValue(PROP_ROUNDROBIN, ValueTypeBoolean.ValueBoolean.of(false));
             PROPERTIES_RATE.setValue(PROP_CHANNEL, ValueTypeInteger.ValueInteger.of(IPositionedAddonsNetworkIngredients.DEFAULT_CHANNEL));
             PROPERTIES_RATE.setValue(PROP_RATE, ValueTypeInteger.ValueInteger.of(1000));
-            PROPERTIES_RATE.setValue(PROP_EXACTAMOUNT, ValueTypeBoolean.ValueBoolean.of(false));
+            //PROPERTIES_RATE.setValue(PROP_EXACTAMOUNT, ValueTypeBoolean.ValueBoolean.of(false));
 
             PROPERTIES_RATECRAFT.setValue(PROP_CHANNEL, ValueTypeInteger.ValueInteger.of(IPositionedAddonsNetworkIngredients.DEFAULT_CHANNEL));
             PROPERTIES_RATECRAFT.setValue(PROP_RATE, ValueTypeInteger.ValueInteger.of(1000));
-            PROPERTIES_RATECRAFT.setValue(PROP_EXACTAMOUNT, ValueTypeBoolean.ValueBoolean.of(false));
+            //PROPERTIES_RATECRAFT.setValue(PROP_EXACTAMOUNT, ValueTypeBoolean.ValueBoolean.of(false));
             PROPERTIES_RATECRAFT.setValue(PROP_CRAFT, ValueTypeBoolean.ValueBoolean.of(false));
 
             PROPERTIES.setValue(PROP_CHANNEL, ValueTypeInteger.ValueInteger.of(IPositionedAddonsNetworkIngredients.DEFAULT_CHANNEL));
             PROPERTIES.setValue(PROP_ROUNDROBIN, ValueTypeBoolean.ValueBoolean.of(false));
-            PROPERTIES.setValue(PROP_EXACTAMOUNT, ValueTypeBoolean.ValueBoolean.of(false));
+            //PROPERTIES.setValue(PROP_EXACTAMOUNT, ValueTypeBoolean.ValueBoolean.of(false));
         }
 
         public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, Boolean>, Triple<PartTarget, IAspectProperties, Integer>>
@@ -284,27 +285,27 @@ public class TunnelAspectWriteBuilders {
                 PROP_CHANNEL,
                 PROP_ROUNDROBIN,
                 PROP_RATE,
-                PROP_EXACTAMOUNT,
+                //PROP_EXACTAMOUNT,
                 PROP_SLOT
         ));
         public static final IAspectProperties PROPERTIES_SLOT = new AspectProperties(ImmutableList.<IAspectPropertyTypeInstance>of(
                 PROP_CHANNEL,
                 PROP_ROUNDROBIN,
-                PROP_EXACTAMOUNT,
+                //PROP_EXACTAMOUNT,
                 PROP_SLOT
         ));
         public static final IAspectProperties PROPERTIES_RATE = new AspectProperties(ImmutableList.<IAspectPropertyTypeInstance>of(
                 PROP_CHANNEL,
                 PROP_ROUNDROBIN,
-                PROP_RATE,
-                PROP_EXACTAMOUNT
+                PROP_RATE
+                //PROP_EXACTAMOUNT
         ));
         public static final IAspectProperties PROPERTIES_RATESLOTCHECKS = new AspectProperties(ImmutableList.<IAspectPropertyTypeInstance>of(
                 PROP_CHANNEL,
                 PROP_ROUNDROBIN,
                 PROP_BLACKLIST,
                 PROP_RATE,
-                PROP_EXACTAMOUNT,
+                //PROP_EXACTAMOUNT,
                 PROP_SLOT,
                 PROP_CHECK_STACKSIZE,
                 PROP_CHECK_NBT,
@@ -315,7 +316,7 @@ public class TunnelAspectWriteBuilders {
                 PROP_ROUNDROBIN,
                 PROP_BLACKLIST,
                 PROP_RATE,
-                PROP_EXACTAMOUNT,
+                //PROP_EXACTAMOUNT,
                 PROP_SLOT,
                 PROP_CHECK_STACKSIZE,
                 PROP_CHECK_NBT,
@@ -327,7 +328,7 @@ public class TunnelAspectWriteBuilders {
                 PROP_ROUNDROBIN,
                 PROP_BLACKLIST,
                 PROP_RATE,
-                PROP_EXACTAMOUNT,
+                //PROP_EXACTAMOUNT,
                 PROP_SLOT,
                 PROP_CHECK_STACKSIZE,
                 PROP_CHECK_NBT
@@ -337,7 +338,7 @@ public class TunnelAspectWriteBuilders {
                 PROP_ROUNDROBIN,
                 PROP_BLACKLIST,
                 PROP_RATE,
-                PROP_EXACTAMOUNT,
+                //PROP_EXACTAMOUNT,
                 PROP_SLOT,
                 PROP_NBT_SUBSET,
                 PROP_NBT_SUPERSET,
@@ -348,24 +349,24 @@ public class TunnelAspectWriteBuilders {
             PROPERTIES_RATESLOT.setValue(PROP_CHANNEL, ValueTypeInteger.ValueInteger.of(IPositionedAddonsNetworkIngredients.DEFAULT_CHANNEL));
             PROPERTIES_RATESLOT.setValue(PROP_ROUNDROBIN, ValueTypeBoolean.ValueBoolean.of(false));
             PROPERTIES_RATESLOT.setValue(PROP_RATE, ValueTypeInteger.ValueInteger.of(64));
-            PROPERTIES_RATESLOT.setValue(PROP_EXACTAMOUNT, ValueTypeBoolean.ValueBoolean.of(false));
+            //PROPERTIES_RATESLOT.setValue(PROP_EXACTAMOUNT, ValueTypeBoolean.ValueBoolean.of(false));
             PROPERTIES_RATESLOT.setValue(PROP_SLOT, ValueTypeInteger.ValueInteger.of(-1));
 
             PROPERTIES_SLOT.setValue(PROP_CHANNEL, ValueTypeInteger.ValueInteger.of(IPositionedAddonsNetworkIngredients.DEFAULT_CHANNEL));
             PROPERTIES_SLOT.setValue(PROP_ROUNDROBIN, ValueTypeBoolean.ValueBoolean.of(false));
-            PROPERTIES_SLOT.setValue(PROP_EXACTAMOUNT, ValueTypeBoolean.ValueBoolean.of(false));
+            //PROPERTIES_SLOT.setValue(PROP_EXACTAMOUNT, ValueTypeBoolean.ValueBoolean.of(false));
             PROPERTIES_SLOT.setValue(PROP_SLOT, ValueTypeInteger.ValueInteger.of(-1));
 
             PROPERTIES_RATE.setValue(PROP_CHANNEL, ValueTypeInteger.ValueInteger.of(IPositionedAddonsNetworkIngredients.DEFAULT_CHANNEL));
             PROPERTIES_RATE.setValue(PROP_ROUNDROBIN, ValueTypeBoolean.ValueBoolean.of(false));
             PROPERTIES_RATE.setValue(PROP_RATE, ValueTypeInteger.ValueInteger.of(64));
-            PROPERTIES_RATE.setValue(PROP_EXACTAMOUNT, ValueTypeBoolean.ValueBoolean.of(false));
+            //PROPERTIES_RATE.setValue(PROP_EXACTAMOUNT, ValueTypeBoolean.ValueBoolean.of(false));
 
             PROPERTIES_RATESLOTCHECKS.setValue(PROP_CHANNEL, ValueTypeInteger.ValueInteger.of(IPositionedAddonsNetworkIngredients.DEFAULT_CHANNEL));
             PROPERTIES_RATESLOTCHECKS.setValue(PROP_ROUNDROBIN, ValueTypeBoolean.ValueBoolean.of(false));
             PROPERTIES_RATESLOTCHECKS.setValue(PROP_BLACKLIST, ValueTypeBoolean.ValueBoolean.of(false));
             PROPERTIES_RATESLOTCHECKS.setValue(PROP_RATE, ValueTypeInteger.ValueInteger.of(64));
-            PROPERTIES_RATESLOTCHECKS.setValue(PROP_EXACTAMOUNT, ValueTypeBoolean.ValueBoolean.of(false));
+            //PROPERTIES_RATESLOTCHECKS.setValue(PROP_EXACTAMOUNT, ValueTypeBoolean.ValueBoolean.of(false));
             PROPERTIES_RATESLOTCHECKS.setValue(PROP_SLOT, ValueTypeInteger.ValueInteger.of(-1));
             PROPERTIES_RATESLOTCHECKS.setValue(PROP_CHECK_STACKSIZE, ValueTypeBoolean.ValueBoolean.of(false));
             PROPERTIES_RATESLOTCHECKS.setValue(PROP_CHECK_NBT, ValueTypeBoolean.ValueBoolean.of(true));
@@ -375,7 +376,7 @@ public class TunnelAspectWriteBuilders {
             PROPERTIES_RATESLOTCHECKSCRAFT.setValue(PROP_ROUNDROBIN, ValueTypeBoolean.ValueBoolean.of(false));
             PROPERTIES_RATESLOTCHECKSCRAFT.setValue(PROP_BLACKLIST, ValueTypeBoolean.ValueBoolean.of(false));
             PROPERTIES_RATESLOTCHECKSCRAFT.setValue(PROP_RATE, ValueTypeInteger.ValueInteger.of(64));
-            PROPERTIES_RATESLOTCHECKSCRAFT.setValue(PROP_EXACTAMOUNT, ValueTypeBoolean.ValueBoolean.of(false));
+            //PROPERTIES_RATESLOTCHECKSCRAFT.setValue(PROP_EXACTAMOUNT, ValueTypeBoolean.ValueBoolean.of(false));
             PROPERTIES_RATESLOTCHECKSCRAFT.setValue(PROP_SLOT, ValueTypeInteger.ValueInteger.of(-1));
             PROPERTIES_RATESLOTCHECKSCRAFT.setValue(PROP_CHECK_STACKSIZE, ValueTypeBoolean.ValueBoolean.of(false));
             PROPERTIES_RATESLOTCHECKSCRAFT.setValue(PROP_CHECK_NBT, ValueTypeBoolean.ValueBoolean.of(true));
@@ -386,7 +387,7 @@ public class TunnelAspectWriteBuilders {
             PROPERTIES_RATESLOTCHECKSLIST.setValue(PROP_ROUNDROBIN, ValueTypeBoolean.ValueBoolean.of(false));
             PROPERTIES_RATESLOTCHECKSLIST.setValue(PROP_BLACKLIST, ValueTypeBoolean.ValueBoolean.of(false));
             PROPERTIES_RATESLOTCHECKSLIST.setValue(PROP_RATE, ValueTypeInteger.ValueInteger.of(64));
-            PROPERTIES_RATESLOTCHECKSLIST.setValue(PROP_EXACTAMOUNT, ValueTypeBoolean.ValueBoolean.of(false));
+            //PROPERTIES_RATESLOTCHECKSLIST.setValue(PROP_EXACTAMOUNT, ValueTypeBoolean.ValueBoolean.of(false));
             PROPERTIES_RATESLOTCHECKSLIST.setValue(PROP_SLOT, ValueTypeInteger.ValueInteger.of(-1));
             PROPERTIES_RATESLOTCHECKSLIST.setValue(PROP_CHECK_STACKSIZE, ValueTypeBoolean.ValueBoolean.of(false));
             PROPERTIES_RATESLOTCHECKSLIST.setValue(PROP_CHECK_NBT, ValueTypeBoolean.ValueBoolean.of(true));
@@ -395,7 +396,7 @@ public class TunnelAspectWriteBuilders {
             PROPERTIES_NBT.setValue(PROP_ROUNDROBIN, ValueTypeBoolean.ValueBoolean.of(false));
             PROPERTIES_NBT.setValue(PROP_BLACKLIST, ValueTypeBoolean.ValueBoolean.of(false));
             PROPERTIES_NBT.setValue(PROP_RATE, ValueTypeInteger.ValueInteger.of(64));
-            PROPERTIES_NBT.setValue(PROP_EXACTAMOUNT, ValueTypeBoolean.ValueBoolean.of(false));
+            //PROPERTIES_NBT.setValue(PROP_EXACTAMOUNT, ValueTypeBoolean.ValueBoolean.of(false));
             PROPERTIES_NBT.setValue(PROP_SLOT, ValueTypeInteger.ValueInteger.of(-1));
             PROPERTIES_NBT.setValue(PROP_NBT_SUBSET, ValueTypeBoolean.ValueBoolean.of(true));
             PROPERTIES_NBT.setValue(PROP_NBT_SUPERSET, ValueTypeBoolean.ValueBoolean.of(true));
@@ -663,14 +664,14 @@ public class TunnelAspectWriteBuilders {
                 new AspectPropertyTypeInstance<>(ValueTypes.BOOLEAN, "aspect.aspecttypes.integratedtunnels.boolean.fluid.nbtrecursive");
 
         public static final IAspectProperties PROPERTIES = new AspectProperties(ImmutableList.<IAspectPropertyTypeInstance>of(
-                PROP_CHANNEL,
-                PROP_EXACTAMOUNT
+                PROP_CHANNEL
+                //PROP_EXACTAMOUNT
         ));
         public static final IAspectProperties PROPERTIES_RATE = new AspectProperties(ImmutableList.<IAspectPropertyTypeInstance>of(
                 PROP_CHANNEL,
                 PROP_ROUNDROBIN,
-                PROP_RATE,
-                PROP_EXACTAMOUNT
+                PROP_RATE
+                //PROP_EXACTAMOUNT
         ));
         public static final IAspectProperties PROPERTIES_RATECHECKS = new AspectProperties(ImmutableList.<IAspectPropertyTypeInstance>of(
                 PROP_CHANNEL,
@@ -678,7 +679,7 @@ public class TunnelAspectWriteBuilders {
                 PROP_BLACKLIST,
                 PROP_EMPTYISANY,
                 PROP_RATE,
-                PROP_EXACTAMOUNT,
+                //PROP_EXACTAMOUNT,
                 PROP_CHECK_AMOUNT,
                 PROP_CHECK_NBT
         ));
@@ -688,7 +689,7 @@ public class TunnelAspectWriteBuilders {
                 PROP_BLACKLIST,
                 PROP_EMPTYISANY,
                 PROP_RATE,
-                PROP_EXACTAMOUNT,
+                //PROP_EXACTAMOUNT,
                 PROP_CHECK_AMOUNT,
                 PROP_CHECK_NBT,
                 PROP_CRAFT
@@ -698,7 +699,7 @@ public class TunnelAspectWriteBuilders {
                 PROP_ROUNDROBIN,
                 PROP_BLACKLIST,
                 PROP_RATE,
-                PROP_EXACTAMOUNT,
+                //PROP_EXACTAMOUNT,
                 PROP_CHECK_AMOUNT,
                 PROP_CHECK_NBT
         ));
@@ -712,19 +713,19 @@ public class TunnelAspectWriteBuilders {
         ));
         static {
             PROPERTIES.setValue(PROP_CHANNEL, ValueTypeInteger.ValueInteger.of(IPositionedAddonsNetworkIngredients.DEFAULT_CHANNEL));
-            PROPERTIES.setValue(PROP_EXACTAMOUNT, ValueTypeBoolean.ValueBoolean.of(false));
+            //PROPERTIES.setValue(PROP_EXACTAMOUNT, ValueTypeBoolean.ValueBoolean.of(false));
 
             PROPERTIES_RATE.setValue(PROP_CHANNEL, ValueTypeInteger.ValueInteger.of(IPositionedAddonsNetworkIngredients.DEFAULT_CHANNEL));
             PROPERTIES_RATE.setValue(PROP_ROUNDROBIN, ValueTypeBoolean.ValueBoolean.of(false));
             PROPERTIES_RATE.setValue(PROP_RATE, ValueTypeInteger.ValueInteger.of(1000));
-            PROPERTIES_RATE.setValue(PROP_EXACTAMOUNT, ValueTypeBoolean.ValueBoolean.of(false));
+            //PROPERTIES_RATE.setValue(PROP_EXACTAMOUNT, ValueTypeBoolean.ValueBoolean.of(false));
 
             PROPERTIES_RATECHECKS.setValue(PROP_CHANNEL, ValueTypeInteger.ValueInteger.of(IPositionedAddonsNetworkIngredients.DEFAULT_CHANNEL));
             PROPERTIES_RATECHECKS.setValue(PROP_ROUNDROBIN, ValueTypeBoolean.ValueBoolean.of(false));
             PROPERTIES_RATECHECKS.setValue(PROP_BLACKLIST, ValueTypeBoolean.ValueBoolean.of(false));
             PROPERTIES_RATECHECKS.setValue(PROP_EMPTYISANY, ValueTypeBoolean.ValueBoolean.of(false));
             PROPERTIES_RATECHECKS.setValue(PROP_RATE, ValueTypeInteger.ValueInteger.of(1000));
-            PROPERTIES_RATECHECKS.setValue(PROP_EXACTAMOUNT, ValueTypeBoolean.ValueBoolean.of(false));
+            //PROPERTIES_RATECHECKS.setValue(PROP_EXACTAMOUNT, ValueTypeBoolean.ValueBoolean.of(false));
             PROPERTIES_RATECHECKS.setValue(PROP_CHECK_AMOUNT, ValueTypeBoolean.ValueBoolean.of(false));
             PROPERTIES_RATECHECKS.setValue(PROP_CHECK_NBT, ValueTypeBoolean.ValueBoolean.of(true));
 
@@ -733,7 +734,7 @@ public class TunnelAspectWriteBuilders {
             PROPERTIES_RATECHECKSCRAFT.setValue(PROP_BLACKLIST, ValueTypeBoolean.ValueBoolean.of(false));
             PROPERTIES_RATECHECKSCRAFT.setValue(PROP_EMPTYISANY, ValueTypeBoolean.ValueBoolean.of(false));
             PROPERTIES_RATECHECKSCRAFT.setValue(PROP_RATE, ValueTypeInteger.ValueInteger.of(1000));
-            PROPERTIES_RATECHECKSCRAFT.setValue(PROP_EXACTAMOUNT, ValueTypeBoolean.ValueBoolean.of(false));
+            //PROPERTIES_RATECHECKSCRAFT.setValue(PROP_EXACTAMOUNT, ValueTypeBoolean.ValueBoolean.of(false));
             PROPERTIES_RATECHECKSCRAFT.setValue(PROP_CHECK_AMOUNT, ValueTypeBoolean.ValueBoolean.of(false));
             PROPERTIES_RATECHECKSCRAFT.setValue(PROP_CHECK_NBT, ValueTypeBoolean.ValueBoolean.of(true));
             PROPERTIES_RATECHECKSCRAFT.setValue(PROP_CRAFT, ValueTypeBoolean.ValueBoolean.of(false));
@@ -742,7 +743,7 @@ public class TunnelAspectWriteBuilders {
             PROPERTIES_RATECHECKSLIST.setValue(PROP_ROUNDROBIN, ValueTypeBoolean.ValueBoolean.of(false));
             PROPERTIES_RATECHECKSLIST.setValue(PROP_BLACKLIST, ValueTypeBoolean.ValueBoolean.of(false));
             PROPERTIES_RATECHECKSLIST.setValue(PROP_RATE, ValueTypeInteger.ValueInteger.of(1000));
-            PROPERTIES_RATECHECKSLIST.setValue(PROP_EXACTAMOUNT, ValueTypeBoolean.ValueBoolean.of(false));
+            //PROPERTIES_RATECHECKSLIST.setValue(PROP_EXACTAMOUNT, ValueTypeBoolean.ValueBoolean.of(false));
             PROPERTIES_RATECHECKSLIST.setValue(PROP_CHECK_NBT, ValueTypeBoolean.ValueBoolean.of(true));
             PROPERTIES_RATECHECKSLIST.setValue(PROP_CHECK_AMOUNT, ValueTypeBoolean.ValueBoolean.of(false));
 
@@ -963,22 +964,22 @@ public class TunnelAspectWriteBuilders {
             }
             public static final IAspectProperties PROPERTIES_ENTITY = new AspectProperties(ImmutableList.<IAspectPropertyTypeInstance>of(
                     PROP_CHANNEL,
-                    PROP_EXACTAMOUNT,
+                    //PROP_EXACTAMOUNT,
                     World.PROPERTY_ENTITYINDEX
             ));
             public static final IAspectProperties PROPERTIES_ENTITYCRAFT = new AspectProperties(ImmutableList.<IAspectPropertyTypeInstance>of(
                     PROP_CHANNEL,
-                    PROP_EXACTAMOUNT,
+                    //PROP_EXACTAMOUNT,
                     World.PROPERTY_ENTITYINDEX,
                     PROP_CRAFT
             ));
             static {
                 PROPERTIES_ENTITY.setValue(PROP_CHANNEL, ValueTypeInteger.ValueInteger.of(IPositionedAddonsNetworkIngredients.DEFAULT_CHANNEL));
-                PROPERTIES_ENTITY.setValue(PROP_EXACTAMOUNT, ValueTypeBoolean.ValueBoolean.of(false));
+                //PROPERTIES_ENTITY.setValue(PROP_EXACTAMOUNT, ValueTypeBoolean.ValueBoolean.of(false));
                 PROPERTIES_ENTITY.setValue(World.PROPERTY_ENTITYINDEX, ValueTypeInteger.ValueInteger.of(0));
 
                 PROPERTIES_ENTITYCRAFT.setValue(PROP_CHANNEL, ValueTypeInteger.ValueInteger.of(IPositionedAddonsNetworkIngredients.DEFAULT_CHANNEL));
-                PROPERTIES_ENTITYCRAFT.setValue(PROP_EXACTAMOUNT, ValueTypeBoolean.ValueBoolean.of(false));
+                //PROPERTIES_ENTITYCRAFT.setValue(PROP_EXACTAMOUNT, ValueTypeBoolean.ValueBoolean.of(false));
                 PROPERTIES_ENTITYCRAFT.setValue(World.PROPERTY_ENTITYINDEX, ValueTypeInteger.ValueInteger.of(0));
                 PROPERTIES_ENTITYCRAFT.setValue(PROP_CRAFT, ValueTypeBoolean.ValueBoolean.of(false));
             }
@@ -1000,7 +1001,7 @@ public class TunnelAspectWriteBuilders {
             public static final IAspectProperties PROPERTIES_ENTITYITEM_PICK_UP_NORATE = new AspectProperties(ImmutableList.<IAspectPropertyTypeInstance>of(
                     PROP_CHANNEL,
                     PROP_ROUNDROBIN,
-                    PROP_EXACTAMOUNT,
+                    //PROP_EXACTAMOUNT,
                     TunnelAspectWriteBuilders.Item.PROP_CHECK_STACKSIZE,
                     TunnelAspectWriteBuilders.Item.PROP_CHECK_NBT,
                     PROP_IGNORE_PICK_UP_DELAY
@@ -1008,7 +1009,7 @@ public class TunnelAspectWriteBuilders {
             public static final IAspectProperties PROPERTIES_ENTITYITEM_PLACE_NORATE_NOCHECKS = new AspectProperties(ImmutableList.<IAspectPropertyTypeInstance>of(
                     PROP_CHANNEL,
                     PROP_ROUNDROBIN,
-                    PROP_EXACTAMOUNT,
+                    //PROP_EXACTAMOUNT,
                     PROP_DISPENSE,
                     PROP_OFFSET_X,
                     PROP_OFFSET_Y,
@@ -1022,14 +1023,14 @@ public class TunnelAspectWriteBuilders {
             static {
                 PROPERTIES_ENTITYITEM_PICK_UP_NORATE.setValue(PROP_CHANNEL, ValueTypeInteger.ValueInteger.of(IPositionedAddonsNetworkIngredients.DEFAULT_CHANNEL));
                 PROPERTIES_ENTITYITEM_PICK_UP_NORATE.setValue(PROP_ROUNDROBIN, ValueTypeBoolean.ValueBoolean.of(false));
-                PROPERTIES_ENTITYITEM_PICK_UP_NORATE.setValue(PROP_EXACTAMOUNT, ValueTypeBoolean.ValueBoolean.of(false));
+                //PROPERTIES_ENTITYITEM_PICK_UP_NORATE.setValue(PROP_EXACTAMOUNT, ValueTypeBoolean.ValueBoolean.of(false));
                 PROPERTIES_ENTITYITEM_PICK_UP_NORATE.setValue(TunnelAspectWriteBuilders.Item.PROP_CHECK_STACKSIZE, ValueTypeBoolean.ValueBoolean.of(false));
                 PROPERTIES_ENTITYITEM_PICK_UP_NORATE.setValue(TunnelAspectWriteBuilders.Item.PROP_CHECK_NBT, ValueTypeBoolean.ValueBoolean.of(true));
                 PROPERTIES_ENTITYITEM_PICK_UP_NORATE.setValue(PROP_IGNORE_PICK_UP_DELAY, ValueTypeBoolean.ValueBoolean.of(true));
 
                 PROPERTIES_ENTITYITEM_PLACE_NORATE_NOCHECKS.setValue(PROP_CHANNEL, ValueTypeInteger.ValueInteger.of(IPositionedAddonsNetworkIngredients.DEFAULT_CHANNEL));
                 PROPERTIES_ENTITYITEM_PLACE_NORATE_NOCHECKS.setValue(PROP_ROUNDROBIN, ValueTypeBoolean.ValueBoolean.of(false));
-                PROPERTIES_ENTITYITEM_PLACE_NORATE_NOCHECKS.setValue(PROP_EXACTAMOUNT, ValueTypeBoolean.ValueBoolean.of(false));
+                //PROPERTIES_ENTITYITEM_PLACE_NORATE_NOCHECKS.setValue(PROP_EXACTAMOUNT, ValueTypeBoolean.ValueBoolean.of(false));
                 PROPERTIES_ENTITYITEM_PLACE_NORATE_NOCHECKS.setValue(PROP_DISPENSE, ValueTypeBoolean.ValueBoolean.of(false));
                 PROPERTIES_ENTITYITEM_PLACE_NORATE_NOCHECKS.setValue(PROP_OFFSET_X, ValueTypeDouble.ValueDouble.of(0.5D));
                 PROPERTIES_ENTITYITEM_PLACE_NORATE_NOCHECKS.setValue(PROP_OFFSET_Y, ValueTypeDouble.ValueDouble.of(0.5D));
@@ -1048,14 +1049,14 @@ public class TunnelAspectWriteBuilders {
             public static final IAspectProperties PROPERTIES_ENTITYITEM_PICK_UP_NOCHECKS = new AspectProperties(ImmutableList.<IAspectPropertyTypeInstance>of(
                     PROP_CHANNEL,
                     PROP_ROUNDROBIN,
-                    PROP_EXACTAMOUNT,
+                    //PROP_EXACTAMOUNT,
                     PROP_IGNORE_PICK_UP_DELAY,
                     TunnelAspectWriteBuilders.Item.PROP_RATE
             ));
             public static final IAspectProperties PROPERTIES_ENTITYITEM_PICK_UP_NORATE_NOCHECKS = new AspectProperties(ImmutableList.<IAspectPropertyTypeInstance>of(
                     PROP_CHANNEL,
                     PROP_ROUNDROBIN,
-                    PROP_EXACTAMOUNT,
+                    //PROP_EXACTAMOUNT,
                     PROP_IGNORE_PICK_UP_DELAY
             ));
             public static final IAspectProperties PROPERTIES_ENTITYITEM_PICK_UP_NBT = new AspectProperties(ImmutableList.<IAspectPropertyTypeInstance>of(
@@ -1074,13 +1075,13 @@ public class TunnelAspectWriteBuilders {
 
                 PROPERTIES_ENTITYITEM_PICK_UP_NOCHECKS.setValue(PROP_CHANNEL, ValueTypeInteger.ValueInteger.of(IPositionedAddonsNetworkIngredients.DEFAULT_CHANNEL));
                 PROPERTIES_ENTITYITEM_PICK_UP_NOCHECKS.setValue(PROP_ROUNDROBIN, ValueTypeBoolean.ValueBoolean.of(false));
-                PROPERTIES_ENTITYITEM_PICK_UP_NOCHECKS.setValue(PROP_EXACTAMOUNT, ValueTypeBoolean.ValueBoolean.of(false));
+                //PROPERTIES_ENTITYITEM_PICK_UP_NOCHECKS.setValue(PROP_EXACTAMOUNT, ValueTypeBoolean.ValueBoolean.of(false));
                 PROPERTIES_ENTITYITEM_PICK_UP_NOCHECKS.setValue(PROP_IGNORE_PICK_UP_DELAY, ValueTypeBoolean.ValueBoolean.of(true));
                 PROPERTIES_ENTITYITEM_PICK_UP_NOCHECKS.setValue(TunnelAspectWriteBuilders.Item.PROP_RATE, ValueTypeInteger.ValueInteger.of(64));
 
                 PROPERTIES_ENTITYITEM_PICK_UP_NORATE_NOCHECKS.setValue(PROP_CHANNEL, ValueTypeInteger.ValueInteger.of(IPositionedAddonsNetworkIngredients.DEFAULT_CHANNEL));
                 PROPERTIES_ENTITYITEM_PICK_UP_NORATE_NOCHECKS.setValue(PROP_ROUNDROBIN, ValueTypeBoolean.ValueBoolean.of(false));
-                PROPERTIES_ENTITYITEM_PICK_UP_NORATE_NOCHECKS.setValue(PROP_EXACTAMOUNT, ValueTypeBoolean.ValueBoolean.of(false));
+                //PROPERTIES_ENTITYITEM_PICK_UP_NORATE_NOCHECKS.setValue(PROP_EXACTAMOUNT, ValueTypeBoolean.ValueBoolean.of(false));
                 PROPERTIES_ENTITYITEM_PICK_UP_NORATE_NOCHECKS.setValue(PROP_IGNORE_PICK_UP_DELAY, ValueTypeBoolean.ValueBoolean.of(true));
 
                 PROPERTIES_ENTITYITEM_PICK_UP_NBT.setValue(PROP_CHANNEL, ValueTypeInteger.ValueInteger.of(IPositionedAddonsNetworkIngredients.DEFAULT_CHANNEL));
