@@ -1,0 +1,11 @@
+As always, don't forget to backup your world before updating!
+Requires CyclopsCore version 1.11.1 or higher.
+
+Changes:
+* Remove `exactQuantity` aspect property
+  The implementation was broken for a long time, and not trivial to restore.
+  Given its under-usage, it will not be missed.
+  Closes #215
+
+Fixes:
+* Fix part id's not being removable via crafting table, CyclopsMC/IntegratedTunnels#214
