@@ -11,4 +11,6 @@ org.cyclops.integratedtunnels.core.world
 org.cyclops.integratedtunnels.item
 org.cyclops.integratedtunnels.part
 org.cyclops.integratedtunnels.part.aspect
+org.cyclops.integratedtunnels.part.aspect.listproxy
+org.cyclops.integratedtunnels.part.aspect.operator
 org.cyclops.integratedtunnels.proxy
