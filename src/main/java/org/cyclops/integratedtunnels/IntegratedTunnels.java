@@ -1,5 +1,6 @@
 package org.cyclops.integratedtunnels;
 
+import com.google.common.collect.Lists;
 import net.minecraft.item.ItemGroup;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -16,6 +17,8 @@ import org.cyclops.cyclopscore.init.ModBaseVersionable;
 import org.cyclops.cyclopscore.proxy.IClientProxy;
 import org.cyclops.cyclopscore.proxy.ICommonProxy;
 import org.cyclops.integrateddynamics.IntegratedDynamics;
+import org.cyclops.integrateddynamics.api.part.aspect.IAspect;
+import org.cyclops.integrateddynamics.core.part.aspect.AspectRegistry;
 import org.cyclops.integrateddynamics.infobook.OnTheDynamicsOfIntegrationBook;
 import org.cyclops.integratedtunnels.api.world.IBlockBreakHandlerRegistry;
 import org.cyclops.integratedtunnels.api.world.IBlockPlaceHandlerRegistry;
@@ -31,6 +34,7 @@ import org.cyclops.integratedtunnels.core.world.BlockPlaceHandlers;
 import org.cyclops.integratedtunnels.item.ItemDummyPickAxeConfig;
 import org.cyclops.integratedtunnels.part.PartTypes;
 import org.cyclops.integratedtunnels.part.aspect.TunnelAspects;
+import org.cyclops.integratedtunnels.part.aspect.listproxy.TunnelValueTypeListProxyFactories;
 import org.cyclops.integratedtunnels.proxy.ClientProxy;
 import org.cyclops.integratedtunnels.proxy.CommonProxy;
 
@@ -80,6 +84,24 @@ public class IntegratedTunnels extends ModBaseVersionable<IntegratedTunnels> {
                 .registerSection(
                         OnTheDynamicsOfIntegrationBook.getInstance(), "info_book.integrateddynamics.tutorials",
                         "/data/" + Reference.MOD_ID + "/info/tunnels_tutorials.xml");
+
+        // Register value list proxies
+        TunnelValueTypeListProxyFactories.load();
+
+        // Inject aspects into ID parts
+        AspectRegistry.getInstance().register(org.cyclops.integrateddynamics.core.part.PartTypes.NETWORK_READER, Lists.newArrayList(
+                TunnelAspects.Read.Item.LONG_COUNT,
+                TunnelAspects.Read.Item.LONG_COUNTMAX,
+                TunnelAspects.Read.Item.LIST_ITEMSTACKS,
+                TunnelAspects.Read.Item.OPERATOR_GETITEMCOUNT,
+                TunnelAspects.Read.Item.INTEGER_INTERFACES,
+
+                TunnelAspects.Read.Fluid.LONG_COUNT,
+                TunnelAspects.Read.Fluid.LONG_COUNTMAX,
+                TunnelAspects.Read.Fluid.LIST_FLUIDSTACKS,
+                TunnelAspects.Read.Fluid.OPERATOR_GETFLUIDCOUNT,
+                TunnelAspects.Read.Fluid.INTEGER_INTERFACES
+        ));
     }
 
     @Override
