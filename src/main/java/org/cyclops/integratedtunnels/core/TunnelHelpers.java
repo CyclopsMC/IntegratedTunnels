@@ -87,8 +87,8 @@ public class TunnelHelpers {
                 }
                 throw new EvaluationException(new StringTextComponent("Ingredient movement failed " +
                         "due to inconsistent insertion behaviour by destination in simulation " +
-                        "and non-simulation mode. This can be caused by invalid network setups. Lost " +
-                        e.getIngredientComponent().getMatcher().localize(e.getRemainder()) + "."));
+                        "and non-simulation mode. This can be caused by invalid network setups. Lost ")
+                            .append(e.getIngredientComponent().getMatcher().getDisplayName(e.getRemainder())));
             }
         } catch (IllegalStateException e) {
             IntegratedTunnels.clog(Level.WARN, e.getMessage());
