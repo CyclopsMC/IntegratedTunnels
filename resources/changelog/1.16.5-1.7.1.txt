@@ -1,0 +1,7 @@
+As always, don't forget to backup your world before updating!
+Requires CyclopsCore version 1.11.1 or higher.
+
+Fixes:
+* Fix server crash on inconsistent transfer error
+  Closes CyclopsMC/IntegratedDynamics#1010
+
