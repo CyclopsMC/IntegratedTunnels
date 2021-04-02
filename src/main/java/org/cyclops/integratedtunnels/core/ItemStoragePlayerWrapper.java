@@ -141,7 +141,7 @@ public class ItemStoragePlayerWrapper implements IIngredientComponentStorage<Ite
                 ActionResultType actionResult = stack.getItem().onItemUseFirst(stack, itemUseContext);
                 if (actionResult == ActionResultType.FAIL) {
                     return stack;
-                } else if (actionResult == ActionResultType.SUCCESS) {
+                } else if (actionResult.isSuccessOrConsume()) {
                     returnPlayerInventory(player);
                     return ItemStack.EMPTY;
                 }
@@ -157,13 +157,26 @@ public class ItemStoragePlayerWrapper implements IIngredientComponentStorage<Ite
                 }
             }
 
+            // Interact with entity
+            List<Entity> entities = world.getEntitiesWithinAABB(Entity.class, new AxisAlignedBB(pos));
+            if (entities.size() > 0) {
+                Entity entity = getEntity(entities);
+                ActionResultType actionResult = player.interactOn(entity, hand);
+                if (actionResult == ActionResultType.FAIL) {
+                    return stack;
+                } else if (actionResult.isSuccessOrConsume()) {
+                    returnPlayerInventory(player);
+                    return ItemStack.EMPTY;
+                }
+            }
+
             // Use itemstack
             if (!stack.isEmpty()) {
                 ActionResultType cancelResult = ForgeHooks.onItemRightClick(player, hand);
                 if (cancelResult != null)  {
                     if (cancelResult == ActionResultType.FAIL) {
                         return stack;
-                    } else if (cancelResult == ActionResultType.SUCCESS) {
+                    } else if (cancelResult.isSuccessOrConsume()) {
                         returnPlayerInventory(player);
                         return ItemStack.EMPTY;
                     }
@@ -180,7 +193,7 @@ public class ItemStoragePlayerWrapper implements IIngredientComponentStorage<Ite
                     } else {
                         PlayerHelpers.setHeldItemSilent(player, hand, actionresult.getResult());
                     }
-                    if (actionresult.getType() == ActionResultType.SUCCESS) {
+                    if (actionresult.getType().isSuccessOrConsume()) {
                         // If the hand was activated, simulate the activated hand for a number of ticks, and deactivate.
                         if (player.isHandActive()) {
                             player.updateActiveHandSimulated();
@@ -207,27 +220,11 @@ public class ItemStoragePlayerWrapper implements IIngredientComponentStorage<Ite
                 ActionResultType actionResult = stack.onItemUse(itemUseContextReach);
                 if (actionResult == ActionResultType.FAIL) {
                     return stack;
-                } else if (actionResult == ActionResultType.SUCCESS) {
+                } else if (actionResult.isSuccessOrConsume()) {
                     returnPlayerInventory(player);
                     return ItemStack.EMPTY;
                 }
                 // Otherwise, PASS the logic
-            }
-
-            // Interact with entity
-            List<Entity> entities = world.getEntitiesWithinAABB(Entity.class, new AxisAlignedBB(pos));
-            if (entities.size() > 0) {
-                Entity entity = getEntity(entities);
-                ActionResultType actionResult = player.interactOn(entity, hand);
-                if (actionResult == ActionResultType.FAIL) {
-                    return stack;
-                } else if (actionResult == ActionResultType.SUCCESS) {
-                    returnPlayerInventory(player);
-                    return ItemStack.EMPTY;
-                }
-            } else {
-                returnPlayerInventory(player);
-                return ItemStack.EMPTY;
             }
         } else {
             /* Inspired by PlayerInteractionManager#func_225416_a (line 120) */
