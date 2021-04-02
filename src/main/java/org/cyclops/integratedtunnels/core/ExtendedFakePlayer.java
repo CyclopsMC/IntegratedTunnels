@@ -2,6 +2,7 @@ package org.cyclops.integratedtunnels.core;
 
 import com.mojang.authlib.GameProfile;
 import net.minecraft.item.ItemStack;
+import net.minecraft.potion.EffectInstance;
 import net.minecraft.world.GameType;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.common.util.FakePlayer;
@@ -24,6 +25,11 @@ public class ExtendedFakePlayer extends FakePlayer {
         super(world, PROFILE);
         this.interactionManager.setGameType(GameType.SURVIVAL);
         this.connection = new FakeNetHandlerPlayServer(world.getServer(), this);
+    }
+
+    @Override
+    public boolean isPotionApplicable(EffectInstance potioneffectIn) {
+        return false;
     }
 
     @Override
