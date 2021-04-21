@@ -32,8 +32,10 @@
       "integratedtunnels:part_importer_world_fluid",
       "integratedtunnels:part_importer_world_energy",
       "integratedtunnels:part_importer_world_block",
-      "integratedtunnels:part_player_simulator"
-
+      "integratedtunnels:part_player_simulator",
+      "integratedtunnels:part_interface_filter_item",
+      "integratedtunnels:part_interface_filter_fluid",
+      "integratedtunnels:part_interface_filter_energy"
     ]
   },
   "criteria": {

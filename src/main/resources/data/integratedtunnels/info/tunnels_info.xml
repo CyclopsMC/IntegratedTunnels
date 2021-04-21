@@ -13,6 +13,7 @@
         <paragraph>info_book.integratedtunnels.concepts.text5</paragraph>
         <paragraph>info_book.integratedtunnels.concepts.text6</paragraph>
         <paragraph>info_book.integratedtunnels.concepts.text7</paragraph>
+        <paragraph>info_book.integratedtunnels.concepts.text8</paragraph>
         <appendix type="image" width="120" height="44">integratedtunnels:textures/gui/infobook/importer.png</appendix>
         <appendix type="image" width="120" height="47">integratedtunnels:textures/gui/infobook/exporter.png</appendix>
         <appendix type="image" width="120" height="48">integratedtunnels:textures/gui/infobook/importerexporter.png</appendix>
@@ -24,36 +25,45 @@
         <tag>integratedtunnels:part_interface_item</tag>
         <tag>integratedtunnels:part_exporter_item</tag>
         <tag>integratedtunnels:part_importer_item</tag>
+        <tag>integratedtunnels:part_interface_filter_item</tag>
         <paragraph>info_book.integratedtunnels.item.text1</paragraph>
         <appendix type="minecraft:crafting">integratedtunnels:crafting/part_interface_item</appendix>
         <appendix type="minecraft:crafting">integratedtunnels:crafting/part_exporter_item</appendix>
         <appendix_list factory="integrateddynamics:part_aspects">integratedtunnels:exporter_item</appendix_list>
         <appendix type="minecraft:crafting">integratedtunnels:crafting/part_importer_item</appendix>
         <appendix_list factory="integrateddynamics:part_aspects">integratedtunnels:importer_item</appendix_list>
+        <appendix type="minecraft:crafting">integratedtunnels:crafting/part_interface_filter_item</appendix>
+        <appendix_list factory="integrateddynamics:part_aspects">integratedtunnels:interface_filter_item</appendix_list>
     </section>
 
     <section name="info_book.integratedtunnels.fluid">
         <tag>integratedtunnels:part_interface_fluid</tag>
         <tag>integratedtunnels:part_exporter_fluid</tag>
         <tag>integratedtunnels:part_importer_fluid</tag>
+        <tag>integratedtunnels:part_interface_filter_fluid</tag>
         <paragraph>info_book.integratedtunnels.fluid.text1</paragraph>
         <appendix type="minecraft:crafting">integratedtunnels:crafting/part_interface_fluid</appendix>
         <appendix type="minecraft:crafting">integratedtunnels:crafting/part_exporter_fluid</appendix>
         <appendix_list factory="integrateddynamics:part_aspects">integratedtunnels:exporter_fluid</appendix_list>
         <appendix type="minecraft:crafting">integratedtunnels:crafting/part_importer_fluid</appendix>
         <appendix_list factory="integrateddynamics:part_aspects">integratedtunnels:importer_fluid</appendix_list>
+        <appendix type="minecraft:crafting">integratedtunnels:crafting/part_interface_filter_fluid</appendix>
+        <appendix_list factory="integrateddynamics:part_aspects">integratedtunnels:interface_filter_fluid</appendix_list>
     </section>
 
     <section name="info_book.integratedtunnels.energy">
         <tag>integratedtunnels:part_interface_energy</tag>
         <tag>integratedtunnels:part_exporter_energy</tag>
         <tag>integratedtunnels:part_importer_energy</tag>
+        <tag>integratedtunnels:part_interface_filter_energy</tag>
         <paragraph>info_book.integratedtunnels.energy.text1</paragraph>
         <appendix type="minecraft:crafting">integratedtunnels:crafting/part_interface_energy</appendix>
         <appendix type="minecraft:crafting">integratedtunnels:crafting/part_exporter_energy</appendix>
         <appendix_list factory="integrateddynamics:part_aspects">integratedtunnels:exporter_energy</appendix_list>
         <appendix type="minecraft:crafting">integratedtunnels:crafting/part_importer_energy</appendix>
         <appendix_list factory="integrateddynamics:part_aspects">integratedtunnels:importer_energy</appendix_list>
+        <appendix type="minecraft:crafting">integratedtunnels:crafting/part_interface_filter_energy</appendix>
+        <appendix_list factory="integrateddynamics:part_aspects">integratedtunnels:interface_filter_energy</appendix_list>
     </section>
 
     <section name="info_book.integratedtunnels.world">

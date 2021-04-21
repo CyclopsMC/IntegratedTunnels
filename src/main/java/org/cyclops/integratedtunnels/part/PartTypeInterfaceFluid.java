@@ -7,6 +7,7 @@ import net.minecraftforge.fluids.capability.IFluidHandler;
 import org.cyclops.integratedtunnels.GeneralConfig;
 import org.cyclops.integratedtunnels.api.network.IFluidNetwork;
 import org.cyclops.integratedtunnels.capability.network.FluidNetworkConfig;
+import org.cyclops.integratedtunnels.core.part.IPartTypeInterfacePositionedAddon;
 import org.cyclops.integratedtunnels.core.part.PartTypeInterfacePositionedAddon;
 
 import javax.annotation.Nonnull;
@@ -21,12 +22,12 @@ public class PartTypeInterfaceFluid extends PartTypeInterfacePositionedAddon<IFl
     }
 
     @Override
-    protected Capability<IFluidNetwork> getNetworkCapability() {
+    public Capability<IFluidNetwork> getNetworkCapability() {
         return FluidNetworkConfig.CAPABILITY;
     }
 
     @Override
-    protected Capability<IFluidHandler> getTargetCapability() {
+    public Capability<IFluidHandler> getTargetCapability() {
         return CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY;
     }
 
@@ -40,92 +41,105 @@ public class PartTypeInterfaceFluid extends PartTypeInterfacePositionedAddon<IFl
         return GeneralConfig.interfaceFluidBaseConsumption;
     }
 
-    public static class State extends PartTypeInterfacePositionedAddon.State<PartTypeInterfaceFluid, IFluidNetwork, IFluidHandler> implements IFluidHandler {
+    public static class State extends PartTypeInterfacePositionedAddon.State<IFluidNetwork, IFluidHandler, PartTypeInterfaceFluid, PartTypeInterfaceFluid.State> {
 
         @Override
-        protected Capability<IFluidHandler> getTargetCapability() {
+        public Capability<IFluidHandler> getTargetCapability() {
             return CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY;
         }
 
+        @Override
+        public IFluidHandler getCapabilityInstance() {
+            return new PartTypeInterfaceFluid.FluidHandler(this);
+        }
+    }
+
+    public static class FluidHandler implements IFluidHandler {
+        private final IPartTypeInterfacePositionedAddon.IState<IFluidNetwork, IFluidHandler, ?, ?> state;
+
+        public FluidHandler(IState<IFluidNetwork, IFluidHandler, ?, ?> state) {
+            this.state = state;
+        }
+
         protected IFluidHandler getFluidHandler() {
-            return getPositionedAddonsNetwork().getChannelExternal(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, getChannel());
+            return state.getPositionedAddonsNetwork().getChannelExternal(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, state.getChannel());
         }
 
         @Override
         public int getTanks() {
-            if (!isNetworkAndPositionValid()) {
+            if (!state.isNetworkAndPositionValid()) {
                 return 0;
             }
-            disablePosition();
+            state.disablePosition();
             int ret = getFluidHandler().getTanks();
-            enablePosition();
+            state.enablePosition();
             return ret;
         }
 
         @Nonnull
         @Override
         public FluidStack getFluidInTank(int tank) {
-            if (!isNetworkAndPositionValid()) {
+            if (!state.isNetworkAndPositionValid()) {
                 return FluidStack.EMPTY;
             }
-            disablePosition();
+            state.disablePosition();
             FluidStack ret = getFluidHandler().getFluidInTank(tank);
-            enablePosition();
+            state.enablePosition();
             return ret;
         }
 
         @Override
         public int getTankCapacity(int tank) {
-            if (!isNetworkAndPositionValid()) {
+            if (!state.isNetworkAndPositionValid()) {
                 return 0;
             }
-            disablePosition();
+            state.disablePosition();
             int ret = getFluidHandler().getTankCapacity(tank);
-            enablePosition();
+            state.enablePosition();
             return ret;
         }
 
         @Override
         public boolean isFluidValid(int tank, @Nonnull FluidStack stack) {
-            if (!isNetworkAndPositionValid()) {
+            if (!state.isNetworkAndPositionValid()) {
                 return false;
             }
-            disablePosition();
+            state.disablePosition();
             boolean ret = getFluidHandler().isFluidValid(tank, stack);
-            enablePosition();
+            state.enablePosition();
             return ret;
         }
 
         @Override
         public int fill(FluidStack resource, FluidAction action) {
-            if (!isNetworkAndPositionValid()) {
+            if (!state.isNetworkAndPositionValid()) {
                 return 0;
             }
-            disablePosition();
+            state.disablePosition();
             int ret = getFluidHandler().fill(resource, action);
-            enablePosition();
+            state.enablePosition();
             return ret;
         }
 
         @Override
         public FluidStack drain(FluidStack resource, FluidAction action) {
-            if (!isNetworkAndPositionValid()) {
+            if (!state.isNetworkAndPositionValid()) {
                 return FluidStack.EMPTY;
             }
-            disablePosition();
+            state.disablePosition();
             FluidStack ret = getFluidHandler().drain(resource, action);
-            enablePosition();
+            state.enablePosition();
             return ret;
         }
 
         @Override
         public FluidStack drain(int maxDrain, FluidAction action) {
-            if (!isNetworkAndPositionValid()) {
+            if (!state.isNetworkAndPositionValid()) {
                 return FluidStack.EMPTY;
             }
-            disablePosition();
+            state.disablePosition();
             FluidStack ret = getFluidHandler().drain(maxDrain, action);
-            enablePosition();
+            state.enablePosition();
             return ret;
         }
     }

@@ -13,18 +13,21 @@ public class PartTypes {
     public static void load() {}
 
     public static final PartTypeInterfaceEnergy INTERFACE_ENERGY = REGISTRY.register(new PartTypeInterfaceEnergy("interface_energy"));
+    public static final PartTypeInterfaceFilteringEnergy INTERFACE_FILTERING_ENERGY = REGISTRY.register(new PartTypeInterfaceFilteringEnergy("interface_filter_energy"));
     public static final PartTypeImporterEnergy IMPORTER_ENERGY = REGISTRY.register(new PartTypeImporterEnergy("importer_energy"));
     public static final PartTypeExporterEnergy EXPORTER_ENERGY = REGISTRY.register(new PartTypeExporterEnergy("exporter_energy"));
     public static final PartTypeImporterWorldEnergy IMPORTER_WORLD_ENERGY = REGISTRY.register(new PartTypeImporterWorldEnergy("importer_world_energy"));
     public static final PartTypeExporterWorldEnergy EXPORTER_WORLD_ENERGY = REGISTRY.register(new PartTypeExporterWorldEnergy("exporter_world_energy"));
 
     public static final PartTypeInterfaceItem INTERFACE_ITEM = REGISTRY.register(new PartTypeInterfaceItem("interface_item"));
+    public static final PartTypeInterfaceFilteringItem INTERFACE_FILTERING_ITEM = REGISTRY.register(new PartTypeInterfaceFilteringItem("interface_filter_item"));
     public static final PartTypeImporterItem IMPORTER_ITEM = REGISTRY.register(new PartTypeImporterItem("importer_item"));
     public static final PartTypeExporterItem EXPORTER_ITEM = REGISTRY.register(new PartTypeExporterItem("exporter_item"));
     public static final PartTypeImporterWorldItem IMPORTER_WORLD_ITEM = REGISTRY.register(new PartTypeImporterWorldItem("importer_world_item"));
     public static final PartTypeExporterWorldItem EXPORTER_WORLD_ITEM = REGISTRY.register(new PartTypeExporterWorldItem("exporter_world_item"));
 
     public static final PartTypeInterfaceFluid INTERFACE_FLUID = REGISTRY.register(new PartTypeInterfaceFluid("interface_fluid"));
+    public static final PartTypeInterfaceFilteringFluid INTERFACE_FILTERING_FLUID = REGISTRY.register(new PartTypeInterfaceFilteringFluid("interface_filter_fluid"));
     public static final PartTypeImporterFluid IMPORTER_FLUID = REGISTRY.register(new PartTypeImporterFluid("importer_fluid"));
     public static final PartTypeExporterFluid EXPORTER_FLUID = REGISTRY.register(new PartTypeExporterFluid("exporter_fluid"));
     public static final PartTypeImporterWorldFluid IMPORTER_WORLD_FLUID = REGISTRY.register(new PartTypeImporterWorldFluid("importer_world_fluid"));

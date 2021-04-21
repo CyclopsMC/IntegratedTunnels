@@ -857,6 +857,109 @@ public class TunnelAspects {
 
         }
 
+        public static final class ItemFilter {
+
+            public static final IAspectWrite<ValueTypeBoolean.ValueBoolean, ValueTypeBoolean> BOOLEAN_SET_FILTER =
+                    TunnelAspectWriteBuilders.Item.BUILDER_BOOLEAN
+                            .withProperties(TunnelAspectWriteBuilders.Item.PROPERTIES_FILTER)
+                            .handle(TunnelAspectWriteBuilders.Item.PROP_BOOLEAN_ITEMPREDICATE)
+                            .handle(TunnelAspectWriteBuilders.propSetFilter())
+                            .appendActivator(TunnelAspectWriteBuilders.PREPARE_FILTER)
+                            .appendDeactivator(TunnelAspectWriteBuilders.RESET_FILTER)
+                            .appendKind("filter").buildWrite();
+            public static final IAspectWrite<ValueObjectTypeItemStack.ValueItemStack, ValueObjectTypeItemStack> ITEMSTACK_SET_FILTER =
+                    TunnelAspectWriteBuilders.Item.BUILDER_ITEMSTACK
+                            .withProperties(TunnelAspectWriteBuilders.Item.PROPERTIES_FILTER_CHECKS)
+                            .handle(TunnelAspectWriteBuilders.Item.PROP_ITEMSTACK_ITEMPREDICATE)
+                            .handle(TunnelAspectWriteBuilders.propSetFilter())
+                            .appendActivator(TunnelAspectWriteBuilders.PREPARE_FILTER)
+                            .appendDeactivator(TunnelAspectWriteBuilders.RESET_FILTER)
+                            .appendKind("filter").buildWrite();
+            public static final IAspectWrite<ValueTypeList.ValueList, ValueTypeList> LIST_SET_FILTER =
+                    TunnelAspectWriteBuilders.Item.BUILDER_LIST
+                            .withProperties(TunnelAspectWriteBuilders.Item.PROPERTIES_FILTER_CHECKS)
+                            .handle(TunnelAspectWriteBuilders.Item.PROP_ITEMSTACKLIST_ITEMPREDICATE)
+                            .handle(TunnelAspectWriteBuilders.propSetFilter())
+                            .appendActivator(TunnelAspectWriteBuilders.PREPARE_FILTER)
+                            .appendDeactivator(TunnelAspectWriteBuilders.RESET_FILTER)
+                            .appendKind("filter").buildWrite();
+            public static final IAspectWrite<ValueTypeOperator.ValueOperator, ValueTypeOperator> PREDICATE_SET_FILTER =
+                    TunnelAspectWriteBuilders.Item.BUILDER_OPERATOR
+                            .withProperties(TunnelAspectWriteBuilders.Item.PROPERTIES_FILTER)
+                            .handle(TunnelAspectWriteBuilders.Item.PROP_ITEMSTACKPREDICATE_ITEMPREDICATE)
+                            .handle(TunnelAspectWriteBuilders.propSetFilter())
+                            .appendActivator(TunnelAspectWriteBuilders.PREPARE_FILTER)
+                            .appendDeactivator(TunnelAspectWriteBuilders.RESET_FILTER)
+                            .appendKind("filter").buildWrite();
+            public static final IAspectWrite<ValueTypeNbt.ValueNbt, ValueTypeNbt> NBT_SET_FILTER =
+                    TunnelAspectWriteBuilders.Item.BUILDER_NBT
+                            .withProperties(TunnelAspectWriteBuilders.Item.PROPERTIES_FILTER_NBT)
+                            .handle(TunnelAspectWriteBuilders.Item.PROP_NBT_ITEMPREDICATE)
+                            .handle(TunnelAspectWriteBuilders.propSetFilter())
+                            .appendActivator(TunnelAspectWriteBuilders.PREPARE_FILTER)
+                            .appendDeactivator(TunnelAspectWriteBuilders.RESET_FILTER)
+                            .appendKind("filter").buildWrite();
+
+        }
+
+        public static final class FluidFilter {
+
+            public static final IAspectWrite<ValueTypeBoolean.ValueBoolean, ValueTypeBoolean> BOOLEAN_SET_FILTER =
+                    TunnelAspectWriteBuilders.Fluid.BUILDER_BOOLEAN
+                            .withProperties(TunnelAspectWriteBuilders.Fluid.PROPERTIES_FILTER)
+                            .handle(TunnelAspectWriteBuilders.Fluid.PROP_BOOLEAN_PREDICATE)
+                            .handle(TunnelAspectWriteBuilders.propSetFilter())
+                            .appendActivator(TunnelAspectWriteBuilders.PREPARE_FILTER)
+                            .appendDeactivator(TunnelAspectWriteBuilders.RESET_FILTER)
+                            .appendKind("filter").buildWrite();
+            public static final IAspectWrite<ValueObjectTypeFluidStack.ValueFluidStack, ValueObjectTypeFluidStack> FLUIDSTACK_SET_FILTER =
+                    TunnelAspectWriteBuilders.Fluid.BUILDER_FLUIDSTACK
+                            .withProperties(TunnelAspectWriteBuilders.Fluid.PROPERTIES_FILTER_CHECKS)
+                            .handle(TunnelAspectWriteBuilders.Fluid.PROP_FLUIDSTACK_FLUIDPREDICATE)
+                            .handle(TunnelAspectWriteBuilders.propSetFilter())
+                            .appendActivator(TunnelAspectWriteBuilders.PREPARE_FILTER)
+                            .appendDeactivator(TunnelAspectWriteBuilders.RESET_FILTER)
+                            .appendKind("filter").buildWrite();
+            public static final IAspectWrite<ValueTypeList.ValueList, ValueTypeList> LIST_SET_FILTER =
+                    TunnelAspectWriteBuilders.Fluid.BUILDER_LIST
+                            .withProperties(TunnelAspectWriteBuilders.Fluid.PROPERTIES_FILTER_CHECKS)
+                            .handle(TunnelAspectWriteBuilders.Fluid.PROP_FLUIDSTACKLIST_FLUIDPREDICATE)
+                            .handle(TunnelAspectWriteBuilders.propSetFilter())
+                            .appendActivator(TunnelAspectWriteBuilders.PREPARE_FILTER)
+                            .appendDeactivator(TunnelAspectWriteBuilders.RESET_FILTER)
+                            .appendKind("filter").buildWrite();
+            public static final IAspectWrite<ValueTypeOperator.ValueOperator, ValueTypeOperator> PREDICATE_SET_FILTER =
+                    TunnelAspectWriteBuilders.Fluid.BUILDER_OPERATOR
+                            .withProperties(TunnelAspectWriteBuilders.Fluid.PROPERTIES_FILTER)
+                            .handle(TunnelAspectWriteBuilders.Fluid.PROP_FLUIDSTACKPREDICATE_FLUIDPREDICATE)
+                            .handle(TunnelAspectWriteBuilders.propSetFilter())
+                            .appendActivator(TunnelAspectWriteBuilders.PREPARE_FILTER)
+                            .appendDeactivator(TunnelAspectWriteBuilders.RESET_FILTER)
+                            .appendKind("filter").buildWrite();
+            public static final IAspectWrite<ValueTypeNbt.ValueNbt, ValueTypeNbt> NBT_SET_FILTER =
+                    TunnelAspectWriteBuilders.Fluid.BUILDER_NBT
+                            .withProperties(TunnelAspectWriteBuilders.Fluid.PROPERTIES_FILTER_NBT)
+                            .handle(TunnelAspectWriteBuilders.Fluid.PROP_NBT_FLUIDPREDICATE)
+                            .handle(TunnelAspectWriteBuilders.propSetFilter())
+                            .appendActivator(TunnelAspectWriteBuilders.PREPARE_FILTER)
+                            .appendDeactivator(TunnelAspectWriteBuilders.RESET_FILTER)
+                            .appendKind("filter").buildWrite();
+
+        }
+
+        public static final class EnergyFilter {
+
+            public static final IAspectWrite<ValueTypeBoolean.ValueBoolean, ValueTypeBoolean> BOOLEAN_SET_FILTER =
+                    TunnelAspectWriteBuilders.Energy.BUILDER_BOOLEAN
+                            .withProperties(TunnelAspectWriteBuilders.Energy.PROPERTIES_FILTER)
+                            .handle(TunnelAspectWriteBuilders.Energy.PROP_BOOLEAN_PREDICATE)
+                            .handle(TunnelAspectWriteBuilders.propSetFilter())
+                            .appendActivator(TunnelAspectWriteBuilders.PREPARE_FILTER)
+                            .appendDeactivator(TunnelAspectWriteBuilders.RESET_FILTER)
+                            .appendKind("filter").buildWrite();
+
+        }
+
     }
 
 }

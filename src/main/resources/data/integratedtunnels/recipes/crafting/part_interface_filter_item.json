@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "item": "integratedtunnels:part_interface_item"
+    },
+    {
+      "item": "integratedtunnels:part_interface_item"
+    },
+    {
+      "item": "minecraft:hopper"
+    }
+  ],
+  "result": {
+    "item": "integratedtunnels:part_interface_filter_item"
+  }
+}

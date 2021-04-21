@@ -9,6 +9,7 @@ import org.cyclops.integrateddynamics.api.part.PartPos;
 import org.cyclops.integrateddynamics.core.helper.EnergyHelpers;
 import org.cyclops.integratedtunnels.Capabilities;
 import org.cyclops.integratedtunnels.GeneralConfig;
+import org.cyclops.integratedtunnels.core.part.IPartTypeInterfacePositionedAddon;
 import org.cyclops.integratedtunnels.core.part.PartTypeInterfacePositionedAddon;
 
 /**
@@ -21,17 +22,17 @@ public class PartTypeInterfaceEnergy extends PartTypeInterfacePositionedAddon<IE
     }
 
     @Override
-    protected Capability<IEnergyNetwork> getNetworkCapability() {
+    public Capability<IEnergyNetwork> getNetworkCapability() {
         return Capabilities.NETWORK_ENERGY;
     }
 
     @Override
-    protected Capability<IEnergyStorage> getTargetCapability() {
+    public Capability<IEnergyStorage> getTargetCapability() {
         return CapabilityEnergy.ENERGY;
     }
 
     @Override
-    protected LazyOptional<IEnergyStorage> getTargetCapabilityInstance(PartPos pos) {
+    public LazyOptional<IEnergyStorage> getTargetCapabilityInstance(PartPos pos) {
         return EnergyHelpers.getEnergyStorage(pos);
     }
 
@@ -45,82 +46,94 @@ public class PartTypeInterfaceEnergy extends PartTypeInterfacePositionedAddon<IE
         return GeneralConfig.interfaceEnergyBaseConsumption;
     }
 
-    public static class State extends PartTypeInterfacePositionedAddon.State<PartTypeInterfaceEnergy, IEnergyNetwork, IEnergyStorage> implements IEnergyStorage {
+    public static class State extends PartTypeInterfacePositionedAddon.State<IEnergyNetwork, IEnergyStorage, PartTypeInterfaceEnergy, PartTypeInterfaceEnergy.State> {
 
         @Override
-        protected Capability<IEnergyStorage> getTargetCapability() {
+        public Capability<IEnergyStorage> getTargetCapability() {
             return CapabilityEnergy.ENERGY;
         }
 
+        @Override
+        public IEnergyStorage getCapabilityInstance() {
+            return new PartTypeInterfaceEnergy.EnergyStorage(this);
+        }
+    }
+
+    public static class EnergyStorage implements IEnergyStorage {
+        private final IPartTypeInterfacePositionedAddon.IState<IEnergyNetwork, IEnergyStorage, ?, ?> state;
+
+        public EnergyStorage(IState<IEnergyNetwork, IEnergyStorage, ?, ?> state) {
+            this.state = state;
+        }
+
         protected IEnergyStorage getEnergyStorage() {
-            return getPositionedAddonsNetwork().getChannelExternal(CapabilityEnergy.ENERGY, getChannel());
+            return state.getPositionedAddonsNetwork().getChannelExternal(CapabilityEnergy.ENERGY, state.getChannel());
         }
 
         @Override
         public int receiveEnergy(int maxReceive, boolean simulate) {
-            if (!isNetworkAndPositionValid()) {
+            if (!state.isNetworkAndPositionValid()) {
                 return 0;
             }
-            disablePosition();
+            state.disablePosition();
             int ret = getEnergyStorage().receiveEnergy(maxReceive, simulate);
-            enablePosition();
+            state.enablePosition();
             return ret;
         }
 
         @Override
         public int extractEnergy(int maxExtract, boolean simulate) {
-            if (!isNetworkAndPositionValid()) {
+            if (!state.isNetworkAndPositionValid()) {
                 return 0;
             }
-            disablePosition();
+            state.disablePosition();
             int ret = getEnergyStorage().extractEnergy(maxExtract, simulate);
-            enablePosition();
+            state.enablePosition();
             return ret;
         }
 
         @Override
         public int getEnergyStored() {
-            if (!isNetworkAndPositionValid()) {
+            if (!state.isNetworkAndPositionValid()) {
                 return 0;
             }
-            disablePosition();
+            state.disablePosition();
             int ret = getEnergyStorage().getEnergyStored();
-            enablePosition();
+            state.enablePosition();
             return ret;
         }
 
         @Override
         public int getMaxEnergyStored() {
-            if (!isNetworkAndPositionValid()) {
+            if (!state.isNetworkAndPositionValid()) {
                 return 0;
             }
-            disablePosition();
+            state.disablePosition();
             int ret = getEnergyStorage().getMaxEnergyStored();
-            enablePosition();
+            state.enablePosition();
             return ret;
         }
 
         @Override
         public boolean canExtract() {
-            if (!isNetworkAndPositionValid()) {
+            if (!state.isNetworkAndPositionValid()) {
                 return false;
             }
-            disablePosition();
+            state.disablePosition();
             boolean ret = getEnergyStorage().canExtract();
-            enablePosition();
+            state.enablePosition();
             return ret;
         }
 
         @Override
         public boolean canReceive() {
-            if (!isNetworkAndPositionValid()) {
+            if (!state.isNetworkAndPositionValid()) {
                 return false;
             }
-            disablePosition();
+            state.disablePosition();
             boolean ret = getEnergyStorage().canReceive();
-            enablePosition();
+            state.enablePosition();
             return ret;
         }
-
     }
 }
