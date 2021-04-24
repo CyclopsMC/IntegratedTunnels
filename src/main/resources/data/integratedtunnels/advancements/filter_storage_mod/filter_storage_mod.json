@@ -1,0 +1,55 @@
+{
+  "display": {
+    "icon": {
+      "item": "integrateddynamics:variable",
+      "nbt": "{\"_type\":\"integrateddynamics:aspect\",\"aspectName\":\"integratedtunnels:write_operator_item_filter\",\"partId\":1,\"_id\":1}"
+    },
+    "title": {
+      "translate": "advancement.integratedtunnels.filter_storage_mod"
+    },
+    "description": {
+      "translate": "advancement.integratedtunnels.filter_storage_mod.desc"
+    }
+  },
+  "parent": "integratedtunnels:interfaces/interface_item",
+  "criteria": {
+    "criteria_0": {
+      "trigger": "integrateddynamics:part_writer_aspect",
+      "conditions": {
+        "parttype": "integratedtunnels:interface_filter_item",
+        "aspect": "integratedtunnels:write_operator_item_filter",
+        "variable": {
+          "type": "integrateddynamics:operator",
+          "operator": "integrateddynamics:operator_pipe",
+          "input": {
+            "0": {
+              "type": "integrateddynamics:valuetype",
+              "valuetype": "integrateddynamics:operator",
+              "value": {
+                "operator": "integrateddynamics:itemstack_mod"
+              }
+            },
+            "1": {
+              "type": "integrateddynamics:operator",
+              "operator": "integrateddynamics:operator_apply",
+              "input": {
+                "0": {
+                  "type": "integrateddynamics:valuetype",
+                  "valuetype": "integrateddynamics:operator",
+                  "value": {
+                    "operator": "integrateddynamics:relational_equals"
+                  }
+                },
+                "1": {
+                  "type": "integrateddynamics:valuetype",
+                  "valuetype": "integrateddynamics:string",
+                  "value": "{Primitive:\"IntegratedDynamics\"}"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

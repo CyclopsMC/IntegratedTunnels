@@ -97,6 +97,44 @@
         </appendix>
     </section>
 
+    <section name="info_book.integratedtunnels.tutorials.filter_storage_day">
+        <paragraph>info_book.integratedtunnels.tutorials.filter_storage_day.text1</paragraph>
+        <appendix type="integrateddynamics:aspect">integrateddynamics:read_boolean_world_isday</appendix>
+        <appendix type="integrateddynamics:aspect">integratedtunnels:write_boolean_item_filter</appendix>
+        <appendix type="advancement_rewards" id="integratedtunnels:filter_storage_day">
+            <advancements>
+                <advancement id="integratedtunnels:filter_storage_day/filter_storage_day" />
+            </advancements>
+            <rewards>
+                <reward type="item" amount="1">integratedtunnels:part_interface_filter_item</reward>
+                <reward type="item" amount="1">integratedtunnels:part_interface_filter_fluid</reward>
+                <reward type="item" amount="1">integratedtunnels:part_interface_filter_energy</reward>
+            </rewards>
+        </appendix>
+    </section>
+
+    <section name="info_book.integratedtunnels.tutorials.filter_storage_mod">
+        <paragraph>info_book.integratedtunnels.tutorials.filter_storage_mod.text1</paragraph>
+        <paragraph>info_book.integratedtunnels.tutorials.filter_storage_mod.text2</paragraph>
+        <paragraph>info_book.integratedtunnels.tutorials.filter_storage_mod.text3</paragraph>
+        <paragraph>info_book.integratedtunnels.tutorials.filter_storage_mod.text4</paragraph>
+        <appendix type="integrateddynamics:operator">integrateddynamics:itemstack_mod</appendix>
+        <appendix type="integrateddynamics:operator">integrateddynamics:relational_equals</appendix>
+        <appendix type="integrateddynamics:operator">integrateddynamics:operator_apply</appendix>
+        <appendix type="integrateddynamics:operator">integrateddynamics:operator_pipe</appendix>
+        <appendix type="integrateddynamics:aspect">integratedtunnels:write_operator_item_filter</appendix>
+        <appendix type="advancement_rewards" id="integratedtunnels:filter_storage_mod">
+            <advancements>
+                <advancement id="integratedtunnels:filter_storage_mod/filter_storage_mod" />
+            </advancements>
+            <rewards>
+                <reward type="item" amount="5">integratedtunnels:part_interface_filter_item</reward>
+                <reward type="item" amount="5">integratedtunnels:part_interface_filter_fluid</reward>
+                <reward type="item" amount="5">integratedtunnels:part_interface_filter_energy</reward>
+            </rewards>
+        </appendix>
+    </section>
+
     <section name="info_book.integratedtunnels.tutorials.world_item_importer_exporter">
         <paragraph>info_book.integratedtunnels.tutorials.world_item_importer_exporter.text1</paragraph>
         <appendix type="minecraft:crafting">integratedtunnels:crafting/part_exporter_world_item</appendix>

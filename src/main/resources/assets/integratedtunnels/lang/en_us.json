@@ -25,6 +25,10 @@
   "advancement.integratedtunnels.import_items_list.desc": "Import all items from a list into an inventory using an Item Importer",
   "advancement.integratedtunnels.export_enchantable_items": "Export Enchantable Items",
   "advancement.integratedtunnels.export_enchantable_items.desc": "Use the Enchantable Operator to export all enchantable items into an inventory using an Item Exporter",
+  "advancement.integratedtunnels.filter_storage_day": "Filter Item Storage if Day",
+  "advancement.integratedtunnels.filter_storage_day.desc": "Use a Filtering Item Interface to only expose an inventory's contents during daytime",
+  "advancement.integratedtunnels.filter_storage_mod": "Filter Item Storage by Mod",
+  "advancement.integratedtunnels.filter_storage_mod.desc": "Use a Filtering Item Interface to only pass items from a certain mod",
   "advancement.integratedtunnels.exporter_world_item": "Advanced Item World Exporting",
   "advancement.integratedtunnels.exporter_world_item.desc": "Craft a World Item Exporter",
   "advancement.integratedtunnels.importer_world_item": "Advanced Item World Importing",
@@ -502,6 +506,15 @@
 
   "info_book.integratedtunnels.tutorials.export_enchantable_items": "Export Enchantable Items",
   "info_book.integratedtunnels.tutorials.export_enchantable_items.text1": "Export all enchantable items to the target inventory. This can be done using a certain &lOperator&r.",
+
+  "info_book.integratedtunnels.tutorials.filter_storage_day": "Filter Item Storage if Day",
+  "info_book.integratedtunnels.tutorials.filter_storage_day.text1": "Using the &lFiltering Item Interface&r, attach a &lChest&r to your network, and only make its contents be available to the network if it's day (and not when it's night).",
+
+  "info_book.integratedtunnels.tutorials.filter_storage_mod": "Filter Item Storage by Mod",
+  "info_book.integratedtunnels.tutorials.filter_storage_mod.text1": "Using the &lFiltering Item Interface&r, attach a &lChest&r to your network, and configure a predicate-based filter that only passes items from the &lIntegratedDynamics&r mod. To do this, we will create a new operator that will take an &8Item&0 as input, and returns a &9Boolean&0 as output.",
+  "info_book.integratedtunnels.tutorials.filter_storage_mod.text2": "To do this, first create an &2Operators&0 value containing the &lRelational Equals&r operator. Next, create a &4String&0 containing the &lIntegratedDynamics&r value. And then, use the &lApply&r operator to partially apply your &lRelational Equals&r operator to your &4String&0 value.",
+  "info_book.integratedtunnels.tutorials.filter_storage_mod.text3": "As a next step, we have to create another &2Operators&0 value, but this time containing the &lItem Mod&r operator. And now, we can use the &lPipe&r operator to pipe our &lItem Mod&r operator into our partially applied operator from the previous step.",
+  "info_book.integratedtunnels.tutorials.filter_storage_mod.text4": "This result from the &lPipe&r operator can be placed into the predicate-based aspect of your &lFiltering Item Interface&r, and all variables we depend on need to be placed into a &lVariable Store&r. If all steps are followed correctly, the filter will only pass items from the &lIntegratedDynamics&r mod, which can be customized by changing our &4String&0 constant.",
 
   "info_book.integratedtunnels.tutorials.world_item_importer_exporter": "World Item Importer Exporter",
   "info_book.integratedtunnels.tutorials.world_item_importer_exporter.text1": "Simular to &oItem Importers&r and &oItem Exporters&r, &lWorld Item Importers&r and &lWorld Item Exporters&r can respectively pick up items from the world into your item network and place items into the world from your item network. Furthermore, these can also be used to interact with dropped items that have inventories, such as &oShulker Boxes&r.",
