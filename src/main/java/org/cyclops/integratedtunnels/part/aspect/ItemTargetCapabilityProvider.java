@@ -10,7 +10,7 @@ import org.cyclops.integrateddynamics.api.part.PartTarget;
 import org.cyclops.integrateddynamics.api.part.aspect.property.IAspectProperties;
 import org.cyclops.integratedtunnels.api.network.IItemNetwork;
 import org.cyclops.integratedtunnels.capability.network.ItemNetworkConfig;
-import org.cyclops.integratedtunnels.core.part.PartStateRoundRobin;
+import org.cyclops.integratedtunnels.core.part.PartStatePositionedAddon;
 import org.cyclops.integratedtunnels.core.predicate.IngredientPredicate;
 
 import javax.annotation.Nullable;
@@ -30,11 +30,12 @@ public class ItemTargetCapabilityProvider extends ChanneledTargetCapabilityProvi
     public ItemTargetCapabilityProvider(ITunnelTransfer transfer, INetwork network, @Nullable ICapabilityProvider capabilityProvider,
                                         Direction side, int slot,
                                         IngredientPredicate<ItemStack, Integer> itemStackMatcher, PartTarget partTarget,
-                                        IAspectProperties properties, @Nullable PartStateRoundRobin<?> partState) {
+                                        IAspectProperties properties, @Nullable PartStatePositionedAddon<?, ?, ItemStack> partState) {
         super(network, capabilityProvider, side, network.getCapability(ItemNetworkConfig.CAPABILITY).orElse(null), partState,
                 properties.getValue(TunnelAspectWriteBuilders.PROP_CHANNEL).getRawValue(),
                 properties.getValue(TunnelAspectWriteBuilders.PROP_ROUNDROBIN).getRawValue(),
-                properties.getValue(TunnelAspectWriteBuilders.PROP_CRAFT).getRawValue());
+                properties.getValue(TunnelAspectWriteBuilders.PROP_CRAFT).getRawValue(),
+                properties.getValue(TunnelAspectWriteBuilders.PROP_PASSIVE_IO).getRawValue());
         this.connection = new TunnelConnectionPositionedNetworkCapabilityProvider(network, getChannel(), partTarget.getTarget(), transfer, capabilityProvider);
         this.slot = slot;
         this.itemStackMatcher = itemStackMatcher;

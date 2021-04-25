@@ -7,15 +7,15 @@ import org.cyclops.integrateddynamics.api.part.PartTarget;
 import org.cyclops.integrateddynamics.api.part.aspect.property.IAspectProperties;
 import org.cyclops.integratedtunnels.api.network.IFluidNetwork;
 import org.cyclops.integratedtunnels.capability.network.FluidNetworkConfig;
+import org.cyclops.integratedtunnels.core.part.PartStatePositionedAddon;
 import org.cyclops.integratedtunnels.core.predicate.IngredientPredicate;
-import org.cyclops.integratedtunnels.core.part.PartStateRoundRobin;
 
 import javax.annotation.Nullable;
 
 /**
  * @author rubensworks
  */
-public class FluidTargetStorage extends ChanneledTarget<IFluidNetwork> implements IFluidTarget {
+public class FluidTargetStorage extends ChanneledTarget<IFluidNetwork, FluidStack> implements IFluidTarget {
 
     private final ITunnelConnection connection;
     private final IIngredientComponentStorage<FluidStack, Integer> storage;
@@ -26,11 +26,12 @@ public class FluidTargetStorage extends ChanneledTarget<IFluidNetwork> implement
     public FluidTargetStorage(ITunnelTransfer transfer, INetwork network,
                               IIngredientComponentStorage<FluidStack, Integer> storage,
                               IngredientPredicate<FluidStack, Integer> fluidStackMatcher, PartTarget partTarget,
-                              IAspectProperties properties, @Nullable PartStateRoundRobin<?> partState) {
+                              IAspectProperties properties, @Nullable PartStatePositionedAddon<?, ?, FluidStack> partState) {
         super(network, network.getCapability(FluidNetworkConfig.CAPABILITY).orElse(null), partState,
                 properties.getValue(TunnelAspectWriteBuilders.PROP_CHANNEL).getRawValue(),
                 properties.getValue(TunnelAspectWriteBuilders.PROP_ROUNDROBIN).getRawValue(),
-                properties.getValue(TunnelAspectWriteBuilders.PROP_CRAFT).getRawValue());
+                properties.getValue(TunnelAspectWriteBuilders.PROP_CRAFT).getRawValue(),
+                properties.getValue(TunnelAspectWriteBuilders.PROP_PASSIVE_IO).getRawValue());
         this.connection = new TunnelConnectionPositionedNetwork(network, getChannel(), partTarget.getTarget(), transfer);
         this.storage = storage;
         this.fluidStackMatcher = fluidStackMatcher;

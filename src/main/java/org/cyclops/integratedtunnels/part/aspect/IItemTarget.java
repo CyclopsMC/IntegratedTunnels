@@ -9,7 +9,7 @@ import org.cyclops.integrateddynamics.api.part.PartPos;
 import org.cyclops.integrateddynamics.api.part.PartTarget;
 import org.cyclops.integrateddynamics.api.part.aspect.property.IAspectProperties;
 import org.cyclops.integratedtunnels.api.network.IItemNetwork;
-import org.cyclops.integratedtunnels.core.part.PartStateRoundRobin;
+import org.cyclops.integratedtunnels.core.part.PartStatePositionedAddon;
 import org.cyclops.integratedtunnels.core.predicate.IngredientPredicate;
 
 import javax.annotation.Nullable;
@@ -17,7 +17,7 @@ import javax.annotation.Nullable;
 /**
  * @author rubensworks
  */
-public interface IItemTarget extends IChanneledTarget<IItemNetwork> {
+public interface IItemTarget extends IChanneledTarget<IItemNetwork, ItemStack> {
 
     public IIngredientComponentStorage<ItemStack, Integer> getItemChannel();
 
@@ -39,7 +39,7 @@ public interface IItemTarget extends IChanneledTarget<IItemNetwork> {
         PartPos target = partTarget.getTarget();
         INetwork network = IChanneledTarget.getNetworkChecked(center);
         TileEntity tile = target.getPos().getWorld(true).getTileEntity(target.getPos().getBlockPos());
-        PartStateRoundRobin<?> partState = IChanneledTarget.getPartState(center);
+        PartStatePositionedAddon<?, ?, ItemStack> partState = (PartStatePositionedAddon<?, ?, ItemStack>) IChanneledTarget.getPartState(center);
         return new ItemTargetCapabilityProvider(transfer, network, tile, target.getSide(),
                 slot, itemStackMatcher, partTarget, properties, partState);
     }
@@ -50,7 +50,7 @@ public interface IItemTarget extends IChanneledTarget<IItemNetwork> {
         PartPos center = partTarget.getCenter();
         PartPos target = partTarget.getTarget();
         INetwork network = IChanneledTarget.getNetworkChecked(center);
-        PartStateRoundRobin<?> partState = IChanneledTarget.getPartState(center);
+        PartStatePositionedAddon<?, ?, ItemStack> partState = (PartStatePositionedAddon<?, ?, ItemStack>) IChanneledTarget.getPartState(center);
         return new ItemTargetCapabilityProvider(transfer, network, entity, target.getSide(),
                 slot, itemStackMatcher, partTarget, properties, partState);
     }
@@ -60,7 +60,7 @@ public interface IItemTarget extends IChanneledTarget<IItemNetwork> {
         PartPos center = partTarget.getCenter();
         PartPos target = partTarget.getTarget();
         INetwork network = IChanneledTarget.getNetworkChecked(center);
-        PartStateRoundRobin<?> partState = IChanneledTarget.getPartState(center);
+        PartStatePositionedAddon<?, ?, ItemStack> partState = (PartStatePositionedAddon<?, ?, ItemStack>) IChanneledTarget.getPartState(center);
         return new ItemTargetCapabilityProvider(transfer, network, null, target.getSide(),
                 slot, itemStackMatcher, partTarget, properties, partState);
     }
@@ -69,7 +69,7 @@ public interface IItemTarget extends IChanneledTarget<IItemNetwork> {
                                               IAspectProperties properties, IngredientPredicate<ItemStack, Integer> itemStackMatcher,
                                               IIngredientComponentStorage<ItemStack, Integer> storage, int slot) {
         PartPos center = partTarget.getCenter();
-        PartStateRoundRobin<?> partState = IChanneledTarget.getPartState(center);
+        PartStatePositionedAddon<?, ?, ItemStack> partState = (PartStatePositionedAddon<?, ?, ItemStack>) IChanneledTarget.getPartState(center);
         return new ItemTargetStorage(transfer, network, storage,
                 slot, itemStackMatcher, partTarget, properties, partState);
     }

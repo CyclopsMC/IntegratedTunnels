@@ -160,6 +160,8 @@
   "aspect.aspecttypes.integratedtunnels.boolean.emptyisany.info": "If an empty value matches with everything, otherwise nothing matches.",
   "aspect.aspecttypes.integratedtunnels.boolean.craft": "Craft",
   "aspect.aspecttypes.integratedtunnels.boolean.craft.info": "If the instance should be crafted if it is not present in the network.",
+  "aspect.aspecttypes.integratedtunnels.boolean.passiveio": "Passive Interaction",
+  "aspect.aspecttypes.integratedtunnels.boolean.passiveio.info": "If the target may insert/extract to/from the network.",
   "aspect.aspecttypes.integratedtunnels.boolean.filter.applytoinsert": "Apply to Insertions",
   "aspect.aspecttypes.integratedtunnels.boolean.filter.applytoinsert.info": "If the filter should apply to insertions into the network.",
   "aspect.aspecttypes.integratedtunnels.boolean.filter.applytoextract": "Apply to Extractions",

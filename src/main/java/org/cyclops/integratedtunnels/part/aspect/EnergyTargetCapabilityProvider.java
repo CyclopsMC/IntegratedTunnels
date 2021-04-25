@@ -8,7 +8,7 @@ import org.cyclops.integrateddynamics.api.network.IEnergyNetwork;
 import org.cyclops.integrateddynamics.api.network.INetwork;
 import org.cyclops.integrateddynamics.api.part.aspect.property.IAspectProperties;
 import org.cyclops.integratedtunnels.Capabilities;
-import org.cyclops.integratedtunnels.core.part.PartStateRoundRobin;
+import org.cyclops.integratedtunnels.core.part.PartStatePositionedAddon;
 
 import javax.annotation.Nullable;
 
@@ -23,11 +23,12 @@ public class EnergyTargetCapabilityProvider extends ChanneledTargetCapabilityPro
 
     public EnergyTargetCapabilityProvider(@Nullable ICapabilityProvider capabilityProvider, Direction side, INetwork network,
                                           IAspectProperties properties,
-                                          int amount, @Nullable PartStateRoundRobin<?> partStateEnergy) {
+                                          int amount, @Nullable PartStatePositionedAddon<?, ?, Integer> partStateEnergy) {
         super(network, capabilityProvider, side, network.getCapability(Capabilities.NETWORK_ENERGY).orElse(null), partStateEnergy,
                 properties.getValue(TunnelAspectWriteBuilders.PROP_CHANNEL).getRawValue(),
                 properties.getValue(TunnelAspectWriteBuilders.PROP_ROUNDROBIN).getRawValue(),
-                properties.getValue(TunnelAspectWriteBuilders.PROP_CRAFT).getRawValue());
+                properties.getValue(TunnelAspectWriteBuilders.PROP_CRAFT).getRawValue(),
+                properties.getValue(TunnelAspectWriteBuilders.PROP_PASSIVE_IO).getRawValue());
         this.amount = amount;
         this.exactAmount = properties.getValue(TunnelAspectWriteBuilders.PROP_EXACTAMOUNT).getRawValue();
     }

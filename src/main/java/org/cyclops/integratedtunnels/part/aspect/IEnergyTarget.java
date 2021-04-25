@@ -8,14 +8,14 @@ import org.cyclops.integrateddynamics.api.network.INetwork;
 import org.cyclops.integrateddynamics.api.part.PartPos;
 import org.cyclops.integrateddynamics.api.part.PartTarget;
 import org.cyclops.integrateddynamics.api.part.aspect.property.IAspectProperties;
-import org.cyclops.integratedtunnels.core.part.PartStateRoundRobin;
+import org.cyclops.integratedtunnels.core.part.PartStatePositionedAddon;
 
 import javax.annotation.Nullable;
 
 /**
  * @author rubensworks
  */
-public interface IEnergyTarget extends IChanneledTarget<IEnergyNetwork> {
+public interface IEnergyTarget extends IChanneledTarget<IEnergyNetwork, Integer> {
 
     public IIngredientComponentStorage<Integer, Boolean> getEnergyChannel();
 
@@ -30,7 +30,7 @@ public interface IEnergyTarget extends IChanneledTarget<IEnergyNetwork> {
         PartPos target = partTarget.getTarget();
         INetwork network = IChanneledTarget.getNetworkChecked(center);
         TileEntity tile = target.getPos().getWorld(true).getTileEntity(target.getPos().getBlockPos());
-        PartStateRoundRobin<?> partState = IChanneledTarget.getPartState(center);
+        PartStatePositionedAddon<?, ?, Integer> partState = (PartStatePositionedAddon<?, ?, Integer>) IChanneledTarget.getPartState(center);
         return new EnergyTargetCapabilityProvider(tile, target.getSide(), network, properties, amount, partState);
     }
 
@@ -39,7 +39,7 @@ public interface IEnergyTarget extends IChanneledTarget<IEnergyNetwork> {
         PartPos center = partTarget.getCenter();
         PartPos target = partTarget.getTarget();
         INetwork network = IChanneledTarget.getNetworkChecked(center);
-        PartStateRoundRobin<?> partState = IChanneledTarget.getPartState(center);
+        PartStatePositionedAddon<?, ?, Integer> partState = (PartStatePositionedAddon<?, ?, Integer>) IChanneledTarget.getPartState(center);
         return new EnergyTargetCapabilityProvider(entity, target.getSide(), network, properties, amount, partState);
     }
 

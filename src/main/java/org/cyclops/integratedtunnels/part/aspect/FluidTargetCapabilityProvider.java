@@ -10,8 +10,8 @@ import org.cyclops.integrateddynamics.api.part.PartTarget;
 import org.cyclops.integrateddynamics.api.part.aspect.property.IAspectProperties;
 import org.cyclops.integratedtunnels.api.network.IFluidNetwork;
 import org.cyclops.integratedtunnels.capability.network.FluidNetworkConfig;
+import org.cyclops.integratedtunnels.core.part.PartStatePositionedAddon;
 import org.cyclops.integratedtunnels.core.predicate.IngredientPredicate;
-import org.cyclops.integratedtunnels.core.part.PartStateRoundRobin;
 
 import javax.annotation.Nullable;
 
@@ -29,11 +29,12 @@ public class FluidTargetCapabilityProvider extends ChanneledTargetCapabilityProv
     public FluidTargetCapabilityProvider(ITunnelTransfer transfer, INetwork network, @Nullable ICapabilityProvider capabilityProvider,
                                          Direction side, IngredientPredicate<FluidStack, Integer> fluidStackMatcher,
                                          PartTarget partTarget, IAspectProperties properties,
-                                         @Nullable PartStateRoundRobin<?> partState) {
+                                         @Nullable PartStatePositionedAddon<?, ?, FluidStack> partState) {
         super(network, capabilityProvider, side, network.getCapability(FluidNetworkConfig.CAPABILITY).orElse(null), partState,
                 properties.getValue(TunnelAspectWriteBuilders.PROP_CHANNEL).getRawValue(),
                 properties.getValue(TunnelAspectWriteBuilders.PROP_ROUNDROBIN).getRawValue(),
-                properties.getValue(TunnelAspectWriteBuilders.PROP_CRAFT).getRawValue());
+                properties.getValue(TunnelAspectWriteBuilders.PROP_CRAFT).getRawValue(),
+                properties.getValue(TunnelAspectWriteBuilders.PROP_PASSIVE_IO).getRawValue());
         this.connection = new TunnelConnectionPositionedNetworkCapabilityProvider(network, getChannel(), partTarget.getTarget(), transfer, capabilityProvider);
         this.fluidStackMatcher = fluidStackMatcher;
         this.partTarget = partTarget;

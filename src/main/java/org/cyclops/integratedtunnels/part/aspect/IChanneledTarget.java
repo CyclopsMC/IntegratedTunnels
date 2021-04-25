@@ -8,6 +8,7 @@ import org.cyclops.integrateddynamics.api.network.IPositionedAddonsNetwork;
 import org.cyclops.integrateddynamics.api.part.PartPos;
 import org.cyclops.integrateddynamics.core.helper.NetworkHelpers;
 import org.cyclops.integrateddynamics.core.helper.PartHelpers;
+import org.cyclops.integratedtunnels.core.part.PartStatePositionedAddon;
 import org.cyclops.integratedtunnels.core.part.PartStateRoundRobin;
 
 import javax.annotation.Nullable;
@@ -16,7 +17,7 @@ import javax.annotation.Nullable;
  * A helper class for movement targets with a certain network type.
  * @author rubensworks
  */
-public interface IChanneledTarget<N extends IPositionedAddonsNetwork> {
+public interface IChanneledTarget<N extends IPositionedAddonsNetwork, T> {
 
     public INetwork getNetwork();
 
@@ -24,13 +25,15 @@ public interface IChanneledTarget<N extends IPositionedAddonsNetwork> {
 
     public boolean hasValidTarget();
 
-    public PartStateRoundRobin<?> getPartState();
+    public PartStatePositionedAddon<?, ?, T> getPartState();
 
     public int getChannel();
 
     public boolean isRoundRobin();
 
     public boolean isCraftIfFailed();
+
+    public boolean isPassiveIO();
 
     public void preTransfer();
 
@@ -46,12 +49,12 @@ public interface IChanneledTarget<N extends IPositionedAddonsNetwork> {
     }
 
     @Nullable
-    public static PartStateRoundRobin<?> getPartState(PartPos center) {
+    public static PartStatePositionedAddon<?, ?, ?> getPartState(PartPos center) {
         PartHelpers.PartStateHolder<?, ?> partStateHolder = PartHelpers.getPart(center);
         if (partStateHolder == null) {
             return null;
         }
-        return (PartStateRoundRobin<?>) partStateHolder.getState();
+        return (PartStatePositionedAddon<?, ?, ?>) partStateHolder.getState();
     }
 
 }

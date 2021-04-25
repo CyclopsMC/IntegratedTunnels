@@ -4,7 +4,7 @@ import org.cyclops.integrateddynamics.api.network.INetwork;
 import org.cyclops.integrateddynamics.api.network.IPartPosIteratorHandler;
 import org.cyclops.integrateddynamics.api.network.IPositionedAddonsNetwork;
 import org.cyclops.integrateddynamics.core.network.PartPosIteratorHandlerRoundRobin;
-import org.cyclops.integratedtunnels.core.part.PartStateRoundRobin;
+import org.cyclops.integratedtunnels.core.part.PartStatePositionedAddon;
 
 import javax.annotation.Nullable;
 
@@ -12,24 +12,26 @@ import javax.annotation.Nullable;
  * A helper class for movement targets with a certain network type.
  * @author rubensworks
  */
-public abstract class ChanneledTarget<N extends IPositionedAddonsNetwork> implements IChanneledTarget<N> {
+public abstract class ChanneledTarget<N extends IPositionedAddonsNetwork, T> implements IChanneledTarget<N, T> {
 
     private final INetwork network;
     private final N channeledNetwork;
     @Nullable
-    private final PartStateRoundRobin<?> partState;
+    private final PartStatePositionedAddon<?, ?, T> partState;
     private final int channel;
     private final boolean roundRobin;
     private final boolean craftIfFailed;
+    private final boolean passiveIO;
 
-    public ChanneledTarget(INetwork network, N channeledNetwork, @Nullable PartStateRoundRobin<?> partState, int channel,
-                           boolean roundRobin, boolean craftIfFailed) {
+    public ChanneledTarget(INetwork network, N channeledNetwork, @Nullable PartStatePositionedAddon<?, ?, T> partState, int channel,
+                           boolean roundRobin, boolean craftIfFailed, boolean passiveIO) {
         this.network = network;
         this.channeledNetwork = channeledNetwork;
         this.partState = partState;
         this.channel = channel;
         this.roundRobin = roundRobin;
         this.craftIfFailed = craftIfFailed;
+        this.passiveIO = passiveIO;
     }
 
     @Override
@@ -44,7 +46,7 @@ public abstract class ChanneledTarget<N extends IPositionedAddonsNetwork> implem
 
     @Nullable
     @Override
-    public PartStateRoundRobin<?> getPartState() {
+    public PartStatePositionedAddon<?, ?, T> getPartState() {
         return partState;
     }
 
@@ -61,6 +63,11 @@ public abstract class ChanneledTarget<N extends IPositionedAddonsNetwork> implem
     @Override
     public boolean isCraftIfFailed() {
         return craftIfFailed;
+    }
+
+    @Override
+    public boolean isPassiveIO() {
+        return passiveIO;
     }
 
     @Override

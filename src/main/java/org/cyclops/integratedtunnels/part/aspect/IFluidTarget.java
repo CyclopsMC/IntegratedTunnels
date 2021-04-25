@@ -9,7 +9,7 @@ import org.cyclops.integrateddynamics.api.part.PartPos;
 import org.cyclops.integrateddynamics.api.part.PartTarget;
 import org.cyclops.integrateddynamics.api.part.aspect.property.IAspectProperties;
 import org.cyclops.integratedtunnels.api.network.IFluidNetwork;
-import org.cyclops.integratedtunnels.core.part.PartStateRoundRobin;
+import org.cyclops.integratedtunnels.core.part.PartStatePositionedAddon;
 import org.cyclops.integratedtunnels.core.predicate.IngredientPredicate;
 
 import javax.annotation.Nullable;
@@ -17,7 +17,7 @@ import javax.annotation.Nullable;
 /**
  * @author rubensworks
  */
-public interface IFluidTarget extends IChanneledTarget<IFluidNetwork> {
+public interface IFluidTarget extends IChanneledTarget<IFluidNetwork, FluidStack> {
 
     public IIngredientComponentStorage<FluidStack, Integer> getFluidChannel();
 
@@ -37,7 +37,7 @@ public interface IFluidTarget extends IChanneledTarget<IFluidNetwork> {
         PartPos target = partTarget.getTarget();
         INetwork network = IChanneledTarget.getNetworkChecked(center);
         TileEntity tile = target.getPos().getWorld(true).getTileEntity(target.getPos().getBlockPos());
-        PartStateRoundRobin<?> partState = IChanneledTarget.getPartState(center);
+        PartStatePositionedAddon<?, ?, FluidStack> partState = (PartStatePositionedAddon<?, ?, FluidStack>) IChanneledTarget.getPartState(center);
         return new FluidTargetCapabilityProvider(transfer, network, tile, target.getSide(),
                 fluidStackMatcher, partTarget, properties, partState);
     }
@@ -48,7 +48,7 @@ public interface IFluidTarget extends IChanneledTarget<IFluidNetwork> {
         PartPos center = partTarget.getCenter();
         PartPos target = partTarget.getTarget();
         INetwork network = IChanneledTarget.getNetworkChecked(center);
-        PartStateRoundRobin<?> partState = IChanneledTarget.getPartState(center);
+        PartStatePositionedAddon<?, ?, FluidStack> partState = (PartStatePositionedAddon<?, ?, FluidStack>) IChanneledTarget.getPartState(center);
         return new FluidTargetCapabilityProvider(transfer, network, entity, target.getSide(),
                 fluidStackMatcher, partTarget, properties, partState);
     }
@@ -58,7 +58,7 @@ public interface IFluidTarget extends IChanneledTarget<IFluidNetwork> {
         PartPos center = partTarget.getCenter();
         PartPos target = partTarget.getTarget();
         INetwork network = IChanneledTarget.getNetworkChecked(center);
-        PartStateRoundRobin<?> partState = IChanneledTarget.getPartState(center);
+        PartStatePositionedAddon<?, ?, FluidStack> partState = (PartStatePositionedAddon<?, ?, FluidStack>) IChanneledTarget.getPartState(center);
         return new FluidTargetCapabilityProvider(transfer, network, null, target.getSide(),
                 fluidStackMatcher, partTarget, properties, partState);
     }
@@ -68,7 +68,7 @@ public interface IFluidTarget extends IChanneledTarget<IFluidNetwork> {
                                                IngredientPredicate<FluidStack, Integer> fluidStackMatcher,
                                                IIngredientComponentStorage<FluidStack, Integer> storage) {
         PartPos center = partTarget.getCenter();
-        PartStateRoundRobin<?> partState = IChanneledTarget.getPartState(center);
+        PartStatePositionedAddon<?, ?, FluidStack> partState = (PartStatePositionedAddon<?, ?, FluidStack>) IChanneledTarget.getPartState(center);
         return new FluidTargetStorage(transfer, network, storage,
                 fluidStackMatcher, partTarget, properties, partState);
     }
