@@ -44,6 +44,11 @@ public abstract class PartTypeInterfacePositionedAddon<N extends IPositionedAddo
     }
 
     @Override
+    public boolean isUpdate(S state) {
+        return getConsumptionRate(state) > 0 && org.cyclops.integrateddynamics.GeneralConfig.energyConsumptionMultiplier > 0;
+    }
+
+    @Override
     public Optional<INamedContainerProvider> getContainerProvider(PartPos pos) {
         return Optional.of(new INamedContainerProvider() {
 
@@ -128,6 +133,11 @@ public abstract class PartTypeInterfacePositionedAddon<N extends IPositionedAddo
 
         private INetwork network;
         private IPartNetwork partNetwork;
+
+        @Override
+        public int getUpdateInterval() {
+            return 1; // For enabling energy consumption
+        }
 
         @Override
         public void readFromNBT(CompoundNBT tag) {
