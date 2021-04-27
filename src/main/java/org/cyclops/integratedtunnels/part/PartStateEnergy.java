@@ -17,7 +17,7 @@ import org.cyclops.integratedtunnels.core.part.PartStatePositionedAddon;
  * It also acts as an energy capability that can be added to itself.
  * @author rubensworks
  */
-public class PartStateEnergy<P extends IPartTypeWriter> extends PartStatePositionedAddon<P, IEnergyNetwork, Integer> implements IEnergyStorage {
+public class PartStateEnergy<P extends IPartTypeWriter> extends PartStatePositionedAddon<P, IEnergyNetwork, Long> implements IEnergyStorage {
 
     public PartStateEnergy(int inventorySize, boolean canReceive, boolean canExtract) {
         super(inventorySize, canReceive, canExtract);
@@ -38,14 +38,14 @@ public class PartStateEnergy<P extends IPartTypeWriter> extends PartStatePositio
     @Override
     public int receiveEnergy(int maxReceive, boolean simulate) {
         maxReceive = Math.min(maxReceive, GeneralConfig.energyRateLimit);
-        return this.canReceive() && getPositionedAddonsNetwork() != null && getStorageFilter() != null && getStorageFilter().testInsertion(maxReceive)
+        return this.canReceive() && getPositionedAddonsNetwork() != null && getStorageFilter() != null && getStorageFilter().testInsertion((long) maxReceive)
                 ? getEnergyStorage().receiveEnergy(maxReceive, simulate) : 0;
     }
 
     @Override
     public int extractEnergy(int maxExtract, boolean simulate) {
         maxExtract = Math.min(maxExtract, GeneralConfig.energyRateLimit);
-        return this.canExtract() && getPositionedAddonsNetwork() != null && getStorageFilter() != null && getStorageFilter().testExtraction(maxExtract)
+        return this.canExtract() && getPositionedAddonsNetwork() != null && getStorageFilter() != null && getStorageFilter().testExtraction((long) maxExtract)
                 ? getEnergyStorage().extractEnergy(maxExtract, simulate) : 0;
     }
 
@@ -53,7 +53,7 @@ public class PartStateEnergy<P extends IPartTypeWriter> extends PartStatePositio
     public int getEnergyStored() {
         if (getPositionedAddonsNetwork() != null && getStorageFilter() != null) {
             int stored = getEnergyStorage().getEnergyStored();
-            if (getStorageFilter().testView(stored)) {
+            if (getStorageFilter().testView((long) stored)) {
                 return stored;
             }
         }

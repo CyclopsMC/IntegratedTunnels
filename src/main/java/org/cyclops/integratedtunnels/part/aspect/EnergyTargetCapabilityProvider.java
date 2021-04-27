@@ -15,15 +15,16 @@ import javax.annotation.Nullable;
 /**
  * @author rubensworks
  */
-public class EnergyTargetCapabilityProvider extends ChanneledTargetCapabilityProvider<IEnergyNetwork, Integer, Boolean>
+public class EnergyTargetCapabilityProvider extends ChanneledTargetCapabilityProvider<IEnergyNetwork, Long, Boolean>
         implements IEnergyTarget {
 
+    // TODO: in next breaking change, migrate to long values
     private final int amount;
     private final boolean exactAmount;
 
     public EnergyTargetCapabilityProvider(@Nullable ICapabilityProvider capabilityProvider, Direction side, INetwork network,
                                           IAspectProperties properties,
-                                          int amount, @Nullable PartStatePositionedAddon<?, ?, Integer> partStateEnergy) {
+                                          int amount, @Nullable PartStatePositionedAddon<?, ?, Long> partStateEnergy) {
         super(network, capabilityProvider, side, network.getCapability(Capabilities.NETWORK_ENERGY).orElse(null), partStateEnergy,
                 properties.getValue(TunnelAspectWriteBuilders.PROP_CHANNEL).getRawValue(),
                 properties.getValue(TunnelAspectWriteBuilders.PROP_ROUNDROBIN).getRawValue(),
@@ -34,7 +35,7 @@ public class EnergyTargetCapabilityProvider extends ChanneledTargetCapabilityPro
     }
 
     @Override
-    public IIngredientComponentStorage<Integer, Boolean> getEnergyChannel() {
+    public IIngredientComponentStorage<Long, Boolean> getEnergyChannel() {
         return getChanneledNetwork().getChannel(getChannel());
     }
 
@@ -49,7 +50,7 @@ public class EnergyTargetCapabilityProvider extends ChanneledTargetCapabilityPro
     }
 
     @Override
-    protected IngredientComponent<Integer, Boolean> getComponent() {
+    protected IngredientComponent<Long, Boolean> getComponent() {
         return IngredientComponent.ENERGY;
     }
 }

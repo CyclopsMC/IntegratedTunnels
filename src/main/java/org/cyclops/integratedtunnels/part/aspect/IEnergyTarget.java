@@ -15,11 +15,11 @@ import javax.annotation.Nullable;
 /**
  * @author rubensworks
  */
-public interface IEnergyTarget extends IChanneledTarget<IEnergyNetwork, Integer> {
+public interface IEnergyTarget extends IChanneledTarget<IEnergyNetwork, Long> {
 
-    public IIngredientComponentStorage<Integer, Boolean> getEnergyChannel();
+    public IIngredientComponentStorage<Long, Boolean> getEnergyChannel();
 
-    public IIngredientComponentStorage<Integer, Boolean> getStorage();
+    public IIngredientComponentStorage<Long, Boolean> getStorage();
 
     public int getAmount();
 
@@ -30,7 +30,7 @@ public interface IEnergyTarget extends IChanneledTarget<IEnergyNetwork, Integer>
         PartPos target = partTarget.getTarget();
         INetwork network = IChanneledTarget.getNetworkChecked(center);
         TileEntity tile = target.getPos().getWorld(true).getTileEntity(target.getPos().getBlockPos());
-        PartStatePositionedAddon<?, ?, Integer> partState = (PartStatePositionedAddon<?, ?, Integer>) IChanneledTarget.getPartState(center);
+        PartStatePositionedAddon<?, ?, Long> partState = (PartStatePositionedAddon<?, ?, Long>) IChanneledTarget.getPartState(center);
         return new EnergyTargetCapabilityProvider(tile, target.getSide(), network, properties, amount, partState);
     }
 
@@ -39,7 +39,7 @@ public interface IEnergyTarget extends IChanneledTarget<IEnergyNetwork, Integer>
         PartPos center = partTarget.getCenter();
         PartPos target = partTarget.getTarget();
         INetwork network = IChanneledTarget.getNetworkChecked(center);
-        PartStatePositionedAddon<?, ?, Integer> partState = (PartStatePositionedAddon<?, ?, Integer>) IChanneledTarget.getPartState(center);
+        PartStatePositionedAddon<?, ?, Long> partState = (PartStatePositionedAddon<?, ?, Long>) IChanneledTarget.getPartState(center);
         return new EnergyTargetCapabilityProvider(entity, target.getSide(), network, properties, amount, partState);
     }
 

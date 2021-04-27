@@ -332,11 +332,11 @@ public class TunnelAspectWriteBuilders {
             }
             return null;
         };
-        public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, Boolean>, Triple<PartTarget, IAspectProperties, ChanneledTargetInformation<Integer, Boolean>>>
+        public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, Boolean>, Triple<PartTarget, IAspectProperties, ChanneledTargetInformation<Long, Boolean>>>
                 PROP_BOOLEAN_PREDICATE = input -> {
-            IngredientPredicate<Integer, Boolean> energyMatcher = new IngredientPredicate<Integer, Boolean>(IngredientComponents.ENERGY, false, false, 0, false) {
+            IngredientPredicate<Long, Boolean> energyMatcher = new IngredientPredicate<Long, Boolean>(IngredientComponents.ENERGY, false, false, 0, false) {
                 @Override
-                public boolean test(Integer integer) {
+                public boolean test(Long integer) {
                     return input.getRight();
                 }
             };
