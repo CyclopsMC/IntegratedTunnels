@@ -22,13 +22,13 @@ Transfer other stuff over Integrated Dynamics networks.
 [[dependencies.integratedtunnels]]
     modId="integrateddynamics"
     mandatory=true
-    versionRange="[1.1.20,)"
+    versionRange="[1.8.0,)"
     ordering="NONE"
     side="BOTH"
 [[dependencies.integratedtunnels]]
     modId="commoncapabilities"
     mandatory=true
-    versionRange="[2.5.3,)"
+    versionRange="[2.7.0,)"
     ordering="NONE"
     side="BOTH"
 [[dependencies.integratedtunnels]]

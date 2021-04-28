@@ -1,0 +1,19 @@
+As always, don't forget to backup your world before updating!
+Requires CyclopsCore version 1.11.1 or higher.
+
+Additions:
+* Add filtering ingredient interfaces, Closes #98
+* Add tutorials for filtering item interfaces
+
+Changes:
+* Apply filters from importers and exporters also on passive I/O
+  Previously, they would just accept anything.
+  Closes #75
+* Migrate energy ingredient component to long-based values
+  Required for CyclopsMC/IntegratedDynamics#1023
+* Make interfaces consume energy (if energy consumption enabled), Closes #224
+
+Fixes:
+* Fix some advancements not having correct icons
+* Fix player simulator unable to milk cows, Closes #220
+* Fix crash when using items that apply potion effect, Closes #219
