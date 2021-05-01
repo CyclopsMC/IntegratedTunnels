@@ -7,7 +7,7 @@ import org.cyclops.integrateddynamics.api.part.PartTarget;
 import org.cyclops.integrateddynamics.api.part.aspect.property.IAspectProperties;
 import org.cyclops.integratedtunnels.api.network.IFluidNetwork;
 import org.cyclops.integratedtunnels.capability.network.FluidNetworkConfig;
-import org.cyclops.integratedtunnels.core.part.PartStatePositionedAddon;
+import org.cyclops.integratedtunnels.core.part.PartStateRoundRobin;
 import org.cyclops.integratedtunnels.core.predicate.IngredientPredicate;
 
 import javax.annotation.Nullable;
@@ -26,7 +26,7 @@ public class FluidTargetStorage extends ChanneledTarget<IFluidNetwork, FluidStac
     public FluidTargetStorage(ITunnelTransfer transfer, INetwork network,
                               IIngredientComponentStorage<FluidStack, Integer> storage,
                               IngredientPredicate<FluidStack, Integer> fluidStackMatcher, PartTarget partTarget,
-                              IAspectProperties properties, @Nullable PartStatePositionedAddon<?, ?, FluidStack> partState) {
+                              IAspectProperties properties, @Nullable PartStateRoundRobin<?> partState) {
         super(network, network.getCapability(FluidNetworkConfig.CAPABILITY).orElse(null), partState,
                 properties.getValue(TunnelAspectWriteBuilders.PROP_CHANNEL).getRawValue(),
                 properties.getValue(TunnelAspectWriteBuilders.PROP_ROUNDROBIN).getRawValue(),

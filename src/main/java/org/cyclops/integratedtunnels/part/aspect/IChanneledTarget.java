@@ -25,7 +25,10 @@ public interface IChanneledTarget<N extends IPositionedAddonsNetwork, T> {
 
     public boolean hasValidTarget();
 
-    public PartStatePositionedAddon<?, ?, T> getPartState();
+    public PartStateRoundRobin<?> getPartState();
+    public default PartStatePositionedAddon<?, ?, T> getPartStatePositionedAddon() {
+        return (PartStatePositionedAddon<?, ?, T>) getPartState();
+    }
 
     public int getChannel();
 
@@ -49,12 +52,12 @@ public interface IChanneledTarget<N extends IPositionedAddonsNetwork, T> {
     }
 
     @Nullable
-    public static PartStatePositionedAddon<?, ?, ?> getPartState(PartPos center) {
+    public static PartStateRoundRobin<?> getPartState(PartPos center) {
         PartHelpers.PartStateHolder<?, ?> partStateHolder = PartHelpers.getPart(center);
         if (partStateHolder == null) {
             return null;
         }
-        return (PartStatePositionedAddon<?, ?, ?>) partStateHolder.getState();
+        return (PartStateRoundRobin<?>) partStateHolder.getState();
     }
 
 }

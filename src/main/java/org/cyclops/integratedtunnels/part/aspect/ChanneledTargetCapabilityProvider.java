@@ -6,7 +6,7 @@ import org.cyclops.commoncapabilities.api.ingredient.IngredientComponent;
 import org.cyclops.commoncapabilities.api.ingredient.storage.IIngredientComponentStorage;
 import org.cyclops.integrateddynamics.api.network.INetwork;
 import org.cyclops.integrateddynamics.api.network.IPositionedAddonsNetwork;
-import org.cyclops.integratedtunnels.core.part.PartStatePositionedAddon;
+import org.cyclops.integratedtunnels.core.part.PartStateRoundRobin;
 
 import javax.annotation.Nullable;
 
@@ -22,7 +22,7 @@ public abstract class ChanneledTargetCapabilityProvider<N extends IPositionedAdd
     private IIngredientComponentStorage<T, M> storage = null;
 
     public ChanneledTargetCapabilityProvider(INetwork network, @Nullable ICapabilityProvider capabilityProvider, Direction side,
-                                             N channeledNetwork, @Nullable PartStatePositionedAddon<?, ?, T> partState, int channel,
+                                             N channeledNetwork, @Nullable PartStateRoundRobin<?> partState, int channel,
                                              boolean roundRobin, boolean craftIfFailed, boolean passiveIO) {
         super(network, channeledNetwork, partState, channel, roundRobin, craftIfFailed, passiveIO);
         this.capabilityProvider = capabilityProvider;

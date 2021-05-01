@@ -4,7 +4,7 @@ import org.cyclops.integrateddynamics.api.network.INetwork;
 import org.cyclops.integrateddynamics.api.network.IPartPosIteratorHandler;
 import org.cyclops.integrateddynamics.api.network.IPositionedAddonsNetwork;
 import org.cyclops.integrateddynamics.core.network.PartPosIteratorHandlerRoundRobin;
-import org.cyclops.integratedtunnels.core.part.PartStatePositionedAddon;
+import org.cyclops.integratedtunnels.core.part.PartStateRoundRobin;
 
 import javax.annotation.Nullable;
 
@@ -17,13 +17,13 @@ public abstract class ChanneledTarget<N extends IPositionedAddonsNetwork, T> imp
     private final INetwork network;
     private final N channeledNetwork;
     @Nullable
-    private final PartStatePositionedAddon<?, ?, T> partState;
+    private final PartStateRoundRobin<?> partState;
     private final int channel;
     private final boolean roundRobin;
     private final boolean craftIfFailed;
     private final boolean passiveIO;
 
-    public ChanneledTarget(INetwork network, N channeledNetwork, @Nullable PartStatePositionedAddon<?, ?, T> partState, int channel,
+    public ChanneledTarget(INetwork network, N channeledNetwork, @Nullable PartStateRoundRobin<?> partState, int channel,
                            boolean roundRobin, boolean craftIfFailed, boolean passiveIO) {
         this.network = network;
         this.channeledNetwork = channeledNetwork;
@@ -46,7 +46,7 @@ public abstract class ChanneledTarget<N extends IPositionedAddonsNetwork, T> imp
 
     @Nullable
     @Override
-    public PartStatePositionedAddon<?, ?, T> getPartState() {
+    public PartStateRoundRobin<?> getPartState() {
         return partState;
     }
 

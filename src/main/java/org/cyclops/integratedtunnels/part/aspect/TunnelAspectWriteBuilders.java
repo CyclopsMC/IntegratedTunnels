@@ -65,7 +65,6 @@ import org.cyclops.integratedtunnels.core.TunnelHelpers;
 import org.cyclops.integratedtunnels.core.TunnelItemHelpers;
 import org.cyclops.integratedtunnels.core.part.IPartTypeInterfacePositionedAddon;
 import org.cyclops.integratedtunnels.core.part.PartStatePositionedAddon;
-import org.cyclops.integratedtunnels.core.part.PartTypeInterfacePositionedAddon;
 import org.cyclops.integratedtunnels.core.part.PartTypeInterfacePositionedAddonFiltering;
 import org.cyclops.integratedtunnels.core.predicate.IngredientPredicate;
 import org.cyclops.integratedtunnels.part.PartStatePlayerSimulator;
@@ -280,7 +279,7 @@ public class TunnelAspectWriteBuilders {
                 PROP_EXPORT = input -> {
             // Save this filter into the part state to handle passive exports
             if (input.isPassiveIO()) {
-                input.getPartState().setStorageFilter(new PositionedAddonsNetworkIngredientsFilter<>(
+                input.getPartStatePositionedAddon().setStorageFilter(new PositionedAddonsNetworkIngredientsFilter<>(
                         (amount) -> amount <= input.getAmount(),
                         false,
                         true,
@@ -308,7 +307,7 @@ public class TunnelAspectWriteBuilders {
                 PROP_IMPORT = input -> {
             // Save this filter into the part state to handle passive imports
             if (input.isPassiveIO()) {
-                input.getPartState().setStorageFilter(new PositionedAddonsNetworkIngredientsFilter<>(
+                input.getPartStatePositionedAddon().setStorageFilter(new PositionedAddonsNetworkIngredientsFilter<>(
                         (amount) -> amount <= input.getAmount(),
                         true,
                         false,
@@ -749,7 +748,7 @@ public class TunnelAspectWriteBuilders {
                 PROP_EXPORT = input -> {
             // Save this filter into the part state to handle passive exports
             if (input.isPassiveIO()) {
-                input.getPartState().setStorageFilter(new PositionedAddonsNetworkIngredientsFilter<>(
+                input.getPartStatePositionedAddon().setStorageFilter(new PositionedAddonsNetworkIngredientsFilter<>(
                         input.getItemStackMatcher(),
                         false,
                         true,
@@ -777,7 +776,7 @@ public class TunnelAspectWriteBuilders {
                 PROP_IMPORT = input -> {
             // Save this filter into the part state to handle passive imports
             if (input.isPassiveIO()) {
-                input.getPartState().setStorageFilter(new PositionedAddonsNetworkIngredientsFilter<>(
+                input.getPartStatePositionedAddon().setStorageFilter(new PositionedAddonsNetworkIngredientsFilter<>(
                         input.getItemStackMatcher(),
                         true,
                         false,
@@ -1105,7 +1104,7 @@ public class TunnelAspectWriteBuilders {
                 PROP_EXPORT = input -> {
             // Save this filter into the part state to handle passive exports
             if (input.isPassiveIO()) {
-                input.getPartState().setStorageFilter(new PositionedAddonsNetworkIngredientsFilter<>(
+                input.getPartStatePositionedAddon().setStorageFilter(new PositionedAddonsNetworkIngredientsFilter<>(
                         input.getFluidStackMatcher(),
                         false,
                         true,
@@ -1136,7 +1135,7 @@ public class TunnelAspectWriteBuilders {
                 PROP_IMPORT = input -> {
             // Save this filter into the part state to handle passive imports
             if (input.isPassiveIO()) {
-                input.getPartState().setStorageFilter(new PositionedAddonsNetworkIngredientsFilter<>(
+                input.getPartStatePositionedAddon().setStorageFilter(new PositionedAddonsNetworkIngredientsFilter<>(
                         input.getFluidStackMatcher(),
                         true,
                         false,
