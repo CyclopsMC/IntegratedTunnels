@@ -79,7 +79,11 @@ repositories {
 	mavenLocal()
     maven {
         name "Cyclops Repo"
-        url "https://oss.jfrog.org/artifactory/simple/libs-release/"
+        url "https://maven.pkg.github.com/CyclopsMC/packages"
+        credentials {
+            username = project.findProperty("gpr.user") ?: System.getenv("MAVEN_USERNAME")
+            password = project.findProperty("gpr.key") ?: System.getenv("MAVEN_KEY")
+        }
     }
 }
 
@@ -88,37 +92,37 @@ dependencies {
 
     // Add something like 'cyclopscore_version_local=0.1.0-DEV' to your gradle.properties if you want to use a custom local CyclopsCore version.
     if(project.hasProperty("cyclopscore_version_local")) {
-        compile "org.cyclops.cyclopscore:CyclopsCore:${config.minecraft_version}-${project.cyclopscore_version_local}:deobf"
+        compile "org.cyclops.cyclopscore:cyclopscore:${config.minecraft_version}-${project.cyclopscore_version_local}:deobf"
     } else {
-        compile "org.cyclops.cyclopscore:CyclopsCore:${config.minecraft_version}-${config.cyclopscore_version}:deobf"
+        compile "org.cyclops.cyclopscore:cyclopscore:${config.minecraft_version}-${config.cyclopscore_version}:deobf"
     }
 	
     // Add something like 'integrateddynamics_version_local=0.1.0-DEV' to your gradle.properties if you want to use a custom local Integrated Tunnels Compat version.
     if(project.hasProperty("integrateddynamics_version_local")) {
-        compile("org.cyclops.integrateddynamics:IntegratedDynamics:${project.integrateddynamics_version_local}:deobf") {
+        compile("org.cyclops.integrateddynamics:integrateddynamics:${project.integrateddynamics_version_local}:deobf") {
             transitive = false
         }
     } else {
-        compile("org.cyclops.integrateddynamics:IntegratedDynamics:${config.integrateddynamics_version}:deobf") {
+        compile("org.cyclops.integrateddynamics:integrateddynamics:${config.integrateddynamics_version}:deobf") {
             transitive = false
         }
     }
 	
     // Add something like 'integratedtunnelscompat_version_local=0.1.0-DEV' to your gradle.properties if you want to use a custom local Integrated Tunnels Compat version.
     if(project.hasProperty("integratedtunnelscompat_version_local")) {
-        shadow("org.cyclops.integratedtunnelscompat:IntegratedTunnelsCompat:${project.integratedtunnelscompat_version_local}") {
+        shadow("org.cyclops.integratedtunnelscompat:integratedtunnelscompat:${project.integratedtunnelscompat_version_local}") {
             transitive = false
         }
     } else {
-        shadow("org.cyclops.integratedtunnelscompat:IntegratedTunnelsCompat:${config.integratedtunnelscompat_version}") {
+        shadow("org.cyclops.integratedtunnelscompat:integratedtunnelscompat:${config.integratedtunnelscompat_version}") {
             transitive = false
         }
     }
 
     if(project.hasProperty("commoncapabilities_version_local")) {
-        compile "org.cyclops.commoncapabilities:CommonCapabilities:${project.commoncapabilities_version_local}:deobf"
+        compile "org.cyclops.commoncapabilities:commoncapabilities:${project.commoncapabilities_version_local}:deobf"
     } else {
-        compile fg.deobf("org.cyclops.commoncapabilities:CommonCapabilities:${config.commoncapabilities_version}") { // https://dl.bintray.com/cyclopsmc/dev/org/cyclops/commoncapabilities/CommonCapabilities/
+        compile fg.deobf("org.cyclops.commoncapabilities:commoncapabilities:${config.commoncapabilities_version}") { // https://dl.bintray.com/cyclopsmc/dev/org/cyclops/commoncapabilities/CommonCapabilities/
             transitive = false
         }
     }
@@ -310,7 +314,7 @@ uploadArchives {
         pom {
             groupId = project.group
             version = project.version
-            artifactId = project.archivesBaseName
+            artifactId = project.archivesBaseName.toLowerCase()
         }
         pom.project {
             name project.archivesBaseName
