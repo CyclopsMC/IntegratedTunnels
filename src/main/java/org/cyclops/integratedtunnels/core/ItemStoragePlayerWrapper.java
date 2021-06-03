@@ -20,6 +20,7 @@ import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.ForgeMod;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
+import net.minecraftforge.eventbus.api.Event;
 import org.cyclops.commoncapabilities.api.ingredient.IngredientComponent;
 import org.cyclops.commoncapabilities.api.ingredient.storage.IIngredientComponentStorage;
 import org.cyclops.cyclopscore.helper.ItemStackHelpers;
@@ -134,26 +135,43 @@ public class ItemStoragePlayerWrapper implements IIngredientComponentStorage<Ite
         }
 
         if (rightClick) {
-            // Use item first
+            /* Inspired by PlayerInteractionManager#func_219441_a (line 324) */
+
+            // Send block right click event
             BlockRayTraceResult blockRayTraceResult = new BlockRayTraceResult(new Vector3d(offsetX, offsetY, offsetZ), side, pos, false);
-            if (!stack.isEmpty()) {
-                ItemUseContext itemUseContext = new ItemUseContext(player, hand, blockRayTraceResult);
-                ActionResultType actionResult = stack.getItem().onItemUseFirst(stack, itemUseContext);
-                if (actionResult == ActionResultType.FAIL) {
-                    return stack;
-                } else if (actionResult.isSuccessOrConsume()) {
-                    returnPlayerInventory(player);
-                    return ItemStack.EMPTY;
+            PlayerInteractEvent.RightClickBlock rightClickBlockActionResult = ForgeHooks.onRightClickBlock(player, hand, pos, blockRayTraceResult);
+            if (rightClickBlockActionResult.isCanceled()) {
+                return stack;
+            }
+
+            // Use item first
+            if (rightClickBlockActionResult.getUseItem() != Event.Result.DENY) {
+                if (!stack.isEmpty()) {
+                    ItemUseContext itemUseContext = new ItemUseContext(player, hand, blockRayTraceResult);
+                    ActionResultType actionResult = stack.getItem().onItemUseFirst(stack, itemUseContext);
+                    if (actionResult == ActionResultType.FAIL) {
+                        return stack;
+                    } else if (actionResult.isSuccessOrConsume()) {
+                        returnPlayerInventory(player);
+                        return ItemStack.EMPTY;
+                    }
+                    // Otherwise, PASS the logic
                 }
-                // Otherwise, PASS the logic
             }
 
             // Activate block
-            BlockState blockState = world.getBlockState(pos);
-            if (!player.isCrouching() || stack.isEmpty()) {
-                if (blockState.onBlockActivated(world, player, hand, blockRayTraceResult).isSuccess()) {
-                    returnPlayerInventory(player);
-                    return ItemStack.EMPTY;
+            boolean playerHasHeldItem = !player.getHeldItemMainhand().isEmpty() || !player.getHeldItemOffhand().isEmpty();
+            boolean flag1 = (player.isSecondaryUseActive() && playerHasHeldItem)
+                    && !(player.getHeldItemMainhand().doesSneakBypassUse(world, pos, player)
+                    && player.getHeldItemOffhand().doesSneakBypassUse(world, pos, player));
+            if (rightClickBlockActionResult.getUseBlock() == Event.Result.ALLOW
+                    || (rightClickBlockActionResult.getUseBlock() != Event.Result.DENY && !flag1)) {
+                BlockState blockState = world.getBlockState(pos);
+                if (!player.isCrouching() || stack.isEmpty()) {
+                    if (blockState.onBlockActivated(world, player, hand, blockRayTraceResult).isSuccess()) {
+                        returnPlayerInventory(player);
+                        return ItemStack.EMPTY;
+                    }
                 }
             }
 
@@ -171,7 +189,7 @@ public class ItemStoragePlayerWrapper implements IIngredientComponentStorage<Ite
             }
 
             // Use itemstack
-            if (!stack.isEmpty()) {
+            if (rightClickBlockActionResult.getUseItem() != Event.Result.DENY && !stack.isEmpty()) {
                 ActionResultType cancelResult = ForgeHooks.onItemRightClick(player, hand);
                 if (cancelResult != null)  {
                     if (cancelResult == ActionResultType.FAIL) {
@@ -206,7 +224,7 @@ public class ItemStoragePlayerWrapper implements IIngredientComponentStorage<Ite
             }
 
             // Use item
-            if (!stack.isEmpty()) {
+            if (rightClickBlockActionResult.getUseItem() != Event.Result.DENY && !stack.isEmpty()) {
                 // Increase reach position.
                 BlockPos targetPos = pos;
                 double reachDistance = player.getAttribute(ForgeMod.REACH_DISTANCE.get()).getValue() + 3;
