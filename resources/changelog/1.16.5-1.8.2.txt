@@ -1,0 +1,9 @@
+As always, don't forget to backup your world before updating!
+Requires CyclopsCore version 1.11.6 or higher.
+
+
+Fixes:
+* Fix RightClickBlock event not being called in player simulator
+  This made some third-party mod functionality break.
+  Closes CyclopsMC/IntegratedDynamics#1046
+
