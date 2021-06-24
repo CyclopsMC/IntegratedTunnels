@@ -279,12 +279,16 @@ public class TunnelAspectWriteBuilders {
                 PROP_EXPORT = input -> {
             // Save this filter into the part state to handle passive exports
             if (input.isPassiveIO()) {
-                input.getPartStatePositionedAddon().setStorageFilter(new PositionedAddonsNetworkIngredientsFilter<>(
-                        (amount) -> amount <= input.getAmount(),
-                        false,
-                        true,
-                        false
-                ));
+                try {
+                    input.getPartStatePositionedAddon().setStorageFilter(new PositionedAddonsNetworkIngredientsFilter<>(
+                            (amount) -> amount <= input.getAmount(),
+                            false,
+                            true,
+                            false
+                    ));
+                } catch (ClassCastException e) {
+                    // TODO: only needed for corrupted parts, which can not be created anymore. Remove this in MC 1.17
+                }
             }
 
             if (input.hasValidTarget() && input.getAmount() != 0) {
@@ -307,12 +311,16 @@ public class TunnelAspectWriteBuilders {
                 PROP_IMPORT = input -> {
             // Save this filter into the part state to handle passive imports
             if (input.isPassiveIO()) {
-                input.getPartStatePositionedAddon().setStorageFilter(new PositionedAddonsNetworkIngredientsFilter<>(
-                        (amount) -> amount <= input.getAmount(),
-                        true,
-                        false,
-                        false
-                ));
+                try {
+                    input.getPartStatePositionedAddon().setStorageFilter(new PositionedAddonsNetworkIngredientsFilter<>(
+                            (amount) -> amount <= input.getAmount(),
+                            true,
+                            false,
+                            false
+                    ));
+                } catch (ClassCastException e) {
+                    // TODO: only needed for corrupted parts, which can not be created anymore. Remove this in MC 1.17
+                }
             }
 
             if (input.hasValidTarget() && input.getAmount() != 0) {
@@ -748,12 +756,16 @@ public class TunnelAspectWriteBuilders {
                 PROP_EXPORT = input -> {
             // Save this filter into the part state to handle passive exports
             if (input.isPassiveIO()) {
-                input.getPartStatePositionedAddon().setStorageFilter(new PositionedAddonsNetworkIngredientsFilter<>(
-                        input.getItemStackMatcher(),
-                        false,
-                        true,
-                        false
-                ));
+                try {
+                    input.getPartStatePositionedAddon().setStorageFilter(new PositionedAddonsNetworkIngredientsFilter<>(
+                            input.getItemStackMatcher(),
+                            false,
+                            true,
+                            false
+                    ));
+                } catch (ClassCastException e) {
+                    // TODO: only needed for corrupted parts, which can not be created anymore. Remove this in MC 1.17
+                }
             }
 
             if (input.hasValidTarget()) {
@@ -776,12 +788,16 @@ public class TunnelAspectWriteBuilders {
                 PROP_IMPORT = input -> {
             // Save this filter into the part state to handle passive imports
             if (input.isPassiveIO()) {
-                input.getPartStatePositionedAddon().setStorageFilter(new PositionedAddonsNetworkIngredientsFilter<>(
-                        input.getItemStackMatcher(),
-                        true,
-                        false,
-                        false
-                ));
+                try {
+                    input.getPartStatePositionedAddon().setStorageFilter(new PositionedAddonsNetworkIngredientsFilter<>(
+                            input.getItemStackMatcher(),
+                            true,
+                            false,
+                            false
+                    ));
+                } catch (ClassCastException e) {
+                    // TODO: only needed for corrupted parts, which can not be created anymore. Remove this in MC 1.17
+                }
             }
 
             if (input.hasValidTarget()) {
@@ -1104,12 +1120,16 @@ public class TunnelAspectWriteBuilders {
                 PROP_EXPORT = input -> {
             // Save this filter into the part state to handle passive exports
             if (input.isPassiveIO()) {
-                input.getPartStatePositionedAddon().setStorageFilter(new PositionedAddonsNetworkIngredientsFilter<>(
-                        input.getFluidStackMatcher(),
-                        false,
-                        true,
-                        false
-                ));
+                try {
+                    input.getPartStatePositionedAddon().setStorageFilter(new PositionedAddonsNetworkIngredientsFilter<>(
+                            input.getFluidStackMatcher(),
+                            false,
+                            true,
+                            false
+                    ));
+                } catch (ClassCastException e) {
+                    // TODO: only needed for corrupted parts, which can not be created anymore. Remove this in MC 1.17
+                }
             }
 
             if (input.hasValidTarget()) {
@@ -1135,12 +1155,16 @@ public class TunnelAspectWriteBuilders {
                 PROP_IMPORT = input -> {
             // Save this filter into the part state to handle passive imports
             if (input.isPassiveIO()) {
-                input.getPartStatePositionedAddon().setStorageFilter(new PositionedAddonsNetworkIngredientsFilter<>(
-                        input.getFluidStackMatcher(),
-                        true,
-                        false,
-                        false
-                ));
+                try {
+                    input.getPartStatePositionedAddon().setStorageFilter(new PositionedAddonsNetworkIngredientsFilter<>(
+                            input.getFluidStackMatcher(),
+                            true,
+                            false,
+                            false
+                    ));
+                } catch (ClassCastException e) {
+                    // TODO: only needed for corrupted parts, which can not be created anymore. Remove this in MC 1.17
+                }
             }
 
             if (input.hasValidTarget()) {
@@ -1239,6 +1263,7 @@ public class TunnelAspectWriteBuilders {
             public static final IAspectProperties PROPERTIES = TunnelAspectWriteBuilders.Energy.PROPERTIES_RATE.clone();
             static {
                 PROPERTIES.setValue(World.PROPERTY_ENTITYINDEX, ValueTypeInteger.ValueInteger.of(0));
+                PROPERTIES.removeValue(PROP_PASSIVE_IO);
             }
             public static final IAspectProperties PROPERTIES_ENTITY = new AspectProperties(ImmutableList.<IAspectPropertyTypeInstance>of(
                     PROP_CHANNEL,
@@ -1407,17 +1432,22 @@ public class TunnelAspectWriteBuilders {
             public static final IAspectProperties PROPERTIES_NBT = TunnelAspectWriteBuilders.Item.PROPERTIES_NBT.clone();
             static {
                 PROPERTIES_RATESLOT.setValue(World.PROPERTY_ENTITYINDEX, ValueTypeInteger.ValueInteger.of(0));
+                PROPERTIES_RATESLOT.removeValue(PROP_PASSIVE_IO);
 
                 PROPERTIES_SLOT.setValue(World.PROPERTY_ENTITYINDEX, ValueTypeInteger.ValueInteger.of(0));
+                PROPERTIES_SLOT.removeValue(PROP_PASSIVE_IO);
 
                 PROPERTIES_RATESLOTCHECKS.setValue(World.PROPERTY_ENTITYINDEX, ValueTypeInteger.ValueInteger.of(0));
                 PROPERTIES_RATESLOTCHECKS.setValue(PROP_BLACKLIST, ValueTypeBoolean.ValueBoolean.of(false));
                 PROPERTIES_RATESLOTCHECKS.setValue(PROP_EMPTYISANY, ValueTypeBoolean.ValueBoolean.of(false));
+                PROPERTIES_RATESLOTCHECKS.removeValue(PROP_PASSIVE_IO);
 
                 PROPERTIES_RATESLOTCHECKSCRAFT.setValue(World.PROPERTY_ENTITYINDEX, ValueTypeInteger.ValueInteger.of(0));
                 PROPERTIES_RATESLOTCHECKSCRAFT.setValue(PROP_BLACKLIST, ValueTypeBoolean.ValueBoolean.of(false));
+                PROPERTIES_RATESLOTCHECKSCRAFT.removeValue(PROP_PASSIVE_IO);
 
                 PROPERTIES_NBT.setValue(World.PROPERTY_ENTITYINDEX, ValueTypeInteger.ValueInteger.of(0));
+                PROPERTIES_NBT.removeValue(PROP_PASSIVE_IO);
             }
             public static final IAspectProperties PROPERTIES_RATESLOTCHECKSLIST = PROPERTIES_RATESLOTCHECKS.clone();
             static {
@@ -1573,6 +1603,7 @@ public class TunnelAspectWriteBuilders {
                 PROPERTIES_UPDATE.setValue(PROP_ROUNDROBIN, ValueTypeBoolean.ValueBoolean.of(false));
                 PROPERTIES_UPDATE.setValue(PROP_BLOCK_UPDATE, ValueTypeBoolean.ValueBoolean.of(false));
                 PROPERTIES_UPDATE.setValue(PROP_IGNORE_REPLACABLE, ValueTypeBoolean.ValueBoolean.of(false));
+                PROPERTIES_UPDATE.removeValue(PROP_PASSIVE_IO);
 
                 PROPERTIES_FLUIDCRAFT_UPDATE.setValue(PROP_CHANNEL, ValueTypeInteger.ValueInteger.of(IPositionedAddonsNetworkIngredients.DEFAULT_CHANNEL));
                 PROPERTIES_FLUIDCRAFT_UPDATE.setValue(PROP_ROUNDROBIN, ValueTypeBoolean.ValueBoolean.of(false));
@@ -1582,6 +1613,7 @@ public class TunnelAspectWriteBuilders {
                 PROPERTIES_FLUIDCRAFT_UPDATE.setValue(PROP_BLOCK_UPDATE, ValueTypeBoolean.ValueBoolean.of(false));
                 PROPERTIES_FLUIDCRAFT_UPDATE.setValue(PROP_IGNORE_REPLACABLE, ValueTypeBoolean.ValueBoolean.of(false));
                 PROPERTIES_FLUIDCRAFT_UPDATE.setValue(PROP_CRAFT, ValueTypeBoolean.ValueBoolean.of(false));
+                PROPERTIES_FLUIDCRAFT_UPDATE.removeValue(PROP_PASSIVE_IO);
 
                 PROPERTIES_FLUIDLIST_UPDATE.setValue(PROP_CHANNEL, ValueTypeInteger.ValueInteger.of(IPositionedAddonsNetworkIngredients.DEFAULT_CHANNEL));
                 PROPERTIES_FLUIDLIST_UPDATE.setValue(PROP_ROUNDROBIN, ValueTypeBoolean.ValueBoolean.of(false));
@@ -1589,27 +1621,34 @@ public class TunnelAspectWriteBuilders {
                 PROPERTIES_FLUIDLIST_UPDATE.setValue(TunnelAspectWriteBuilders.Fluid.PROP_CHECK_NBT, ValueTypeBoolean.ValueBoolean.of(true));
                 PROPERTIES_FLUIDLIST_UPDATE.setValue(PROP_BLOCK_UPDATE, ValueTypeBoolean.ValueBoolean.of(false));
                 PROPERTIES_FLUIDLIST_UPDATE.setValue(PROP_IGNORE_REPLACABLE, ValueTypeBoolean.ValueBoolean.of(false));
+                PROPERTIES_FLUIDLIST_UPDATE.removeValue(PROP_PASSIVE_IO);
 
                 PROPERTIES_FLUID.setValue(PROP_CHANNEL, ValueTypeInteger.ValueInteger.of(IPositionedAddonsNetworkIngredients.DEFAULT_CHANNEL));
                 PROPERTIES_FLUID.setValue(PROP_ROUNDROBIN, ValueTypeBoolean.ValueBoolean.of(false));
                 PROPERTIES_FLUID.setValue(PROP_BLACKLIST, ValueTypeBoolean.ValueBoolean.of(false));
                 PROPERTIES_FLUID.setValue(PROP_EMPTYISANY, ValueTypeBoolean.ValueBoolean.of(false));
                 PROPERTIES_FLUID.setValue(TunnelAspectWriteBuilders.Fluid.PROP_CHECK_NBT, ValueTypeBoolean.ValueBoolean.of(true));
+                PROPERTIES_FLUID.removeValue(PROP_PASSIVE_IO);
 
                 PROPERTIES_FLUIDLIST.setValue(PROP_CHANNEL, ValueTypeInteger.ValueInteger.of(IPositionedAddonsNetworkIngredients.DEFAULT_CHANNEL));
                 PROPERTIES_FLUIDLIST.setValue(PROP_ROUNDROBIN, ValueTypeBoolean.ValueBoolean.of(false));
                 PROPERTIES_FLUIDLIST.setValue(PROP_BLACKLIST, ValueTypeBoolean.ValueBoolean.of(false));
                 PROPERTIES_FLUIDLIST.setValue(TunnelAspectWriteBuilders.Fluid.PROP_CHECK_NBT, ValueTypeBoolean.ValueBoolean.of(true));
+                PROPERTIES_FLUIDLIST.removeValue(PROP_PASSIVE_IO);
 
                 PROPERTIES_RATE.setValue(World.PROPERTY_ENTITYINDEX, ValueTypeInteger.ValueInteger.of(0));
+                PROPERTIES_RATE.removeValue(PROP_PASSIVE_IO);
 
                 PROPERTIES_RATECHECKS.setValue(World.PROPERTY_ENTITYINDEX, ValueTypeInteger.ValueInteger.of(0));
                 PROPERTIES_RATECHECKS.setValue(PROP_BLACKLIST, ValueTypeBoolean.ValueBoolean.of(false));
+                PROPERTIES_RATECHECKS.removeValue(PROP_PASSIVE_IO);
 
                 PROPERTIES_RATECHECKSCRAFT.setValue(World.PROPERTY_ENTITYINDEX, ValueTypeInteger.ValueInteger.of(0));
                 PROPERTIES_RATECHECKSCRAFT.setValue(PROP_BLACKLIST, ValueTypeBoolean.ValueBoolean.of(false));
+                PROPERTIES_RATECHECKSCRAFT.removeValue(PROP_PASSIVE_IO);
 
                 PROPERTIES_RATECHECKSLIST.setValue(World.PROPERTY_ENTITYINDEX, ValueTypeInteger.ValueInteger.of(0));
+                PROPERTIES_RATECHECKSLIST.removeValue(PROP_PASSIVE_IO);
 
                 PROPERTIES_NBT_UPDATE.setValue(PROP_CHANNEL, ValueTypeInteger.ValueInteger.of(IPositionedAddonsNetworkIngredients.DEFAULT_CHANNEL));
                 PROPERTIES_NBT_UPDATE.setValue(PROP_BLOCK_UPDATE, ValueTypeBoolean.ValueBoolean.of(false));
@@ -1618,12 +1657,14 @@ public class TunnelAspectWriteBuilders {
                 PROPERTIES_NBT_UPDATE.setValue(TunnelAspectWriteBuilders.Fluid.PROP_NBT_SUPERSET, ValueTypeBoolean.ValueBoolean.of(true));
                 PROPERTIES_NBT_UPDATE.setValue(TunnelAspectWriteBuilders.Fluid.PROP_NBT_REQUIRE, ValueTypeBoolean.ValueBoolean.of(true));
                 PROPERTIES_NBT_UPDATE.setValue(TunnelAspectWriteBuilders.Fluid.PROP_NBT_RECURSIVE, ValueTypeBoolean.ValueBoolean.of(true));
+                PROPERTIES_NBT_UPDATE.removeValue(PROP_PASSIVE_IO);
 
                 PROPERTIES_NBT.setValue(PROP_CHANNEL, ValueTypeInteger.ValueInteger.of(IPositionedAddonsNetworkIngredients.DEFAULT_CHANNEL));
                 PROPERTIES_NBT.setValue(TunnelAspectWriteBuilders.Fluid.PROP_NBT_SUBSET, ValueTypeBoolean.ValueBoolean.of(true));
                 PROPERTIES_NBT.setValue(TunnelAspectWriteBuilders.Fluid.PROP_NBT_SUPERSET, ValueTypeBoolean.ValueBoolean.of(true));
                 PROPERTIES_NBT.setValue(TunnelAspectWriteBuilders.Fluid.PROP_NBT_REQUIRE, ValueTypeBoolean.ValueBoolean.of(true));
                 PROPERTIES_NBT.setValue(TunnelAspectWriteBuilders.Fluid.PROP_NBT_RECURSIVE, ValueTypeBoolean.ValueBoolean.of(true));
+                PROPERTIES_NBT.removeValue(PROP_PASSIVE_IO);
             }
 
             public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, Boolean>, IFluidTarget>
