@@ -1,0 +1,6 @@
+As always, don't forget to backup your world before updating!
+Requires CyclopsCore version 1.11.6 or higher.
+
+Fixes:
+* Fix world parts crashing in some cases, Closes #231
+
