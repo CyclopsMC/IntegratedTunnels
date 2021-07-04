@@ -5,7 +5,6 @@ import org.cyclops.commoncapabilities.api.ingredient.IngredientComponent;
 import org.cyclops.integrateddynamics.api.evaluate.variable.IValueTypeListProxy;
 import org.cyclops.integrateddynamics.core.evaluate.variable.ValueObjectTypeItemStack;
 import org.cyclops.integratedtunnels.core.TunnelItemHelpers;
-import org.cyclops.integratedtunnels.core.predicate.IngredientPredicate;
 
 import javax.annotation.Nullable;
 
@@ -32,7 +31,7 @@ public class IngredientPredicateItemStackList extends IngredientPredicate<ItemSt
     public boolean test(@Nullable ItemStack input) {
         for (ValueObjectTypeItemStack.ValueItemStack itemStack : itemStacks) {
             if (!itemStack.getRawValue().isEmpty()
-                    && TunnelItemHelpers.areItemStackEqual(input, itemStack.getRawValue(), checkStackSize, checkItem, checkNbt)) {
+                    && TunnelItemHelpers.areItemStackEqual(input, itemStack.getRawValue(), false, checkItem, checkNbt)) { // TODO: hardcoded 'false' may have to be removed when restoring exact amount
                 return !blacklist;
             }
         }

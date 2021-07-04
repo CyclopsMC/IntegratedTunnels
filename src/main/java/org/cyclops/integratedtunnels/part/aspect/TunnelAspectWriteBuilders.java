@@ -648,7 +648,8 @@ public class TunnelAspectWriteBuilders {
             boolean checkStackSize = properties.getValue(PROP_CHECK_STACKSIZE).getRawValue();
             boolean checkNbt = properties.getValue(PROP_CHECK_NBT).getRawValue();
             boolean blacklist = properties.getValue(PROP_BLACKLIST).getRawValue();
-            boolean exactAmount = properties.getValue(PROP_EXACTAMOUNT).getRawValue();
+            boolean exactAmount = properties.getValue(PROP_EXACTAMOUNT).getRawValue()
+                    || checkStackSize; // TODO: restore exact amount
             int amount = properties.getValue(PROP_RATE).getRawValue();
 
             IngredientPredicate<ItemStack, Integer> itemStackMatcher = TunnelItemHelpers.matchItemStacks(list.getRawValue(), true, checkStackSize, checkNbt, blacklist, amount, exactAmount);
@@ -1071,8 +1072,9 @@ public class TunnelAspectWriteBuilders {
 
             IAspectProperties properties = input.getMiddle();
             int rate = properties.getValue(PROP_RATE).getRawValue();
-            boolean exactAmount = properties.getValue(PROP_EXACTAMOUNT).getRawValue();
             boolean checkAmount = properties.getValue(PROP_CHECK_AMOUNT).getRawValue();
+            boolean exactAmount = properties.getValue(PROP_EXACTAMOUNT).getRawValue()
+                    || checkAmount; // TODO: restore exact amount
             boolean checkNbt = properties.getValue(PROP_CHECK_NBT).getRawValue();
             boolean blacklist = properties.getValue(PROP_BLACKLIST).getRawValue();
             IngredientPredicate<FluidStack, Integer> fluidStackMatcher = TunnelFluidHelpers.matchFluidStacks(list.getRawValue(), true, checkAmount, checkNbt, blacklist, rate, exactAmount);

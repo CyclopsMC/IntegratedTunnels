@@ -5,7 +5,6 @@ import org.cyclops.commoncapabilities.api.ingredient.IngredientComponent;
 import org.cyclops.integrateddynamics.api.evaluate.variable.IValueTypeListProxy;
 import org.cyclops.integrateddynamics.core.evaluate.variable.ValueObjectTypeFluidStack;
 import org.cyclops.integratedtunnels.core.TunnelFluidHelpers;
-import org.cyclops.integratedtunnels.core.predicate.IngredientPredicate;
 
 import javax.annotation.Nullable;
 
@@ -32,7 +31,7 @@ public class IngredientPredicateFluidStackList extends IngredientPredicate<Fluid
     public boolean test(@Nullable FluidStack input) {
         for (ValueObjectTypeFluidStack.ValueFluidStack fluidStack : fluidStacks) {
             if (!fluidStack.getRawValue().isEmpty()
-                    && TunnelFluidHelpers.areFluidStackEqual(input, fluidStack.getRawValue(), checkFluid, checkAmount, checkNbt)) {
+                    && TunnelFluidHelpers.areFluidStackEqual(input, fluidStack.getRawValue(), checkFluid, false, checkNbt)) { // TODO: hardcoded 'false' may have to be removed when restoring exact amount
                 return !blacklist;
             }
         }
