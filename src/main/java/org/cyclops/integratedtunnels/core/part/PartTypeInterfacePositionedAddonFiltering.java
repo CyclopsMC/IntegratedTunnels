@@ -1,22 +1,34 @@
 package org.cyclops.integratedtunnels.core.part;
 
 import net.minecraft.block.Block;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.inventory.Inventory;
+import net.minecraft.inventory.container.Container;
+import net.minecraft.inventory.container.INamedContainerProvider;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.IBlockReader;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.common.util.LazyOptional;
+import org.apache.commons.lang3.tuple.Triple;
 import org.cyclops.integrateddynamics.api.network.INetwork;
 import org.cyclops.integrateddynamics.api.network.IPartNetwork;
 import org.cyclops.integrateddynamics.api.network.IPositionedAddonsNetwork;
 import org.cyclops.integrateddynamics.api.network.IPositionedAddonsNetworkIngredients;
 import org.cyclops.integrateddynamics.api.network.PositionedAddonsNetworkIngredientsFilter;
+import org.cyclops.integrateddynamics.api.part.IPartContainer;
 import org.cyclops.integrateddynamics.api.part.PartPos;
 import org.cyclops.integrateddynamics.api.part.PartTarget;
+import org.cyclops.integrateddynamics.core.helper.PartHelpers;
+import org.cyclops.integrateddynamics.core.part.PartTypeBase;
 import org.cyclops.integrateddynamics.core.part.write.PartStateWriterBase;
 
 import javax.annotation.Nullable;
+import java.util.Optional;
 
 /**
  * Interface for positioned network addons that have a filter.
@@ -36,6 +48,25 @@ public abstract class PartTypeInterfacePositionedAddonFiltering<N extends IPosit
             // For filter interfaces, we assume that targetFilters are set upon each aspect exec, which we only need to do once.
             super.update(network, partNetwork, target, state);
         }
+    }
+
+    @Override
+    public Optional<INamedContainerProvider> getContainerProviderSettings(PartPos pos) {
+        return Optional.of(new INamedContainerProvider() {
+
+            @Override
+            public ITextComponent getDisplayName() {
+                return new TranslationTextComponent(getTranslationKey());
+            }
+
+            @Nullable
+            @Override
+            public Container createMenu(int id, PlayerInventory playerInventory, PlayerEntity playerEntity) {
+                Triple<IPartContainer, PartTypeBase, PartTarget> data = PartHelpers.getContainerPartConstructionData(pos);
+                return new ContainerInterfaceSettings(id, playerInventory, new Inventory(0),
+                        data.getRight(), Optional.of(data.getLeft()), data.getMiddle());
+            }
+        });
     }
 
     @Override
