@@ -31,7 +31,7 @@ public class EnergyTargetCapabilityProvider extends ChanneledTargetCapabilityPro
                 properties.getValue(TunnelAspectWriteBuilders.PROP_CRAFT).getRawValue(),
                 properties.getValue(TunnelAspectWriteBuilders.PROP_PASSIVE_IO).getRawValue());
         this.amount = amount;
-        this.exactAmount = properties.getValue(TunnelAspectWriteBuilders.PROP_EXACTAMOUNT).getRawValue();
+        this.exactAmount = properties.getValue(TunnelAspectWriteBuilders.PROP_EXACTAMOUNT).getRawValue() || properties.getValue(TunnelAspectWriteBuilders.Energy.PROP_CHECK_AMOUNT).getRawValue(); // TODO: restore exact amount
     }
 
     @Override

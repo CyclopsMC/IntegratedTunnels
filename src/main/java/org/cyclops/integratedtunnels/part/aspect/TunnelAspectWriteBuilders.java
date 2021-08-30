@@ -223,25 +223,30 @@ public class TunnelAspectWriteBuilders {
         public static final IAspectPropertyTypeInstance<ValueTypeInteger, ValueTypeInteger.ValueInteger> PROP_RATE =
                 new AspectPropertyTypeInstance<>(ValueTypes.INTEGER, "aspect.aspecttypes.integratedtunnels.integer.energy.rate",
                         AspectReadBuilders.VALIDATOR_INTEGER_POSITIVE.and(VALIDATOR_INTEGER_MAXRATE));
+        public static final IAspectPropertyTypeInstance<ValueTypeBoolean, ValueTypeBoolean.ValueBoolean> PROP_CHECK_AMOUNT =
+                new AspectPropertyTypeInstance<>(ValueTypes.BOOLEAN, "aspect.aspecttypes.integratedtunnels.boolean.energy.checkamount");
         public static final IAspectProperties PROPERTIES_RATE = new AspectProperties(ImmutableList.<IAspectPropertyTypeInstance>of(
                 PROP_CHANNEL,
                 PROP_ROUNDROBIN,
                 PROP_RATE,
                 //PROP_EXACTAMOUNT,
-                PROP_PASSIVE_IO
+                PROP_PASSIVE_IO,
+                PROP_CHECK_AMOUNT
         ));
         public static final IAspectProperties PROPERTIES_RATECRAFT = new AspectProperties(ImmutableList.<IAspectPropertyTypeInstance>of(
                 PROP_CHANNEL,
                 PROP_RATE,
                 //PROP_EXACTAMOUNT,
                 PROP_CRAFT,
-                PROP_PASSIVE_IO
+                PROP_PASSIVE_IO,
+                PROP_CHECK_AMOUNT
         ));
         public static final IAspectProperties PROPERTIES = new AspectProperties(ImmutableList.<IAspectPropertyTypeInstance>of(
                 PROP_CHANNEL,
                 PROP_ROUNDROBIN,
-                PROP_PASSIVE_IO
+                PROP_PASSIVE_IO,
                 //PROP_EXACTAMOUNT
+                PROP_CHECK_AMOUNT
         ));
         public static final IAspectProperties PROPERTIES_FILTER = new AspectProperties(ImmutableList.<IAspectPropertyTypeInstance>of(
                 PROP_FILTER_APPLY_TO_INSERTIONS,
@@ -254,17 +259,20 @@ public class TunnelAspectWriteBuilders {
             PROPERTIES_RATE.setValue(PROP_RATE, ValueTypeInteger.ValueInteger.of(1000));
             PROPERTIES_RATE.setValue(PROP_PASSIVE_IO, ValueTypeBoolean.ValueBoolean.of(true));
             //PROPERTIES_RATE.setValue(PROP_EXACTAMOUNT, ValueTypeBoolean.ValueBoolean.of(false));
+            PROPERTIES_RATE.setValue(PROP_CHECK_AMOUNT, ValueTypeBoolean.ValueBoolean.of(false));
 
             PROPERTIES_RATECRAFT.setValue(PROP_CHANNEL, ValueTypeInteger.ValueInteger.of(IPositionedAddonsNetworkIngredients.DEFAULT_CHANNEL));
             PROPERTIES_RATECRAFT.setValue(PROP_RATE, ValueTypeInteger.ValueInteger.of(1000));
             //PROPERTIES_RATECRAFT.setValue(PROP_EXACTAMOUNT, ValueTypeBoolean.ValueBoolean.of(false));
             PROPERTIES_RATECRAFT.setValue(PROP_CRAFT, ValueTypeBoolean.ValueBoolean.of(false));
             PROPERTIES_RATECRAFT.setValue(PROP_PASSIVE_IO, ValueTypeBoolean.ValueBoolean.of(true));
+            PROPERTIES_RATECRAFT.setValue(PROP_CHECK_AMOUNT, ValueTypeBoolean.ValueBoolean.of(false));
 
             PROPERTIES.setValue(PROP_CHANNEL, ValueTypeInteger.ValueInteger.of(IPositionedAddonsNetworkIngredients.DEFAULT_CHANNEL));
             PROPERTIES.setValue(PROP_ROUNDROBIN, ValueTypeBoolean.ValueBoolean.of(false));
             //PROPERTIES.setValue(PROP_EXACTAMOUNT, ValueTypeBoolean.ValueBoolean.of(false));
             PROPERTIES.setValue(PROP_PASSIVE_IO, ValueTypeBoolean.ValueBoolean.of(true));
+            PROPERTIES.setValue(PROP_CHECK_AMOUNT, ValueTypeBoolean.ValueBoolean.of(false));
 
             PROPERTIES_FILTER.setValue(PROP_FILTER_APPLY_TO_INSERTIONS, ValueTypeBoolean.ValueBoolean.of(true));
             PROPERTIES_FILTER.setValue(PROP_FILTER_APPLY_TO_EXTRACTIONS, ValueTypeBoolean.ValueBoolean.of(true));
@@ -407,21 +415,24 @@ public class TunnelAspectWriteBuilders {
                 PROP_RATE,
                 //PROP_EXACTAMOUNT,
                 PROP_SLOT,
-                PROP_PASSIVE_IO
+                PROP_PASSIVE_IO,
+                PROP_CHECK_STACKSIZE
         ));
         public static final IAspectProperties PROPERTIES_SLOT = new AspectProperties(ImmutableList.<IAspectPropertyTypeInstance>of(
                 PROP_CHANNEL,
                 PROP_ROUNDROBIN,
                 //PROP_EXACTAMOUNT,
                 PROP_SLOT,
-                PROP_PASSIVE_IO
+                PROP_PASSIVE_IO,
+                PROP_CHECK_STACKSIZE
         ));
         public static final IAspectProperties PROPERTIES_RATE = new AspectProperties(ImmutableList.<IAspectPropertyTypeInstance>of(
                 PROP_CHANNEL,
                 PROP_ROUNDROBIN,
                 PROP_RATE,
                 //PROP_EXACTAMOUNT
-                PROP_PASSIVE_IO
+                PROP_PASSIVE_IO,
+                PROP_CHECK_STACKSIZE
         ));
         public static final IAspectProperties PROPERTIES_RATESLOTCHECKS = new AspectProperties(ImmutableList.<IAspectPropertyTypeInstance>of(
                 PROP_CHANNEL,
@@ -504,18 +515,21 @@ public class TunnelAspectWriteBuilders {
             //PROPERTIES_RATESLOT.setValue(PROP_EXACTAMOUNT, ValueTypeBoolean.ValueBoolean.of(false));
             PROPERTIES_RATESLOT.setValue(PROP_SLOT, ValueTypeInteger.ValueInteger.of(-1));
             PROPERTIES_RATESLOT.setValue(PROP_PASSIVE_IO, ValueTypeBoolean.ValueBoolean.of(true));
+            PROPERTIES_RATESLOT.setValue(PROP_CHECK_STACKSIZE, ValueTypeBoolean.ValueBoolean.of(false));
 
             PROPERTIES_SLOT.setValue(PROP_CHANNEL, ValueTypeInteger.ValueInteger.of(IPositionedAddonsNetworkIngredients.DEFAULT_CHANNEL));
             PROPERTIES_SLOT.setValue(PROP_ROUNDROBIN, ValueTypeBoolean.ValueBoolean.of(false));
             //PROPERTIES_SLOT.setValue(PROP_EXACTAMOUNT, ValueTypeBoolean.ValueBoolean.of(false));
             PROPERTIES_SLOT.setValue(PROP_SLOT, ValueTypeInteger.ValueInteger.of(-1));
             PROPERTIES_SLOT.setValue(PROP_PASSIVE_IO, ValueTypeBoolean.ValueBoolean.of(true));
+            PROPERTIES_SLOT.setValue(PROP_CHECK_STACKSIZE, ValueTypeBoolean.ValueBoolean.of(false));
 
             PROPERTIES_RATE.setValue(PROP_CHANNEL, ValueTypeInteger.ValueInteger.of(IPositionedAddonsNetworkIngredients.DEFAULT_CHANNEL));
             PROPERTIES_RATE.setValue(PROP_ROUNDROBIN, ValueTypeBoolean.ValueBoolean.of(false));
             PROPERTIES_RATE.setValue(PROP_RATE, ValueTypeInteger.ValueInteger.of(64));
             //PROPERTIES_RATE.setValue(PROP_EXACTAMOUNT, ValueTypeBoolean.ValueBoolean.of(false));
             PROPERTIES_RATE.setValue(PROP_PASSIVE_IO, ValueTypeBoolean.ValueBoolean.of(true));
+            PROPERTIES_RATE.setValue(PROP_CHECK_STACKSIZE, ValueTypeBoolean.ValueBoolean.of(false));
 
             PROPERTIES_RATESLOTCHECKS.setValue(PROP_CHANNEL, ValueTypeInteger.ValueInteger.of(IPositionedAddonsNetworkIngredients.DEFAULT_CHANNEL));
             PROPERTIES_RATESLOTCHECKS.setValue(PROP_ROUNDROBIN, ValueTypeBoolean.ValueBoolean.of(false));
@@ -589,7 +603,7 @@ public class TunnelAspectWriteBuilders {
                 PROP_BOOLEAN_ITEMPREDICATE = input -> {
             IAspectProperties properties = input.getMiddle();
             int amount = input.getRight() ? input.getMiddle().getValue(PROP_RATE).getRawValue() : 0;
-            boolean exactAmount = properties.getValue(PROP_EXACTAMOUNT).getRawValue();
+            boolean exactAmount = properties.getValue(PROP_CHECK_STACKSIZE).getRawValue() || properties.getValue(PROP_EXACTAMOUNT).getRawValue(); // TODO: restore exact amount
             IngredientPredicate<ItemStack, Integer> itemStackMatcher = input.getRight() ? TunnelItemHelpers.matchAll(amount, exactAmount) : TunnelItemHelpers.MATCH_NONE;
             int slot = input.getMiddle().getValue(PROP_SLOT).getRawValue();
             return Triple.of(input.getLeft(), input.getMiddle(), ChanneledTargetInformation.of(itemStackMatcher, itemStackMatcher, slot));
@@ -598,7 +612,7 @@ public class TunnelAspectWriteBuilders {
                 PROP_INTEGER_ITEMPREDICATE = input -> {
             IAspectProperties properties = input.getMiddle();
             int amount = input.getRight();
-            boolean exactAmount = properties.getValue(PROP_EXACTAMOUNT).getRawValue();
+            boolean exactAmount = properties.getValue(PROP_CHECK_STACKSIZE).getRawValue() || properties.getValue(PROP_EXACTAMOUNT).getRawValue(); // TODO: restore exact amount
             IngredientPredicate<ItemStack, Integer> itemStackMatcher = TunnelItemHelpers.matchAll(amount, exactAmount);
             int slot = properties.getValue(PROP_SLOT).getRawValue();
             return Triple.of(input.getLeft(), input.getMiddle(), ChanneledTargetInformation.of(itemStackMatcher, itemStackMatcher, slot));
@@ -607,7 +621,7 @@ public class TunnelAspectWriteBuilders {
                 PROP_INTEGER_SLOT_ITEMPREDICATE = input -> {
             IAspectProperties properties = input.getMiddle();
             int amount = input.getRight() >= -1 ? properties.getValue(PROP_RATE).getRawValue() : 0;
-            boolean exactAmount = properties.getValue(PROP_EXACTAMOUNT).getRawValue();
+            boolean exactAmount = properties.getValue(PROP_CHECK_STACKSIZE).getRawValue() || properties.getValue(PROP_EXACTAMOUNT).getRawValue(); // TODO: restore exact amount
             IngredientPredicate<ItemStack, Integer> itemStackMatcher = TunnelItemHelpers.matchAll(amount, exactAmount);
             int slot = input.getRight();
             return Triple.of(input.getLeft(), input.getMiddle(), ChanneledTargetInformation.of(itemStackMatcher, itemStackMatcher, slot));
@@ -874,15 +888,17 @@ public class TunnelAspectWriteBuilders {
                 new AspectPropertyTypeInstance<>(ValueTypes.BOOLEAN, "aspect.aspecttypes.integratedtunnels.boolean.fluid.nbtrecursive");
 
         public static final IAspectProperties PROPERTIES = new AspectProperties(ImmutableList.<IAspectPropertyTypeInstance>of(
-                PROP_CHANNEL
+                PROP_CHANNEL,
                 //PROP_EXACTAMOUNT
+                PROP_CHECK_AMOUNT
         ));
         public static final IAspectProperties PROPERTIES_RATE = new AspectProperties(ImmutableList.<IAspectPropertyTypeInstance>of(
                 PROP_CHANNEL,
                 PROP_ROUNDROBIN,
                 PROP_RATE,
                 //PROP_EXACTAMOUNT
-                PROP_PASSIVE_IO
+                PROP_PASSIVE_IO,
+                PROP_CHECK_AMOUNT
         ));
         public static final IAspectProperties PROPERTIES_RATECHECKS = new AspectProperties(ImmutableList.<IAspectPropertyTypeInstance>of(
                 PROP_CHANNEL,
@@ -954,12 +970,14 @@ public class TunnelAspectWriteBuilders {
             PROPERTIES.setValue(PROP_CHANNEL, ValueTypeInteger.ValueInteger.of(IPositionedAddonsNetworkIngredients.DEFAULT_CHANNEL));
             //PROPERTIES.setValue(PROP_EXACTAMOUNT, ValueTypeBoolean.ValueBoolean.of(false));
             PROPERTIES.setValue(PROP_PASSIVE_IO, ValueTypeBoolean.ValueBoolean.of(true));
+            PROPERTIES.setValue(PROP_CHECK_AMOUNT, ValueTypeBoolean.ValueBoolean.of(false));
 
             PROPERTIES_RATE.setValue(PROP_CHANNEL, ValueTypeInteger.ValueInteger.of(IPositionedAddonsNetworkIngredients.DEFAULT_CHANNEL));
             PROPERTIES_RATE.setValue(PROP_ROUNDROBIN, ValueTypeBoolean.ValueBoolean.of(false));
             PROPERTIES_RATE.setValue(PROP_RATE, ValueTypeInteger.ValueInteger.of(1000));
             //PROPERTIES_RATE.setValue(PROP_EXACTAMOUNT, ValueTypeBoolean.ValueBoolean.of(false));
             PROPERTIES_RATE.setValue(PROP_PASSIVE_IO, ValueTypeBoolean.ValueBoolean.of(true));
+            PROPERTIES_RATE.setValue(PROP_CHECK_AMOUNT, ValueTypeBoolean.ValueBoolean.of(false));
 
             PROPERTIES_RATECHECKS.setValue(PROP_CHANNEL, ValueTypeInteger.ValueInteger.of(IPositionedAddonsNetworkIngredients.DEFAULT_CHANNEL));
             PROPERTIES_RATECHECKS.setValue(PROP_ROUNDROBIN, ValueTypeBoolean.ValueBoolean.of(false));
@@ -1025,7 +1043,9 @@ public class TunnelAspectWriteBuilders {
                 PROP_BOOLEAN_GETRATE = input -> Triple.of(input.getLeft(), input.getMiddle(), input.getRight() ? input.getMiddle().getValue(PROP_RATE).getRawValue() : 0);
         public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, Boolean>, Triple<PartTarget, IAspectProperties, ChanneledTargetInformation<FluidStack, Integer>>>
                 PROP_BOOLEAN_PREDICATE = input -> {
-            IngredientPredicate<FluidStack, Integer> fluidMatcher = new IngredientPredicate<FluidStack, Integer>(IngredientComponents.FLUIDSTACK, false, false, 0, false) {
+            IAspectProperties properties = input.getMiddle();
+            // TODO: restore exact amount
+            IngredientPredicate<FluidStack, Integer> fluidMatcher = new IngredientPredicate<FluidStack, Integer>(IngredientComponents.FLUIDSTACK, false, false, 0, properties.getValue(PROP_CHECK_AMOUNT).getRawValue()) {
                 @Override
                 public boolean test(FluidStack integer) {
                     return input.getRight();
@@ -1035,15 +1055,16 @@ public class TunnelAspectWriteBuilders {
         };
         public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, Integer>, Triple<PartTarget, IAspectProperties, ChanneledTargetInformation<FluidStack, Integer>>>
                 PROP_INTEGER_FLUIDPREDICATE = input -> {
-            IngredientPredicate<FluidStack, Integer> fluidStackMatcher = TunnelFluidHelpers.matchAll(input.getRight(), input.getMiddle().getValue(PROP_EXACTAMOUNT).getRawValue());
+            // TODO: restore exact amount
+            IngredientPredicate<FluidStack, Integer> fluidStackMatcher = TunnelFluidHelpers.matchAll(input.getRight(), input.getMiddle().getValue(PROP_CHECK_AMOUNT).getRawValue() || input.getMiddle().getValue(PROP_EXACTAMOUNT).getRawValue());
             return Triple.of(input.getLeft(), input.getMiddle(), ChanneledTargetInformation.of(fluidStackMatcher, fluidStackMatcher, -1));
         };
         public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, FluidStack>, Triple<PartTarget, IAspectProperties, ChanneledTargetInformation<FluidStack, Integer>>>
                 PROP_FLUIDSTACK_FLUIDPREDICATE = input -> {
             IAspectProperties properties = input.getMiddle();
             int rate = properties.getValue(PROP_RATE).getRawValue();
-            boolean exactAmount = properties.getValue(PROP_EXACTAMOUNT).getRawValue();
             boolean checkAmount = properties.getValue(PROP_CHECK_AMOUNT).getRawValue();
+            boolean exactAmount = properties.getValue(PROP_EXACTAMOUNT).getRawValue();
             boolean checkNbt = properties.getValue(PROP_CHECK_NBT).getRawValue();
             boolean blacklist = properties.getValue(PROP_BLACKLIST).getRawValue();
             boolean checkFluid = true;
