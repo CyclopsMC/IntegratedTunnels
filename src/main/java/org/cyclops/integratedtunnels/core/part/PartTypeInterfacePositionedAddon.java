@@ -135,11 +135,6 @@ public abstract class PartTypeInterfacePositionedAddon<N extends IPositionedAddo
         private IPartNetwork partNetwork;
 
         @Override
-        public int getUpdateInterval() {
-            return 1; // For enabling energy consumption
-        }
-
-        @Override
         public void readFromNBT(CompoundNBT tag) {
             super.readFromNBT(tag);
             if (tag.contains("channelInterface", Constants.NBT.TAG_INT)) {
