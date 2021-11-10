@@ -168,7 +168,7 @@ public class ItemStoragePlayerWrapper implements IIngredientComponentStorage<Ite
                     || (rightClickBlockActionResult.getUseBlock() != Event.Result.DENY && !flag1)) {
                 BlockState blockState = world.getBlockState(pos);
                 if (!player.isCrouching() || stack.isEmpty()) {
-                    if (blockState.onBlockActivated(world, player, hand, blockRayTraceResult).isSuccess()) {
+                    if (blockState.onBlockActivated(world, player, hand, blockRayTraceResult).isSuccessOrConsume()) {
                         returnPlayerInventory(player);
                         return ItemStack.EMPTY;
                     }
