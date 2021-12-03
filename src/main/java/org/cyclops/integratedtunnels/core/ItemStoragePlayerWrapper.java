@@ -5,6 +5,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUseContext;
 import net.minecraft.util.ActionResult;
@@ -287,7 +288,10 @@ public class ItemStoragePlayerWrapper implements IIngredientComponentStorage<Ite
                 List<Entity> entities = world.getEntitiesWithinAABB(Entity.class, new AxisAlignedBB(pos), CAN_BE_ATTACKED::test);
                 if (entities.size() > 0) {
                     Entity entity = getEntity(entities);
+                    EquipmentSlotType equipmentSlotType = hand == Hand.MAIN_HAND ? EquipmentSlotType.MAINHAND : EquipmentSlotType.OFFHAND;
+                    player.getAttributeManager().reapplyModifiers(stack.getAttributeModifiers(equipmentSlotType));
                     player.attackTargetEntityWithCurrentItem(entity);
+                    player.getAttributeManager().removeModifiers(stack.getAttributeModifiers(equipmentSlotType));
                     returnPlayerInventory(player);
                     return ItemStack.EMPTY;
                 } else {
