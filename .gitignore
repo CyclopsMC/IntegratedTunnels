@@ -13,6 +13,7 @@ eclipse/*
 .gradle/*
 repo/*
 *.iml
+/.idea/
 *.ipr
 *.iws
 out/*
