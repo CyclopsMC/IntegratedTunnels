@@ -114,6 +114,7 @@ aspect.aspecttypes.integratedtunnels.boolean.world.blockupdate.name=Cause Block 
 aspect.aspecttypes.integratedtunnels.boolean.world.righthand.name=Right Hand
 aspect.aspecttypes.integratedtunnels.boolean.world.silktouch.name=Silk Touch
 aspect.aspecttypes.integratedtunnels.boolean.world.ignorereplacable.name=Ignore Replacable
+aspect.aspecttypes.integratedtunnels.boolean.world.replaceflow.name=Replace flow
 aspect.aspecttypes.integratedtunnels.boolean.world.breaknodrops.name=Break Block When No Drops
 aspect.aspecttypes.integratedtunnels.boolean.world.breaknodrops.info=If the block should only be broken if it produces drops.
 aspect.aspecttypes.integratedtunnels.boolean.world.ignorepickupdelay.name=Ignore Pickup Delay

@@ -11,7 +11,9 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.FluidUtil;
 import net.minecraftforge.fluids.IFluidBlock;
+import net.minecraftforge.fluids.capability.IFluidHandler;
 import org.cyclops.commoncapabilities.api.capability.fluidhandler.FluidMatch;
 import org.cyclops.commoncapabilities.api.ingredient.IngredientComponent;
 import org.cyclops.commoncapabilities.api.ingredient.storage.IIngredientComponentStorage;
@@ -124,6 +126,7 @@ public class TunnelFluidHelpers {
      * @param fluidStackMatcher The fluidstack match predicate.
      * @param blockUpdate If a block update should occur after placement.
      * @param ignoreReplacable If replacable blocks should be overriden when placing blocks.
+     * @param replaceFlow If fluid flow should be overriden when placing blocks.
      * @param craftIfFailed If the exact ingredient from ingredientPredicate should be crafted if transfer failed.
      * @return The placed fluid.
      * @throws EvaluationException If illegal movement occured and further movement should stop.
@@ -132,19 +135,28 @@ public class TunnelFluidHelpers {
                                          int channel, ITunnelConnection connection,
                                          IIngredientComponentStorage<FluidStack, Integer> source, final World world, final BlockPos pos,
                                          IngredientPredicate<FluidStack, Integer> fluidStackMatcher, boolean blockUpdate,
-                                         boolean ignoreReplacable, boolean craftIfFailed) throws EvaluationException {
+                                         boolean ignoreReplacable, boolean replaceFlow, boolean craftIfFailed) throws EvaluationException {
         IBlockState destBlockState = world.getBlockState(pos);
         final Material destMaterial = destBlockState.getMaterial();
         final boolean isDestNonSolid = !destMaterial.isSolid();
         final boolean isDestReplaceable = destBlockState.getBlock().isReplaceable(world, pos);
         if (!world.isAirBlock(pos)
-                && (!isDestNonSolid || !(ignoreReplacable && isDestReplaceable) || destMaterial.isLiquid())) {
+                && (!isDestNonSolid || !(ignoreReplacable && isDestReplaceable) || destMaterial.isLiquid() && (!replaceFlow || isFluidSource(world, pos)))) {
             return null;
         }
 
         IIngredientComponentStorage<FluidStack, Integer> destination = new FluidStorageBlockWrapper((WorldServer) world, pos, null, blockUpdate);
         return TunnelHelpers.moveSingleStateOptimized(network, ingredientsNetwork, channel, connection, source,
                 -1, destination, -1, fluidStackMatcher, PartPos.of(world, pos, null), craftIfFailed);
+    }
+
+    private static boolean isFluidSource(World world, BlockPos pos) {
+        IFluidHandler fluidHandler = FluidUtil.getFluidHandler(world, pos, null);
+        if(fluidHandler!=null) {
+            FluidStack exists = fluidHandler.drain(1000, false);
+            return exists != null && exists.amount == 1000;
+        }else
+            return false;
     }
 
     /**

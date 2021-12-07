@@ -936,6 +936,8 @@ public class TunnelAspectWriteBuilders {
                 new AspectPropertyTypeInstance<>(ValueTypes.BOOLEAN, "aspect.aspecttypes.integratedtunnels.boolean.world.silktouch.name");
         public static final IAspectPropertyTypeInstance<ValueTypeBoolean, ValueTypeBoolean.ValueBoolean> PROP_IGNORE_REPLACABLE =
                 new AspectPropertyTypeInstance<>(ValueTypes.BOOLEAN, "aspect.aspecttypes.integratedtunnels.boolean.world.ignorereplacable.name");
+        public static final IAspectPropertyTypeInstance<ValueTypeBoolean, ValueTypeBoolean.ValueBoolean> PROP_REPLACE_FLOW =
+                new AspectPropertyTypeInstance<>(ValueTypes.BOOLEAN, "aspect.aspecttypes.integratedtunnels.boolean.world.replaceflow.name");
         public static final IAspectPropertyTypeInstance<ValueTypeBoolean, ValueTypeBoolean.ValueBoolean> PROP_BREAK_ON_NO_DROPS =
                 new AspectPropertyTypeInstance<>(ValueTypes.BOOLEAN, "aspect.aspecttypes.integratedtunnels.boolean.world.breaknodrops.name");
         public static final IAspectPropertyTypeInstance<ValueTypeBoolean, ValueTypeBoolean.ValueBoolean> PROP_IGNORE_PICK_UP_DELAY =
@@ -1248,7 +1250,8 @@ public class TunnelAspectWriteBuilders {
                     PROP_CHANNEL,
                     PROP_ROUNDROBIN,
                     PROP_BLOCK_UPDATE,
-                    PROP_IGNORE_REPLACABLE
+                    PROP_IGNORE_REPLACABLE,
+                    PROP_REPLACE_FLOW
             ));
             public static final IAspectProperties PROPERTIES_FLUIDCRAFT_UPDATE = new AspectProperties(ImmutableList.<IAspectPropertyTypeInstance>of(
                     PROP_CHANNEL,
@@ -1258,6 +1261,7 @@ public class TunnelAspectWriteBuilders {
                     TunnelAspectWriteBuilders.Fluid.PROP_CHECK_NBT,
                     PROP_BLOCK_UPDATE,
                     PROP_IGNORE_REPLACABLE,
+                    PROP_REPLACE_FLOW,
                     PROP_CRAFT
             ));
             public static final IAspectProperties PROPERTIES_FLUIDLIST_UPDATE = new AspectProperties(ImmutableList.<IAspectPropertyTypeInstance>of(
@@ -1266,7 +1270,8 @@ public class TunnelAspectWriteBuilders {
                     PROP_BLACKLIST,
                     TunnelAspectWriteBuilders.Fluid.PROP_CHECK_NBT,
                     PROP_BLOCK_UPDATE,
-                    PROP_IGNORE_REPLACABLE
+                    PROP_IGNORE_REPLACABLE,
+                    PROP_REPLACE_FLOW
             ));
             public static final IAspectProperties PROPERTIES_FLUID = new AspectProperties(ImmutableList.<IAspectPropertyTypeInstance>of(
                     PROP_CHANNEL,
@@ -1284,6 +1289,7 @@ public class TunnelAspectWriteBuilders {
                     PROP_CHANNEL,
                     PROP_BLOCK_UPDATE,
                     PROP_IGNORE_REPLACABLE,
+                    PROP_REPLACE_FLOW,
                     TunnelAspectWriteBuilders.Fluid.PROP_NBT_SUBSET,
                     TunnelAspectWriteBuilders.Fluid.PROP_NBT_SUPERSET,
                     TunnelAspectWriteBuilders.Fluid.PROP_NBT_REQUIRE,
@@ -1306,6 +1312,7 @@ public class TunnelAspectWriteBuilders {
                 PROPERTIES_UPDATE.setValue(PROP_ROUNDROBIN, ValueTypeBoolean.ValueBoolean.of(false));
                 PROPERTIES_UPDATE.setValue(PROP_BLOCK_UPDATE, ValueTypeBoolean.ValueBoolean.of(false));
                 PROPERTIES_UPDATE.setValue(PROP_IGNORE_REPLACABLE, ValueTypeBoolean.ValueBoolean.of(false));
+                PROPERTIES_UPDATE.setValue(PROP_REPLACE_FLOW, ValueTypeBoolean.ValueBoolean.of(false));
 
                 PROPERTIES_FLUIDCRAFT_UPDATE.setValue(PROP_CHANNEL, ValueTypeInteger.ValueInteger.of(IPositionedAddonsNetworkIngredients.DEFAULT_CHANNEL));
                 PROPERTIES_FLUIDCRAFT_UPDATE.setValue(PROP_ROUNDROBIN, ValueTypeBoolean.ValueBoolean.of(false));
@@ -1314,6 +1321,7 @@ public class TunnelAspectWriteBuilders {
                 PROPERTIES_FLUIDCRAFT_UPDATE.setValue(TunnelAspectWriteBuilders.Fluid.PROP_CHECK_NBT, ValueTypeBoolean.ValueBoolean.of(true));
                 PROPERTIES_FLUIDCRAFT_UPDATE.setValue(PROP_BLOCK_UPDATE, ValueTypeBoolean.ValueBoolean.of(false));
                 PROPERTIES_FLUIDCRAFT_UPDATE.setValue(PROP_IGNORE_REPLACABLE, ValueTypeBoolean.ValueBoolean.of(false));
+                PROPERTIES_FLUIDCRAFT_UPDATE.setValue(PROP_REPLACE_FLOW, ValueTypeBoolean.ValueBoolean.of(false));
                 PROPERTIES_FLUIDCRAFT_UPDATE.setValue(PROP_CRAFT, ValueTypeBoolean.ValueBoolean.of(false));
 
                 PROPERTIES_FLUIDLIST_UPDATE.setValue(PROP_CHANNEL, ValueTypeInteger.ValueInteger.of(IPositionedAddonsNetworkIngredients.DEFAULT_CHANNEL));
@@ -1322,6 +1330,7 @@ public class TunnelAspectWriteBuilders {
                 PROPERTIES_FLUIDLIST_UPDATE.setValue(TunnelAspectWriteBuilders.Fluid.PROP_CHECK_NBT, ValueTypeBoolean.ValueBoolean.of(true));
                 PROPERTIES_FLUIDLIST_UPDATE.setValue(PROP_BLOCK_UPDATE, ValueTypeBoolean.ValueBoolean.of(false));
                 PROPERTIES_FLUIDLIST_UPDATE.setValue(PROP_IGNORE_REPLACABLE, ValueTypeBoolean.ValueBoolean.of(false));
+                PROPERTIES_FLUIDLIST_UPDATE.setValue(PROP_REPLACE_FLOW, ValueTypeBoolean.ValueBoolean.of(false));
 
                 PROPERTIES_FLUID.setValue(PROP_CHANNEL, ValueTypeInteger.ValueInteger.of(IPositionedAddonsNetworkIngredients.DEFAULT_CHANNEL));
                 PROPERTIES_FLUID.setValue(PROP_ROUNDROBIN, ValueTypeBoolean.ValueBoolean.of(false));
@@ -1347,6 +1356,7 @@ public class TunnelAspectWriteBuilders {
                 PROPERTIES_NBT_UPDATE.setValue(PROP_CHANNEL, ValueTypeInteger.ValueInteger.of(IPositionedAddonsNetworkIngredients.DEFAULT_CHANNEL));
                 PROPERTIES_NBT_UPDATE.setValue(PROP_BLOCK_UPDATE, ValueTypeBoolean.ValueBoolean.of(false));
                 PROPERTIES_NBT_UPDATE.setValue(PROP_IGNORE_REPLACABLE, ValueTypeBoolean.ValueBoolean.of(false));
+                PROPERTIES_NBT_UPDATE.setValue(PROP_REPLACE_FLOW, ValueTypeBoolean.ValueBoolean.of(false));
                 PROPERTIES_NBT_UPDATE.setValue(TunnelAspectWriteBuilders.Fluid.PROP_NBT_SUBSET, ValueTypeBoolean.ValueBoolean.of(true));
                 PROPERTIES_NBT_UPDATE.setValue(TunnelAspectWriteBuilders.Fluid.PROP_NBT_SUPERSET, ValueTypeBoolean.ValueBoolean.of(true));
                 PROPERTIES_NBT_UPDATE.setValue(TunnelAspectWriteBuilders.Fluid.PROP_NBT_REQUIRE, ValueTypeBoolean.ValueBoolean.of(true));
@@ -1451,6 +1461,7 @@ public class TunnelAspectWriteBuilders {
                             input.getFluidStackMatcher(),
                             input.getProperties().getValue(PROP_BLOCK_UPDATE).getRawValue(),
                             input.getProperties().getValue(PROP_IGNORE_REPLACABLE).getRawValue(),
+                            input.getProperties().getValue(PROP_REPLACE_FLOW).getRawValue(),
                             input.isCraftIfFailed());
                     input.postTransfer();
                 }

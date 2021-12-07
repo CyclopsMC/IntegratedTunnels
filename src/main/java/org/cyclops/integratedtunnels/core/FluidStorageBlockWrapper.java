@@ -105,7 +105,9 @@ public class FluidStorageBlockWrapper implements IIngredientComponentStorage<Flu
     @Override
     public FluidStack insert(@Nonnull FluidStack stack, boolean simulate) {
         if (targetStorage != null) {
-            return stack;
+            FluidStack exists = targetStorage.extract(1000, false);
+            if(exists != null && exists.amount == 1000)
+                return stack;
         }
 
         net.minecraftforge.fluids.Fluid fluid = stack.getFluid();
