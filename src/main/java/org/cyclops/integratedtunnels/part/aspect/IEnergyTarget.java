@@ -29,7 +29,7 @@ public interface IEnergyTarget extends IChanneledTarget<IEnergyNetwork, Long> {
         PartPos center = partTarget.getCenter();
         PartPos target = partTarget.getTarget();
         INetwork network = IChanneledTarget.getNetworkChecked(center);
-        TileEntity tile = target.getPos().getWorld(true).getTileEntity(target.getPos().getBlockPos());
+        TileEntity tile = target.getPos().getWorld(true).getBlockEntity(target.getPos().getBlockPos());
         PartStateRoundRobin<?> partState = IChanneledTarget.getPartState(center);
         return new EnergyTargetCapabilityProvider(tile, target.getSide(), network, properties, amount, partState);
     }

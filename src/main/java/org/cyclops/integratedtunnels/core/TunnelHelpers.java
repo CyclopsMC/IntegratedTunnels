@@ -232,8 +232,8 @@ public class TunnelHelpers {
      */
     public static BlockItemUseContext createBlockItemUseContext(World world, @Nullable PlayerEntity playerEntity, BlockPos pos, Direction side, Hand hand) {
         return new BlockItemUseContext(world, playerEntity, hand, ItemStack.EMPTY,
-                new BlockRayTraceResult(new Vector3d((double)pos.getX() + 0.5D + (double)side.getXOffset() * 0.5D,
-                        (double)pos.getY() + 0.5D + (double)side.getYOffset() * 0.5D,
-                        (double)pos.getZ() + 0.5D + (double)side.getZOffset() * 0.5D), side, pos, false));
+                new BlockRayTraceResult(new Vector3d((double)pos.getX() + 0.5D + (double)side.getStepX() * 0.5D,
+                        (double)pos.getY() + 0.5D + (double)side.getStepY() * 0.5D,
+                        (double)pos.getZ() + 0.5D + (double)side.getStepZ() * 0.5D), side, pos, false));
     }
 }

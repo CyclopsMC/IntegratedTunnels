@@ -30,13 +30,13 @@ public class BlockBreakHandlerShulkerBox implements IBlockBreakHandler {
                 .map(tile -> {
                     if (!tile.isEmpty()) {
                         ItemStack itemStack = ShulkerBoxBlock.getColoredItemStack(tile.getColor());
-                        CompoundNBT compoundnbt = tile.saveToNbt(new CompoundNBT());
+                        CompoundNBT compoundnbt = tile.saveToTag(new CompoundNBT());
                         if (!compoundnbt.isEmpty()) {
-                            itemStack.setTagInfo("BlockEntityTag", compoundnbt);
+                            itemStack.addTagElement("BlockEntityTag", compoundnbt);
                         }
 
                         if (tile.hasCustomName()) {
-                            itemStack.setDisplayName(tile.getName());
+                            itemStack.setHoverName(tile.getName());
                         }
 
                         NonNullList<ItemStack> list = NonNullList.create();
@@ -51,7 +51,7 @@ public class BlockBreakHandlerShulkerBox implements IBlockBreakHandler {
     @Override
     public void breakBlock(BlockState blockState, World world, BlockPos pos, PlayerEntity player) {
         TileHelpers.getSafeTile(world, pos, ShulkerBoxTileEntity.class)
-                .ifPresent(LockableLootTileEntity::clear);
+                .ifPresent(LockableLootTileEntity::clearContent);
         blockState.getBlock().removedByPlayer(blockState, world, pos, player, false, world.getFluidState(pos));
     }
 }

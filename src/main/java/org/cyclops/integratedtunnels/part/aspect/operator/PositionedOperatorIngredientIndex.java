@@ -15,6 +15,8 @@ import org.cyclops.integratedtunnels.part.aspect.TunnelAspectReadBuilders;
 
 import java.util.Optional;
 
+import org.cyclops.integrateddynamics.core.evaluate.operator.OperatorBase.IFunction;
+
 /**
  * @author rubensworks
  */

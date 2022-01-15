@@ -39,7 +39,7 @@ import java.util.function.Predicate;
  */
 public class ItemStoragePlayerWrapper implements IIngredientComponentStorage<ItemStack, Integer> {
 
-    private static final Predicate<Entity> CAN_BE_ATTACKED = Entity::canBeAttackedWithItem;
+    private static final Predicate<Entity> CAN_BE_ATTACKED = Entity::isAttackable;
 
     private final ExtendedFakePlayer player;
     private final ServerWorld world;
@@ -75,13 +75,13 @@ public class ItemStoragePlayerWrapper implements IIngredientComponentStorage<Ite
     }
 
     public static void cancelDestroyingBlock(ServerPlayerEntity player) {
-        player.interactionManager.isDestroyingBlock = false;
-        player.interactionManager.durabilityRemainingOnBlock = -1;
+        player.gameMode.isDestroyingBlock = false;
+        player.gameMode.lastSentState = -1;
     }
 
     protected Entity getEntity(List<Entity> entities) {
         if (this.entityIndex < 0) {
-            return entities.get(world.rand.nextInt(entities.size()));
+            return entities.get(world.random.nextInt(entities.size()));
         }
         return entities.get(Math.min(this.entityIndex, entities.size() - 1));
     }
@@ -136,7 +136,7 @@ public class ItemStoragePlayerWrapper implements IIngredientComponentStorage<Ite
         }
 
         if (rightClick) {
-            /* Inspired by PlayerInteractionManager#func_219441_a (line 324) */
+            /* Inspired by PlayerInteractionManager#useItemOn (line 324) */
 
             // Send block right click event
             BlockRayTraceResult blockRayTraceResult = new BlockRayTraceResult(new Vector3d(offsetX, offsetY, offsetZ), side, pos, false);
@@ -152,7 +152,7 @@ public class ItemStoragePlayerWrapper implements IIngredientComponentStorage<Ite
                     ActionResultType actionResult = stack.getItem().onItemUseFirst(stack, itemUseContext);
                     if (actionResult == ActionResultType.FAIL) {
                         return stack;
-                    } else if (actionResult.isSuccessOrConsume()) {
+                    } else if (actionResult.consumesAction()) {
                         returnPlayerInventory(player);
                         return ItemStack.EMPTY;
                     }
@@ -161,15 +161,15 @@ public class ItemStoragePlayerWrapper implements IIngredientComponentStorage<Ite
             }
 
             // Activate block
-            boolean playerHasHeldItem = !player.getHeldItemMainhand().isEmpty() || !player.getHeldItemOffhand().isEmpty();
+            boolean playerHasHeldItem = !player.getMainHandItem().isEmpty() || !player.getOffhandItem().isEmpty();
             boolean flag1 = (player.isSecondaryUseActive() && playerHasHeldItem)
-                    && !(player.getHeldItemMainhand().doesSneakBypassUse(world, pos, player)
-                    && player.getHeldItemOffhand().doesSneakBypassUse(world, pos, player));
+                    && !(player.getMainHandItem().doesSneakBypassUse(world, pos, player)
+                    && player.getOffhandItem().doesSneakBypassUse(world, pos, player));
             if (rightClickBlockActionResult.getUseBlock() == Event.Result.ALLOW
                     || (rightClickBlockActionResult.getUseBlock() != Event.Result.DENY && !flag1)) {
                 BlockState blockState = world.getBlockState(pos);
                 if (!player.isCrouching() || stack.isEmpty()) {
-                    if (blockState.onBlockActivated(world, player, hand, blockRayTraceResult).isSuccessOrConsume()) {
+                    if (blockState.use(world, player, hand, blockRayTraceResult).consumesAction()) {
                         returnPlayerInventory(player);
                         return ItemStack.EMPTY;
                     }
@@ -177,13 +177,13 @@ public class ItemStoragePlayerWrapper implements IIngredientComponentStorage<Ite
             }
 
             // Interact with entity
-            List<Entity> entities = world.getEntitiesWithinAABB(Entity.class, new AxisAlignedBB(pos));
+            List<Entity> entities = world.getEntitiesOfClass(Entity.class, new AxisAlignedBB(pos));
             if (entities.size() > 0) {
                 Entity entity = getEntity(entities);
                 ActionResultType actionResult = player.interactOn(entity, hand);
                 if (actionResult == ActionResultType.FAIL) {
                     return stack;
-                } else if (actionResult.isSuccessOrConsume()) {
+                } else if (actionResult.consumesAction()) {
                     returnPlayerInventory(player);
                     return ItemStack.EMPTY;
                 }
@@ -195,28 +195,28 @@ public class ItemStoragePlayerWrapper implements IIngredientComponentStorage<Ite
                 if (cancelResult != null)  {
                     if (cancelResult == ActionResultType.FAIL) {
                         return stack;
-                    } else if (cancelResult.isSuccessOrConsume()) {
+                    } else if (cancelResult.consumesAction()) {
                         returnPlayerInventory(player);
                         return ItemStack.EMPTY;
                     }
                     // Otherwise, PASS the logic
                 } else {
                     ItemStack copyBeforeUse = stack.copy();
-                    ActionResult<ItemStack> actionresult = stack.useItemRightClick(world, player, hand);
-                    if (actionresult.getType() == ActionResultType.FAIL) {
+                    ActionResult<ItemStack> actionresult = stack.use(world, player, hand);
+                    if (actionresult.getResult() == ActionResultType.FAIL) {
                         return stack;
                     }
-                    if (actionresult.getResult().isEmpty()) {
+                    if (actionresult.getObject().isEmpty()) {
                         PlayerHelpers.setHeldItemSilent(player, hand, ItemStack.EMPTY);
                         ForgeEventFactory.onPlayerDestroyItem(player, copyBeforeUse, hand);
                     } else {
-                        PlayerHelpers.setHeldItemSilent(player, hand, actionresult.getResult());
+                        PlayerHelpers.setHeldItemSilent(player, hand, actionresult.getObject());
                     }
-                    if (actionresult.getType().isSuccessOrConsume()) {
+                    if (actionresult.getResult().consumesAction()) {
                         // If the hand was activated, simulate the activated hand for a number of ticks, and deactivate.
-                        if (player.isHandActive()) {
+                        if (player.isUsingItem()) {
                             player.updateActiveHandSimulated();
-                            player.stopActiveHand();
+                            player.releaseUsingItem();
                         }
                         returnPlayerInventory(player);
                         return ItemStack.EMPTY;
@@ -230,53 +230,53 @@ public class ItemStoragePlayerWrapper implements IIngredientComponentStorage<Ite
                 BlockPos targetPos = pos;
                 double reachDistance = player.getAttribute(ForgeMod.REACH_DISTANCE.get()).getValue() + 3;
                 int i = 0;
-                while (i++ < reachDistance && world.isAirBlock(targetPos)) {
-                    targetPos = targetPos.offset(side.getOpposite());
+                while (i++ < reachDistance && world.isEmptyBlock(targetPos)) {
+                    targetPos = targetPos.relative(side.getOpposite());
                 }
 
                 ItemUseContext itemUseContextReach = new ItemUseContext(player, hand,
                         new BlockRayTraceResult(new Vector3d(offsetX, offsetY, offsetZ), side, targetPos, false));
-                ActionResultType actionResult = stack.onItemUse(itemUseContextReach);
+                ActionResultType actionResult = stack.useOn(itemUseContextReach);
                 if (actionResult == ActionResultType.FAIL) {
                     return stack;
-                } else if (actionResult.isSuccessOrConsume()) {
+                } else if (actionResult.consumesAction()) {
                     returnPlayerInventory(player);
                     return ItemStack.EMPTY;
                 }
                 // Otherwise, PASS the logic
             }
         } else {
-            /* Inspired by PlayerInteractionManager#func_225416_a (line 120) */
+            /* Inspired by PlayerInteractionManager#handleBlockBreakAction (line 120) */
 
             // Check if left clicking is allowed
             PlayerInteractEvent.LeftClickBlock event = net.minecraftforge.common.ForgeHooks.onLeftClickBlock(player, pos, side);
             BlockState blockState = world.getBlockState(pos);
             if (event.isCanceled() || (event.getUseItem() == net.minecraftforge.eventbus.api.Event.Result.DENY)) { // Restore block and te data
-                world.notifyBlockUpdate(pos, blockState, world.getBlockState(pos), 3);
+                world.sendBlockUpdated(pos, blockState, world.getBlockState(pos), 3);
                 return stack;
             }
 
-            if (!world.isAirBlock(pos)) {
+            if (!world.isEmptyBlock(pos)) {
                 // Break block
-                int durabilityRemaining = player.interactionManager.durabilityRemainingOnBlock;
+                int durabilityRemaining = player.gameMode.lastSentState;
                 if (durabilityRemaining < 0) {
-                    world.getBlockState(pos).onBlockClicked(world, pos, player);
-                    float relativeBlockHardness = blockState.getPlayerRelativeBlockHardness(this.player, this.player.world, pos);
+                    world.getBlockState(pos).attack(world, pos, player);
+                    float relativeBlockHardness = blockState.getDestroyProgress(this.player, this.player.level, pos);
                     if (relativeBlockHardness >= 1.0F) {
                         // Insta-mine
-                        player.interactionManager.tryHarvestBlock(pos);
+                        player.gameMode.destroyBlock(pos);
                     } else {
                         // Initiate break progress
-                        player.interactionManager.initialDamage = player.interactionManager.ticks;
-                        player.interactionManager.isDestroyingBlock = true;
-                        player.interactionManager.destroyPos = pos.toImmutable();
-                        player.interactionManager.durabilityRemainingOnBlock = (int) (relativeBlockHardness * 10.0F);
+                        player.gameMode.destroyProgressStart = player.gameMode.gameTicks;
+                        player.gameMode.isDestroyingBlock = true;
+                        player.gameMode.destroyPos = pos.immutable();
+                        player.gameMode.lastSentState = (int) (relativeBlockHardness * 10.0F);
                     }
                 } else if (durabilityRemaining >= 9) {
-                    player.interactionManager.tryHarvestBlock(pos);
+                    player.gameMode.destroyBlock(pos);
                     cancelDestroyingBlock(player);
                 } else {
-                    player.interactionManager.tick();
+                    player.gameMode.tick();
                 }
                 returnPlayerInventory(player);
                 return ItemStack.EMPTY;
@@ -285,13 +285,13 @@ public class ItemStoragePlayerWrapper implements IIngredientComponentStorage<Ite
                 cancelDestroyingBlock(player);
 
                 // Interact with entity
-                List<Entity> entities = world.getEntitiesWithinAABB(Entity.class, new AxisAlignedBB(pos), CAN_BE_ATTACKED::test);
+                List<Entity> entities = world.getEntitiesOfClass(Entity.class, new AxisAlignedBB(pos), CAN_BE_ATTACKED::test);
                 if (entities.size() > 0) {
                     Entity entity = getEntity(entities);
                     EquipmentSlotType equipmentSlotType = hand == Hand.MAIN_HAND ? EquipmentSlotType.MAINHAND : EquipmentSlotType.OFFHAND;
-                    player.getAttributeManager().reapplyModifiers(stack.getAttributeModifiers(equipmentSlotType));
-                    player.attackTargetEntityWithCurrentItem(entity);
-                    player.getAttributeManager().removeModifiers(stack.getAttributeModifiers(equipmentSlotType));
+                    player.getAttributes().addTransientAttributeModifiers(stack.getAttributeModifiers(equipmentSlotType));
+                    player.attack(entity);
+                    player.getAttributes().removeAttributeModifiers(stack.getAttributeModifiers(equipmentSlotType));
                     returnPlayerInventory(player);
                     return ItemStack.EMPTY;
                 } else {

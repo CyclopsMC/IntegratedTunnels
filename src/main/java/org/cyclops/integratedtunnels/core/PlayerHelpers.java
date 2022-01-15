@@ -30,14 +30,14 @@ public class PlayerHelpers {
     public static void setPlayerState(PlayerEntity player, Hand hand, BlockPos pos,
                                       double offsetX, double offsetY, double offsetZ, Direction side, boolean sneaking) {
         offsetY = side == Direction.DOWN ? -offsetY : offsetY;
-        player.setPosition(pos.getX() + offsetX, pos.getY() + offsetY, pos.getZ() + offsetZ);
-        player.prevPosX = player.getPosX();
-        player.prevPosY = player.getPosY();
-        player.prevPosZ = player.getPosZ();
-        player.rotationYaw = side.getOpposite().getHorizontalAngle();
-        player.rotationPitch = side == Direction.UP ? 90F : (side == Direction.DOWN ? -90F : 0F);
+        player.setPos(pos.getX() + offsetX, pos.getY() + offsetY, pos.getZ() + offsetZ);
+        player.xo = player.getX();
+        player.yo = player.getY();
+        player.zo = player.getZ();
+        player.yRot = side.getOpposite().toYRot();
+        player.xRot = side == Direction.UP ? 90F : (side == Direction.DOWN ? -90F : 0F);
         player.eyeHeight = 0F;
-        player.setSneaking(sneaking);
+        player.setShiftKeyDown(sneaking);
         setHeldItemSilent(player, hand, ItemStack.EMPTY);
         player.tick();
         player.setOnGround(true);
@@ -45,12 +45,12 @@ public class PlayerHelpers {
 
     public static void setHeldItemSilent(PlayerEntity player, Hand hand, ItemStack itemStack) {
         if (hand == Hand.MAIN_HAND) {
-            player.inventory.mainInventory.set(player.inventory.currentItem, itemStack);
+            player.inventory.items.set(player.inventory.selected, itemStack);
         } else if (hand == Hand.OFF_HAND) {
-            player.inventory.offHandInventory.set(0, itemStack);
+            player.inventory.offhand.set(0, itemStack);
         } else {
             // Could happen if some mod messes with the hand types.
-            player.setHeldItem(hand, itemStack);
+            player.setItemInHand(hand, itemStack);
         }
     }
 

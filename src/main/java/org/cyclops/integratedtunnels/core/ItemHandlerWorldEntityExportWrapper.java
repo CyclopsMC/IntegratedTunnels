@@ -76,12 +76,12 @@ public class ItemHandlerWorldEntityExportWrapper implements IIngredientComponent
         x = x * velocity;
         y = y * velocity;
         z = z * velocity;
-        entity.setMotion(new Vector3d(x, y, z));
+        entity.setDeltaMovement(new Vector3d(x, y, z));
         float f1 = MathHelper.sqrt(x * x + z * z);
-        entity.rotationYaw = (float)(MathHelper.atan2(x, z) * (180D / Math.PI));
-        entity.rotationPitch = (float)(MathHelper.atan2(y, (double)f1) * (180D / Math.PI));
-        entity.prevRotationYaw = entity.rotationYaw;
-        entity.prevRotationPitch = entity.rotationPitch;
+        entity.yRot = (float)(MathHelper.atan2(x, z) * (180D / Math.PI));
+        entity.xRot = (float)(MathHelper.atan2(y, (double)f1) * (180D / Math.PI));
+        entity.yRotO = entity.yRot;
+        entity.xRotO = entity.xRot;
     }
 
     protected static void handleDispenseResult(IIngredientComponentStorage<ItemStack, Integer> dispenseResultHandler,
@@ -93,39 +93,39 @@ public class ItemHandlerWorldEntityExportWrapper implements IIngredientComponent
     }
 
     @Override
-    public double getX() {
-        return getBlockPos().getX() + offsetX;
+    public double x() {
+        return getPos().getX() + offsetX;
     }
 
     @Override
-    public double getY() {
-        return getBlockPos().getY() + offsetY;
+    public double y() {
+        return getPos().getY() + offsetY;
     }
 
     @Override
-    public double getZ() {
-        return getBlockPos().getZ() + offsetZ;
+    public double z() {
+        return getPos().getZ() + offsetZ;
     }
 
     @Override
-    public BlockPos getBlockPos() {
-        return this.pos.offset(this.facing.getOpposite());
+    public BlockPos getPos() {
+        return this.pos.relative(this.facing.getOpposite());
     }
 
     @Override
     public BlockState getBlockState() {
-        return Blocks.DISPENSER.getDefaultState()
-                .with(DispenserBlock.TRIGGERED, false)
-                .with(DispenserBlock.FACING, this.facing);
+        return Blocks.DISPENSER.defaultBlockState()
+                .setValue(DispenserBlock.TRIGGERED, false)
+                .setValue(DispenserBlock.FACING, this.facing);
     }
 
     @Override
-    public DispenserTileEntity getBlockTileEntity() {
+    public DispenserTileEntity getEntity() {
         return new SimulatedTileEntityDispenser(dispenseResultHandler, this);
     }
 
     @Override
-    public ServerWorld getWorld() {
+    public ServerWorld getLevel() {
         return world;
     }
 
@@ -153,7 +153,7 @@ public class ItemHandlerWorldEntityExportWrapper implements IIngredientComponent
     public ItemStack insert(@Nonnull ItemStack stack, boolean simulate) {
         if (!simulate) {
             if (this.dispense) {
-                IDispenseItemBehavior behaviorDispenseItem = DispenserBlock.DISPENSE_BEHAVIOR_REGISTRY.get(stack.getItem());
+                IDispenseItemBehavior behaviorDispenseItem = DispenserBlock.DISPENSER_REGISTRY.get(stack.getItem());
                 if (behaviorDispenseItem.getClass() != DefaultDispenseItemBehavior.class) {
                     ItemStack result = behaviorDispenseItem.dispense(this, stack.copy());
                     if (!result.isEmpty()) {
@@ -164,19 +164,19 @@ public class ItemHandlerWorldEntityExportWrapper implements IIngredientComponent
             }
             ItemEntity entity = new ItemEntity(world, pos.getX() + offsetX, pos.getY() + offsetY, pos.getZ() + offsetZ, stack.copy());
             entity.lifespan = lifespan <= 0 ? stack.getItem().getEntityLifespan(stack, world) : lifespan;
-            float yaw = facing.getHorizontalAngle() + yawOffset;
+            float yaw = facing.toYRot() + yawOffset;
             float pitch = (facing == Direction.UP ? -90F : (facing == Direction.DOWN ? 90F : 0)) - pitchOffset;
             this.setThrowableHeading(entity,
                     -MathHelper.sin(yaw * 0.017453292F) * MathHelper.cos(pitch * 0.017453292F),
                     -MathHelper.sin((pitch) * 0.017453292F),
                     MathHelper.cos(yaw * 0.017453292F) * MathHelper.cos(pitch * 0.017453292F),
                     this.velocity);
-            entity.setPickupDelay(delayBeforePickup);
-            world.addEntity(entity);
+            entity.setPickUpDelay(delayBeforePickup);
+            world.addFreshEntity(entity);
 
             if (GeneralConfig.worldInteractionEvents) {
-                world.playEvent(1000, pos, 0); // Sound
-                world.playEvent(2000, pos.offset(facing.getOpposite()), facing.getIndex()); // Particles
+                world.levelEvent(1000, pos, 0); // Sound
+                world.levelEvent(2000, pos.relative(facing.getOpposite()), facing.get3DDataValue()); // Particles
             }
         } else if (this.dispense) {
             stack = stack.copy();
@@ -207,12 +207,12 @@ public class ItemHandlerWorldEntityExportWrapper implements IIngredientComponent
         }
 
         @Override
-        public int getSizeInventory() {
+        public int getContainerSize() {
             return 0;
         }
 
         @Override
-        public int getDispenseSlot() {
+        public int getRandomSlot() {
             return 0;
         }
 
@@ -222,7 +222,7 @@ public class ItemHandlerWorldEntityExportWrapper implements IIngredientComponent
         }
 
         @Override
-        public int addItemStack(ItemStack stack) {
+        public int addItem(ItemStack stack) {
             handleDispenseResult(this.dispenseResultHandler, this.blockSource, stack);
             return 0;
         }

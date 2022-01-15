@@ -26,7 +26,7 @@ public class ItemDummyPickAxe extends ToolItem {
     }
 
     @Override
-    public boolean canHarvestBlock(BlockState blockIn) {
+    public boolean isCorrectToolForDrops(BlockState blockIn) {
         return true;
     }
 
@@ -40,10 +40,10 @@ public class ItemDummyPickAxe extends ToolItem {
         return ITEMSTACKS.computeIfAbsent(data, (key) -> {
             ItemStack itemStack = new ItemStack(RegistryEntries.ITEM_DUMMY_PICKAXE, 1);
             if (silkTouch) {
-                itemStack.addEnchantment(Enchantments.SILK_TOUCH, 1);
+                itemStack.enchant(Enchantments.SILK_TOUCH, 1);
             }
             if (fortune > 0) {
-                itemStack.addEnchantment(Enchantments.FORTUNE, fortune);
+                itemStack.enchant(Enchantments.BLOCK_FORTUNE, fortune);
             }
             return itemStack;
         });

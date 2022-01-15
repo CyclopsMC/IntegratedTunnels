@@ -12,6 +12,9 @@ import org.cyclops.integratedtunnels.core.part.PartTypeInterfacePositionedAddon;
 
 import javax.annotation.Nonnull;
 
+import net.minecraftforge.fluids.capability.IFluidHandler.FluidAction;
+import org.cyclops.integratedtunnels.core.part.IPartTypeInterfacePositionedAddon.IState;
+
 /**
  * Interface for fluid handlers.
  * @author rubensworks

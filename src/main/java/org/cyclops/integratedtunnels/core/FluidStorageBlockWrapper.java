@@ -85,7 +85,7 @@ public class FluidStorageBlockWrapper implements IIngredientComponentStorage<Flu
 
     @Override
     public FluidStack insert(@Nonnull FluidStack stack, boolean simulate) {
-        if (world.getDimensionType().isUltrawarm()
+        if (world.dimensionType().ultraWarm()
                 && stack.getFluid().getAttributes().doesVaporize(world, pos, stack)) {
             return FluidStack.EMPTY;
         }

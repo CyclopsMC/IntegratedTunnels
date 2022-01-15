@@ -38,7 +38,7 @@ public interface IItemTarget extends IChanneledTarget<IItemNetwork, ItemStack> {
         PartPos center = partTarget.getCenter();
         PartPos target = partTarget.getTarget();
         INetwork network = IChanneledTarget.getNetworkChecked(center);
-        TileEntity tile = target.getPos().getWorld(true).getTileEntity(target.getPos().getBlockPos());
+        TileEntity tile = target.getPos().getWorld(true).getBlockEntity(target.getPos().getBlockPos());
         PartStateRoundRobin<?> partState = IChanneledTarget.getPartState(center);
         return new ItemTargetCapabilityProvider(transfer, network, tile, target.getSide(),
                 slot, itemStackMatcher, partTarget, properties, partState);

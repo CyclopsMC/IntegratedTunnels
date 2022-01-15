@@ -137,8 +137,8 @@ public class TunnelFluidHelpers {
         BlockState destBlockState = world.getBlockState(pos);
         final Material destMaterial = destBlockState.getMaterial();
         final boolean isDestNonSolid = !destMaterial.isSolid();
-        final boolean isDestReplaceable = destBlockState.isReplaceable(TunnelHelpers.createBlockItemUseContext(world, null, pos, Direction.UP, Hand.MAIN_HAND));
-        if (!world.isAirBlock(pos)
+        final boolean isDestReplaceable = destBlockState.canBeReplaced(TunnelHelpers.createBlockItemUseContext(world, null, pos, Direction.UP, Hand.MAIN_HAND));
+        if (!world.isEmptyBlock(pos)
                 && (!isDestNonSolid || !(ignoreReplacable && isDestReplaceable) || destMaterial.isLiquid())) {
             return null;
         }

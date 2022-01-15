@@ -12,6 +12,8 @@ import org.cyclops.integrateddynamics.core.evaluate.variable.ValueTypeLong;
 import org.cyclops.integrateddynamics.core.evaluate.variable.ValueTypes;
 import org.cyclops.integratedtunnels.capability.network.ItemNetworkConfig;
 
+import org.cyclops.integrateddynamics.core.evaluate.operator.OperatorBase.SafeVariablesGetter;
+
 /**
  * @author rubensworks
  */

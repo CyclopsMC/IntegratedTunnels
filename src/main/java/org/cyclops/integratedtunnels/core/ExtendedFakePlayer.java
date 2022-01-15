@@ -23,12 +23,12 @@ public class ExtendedFakePlayer extends FakePlayer {
 
     public ExtendedFakePlayer(ServerWorld world) {
         super(world, PROFILE);
-        this.interactionManager.setGameType(GameType.SURVIVAL);
+        this.gameMode.setGameModeForPlayer(GameType.SURVIVAL);
         this.connection = new FakeNetHandlerPlayServer(world.getServer(), this);
     }
 
     @Override
-    public boolean isPotionApplicable(EffectInstance potioneffectIn) {
+    public boolean canBeAffected(EffectInstance potioneffectIn) {
         return false;
     }
 
@@ -36,54 +36,54 @@ public class ExtendedFakePlayer extends FakePlayer {
     public void tick() {
         super.tick();
 
-        int toTick = (int) (world.getGameTime() - this.lastUpdateTick);
+        int toTick = (int) (level.getGameTime() - this.lastUpdateTick);
         if (toTick > 0) {
             this.ticksSinceLastTick = toTick;
         }
-        this.lastUpdateTick = world.getGameTime();
+        this.lastUpdateTick = level.getGameTime();
 
-        this.ticksSinceLastSwing = (int) (world.getGameTime() - lastSwingUpdateTick);
+        this.attackStrengthTicker = (int) (level.getGameTime() - lastSwingUpdateTick);
         this.inventory.tick();
     }
 
     @Override
-    public void resetCooldown() {
-        super.resetCooldown();
-        lastSwingUpdateTick = world.getGameTime();
+    public void resetAttackStrengthTicker() {
+        super.resetAttackStrengthTicker();
+        lastSwingUpdateTick = level.getGameTime();
     }
 
     public void updateActiveHandSimulated() {
-        if (this.isHandActive()) {
+        if (this.isUsingItem()) {
             for (int i = 0; i < this.ticksSinceLastTick; i++) {
-                if (this.isHandActive()) {
-                    ItemStack itemstack = this.getHeldItem(this.getActiveHand());
-                    if (net.minecraftforge.common.ForgeHooks.canContinueUsing(this.activeItemStack, itemstack)) {
-                        this.activeItemStack = itemstack;
+                if (this.isUsingItem()) {
+                    ItemStack itemstack = this.getItemInHand(this.getUsedItemHand());
+                    if (net.minecraftforge.common.ForgeHooks.canContinueUsing(this.useItem, itemstack)) {
+                        this.useItem = itemstack;
                     }
                     // Based on LivingEntity#updateActiveHand
-                    if (itemstack == this.activeItemStack) {
-                        if (!this.activeItemStack.isEmpty()) {
-                            activeItemStackUseCount = net.minecraftforge.event.ForgeEventFactory.onItemUseTick(this, activeItemStack, activeItemStackUseCount);
-                            if (activeItemStackUseCount > 0)
-                                activeItemStack.getItem().onUsingTick(activeItemStack, this, activeItemStackUseCount);
+                    if (itemstack == this.useItem) {
+                        if (!this.useItem.isEmpty()) {
+                            useItemRemaining = net.minecraftforge.event.ForgeEventFactory.onItemUseTick(this, useItem, useItemRemaining);
+                            if (useItemRemaining > 0)
+                                useItem.getItem().onUsingTick(useItem, this, useItemRemaining);
                         }
 
-                        if (this.getItemInUseCount() <= 25 && this.getItemInUseCount() % 4 == 0) {
-                            this.triggerItemUseEffects(this.activeItemStack, 5);
+                        if (this.getUseItemRemainingTicks() <= 25 && this.getUseItemRemainingTicks() % 4 == 0) {
+                            this.triggerItemUseEffects(this.useItem, 5);
                         }
 
-                        if (--this.activeItemStackUseCount <= 0 && !this.world.isRemote() && !this.activeItemStack.isCrossbowStack()) {
-                            this.onItemUseFinish();
+                        if (--this.useItemRemaining <= 0 && !this.level.isClientSide() && !this.useItem.useOnRelease()) {
+                            this.completeUsingItem();
                             break;
                         }
                     } else {
-                        this.resetActiveHand();
+                        this.stopUsingItem();
                         break;
                     }
                 }
             }
         } else {
-            this.resetActiveHand();
+            this.stopUsingItem();
         }
     }
 }

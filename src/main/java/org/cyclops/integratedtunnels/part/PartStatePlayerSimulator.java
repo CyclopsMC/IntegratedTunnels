@@ -27,7 +27,7 @@ public class PartStatePlayerSimulator extends PartStateRoundRobin<PartTypePlayer
 
     public void update(PartTarget target) {
         World world = target.getTarget().getPos().getWorld(false);
-        if (world != null && !world.isRemote()) {
+        if (world != null && !world.isClientSide()) {
             if (player == null) {
                 player = new ExtendedFakePlayer((ServerWorld) world);
             }

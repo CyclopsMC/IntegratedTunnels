@@ -36,8 +36,8 @@ public class ItemHandlerWorldEntityImportWrapper implements IIngredientComponent
         this.world = world;
         this.pos = pos;
         this.facing = facing;
-        this.entities = world.getEntitiesWithinAABB(ItemEntity.class, area,
-                input -> (ignorePickupDelay || !input.cannotPickup()) && input.isAlive());
+        this.entities = world.getEntitiesOfClass(ItemEntity.class, area,
+                input -> (ignorePickupDelay || !input.hasPickUpDelay()) && input.isAlive());
     }
 
     public List<ItemEntity> getEntities() {
@@ -76,8 +76,8 @@ public class ItemHandlerWorldEntityImportWrapper implements IIngredientComponent
             entity.setItem(itemStack);
         }
         if (GeneralConfig.worldInteractionEvents) {
-            world.playEvent(1000, pos, 0); // Sound
-            world.playEvent(2000, pos.offset(facing.getOpposite()), facing.getIndex()); // Particles
+            world.levelEvent(1000, pos, 0); // Sound
+            world.levelEvent(2000, pos.relative(facing.getOpposite()), facing.get3DDataValue()); // Particles
         }
     }
 

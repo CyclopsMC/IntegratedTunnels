@@ -16,6 +16,8 @@ import org.cyclops.integratedtunnels.core.part.PartStatePositionedAddon;
 
 import javax.annotation.Nonnull;
 
+import net.minecraftforge.fluids.capability.IFluidHandler.FluidAction;
+
 /**
  * A part state for handling fluid import and export.
  * It also acts as an fluid capability that can be added to itself.

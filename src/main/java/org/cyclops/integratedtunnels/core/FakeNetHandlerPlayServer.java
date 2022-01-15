@@ -35,7 +35,7 @@ public class FakeNetHandlerPlayServer extends ServerPlayNetHandler {
             }
 
             @Override
-            public void setConnectionState(ProtocolType newState) {
+            public void setProtocol(ProtocolType newState) {
 
             }
 
@@ -50,17 +50,17 @@ public class FakeNetHandlerPlayServer extends ServerPlayNetHandler {
             }
 
             @Override
-            public void setNetHandler(INetHandler handler) {
+            public void setListener(INetHandler handler) {
 
             }
 
             @Override
-            public void sendPacket(IPacket<?> packetIn) {
+            public void send(IPacket<?> packetIn) {
 
             }
 
             @Override
-            public void sendPacket(IPacket<?> packetIn, @Nullable GenericFutureListener<? extends Future<? super Void>> p_201058_2_) {
+            public void send(IPacket<?> packetIn, @Nullable GenericFutureListener<? extends Future<? super Void>> p_201058_2_) {
 
             }
 
@@ -70,37 +70,37 @@ public class FakeNetHandlerPlayServer extends ServerPlayNetHandler {
             }
 
             @Override
-            public boolean isLocalChannel() {
+            public boolean isMemoryConnection() {
                 return false;
             }
 
             @Override
-            public void func_244777_a(Cipher p_244777_1_, Cipher p_244777_2_) {
+            public void setEncryptionKey(Cipher p_244777_1_, Cipher p_244777_2_) {
 
             }
 
             @Override
-            public boolean isChannelOpen() {
+            public boolean isConnected() {
                 return false;
             }
 
             @Override
-            public INetHandler getNetHandler() {
+            public INetHandler getPacketListener() {
                 return null;
             }
 
             @Override
-            public ITextComponent getExitMessage() {
+            public ITextComponent getDisconnectedReason() {
                 return null;
             }
 
             @Override
-            public void setCompressionThreshold(int threshold) {
+            public void setupCompression(int threshold) {
 
             }
 
             @Override
-            public void disableAutoRead() {
+            public void setReadOnly() {
 
             }
 
@@ -127,62 +127,62 @@ public class FakeNetHandlerPlayServer extends ServerPlayNetHandler {
     }
 
     @Override
-    public void processInput(CInputPacket packetIn) {
+    public void handlePlayerInput(CInputPacket packetIn) {
 
     }
 
     @Override
-    public void processVehicleMove(CMoveVehiclePacket packetIn) {
+    public void handleMoveVehicle(CMoveVehiclePacket packetIn) {
 
     }
 
     @Override
-    public void processConfirmTeleport(CConfirmTeleportPacket packetIn) {
+    public void handleAcceptTeleportPacket(CConfirmTeleportPacket packetIn) {
 
     }
 
     @Override
-    public void processPlayer(CPlayerPacket packetIn) {
+    public void handleMovePlayer(CPlayerPacket packetIn) {
 
     }
 
     @Override
-    public void setPlayerLocation(double x, double y, double z, float yaw, float pitch) {
+    public void teleport(double x, double y, double z, float yaw, float pitch) {
 
     }
 
     @Override
-    public void setPlayerLocation(double x, double y, double z, float yaw, float pitch, Set<SPlayerPositionLookPacket.Flags> relativeSet) {
+    public void teleport(double x, double y, double z, float yaw, float pitch, Set<SPlayerPositionLookPacket.Flags> relativeSet) {
 
     }
 
     @Override
-    public void processPlayerDigging(CPlayerDiggingPacket packetIn) {
+    public void handlePlayerAction(CPlayerDiggingPacket packetIn) {
 
     }
 
     @Override
-    public void processTryUseItemOnBlock(CPlayerTryUseItemOnBlockPacket packetIn) {
+    public void handleUseItemOn(CPlayerTryUseItemOnBlockPacket packetIn) {
 
     }
 
     @Override
-    public void processTryUseItem(CPlayerTryUseItemPacket packetIn) {
+    public void handleUseItem(CPlayerTryUseItemPacket packetIn) {
 
     }
 
     @Override
-    public void handleSpectate(CSpectatePacket packetIn) {
+    public void handleTeleportToEntityPacket(CSpectatePacket packetIn) {
 
     }
 
     @Override
-    public void handleResourcePackStatus(CResourcePackStatusPacket packetIn) {
+    public void handleResourcePackResponse(CResourcePackStatusPacket packetIn) {
 
     }
 
     @Override
-    public void processSteerBoat(CSteerBoatPacket packetIn) {
+    public void handlePaddleBoat(CSteerBoatPacket packetIn) {
 
     }
 
@@ -192,92 +192,92 @@ public class FakeNetHandlerPlayServer extends ServerPlayNetHandler {
     }
 
     @Override
-    public void sendPacket(final IPacket<?> packetIn) {
+    public void send(final IPacket<?> packetIn) {
 
     }
 
     @Override
-    public void processHeldItemChange(CHeldItemChangePacket packetIn) {
+    public void handleSetCarriedItem(CHeldItemChangePacket packetIn) {
 
     }
 
     @Override
-    public void processChatMessage(CChatMessagePacket packetIn) {
+    public void handleChat(CChatMessagePacket packetIn) {
 
     }
 
     @Override
-    public void handleAnimation(CAnimateHandPacket packetIn) {
+    public void handleAnimate(CAnimateHandPacket packetIn) {
 
     }
 
     @Override
-    public void processEntityAction(CEntityActionPacket packetIn) {
+    public void handlePlayerCommand(CEntityActionPacket packetIn) {
 
     }
 
     @Override
-    public void processUseEntity(CUseEntityPacket packetIn) {
+    public void handleInteract(CUseEntityPacket packetIn) {
 
     }
 
     @Override
-    public void processClientStatus(CClientStatusPacket packetIn) {
+    public void handleClientCommand(CClientStatusPacket packetIn) {
 
     }
 
     @Override
-    public void processCloseWindow(CCloseWindowPacket packetIn) {
+    public void handleContainerClose(CCloseWindowPacket packetIn) {
 
     }
 
     @Override
-    public void processClickWindow(CClickWindowPacket packetIn) {
+    public void handleContainerClick(CClickWindowPacket packetIn) {
 
     }
 
     @Override
-    public void processEnchantItem(CEnchantItemPacket packetIn) {
+    public void handleContainerButtonClick(CEnchantItemPacket packetIn) {
 
     }
 
     @Override
-    public void processCreativeInventoryAction(CCreativeInventoryActionPacket packetIn) {
+    public void handleSetCreativeModeSlot(CCreativeInventoryActionPacket packetIn) {
 
     }
 
     @Override
-    public void processConfirmTransaction(CConfirmTransactionPacket packetIn) {
+    public void handleContainerAck(CConfirmTransactionPacket packetIn) {
 
     }
 
     @Override
-    public void processUpdateSign(CUpdateSignPacket packetIn) {
+    public void handleSignUpdate(CUpdateSignPacket packetIn) {
 
     }
 
     @Override
-    public void processKeepAlive(CKeepAlivePacket packetIn) {
+    public void handleKeepAlive(CKeepAlivePacket packetIn) {
 
     }
 
     @Override
-    public void processPlayerAbilities(CPlayerAbilitiesPacket packetIn) {
+    public void handlePlayerAbilities(CPlayerAbilitiesPacket packetIn) {
 
     }
 
     @Override
-    public void processTabComplete(CTabCompletePacket packetIn) {
+    public void handleCustomCommandSuggestions(CTabCompletePacket packetIn) {
 
     }
 
     @Override
-    public void processClientSettings(CClientSettingsPacket packetIn) {
+    public void handleClientInformation(CClientSettingsPacket packetIn) {
 
     }
 
     @Override
-    public void processCustomPayload(CCustomPayloadPacket packetIn) {
+    public void handleCustomPayload(CCustomPayloadPacket packetIn) {
 
     }
 }

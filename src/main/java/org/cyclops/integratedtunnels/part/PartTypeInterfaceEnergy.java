@@ -12,6 +12,8 @@ import org.cyclops.integratedtunnels.GeneralConfig;
 import org.cyclops.integratedtunnels.core.part.IPartTypeInterfacePositionedAddon;
 import org.cyclops.integratedtunnels.core.part.PartTypeInterfacePositionedAddon;
 
+import org.cyclops.integratedtunnels.core.part.IPartTypeInterfacePositionedAddon.IState;
+
 /**
  * Interface for energy storages.
  * @author rubensworks

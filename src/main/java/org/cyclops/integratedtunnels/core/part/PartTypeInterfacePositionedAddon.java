@@ -70,7 +70,7 @@ public abstract class PartTypeInterfacePositionedAddon<N extends IPositionedAddo
     @Override
     public void writeExtraGuiData(PacketBuffer packetBuffer, PartPos pos, ServerPlayerEntity player) {
         PacketCodec.write(packetBuffer, pos);
-        packetBuffer.writeString(this.getUniqueName().toString());
+        packetBuffer.writeUtf(this.getUniqueName().toString());
     }
 
     @Override

@@ -19,11 +19,11 @@ public class TunnelTransferEntity implements ITunnelTransfer {
             return false;
         }
         TunnelTransferEntity that = (TunnelTransferEntity) obj;
-        return this.entity.getEntityId() == that.entity.getEntityId();
+        return this.entity.getId() == that.entity.getId();
     }
 
     @Override
     public int hashCode() {
-        return entity.getEntityId();
+        return entity.getId();
     }
 }

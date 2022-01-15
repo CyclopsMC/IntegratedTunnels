@@ -36,7 +36,7 @@ public interface IFluidTarget extends IChanneledTarget<IFluidNetwork, FluidStack
         PartPos center = partTarget.getCenter();
         PartPos target = partTarget.getTarget();
         INetwork network = IChanneledTarget.getNetworkChecked(center);
-        TileEntity tile = target.getPos().getWorld(true).getTileEntity(target.getPos().getBlockPos());
+        TileEntity tile = target.getPos().getWorld(true).getBlockEntity(target.getPos().getBlockPos());
         PartStateRoundRobin<?> partState = IChanneledTarget.getPartState(center);
         return new FluidTargetCapabilityProvider(transfer, network, tile, target.getSide(),
                 fluidStackMatcher, partTarget, properties, partState);

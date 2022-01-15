@@ -14,6 +14,8 @@ import org.cyclops.cyclopscore.helper.FluidHelpers;
 
 import javax.annotation.Nonnull;
 
+import net.minecraftforge.fluids.capability.IFluidHandler.FluidAction;
+
 /**
  * A fluid handler that wraps around a fluid block for draining and filling it,
  * @author rubensworks
@@ -39,7 +41,7 @@ public class FluidHandlerBlock implements IFluidHandler {
     @Override
     public FluidStack getFluidInTank(int tank) {
         Block block = this.state.getBlock();
-        if (block instanceof FlowingFluidBlock && this.state.get(FlowingFluidBlock.LEVEL) == 0) {
+        if (block instanceof FlowingFluidBlock && this.state.getValue(FlowingFluidBlock.LEVEL) == 0) {
             return new FluidStack(((FlowingFluidBlock) block).getFluid(), FluidHelpers.BUCKET_VOLUME);
         } else {
             return FluidStack.EMPTY;
@@ -59,7 +61,7 @@ public class FluidHandlerBlock implements IFluidHandler {
     @Override
     public int fill(FluidStack resource, FluidAction action) {
         Fluid fluid = resource.getFluid();
-        BlockState block = fluid.getAttributes().getBlock(world, blockPos, fluid.getDefaultState());
+        BlockState block = fluid.getAttributes().getBlock(world, blockPos, fluid.defaultFluidState());
         return new BlockWrapper(block, world, blockPos).fill(resource, action);
     }
 
@@ -79,10 +81,10 @@ public class FluidHandlerBlock implements IFluidHandler {
     public FluidStack drain(int maxDrain, FluidAction action) {
         Block block = this.state.getBlock();
         if (block instanceof FlowingFluidBlock
-                && this.state.get(FlowingFluidBlock.LEVEL) == 0
+                && this.state.getValue(FlowingFluidBlock.LEVEL) == 0
                 && maxDrain >= FluidHelpers.BUCKET_VOLUME) {
             if (action.execute()) {
-                this.world.setBlockState(this.blockPos, Blocks.AIR.getDefaultState(), 11);
+                this.world.setBlock(this.blockPos, Blocks.AIR.defaultBlockState(), 11);
             }
             return new FluidStack(((FlowingFluidBlock) block).getFluid(), FluidHelpers.BUCKET_VOLUME);
         }

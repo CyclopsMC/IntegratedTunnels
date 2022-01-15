@@ -83,12 +83,12 @@ public class TunnelAspectWriteBuilders {
 
     @Nullable
     public static Entity getEntity(PartPos target, int entityIndex) {
-        List<Entity> entities = target.getPos().getWorld(true).getEntitiesWithinAABB(Entity.class,
+        List<Entity> entities = target.getPos().getWorld(true).getEntitiesOfClass(Entity.class,
                 new AxisAlignedBB(target.getPos().getBlockPos()));
         Entity entity = null;
         if (entities.size() > 0 && entityIndex < entities.size()) {
             if (entityIndex == -1) {
-                entity = entities.get(target.getPos().getWorld(true).rand.nextInt(entities.size()));
+                entity = entities.get(target.getPos().getWorld(true).random.nextInt(entities.size()));
             } else {
                 entity = entities.get(entityIndex);
             }

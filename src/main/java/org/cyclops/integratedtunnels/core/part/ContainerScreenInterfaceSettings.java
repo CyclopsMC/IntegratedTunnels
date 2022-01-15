@@ -35,7 +35,7 @@ public class ContainerScreenInterfaceSettings extends ContainerScreenPartSetting
         super.onSave();
         try {
             int channelInterface = numberFieldChannelInterface.getInt();
-            ValueNotifierHelpers.setValue(getContainer(), ((ContainerInterfaceSettings) getContainer()).getLastChannelInterfaceValueId(), channelInterface);
+            ValueNotifierHelpers.setValue(getMenu(), ((ContainerInterfaceSettings) getMenu()).getLastChannelInterfaceValueId(), channelInterface);
         } catch (NumberFormatException e) {
         }
     }
@@ -44,9 +44,9 @@ public class ContainerScreenInterfaceSettings extends ContainerScreenPartSetting
     public void init() {
         super.init();
 
-        numberFieldChannelInterface = new WidgetNumberField(font, guiLeft + 106, guiTop + 109, 70, 14, true, new TranslationTextComponent("gui.integratedtunnels.partsettings.channel.interface"), true);
+        numberFieldChannelInterface = new WidgetNumberField(font, leftPos + 106, topPos + 109, 70, 14, true, new TranslationTextComponent("gui.integratedtunnels.partsettings.channel.interface"), true);
         numberFieldChannelInterface.setPositiveOnly(false);
-        numberFieldChannelInterface.setMaxStringLength(15);
+        numberFieldChannelInterface.setMaxLength(15);
         numberFieldChannelInterface.setVisible(true);
         numberFieldChannelInterface.setTextColor(16777215);
         numberFieldChannelInterface.setCanLoseFocus(true);
@@ -81,10 +81,10 @@ public class ContainerScreenInterfaceSettings extends ContainerScreenPartSetting
     }
 
     @Override
-    protected void drawGuiContainerBackgroundLayer(MatrixStack matrixStack, float partialTicks, int mouseX, int mouseY) {
-        super.drawGuiContainerBackgroundLayer(matrixStack, partialTicks, mouseX, mouseY);
-        font.drawString(matrixStack, L10NHelpers.localize("gui.integratedtunnels.partsettings.channel.interface"),
-                guiLeft + 8, guiTop + 112, Helpers.RGBToInt(0, 0, 0));
+    protected void renderBg(MatrixStack matrixStack, float partialTicks, int mouseX, int mouseY) {
+        // super.renderBg(matrixStack, partialTicks, mouseX, mouseY); // TODO: restore
+        font.draw(matrixStack, L10NHelpers.localize("gui.integratedtunnels.partsettings.channel.interface"),
+                leftPos + 8, topPos + 112, Helpers.RGBToInt(0, 0, 0));
         numberFieldChannelInterface.render(matrixStack, mouseX, mouseY, partialTicks);
     }
 
@@ -96,8 +96,8 @@ public class ContainerScreenInterfaceSettings extends ContainerScreenPartSetting
     @Override
     public void onUpdate(int valueId, CompoundNBT value) {
         super.onUpdate(valueId, value);
-        if (valueId == getContainer().getLastChannelInterfaceValueId()) {
-            numberFieldChannelInterface.setText(Integer.toString(getContainer().getLastChannelInterfaceValue()));
+        if (valueId == getMenu().getLastChannelInterfaceValueId()) {
+            numberFieldChannelInterface.setValue(Integer.toString(getMenu().getLastChannelInterfaceValue()));
         }
     }
 }
