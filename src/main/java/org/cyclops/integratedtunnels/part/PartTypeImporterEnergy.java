@@ -17,7 +17,7 @@ public class PartTypeImporterEnergy extends PartTypeTunnelAspects<PartTypeImport
         super(name);
         AspectRegistry.getInstance().register(this, Lists.<IAspect>newArrayList(
                 TunnelAspects.Write.Energy.BOOLEAN_IMPORT,
-                TunnelAspects.Write.Energy.INTEGER_IMPORT
+                TunnelAspects.Write.Energy.LONG_IMPORT
         ));
     }
 

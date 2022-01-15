@@ -17,7 +17,7 @@ public class PartTypeExporterWorldEnergy extends PartTypeTunnelAspectsWorld<Part
         super(name);
         AspectRegistry.getInstance().register(this, Lists.<IAspect>newArrayList(
                 TunnelAspects.Write.World.ENTITY_ENERGY_BOOLEAN_EXPORT,
-                TunnelAspects.Write.World.ENTITY_ENERGY_INTEGER_EXPORT
+                TunnelAspects.Write.World.ENTITY_ENERGY_LONG_EXPORT
         ));
     }
 

@@ -116,8 +116,8 @@ public class TunnelAspects {
                             .handle(TunnelAspectWriteBuilders.Energy.PROP_ENERGYTARGET)
                             .handle(TunnelAspectWriteBuilders.Energy.PROP_EXPORT)
                             .appendKind("export").buildWrite();
-            public static final IAspectWrite<ValueTypeInteger.ValueInteger, ValueTypeInteger> INTEGER_EXPORT =
-                    TunnelAspectWriteBuilders.Energy.BUILDER_INTEGER
+            public static final IAspectWrite<ValueTypeLong.ValueLong, ValueTypeLong> LONG_EXPORT =
+                    TunnelAspectWriteBuilders.Energy.BUILDER_LONG
                             .withProperties(TunnelAspectWriteBuilders.Energy.PROPERTIES_RATECRAFT)
                             .handle(TunnelAspectWriteBuilders.Energy.PROP_ENERGYTARGET)
                             .handle(TunnelAspectWriteBuilders.Energy.PROP_EXPORT)
@@ -130,8 +130,8 @@ public class TunnelAspects {
                             .handle(TunnelAspectWriteBuilders.Energy.PROP_ENERGYTARGET)
                             .handle(TunnelAspectWriteBuilders.Energy.PROP_IMPORT)
                             .appendKind("import").buildWrite();
-            public static final IAspectWrite<ValueTypeInteger.ValueInteger, ValueTypeInteger> INTEGER_IMPORT =
-                    TunnelAspectWriteBuilders.Energy.BUILDER_INTEGER
+            public static final IAspectWrite<ValueTypeLong.ValueLong, ValueTypeLong> LONG_IMPORT =
+                    TunnelAspectWriteBuilders.Energy.BUILDER_LONG
                             .withProperties(TunnelAspectWriteBuilders.Energy.PROPERTIES)
                             .handle(TunnelAspectWriteBuilders.Energy.PROP_ENERGYTARGET)
                             .handle(TunnelAspectWriteBuilders.Energy.PROP_IMPORT)
@@ -782,8 +782,8 @@ public class TunnelAspects {
                                 .handle(TunnelAspectWriteBuilders.World.Energy.PROP_ENTITY_ENERGYTARGET)
                                 .handle(TunnelAspectWriteBuilders.Energy.PROP_EXPORT)
                                 .appendKind("entity").appendKind("energy").appendKind("export").buildWrite();
-                public static final IAspectWrite<ValueTypeInteger.ValueInteger, ValueTypeInteger> ENTITY_ENERGY_INTEGER_EXPORT =
-                        TunnelAspectWriteBuilders.World.BUILDER_INTEGER
+                public static final IAspectWrite<ValueTypeLong.ValueLong, ValueTypeLong> ENTITY_ENERGY_LONG_EXPORT =
+                        TunnelAspectWriteBuilders.World.BUILDER_LONG
                                 .withProperties(TunnelAspectWriteBuilders.World.Energy.PROPERTIES_ENTITYCRAFT)
                                 .handle(TunnelAspectWriteBuilders.World.Energy.PROP_ENTITY_ENERGYTARGET)
                                 .handle(TunnelAspectWriteBuilders.Energy.PROP_EXPORT)
@@ -796,8 +796,8 @@ public class TunnelAspects {
                                 .handle(TunnelAspectWriteBuilders.World.Energy.PROP_ENTITY_ENERGYTARGET)
                                 .handle(TunnelAspectWriteBuilders.Energy.PROP_IMPORT)
                                 .appendKind("entity").appendKind("energy").appendKind("import").buildWrite();
-                public static final IAspectWrite<ValueTypeInteger.ValueInteger, ValueTypeInteger> ENTITY_ENERGY_INTEGER_IMPORT =
-                        TunnelAspectWriteBuilders.World.BUILDER_INTEGER
+                public static final IAspectWrite<ValueTypeLong.ValueLong, ValueTypeLong> ENTITY_ENERGY_LONG_IMPORT =
+                        TunnelAspectWriteBuilders.World.BUILDER_LONG
                                 .withProperties(TunnelAspectWriteBuilders.World.Energy.PROPERTIES_ENTITY)
                                 .handle(TunnelAspectWriteBuilders.World.Energy.PROP_ENTITY_ENERGYTARGET)
                                 .handle(TunnelAspectWriteBuilders.Energy.PROP_IMPORT)

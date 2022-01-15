@@ -81,6 +81,9 @@ import java.util.function.Supplier;
  */
 public class TunnelAspectWriteBuilders {
 
+    public static final AspectBuilder<ValueTypeLong.ValueLong, ValueTypeLong, Triple<PartTarget, IAspectProperties, ValueTypeLong.ValueLong>>
+            BUILDER_LONG = AspectWriteBuilders.getValue(AspectBuilder.forWriteType(ValueTypes.LONG));
+
     @Nullable
     public static Entity getEntity(PartPos target, int entityIndex) {
         List<Entity> entities = target.getPos().getLevel(true).getEntitiesOfClass(Entity.class,
@@ -212,17 +215,20 @@ public class TunnelAspectWriteBuilders {
                 BUILDER_BOOLEAN = AspectWriteBuilders.BUILDER_BOOLEAN.byMod(IntegratedTunnels._instance)
                 .appendActivator(ACTIVATOR).appendDeactivator(DEACTIVATOR)
                 .appendKind("energy").handle(AspectWriteBuilders.PROP_GET_BOOLEAN).withProperties(PROPERTIES_CHANNEL);
-        public static final AspectBuilder<ValueTypeInteger.ValueInteger, ValueTypeInteger, Triple<PartTarget, IAspectProperties, Integer>>
-                BUILDER_INTEGER = AspectWriteBuilders.BUILDER_INTEGER.byMod(IntegratedTunnels._instance)
+        public static final AspectBuilder<ValueTypeLong.ValueLong, ValueTypeLong, Triple<PartTarget, IAspectProperties, Long>>
+                BUILDER_LONG = TunnelAspectWriteBuilders.BUILDER_LONG.byMod(IntegratedTunnels._instance)
                 .appendActivator(ACTIVATOR).appendDeactivator(DEACTIVATOR)
-                .appendKind("energy").handle(AspectWriteBuilders.PROP_GET_INTEGER).withProperties(PROPERTIES_CHANNEL);
+                .appendKind("energy").handle(AspectWriteBuilders.PROP_GET_LONG).withProperties(PROPERTIES_CHANNEL);
 
-        public static final Predicate<ValueTypeInteger.ValueInteger> VALIDATOR_INTEGER_MAXRATE =
+        public static final Predicate<ValueTypeLong.ValueLong> VALIDATOR_LONG_MAXRATE =
                 input -> input.getRawValue() <= org.cyclops.integrateddynamics.GeneralConfig.energyRateLimit;
 
-        public static final IAspectPropertyTypeInstance<ValueTypeInteger, ValueTypeInteger.ValueInteger> PROP_RATE =
-                new AspectPropertyTypeInstance<>(ValueTypes.INTEGER, "aspect.aspecttypes.integratedtunnels.integer.energy.rate",
-                        AspectReadBuilders.VALIDATOR_INTEGER_POSITIVE.and(VALIDATOR_INTEGER_MAXRATE));
+        public static final Predicate<ValueTypeLong.ValueLong>
+                VALIDATOR_LONG_POSITIVE = input -> input.getRawValue() >= 0;
+
+        public static final IAspectPropertyTypeInstance<ValueTypeLong, ValueTypeLong.ValueLong> PROP_RATE =
+                new AspectPropertyTypeInstance<>(ValueTypes.LONG, "aspect.aspecttypes.integratedtunnels.long.energy.rate",
+                        VALIDATOR_LONG_POSITIVE.and(VALIDATOR_LONG_MAXRATE));
         public static final IAspectPropertyTypeInstance<ValueTypeBoolean, ValueTypeBoolean.ValueBoolean> PROP_CHECK_AMOUNT =
                 new AspectPropertyTypeInstance<>(ValueTypes.BOOLEAN, "aspect.aspecttypes.integratedtunnels.boolean.energy.checkamount");
         public static final IAspectProperties PROPERTIES_RATE = new AspectProperties(ImmutableList.<IAspectPropertyTypeInstance>of(
@@ -256,13 +262,13 @@ public class TunnelAspectWriteBuilders {
         static {
             PROPERTIES_RATE.setValue(PROP_ROUNDROBIN, ValueTypeBoolean.ValueBoolean.of(false));
             PROPERTIES_RATE.setValue(PROP_CHANNEL, ValueTypeInteger.ValueInteger.of(IPositionedAddonsNetworkIngredients.DEFAULT_CHANNEL));
-            PROPERTIES_RATE.setValue(PROP_RATE, ValueTypeInteger.ValueInteger.of(1000));
+            PROPERTIES_RATE.setValue(PROP_RATE, ValueTypeLong.ValueLong.of(1000L));
             PROPERTIES_RATE.setValue(PROP_PASSIVE_IO, ValueTypeBoolean.ValueBoolean.of(true));
             //PROPERTIES_RATE.setValue(PROP_EXACTAMOUNT, ValueTypeBoolean.ValueBoolean.of(false));
             PROPERTIES_RATE.setValue(PROP_CHECK_AMOUNT, ValueTypeBoolean.ValueBoolean.of(false));
 
             PROPERTIES_RATECRAFT.setValue(PROP_CHANNEL, ValueTypeInteger.ValueInteger.of(IPositionedAddonsNetworkIngredients.DEFAULT_CHANNEL));
-            PROPERTIES_RATECRAFT.setValue(PROP_RATE, ValueTypeInteger.ValueInteger.of(1000));
+            PROPERTIES_RATECRAFT.setValue(PROP_RATE, ValueTypeLong.ValueLong.of(1000L));
             //PROPERTIES_RATECRAFT.setValue(PROP_EXACTAMOUNT, ValueTypeBoolean.ValueBoolean.of(false));
             PROPERTIES_RATECRAFT.setValue(PROP_CRAFT, ValueTypeBoolean.ValueBoolean.of(false));
             PROPERTIES_RATECRAFT.setValue(PROP_PASSIVE_IO, ValueTypeBoolean.ValueBoolean.of(true));
@@ -279,9 +285,9 @@ public class TunnelAspectWriteBuilders {
             PROPERTIES_FILTER.setValue(PROP_FILTER_ALLOW_ALL_IF_NOT_APPLIED, ValueTypeBoolean.ValueBoolean.of(false));
         }
 
-        public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, Boolean>, Triple<PartTarget, IAspectProperties, Integer>>
+        public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, Boolean>, Triple<PartTarget, IAspectProperties, Long>>
                 PROP_GETRATE = input -> Triple.of(input.getLeft(), input.getMiddle(), input.getRight() ? input.getMiddle().getValue(PROP_RATE).getRawValue() : 0);
-        public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, Integer>, IEnergyTarget>
+        public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, Long>, IEnergyTarget>
                 PROP_ENERGYTARGET = input -> IEnergyTarget.ofTile(input.getLeft(), input.getMiddle(), input.getRight());
         public static final IAspectValuePropagator<IEnergyTarget, Void>
                 PROP_EXPORT = input -> {
@@ -1223,6 +1229,9 @@ public class TunnelAspectWriteBuilders {
         public static final AspectBuilder<ValueTypeInteger.ValueInteger, ValueTypeInteger, Triple<PartTarget, IAspectProperties, Integer>>
                 BUILDER_INTEGER = AspectWriteBuilders.BUILDER_INTEGER.byMod(IntegratedTunnels._instance)
                 .appendKind("world").handle(AspectWriteBuilders.PROP_GET_INTEGER).withProperties(PROPERTIES_CHANNEL);
+        public static final AspectBuilder<ValueTypeLong.ValueLong, ValueTypeLong, Triple<PartTarget, IAspectProperties, Long>>
+                BUILDER_LONG = TunnelAspectWriteBuilders.BUILDER_LONG.byMod(IntegratedTunnels._instance)
+                .appendKind("world").handle(AspectWriteBuilders.PROP_GET_LONG).withProperties(PROPERTIES_CHANNEL);
         public static final AspectBuilder<ValueObjectTypeItemStack.ValueItemStack, ValueObjectTypeItemStack, Triple<PartTarget, IAspectProperties, ItemStack>>
                 BUILDER_ITEMSTACK = AspectWriteBuilders.BUILDER_ITEMSTACK.byMod(IntegratedTunnels._instance)
                 .appendKind("world").handle(AspectWriteBuilders.PROP_GET_ITEMSTACK).withProperties(PROPERTIES_CHANNEL);
@@ -1310,11 +1319,11 @@ public class TunnelAspectWriteBuilders {
                 PROPERTIES_ENTITYCRAFT.setValue(PROP_CRAFT, ValueTypeBoolean.ValueBoolean.of(false));
             }
 
-            public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, Integer>, IEnergyTarget>
+            public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, Long>, IEnergyTarget>
                     PROP_ENTITY_ENERGYTARGET = input -> {
                 PartTarget partTarget = input.getLeft();
                 IAspectProperties properties = input.getMiddle();
-                int amount = input.getRight();
+                long amount = input.getRight();
                 int entityIndex = properties.getValue(World.PROPERTY_ENTITYINDEX).getRawValue();
 
                 Entity entity = getEntity(partTarget.getTarget(), entityIndex);

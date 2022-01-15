@@ -19,12 +19,12 @@ public class EnergyTargetCapabilityProvider extends ChanneledTargetCapabilityPro
         implements IEnergyTarget {
 
     // TODO: in next breaking change, migrate to long values
-    private final int amount;
+    private final long amount;
     private final boolean exactAmount;
 
     public EnergyTargetCapabilityProvider(@Nullable ICapabilityProvider capabilityProvider, Direction side, INetwork network,
                                           IAspectProperties properties,
-                                          int amount, @Nullable PartStateRoundRobin<?> partStateEnergy) {
+                                          long amount, @Nullable PartStateRoundRobin<?> partStateEnergy) {
         super(network, capabilityProvider, side, network.getCapability(Capabilities.NETWORK_ENERGY).orElse(null), partStateEnergy,
                 properties.getValue(TunnelAspectWriteBuilders.PROP_CHANNEL).getRawValue(),
                 properties.getValue(TunnelAspectWriteBuilders.PROP_ROUNDROBIN).getRawValue(),
@@ -40,7 +40,7 @@ public class EnergyTargetCapabilityProvider extends ChanneledTargetCapabilityPro
     }
 
     @Override
-    public int getAmount() {
+    public long getAmount() {
         return amount;
     }
 
