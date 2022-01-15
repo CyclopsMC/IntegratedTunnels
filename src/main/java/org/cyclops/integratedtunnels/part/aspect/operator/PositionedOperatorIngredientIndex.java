@@ -1,7 +1,7 @@
 package org.cyclops.integratedtunnels.part.aspect.operator;
 
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.core.Direction;
 import net.minecraftforge.common.capabilities.Capability;
 import org.cyclops.cyclopscore.datastructure.DimPos;
 import org.cyclops.cyclopscore.persist.nbt.NBTClassType;
@@ -33,12 +33,12 @@ public abstract class PositionedOperatorIngredientIndex<T, M> extends Positioned
         ((PositionedOperatorIngredientIndex.Function) this.getFunction()).setOperator(this);
     }
 
-    public void writeGeneratedFieldsToNBT(CompoundNBT tag) {
+    public void writeGeneratedFieldsToNBT(CompoundTag tag) {
         super.writeGeneratedFieldsToNBT(tag);
         NBTClassType.writeNbt(Integer.class, "channel", this.channel, tag);
     }
 
-    public void readGeneratedFieldsFromNBT(CompoundNBT tag) {
+    public void readGeneratedFieldsFromNBT(CompoundTag tag) {
         super.readGeneratedFieldsFromNBT(tag);
         this.channel = NBTClassType.readNbt(Integer.class, "channel", tag);
     }

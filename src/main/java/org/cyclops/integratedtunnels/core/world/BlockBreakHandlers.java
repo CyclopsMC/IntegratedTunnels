@@ -1,6 +1,6 @@
 package org.cyclops.integratedtunnels.core.world;
 
-import net.minecraft.block.Blocks;
+import net.minecraft.world.level.block.Blocks;
 import org.cyclops.integratedtunnels.IntegratedTunnels;
 import org.cyclops.integratedtunnels.api.world.IBlockBreakHandler;
 import org.cyclops.integratedtunnels.api.world.IBlockBreakHandlerRegistry;

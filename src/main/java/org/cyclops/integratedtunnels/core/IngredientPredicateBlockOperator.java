@@ -1,8 +1,8 @@
 package org.cyclops.integratedtunnels.core;
 
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.text.IFormattableTextComponent;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.network.chat.MutableComponent;
 import org.cyclops.commoncapabilities.api.ingredient.IngredientComponent;
 import org.cyclops.cyclopscore.helper.BlockHelpers;
 import org.cyclops.cyclopscore.helper.L10NHelpers;
@@ -44,7 +44,7 @@ public class IngredientPredicateBlockOperator extends IngredientPredicate<ItemSt
             PartHelpers.PartStateHolder<?, ?> partData = PartHelpers.getPart(partTarget.getCenter());
             if (partData != null) {
                 IPartStateWriter partState = (IPartStateWriter) partData.getState();
-                partState.addError(partState.getActiveAspect(), (IFormattableTextComponent) e.getErrorMessage());
+                partState.addError(partState.getActiveAspect(), (MutableComponent) e.getErrorMessage());
                 partState.setDeactivated(true);
             }
             return false;

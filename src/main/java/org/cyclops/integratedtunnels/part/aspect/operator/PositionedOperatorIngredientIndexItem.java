@@ -1,7 +1,7 @@
 package org.cyclops.integratedtunnels.part.aspect.operator;
 
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.Direction;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.core.Direction;
 import net.minecraftforge.common.capabilities.Capability;
 import org.cyclops.cyclopscore.datastructure.DimPos;
 import org.cyclops.integrateddynamics.api.evaluate.EvaluationException;

@@ -1,7 +1,7 @@
 package org.cyclops.integratedtunnels.part.aspect;
 
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.Direction;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.core.Direction;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.fluids.FluidStack;
 import org.apache.commons.lang3.tuple.Pair;
@@ -37,7 +37,7 @@ public class TunnelAspectReadBuilders {
 
         public static <T, M> Optional<IIngredientComponentStorage<T, M>> getChannel(Capability<? extends IPositionedAddonsNetworkIngredients<T, M>> networkCapability,
                                                                                     DimPos dimPos, Direction side, int channel) {
-            INetwork network = NetworkHelpers.getNetwork(dimPos.getWorld(true), dimPos.getBlockPos(), side).orElse(null);
+            INetwork network = NetworkHelpers.getNetwork(dimPos.getLevel(true), dimPos.getBlockPos(), side).orElse(null);
             return Optional.ofNullable(network != null ? network.getCapability(networkCapability)
                     .map(itemNetwork -> {
                         itemNetwork.scheduleObservation();
@@ -48,7 +48,7 @@ public class TunnelAspectReadBuilders {
 
         public static <T, M> Optional<IIngredientPositionsIndex<T, M>> getChannelIndex(Capability<? extends IPositionedAddonsNetworkIngredients<T, M>> networkCapability,
                                                                                        DimPos dimPos, Direction side, int channel) {
-            INetwork network = NetworkHelpers.getNetwork(dimPos.getWorld(true), dimPos.getBlockPos(), side).orElse(null);
+            INetwork network = NetworkHelpers.getNetwork(dimPos.getLevel(true), dimPos.getBlockPos(), side).orElse(null);
             return Optional.ofNullable(network != null ? network.getCapability(networkCapability)
                     .map(itemNetwork -> {
                         itemNetwork.scheduleObservation();

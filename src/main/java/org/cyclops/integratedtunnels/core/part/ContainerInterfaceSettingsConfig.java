@@ -1,8 +1,8 @@
 package org.cyclops.integratedtunnels.core.part;
 
-import net.minecraft.client.gui.IHasContainer;
-import net.minecraft.client.gui.ScreenManager;
-import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.screens.inventory.MenuAccess;
+import net.minecraft.client.gui.screens.MenuScreens;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.cyclops.cyclopscore.client.gui.ScreenFactorySafe;
@@ -25,7 +25,7 @@ public class ContainerInterfaceSettingsConfig extends GuiConfig<ContainerInterfa
 
     @OnlyIn(Dist.CLIENT)
     @Override
-    public <U extends Screen & IHasContainer<ContainerInterfaceSettings>> ScreenManager.IScreenFactory<ContainerInterfaceSettings, U> getScreenFactory() {
+    public <U extends Screen & MenuAccess<ContainerInterfaceSettings>> MenuScreens.ScreenConstructor<ContainerInterfaceSettings, U> getScreenFactory() {
         return new ScreenFactorySafe<>(ContainerScreenInterfaceSettings::new);
     }
 

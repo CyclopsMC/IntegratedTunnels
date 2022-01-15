@@ -1,6 +1,6 @@
 package org.cyclops.integratedtunnels.part.aspect.operator;
 
-import net.minecraft.util.Direction;
+import net.minecraft.core.Direction;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.fluids.FluidStack;
 import org.cyclops.cyclopscore.datastructure.DimPos;

@@ -1,7 +1,7 @@
 package org.cyclops.integratedtunnels;
 
 import com.google.common.collect.Lists;
-import net.minecraft.item.ItemGroup;
+import net.minecraft.world.item.CreativeModeTab;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.MinecraftForge;
@@ -77,11 +77,11 @@ public class IntegratedTunnels extends ModBaseVersionable<IntegratedTunnels> {
 
         // Initialize info book
         IntegratedDynamics._instance.getRegistryManager().getRegistry(IInfoBookRegistry.class)
-                .registerSection(
+                .registerSection(this,
                         OnTheDynamicsOfIntegrationBook.getInstance(), "info_book.integrateddynamics.manual",
                         "/data/" + Reference.MOD_ID + "/info/tunnels_info.xml");
         IntegratedDynamics._instance.getRegistryManager().getRegistry(IInfoBookRegistry.class)
-                .registerSection(
+                .registerSection(this,
                         OnTheDynamicsOfIntegrationBook.getInstance(), "info_book.integrateddynamics.tutorials",
                         "/data/" + Reference.MOD_ID + "/info/tunnels_tutorials.xml");
 
@@ -105,7 +105,7 @@ public class IntegratedTunnels extends ModBaseVersionable<IntegratedTunnels> {
     }
 
     @Override
-    public ItemGroup constructDefaultItemGroup() {
+    public CreativeModeTab constructDefaultCreativeModeTab() {
         return new ItemGroupMod(this, () -> RegistryEntries.ITEM_PART_INTERFACE);
     }
 

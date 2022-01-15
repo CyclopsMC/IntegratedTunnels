@@ -1,7 +1,7 @@
 package org.cyclops.integratedtunnels;
 
-import net.minecraft.inventory.container.ContainerType;
-import net.minecraft.item.Item;
+import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.item.Item;
 import net.minecraftforge.registries.ObjectHolder;
 import org.cyclops.integratedtunnels.core.part.ContainerInterfaceSettings;
 
@@ -17,6 +17,6 @@ public class RegistryEntries {
     public static final Item ITEM_DUMMY_PICKAXE = null;
 
     @ObjectHolder("integratedtunnels:part_interface_settings")
-    public static final ContainerType<ContainerInterfaceSettings> CONTAINER_INTERFACE_SETTINGS = null;
+    public static final MenuType<ContainerInterfaceSettings> CONTAINER_INTERFACE_SETTINGS = null;
 
 }

@@ -1,10 +1,10 @@
 package org.cyclops.integratedtunnels.core;
 
 import com.mojang.authlib.GameProfile;
-import net.minecraft.item.ItemStack;
-import net.minecraft.potion.EffectInstance;
-import net.minecraft.world.GameType;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.level.GameType;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraftforge.common.util.FakePlayer;
 
 import java.util.UUID;
@@ -21,14 +21,14 @@ public class ExtendedFakePlayer extends FakePlayer {
     private long lastSwingUpdateTick = 0;
     private int ticksSinceLastTick = 0;
 
-    public ExtendedFakePlayer(ServerWorld world) {
+    public ExtendedFakePlayer(ServerLevel world) {
         super(world, PROFILE);
-        this.gameMode.setGameModeForPlayer(GameType.SURVIVAL);
+        this.gameMode.changeGameModeForPlayer(GameType.SURVIVAL);
         this.connection = new FakeNetHandlerPlayServer(world.getServer(), this);
     }
 
     @Override
-    public boolean canBeAffected(EffectInstance potioneffectIn) {
+    public boolean canBeAffected(MobEffectInstance potioneffectIn) {
         return false;
     }
 
@@ -43,7 +43,7 @@ public class ExtendedFakePlayer extends FakePlayer {
         this.lastUpdateTick = level.getGameTime();
 
         this.attackStrengthTicker = (int) (level.getGameTime() - lastSwingUpdateTick);
-        this.inventory.tick();
+        this.getInventory().tick();
     }
 
     @Override

@@ -1,8 +1,8 @@
 package org.cyclops.integratedtunnels.part.aspect;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import org.cyclops.commoncapabilities.api.ingredient.storage.IIngredientComponentStorage;
 import org.cyclops.integrateddynamics.api.network.INetwork;
 import org.cyclops.integrateddynamics.api.part.PartPos;
@@ -38,7 +38,7 @@ public interface IItemTarget extends IChanneledTarget<IItemNetwork, ItemStack> {
         PartPos center = partTarget.getCenter();
         PartPos target = partTarget.getTarget();
         INetwork network = IChanneledTarget.getNetworkChecked(center);
-        TileEntity tile = target.getPos().getWorld(true).getBlockEntity(target.getPos().getBlockPos());
+        BlockEntity tile = target.getPos().getLevel(true).getBlockEntity(target.getPos().getBlockPos());
         PartStateRoundRobin<?> partState = IChanneledTarget.getPartState(center);
         return new ItemTargetCapabilityProvider(transfer, network, tile, target.getSide(),
                 slot, itemStackMatcher, partTarget, properties, partState);

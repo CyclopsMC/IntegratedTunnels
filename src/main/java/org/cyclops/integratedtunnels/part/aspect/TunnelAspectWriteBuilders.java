@@ -1,16 +1,16 @@
 package org.cyclops.integratedtunnels.part.aspect;
 
 import com.google.common.collect.ImmutableList;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.Entity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.INBT;
-import net.minecraft.util.Direction;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.nbt.Tag;
+import net.minecraft.core.Direction;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.energy.CapabilityEnergy;
@@ -83,12 +83,12 @@ public class TunnelAspectWriteBuilders {
 
     @Nullable
     public static Entity getEntity(PartPos target, int entityIndex) {
-        List<Entity> entities = target.getPos().getWorld(true).getEntitiesOfClass(Entity.class,
-                new AxisAlignedBB(target.getPos().getBlockPos()));
+        List<Entity> entities = target.getPos().getLevel(true).getEntitiesOfClass(Entity.class,
+                new AABB(target.getPos().getBlockPos()));
         Entity entity = null;
         if (entities.size() > 0 && entityIndex < entities.size()) {
             if (entityIndex == -1) {
-                entity = entities.get(target.getPos().getWorld(true).random.nextInt(entities.size()));
+                entity = entities.get(target.getPos().getLevel(true).random.nextInt(entities.size()));
             } else {
                 entity = entities.get(entityIndex);
             }
@@ -99,18 +99,18 @@ public class TunnelAspectWriteBuilders {
     public static void validateListValues(ValueTypeList.ValueList list, IValueType<?> expectedValueType) throws EvaluationException {
         // For typed lists, just check if they correspond to the expected type
         if (!ValueHelpers.correspondsTo(list.getRawValue().getValueType(), expectedValueType)) {
-            throw new EvaluationException(new TranslationTextComponent(L10NValues.VALUETYPE_ERROR_INVALIDLISTVALUETYPE,
-                    new TranslationTextComponent(expectedValueType.getTranslationKey()),
-                    new TranslationTextComponent(list.getRawValue().getValueType().getTranslationKey())));
+            throw new EvaluationException(new TranslatableComponent(L10NValues.VALUETYPE_ERROR_INVALIDLISTVALUETYPE,
+                    new TranslatableComponent(expectedValueType.getTranslationKey()),
+                    new TranslatableComponent(list.getRawValue().getValueType().getTranslationKey())));
         }
 
         // If we have an ANY list, strictly check each value in the list
         if (list.getRawValue().getValueType() == ValueTypes.CATEGORY_ANY) {
             for (IValue value : (IValueTypeListProxy<ValueTypeCategoryAny, IValue>) list.getRawValue()) {
                 if (value.getType() != expectedValueType) {
-                    throw new EvaluationException(new TranslationTextComponent(L10NValues.VALUETYPE_ERROR_INVALIDLISTVALUETYPE,
-                            new TranslationTextComponent(expectedValueType.getTranslationKey()),
-                            new TranslationTextComponent(value.getType().getTranslationKey())));
+                    throw new EvaluationException(new TranslatableComponent(L10NValues.VALUETYPE_ERROR_INVALIDLISTVALUETYPE,
+                            new TranslatableComponent(expectedValueType.getTranslationKey()),
+                            new TranslatableComponent(value.getType().getTranslationKey())));
                 }
             }
         }
@@ -387,7 +387,7 @@ public class TunnelAspectWriteBuilders {
                 BUILDER_OPERATOR = AspectWriteBuilders.BUILDER_OPERATOR.byMod(IntegratedTunnels._instance)
                 .appendActivator(ACTIVATOR).appendDeactivator(DEACTIVATOR)
                 .appendKind("item").withProperties(PROPERTIES_CHANNEL);
-        public static final AspectBuilder<ValueTypeNbt.ValueNbt, ValueTypeNbt, Triple<PartTarget, IAspectProperties, Optional<INBT>>>
+        public static final AspectBuilder<ValueTypeNbt.ValueNbt, ValueTypeNbt, Triple<PartTarget, IAspectProperties, Optional<Tag>>>
                 BUILDER_NBT = AspectWriteBuilders.BUILDER_NBT.byMod(IntegratedTunnels._instance)
                 .appendActivator(ACTIVATOR).appendDeactivator(DEACTIVATOR)
                 .appendKind("item").handle(AspectWriteBuilders.PROP_GET_NBT).withProperties(PROPERTIES_CHANNEL);
@@ -683,15 +683,15 @@ public class TunnelAspectWriteBuilders {
                 int slot = properties.getValue(PROP_SLOT).getRawValue();
                 return Triple.of(input.getLeft(), input.getMiddle(), ChanneledTargetInformation.of(itemStackMatcher, itemStackMatcher, slot));
             } else {
-                ITextComponent current = ValueTypeOperator.getSignature(predicate);
-                ITextComponent expected = ValueTypeOperator.getSignature(new IValueType[]{ValueTypes.OBJECT_ITEMSTACK}, ValueTypes.BOOLEAN);
-                throw new EvaluationException(new TranslationTextComponent(L10NValues.ASPECT_ERROR_INVALIDTYPE,
+                Component current = ValueTypeOperator.getSignature(predicate);
+                Component expected = ValueTypeOperator.getSignature(new IValueType[]{ValueTypes.OBJECT_ITEMSTACK}, ValueTypes.BOOLEAN);
+                throw new EvaluationException(new TranslatableComponent(L10NValues.ASPECT_ERROR_INVALIDTYPE,
                         expected, current));
             }
         };
-        public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, Optional<INBT>>, Triple<PartTarget, IAspectProperties, ChanneledTargetInformation<ItemStack, Integer>>>
+        public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, Optional<Tag>>, Triple<PartTarget, IAspectProperties, ChanneledTargetInformation<ItemStack, Integer>>>
                 PROP_NBT_ITEMPREDICATE = input -> {
-            Optional<INBT> tag = input.getRight();
+            Optional<Tag> tag = input.getRight();
             IAspectProperties properties = input.getMiddle();
             int amount = properties.getValue(PROP_RATE).getRawValue();
             boolean exactAmount = properties.getValue(PROP_EXACTAMOUNT).getRawValue();
@@ -756,9 +756,9 @@ public class TunnelAspectWriteBuilders {
                 int slot = properties.getValue(PROP_SLOT).getRawValue();
                 return Triple.of(input.getLeft(), input.getMiddle(), ChanneledTargetInformation.of(itemStackMatcher, itemStackMatcher, slot));
             } else {
-                ITextComponent current = ValueTypeOperator.getSignature(predicate);
-                ITextComponent expected = ValueTypeOperator.getSignature(new IValueType[]{ValueTypes.OBJECT_BLOCK}, ValueTypes.BOOLEAN);
-                throw new EvaluationException(new TranslationTextComponent(L10NValues.ASPECT_ERROR_INVALIDTYPE,
+                Component current = ValueTypeOperator.getSignature(predicate);
+                Component expected = ValueTypeOperator.getSignature(new IValueType[]{ValueTypes.OBJECT_BLOCK}, ValueTypes.BOOLEAN);
+                throw new EvaluationException(new TranslatableComponent(L10NValues.ASPECT_ERROR_INVALIDTYPE,
                         expected, current));
             }
         };
@@ -863,7 +863,7 @@ public class TunnelAspectWriteBuilders {
                 BUILDER_OPERATOR = AspectWriteBuilders.BUILDER_OPERATOR.byMod(IntegratedTunnels._instance)
                 .appendActivator(ACTIVATOR).appendDeactivator(DEACTIVATOR)
                 .appendKind("fluid").withProperties(PROPERTIES_CHANNEL);
-        public static final AspectBuilder<ValueTypeNbt.ValueNbt, ValueTypeNbt, Triple<PartTarget, IAspectProperties, Optional<INBT>>>
+        public static final AspectBuilder<ValueTypeNbt.ValueNbt, ValueTypeNbt, Triple<PartTarget, IAspectProperties, Optional<Tag>>>
                 BUILDER_NBT = AspectWriteBuilders.BUILDER_NBT.byMod(IntegratedTunnels._instance)
                 .appendActivator(ACTIVATOR).appendDeactivator(DEACTIVATOR)
                 .appendKind("fluid").handle(AspectWriteBuilders.PROP_GET_NBT).withProperties(PROPERTIES_CHANNEL);
@@ -1115,16 +1115,16 @@ public class TunnelAspectWriteBuilders {
                 return Triple.of(input.getLeft(), input.getMiddle(),
                         ChanneledTargetInformation.of(fluidStackMatcher, fluidStackMatcher, -1));
             } else {
-                ITextComponent current = ValueTypeOperator.getSignature(predicate);
-                ITextComponent expected = ValueTypeOperator.getSignature(new IValueType[]{ValueTypes.OBJECT_FLUIDSTACK}, ValueTypes.BOOLEAN);
-                throw new EvaluationException(new TranslationTextComponent(L10NValues.ASPECT_ERROR_INVALIDTYPE,
+                Component current = ValueTypeOperator.getSignature(predicate);
+                Component expected = ValueTypeOperator.getSignature(new IValueType[]{ValueTypes.OBJECT_FLUIDSTACK}, ValueTypes.BOOLEAN);
+                throw new EvaluationException(new TranslatableComponent(L10NValues.ASPECT_ERROR_INVALIDTYPE,
                         expected, current));
             }
         };
-        public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, Optional<INBT>>, Triple<PartTarget, IAspectProperties, ChanneledTargetInformation<FluidStack, Integer>>>
+        public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, Optional<Tag>>, Triple<PartTarget, IAspectProperties, ChanneledTargetInformation<FluidStack, Integer>>>
                 PROP_NBT_FLUIDPREDICATE = input -> {
             IAspectProperties properties = input.getMiddle();
-            Optional<INBT> tag = input.getRight();
+            Optional<Tag> tag = input.getRight();
             int rate = properties.getValue(PROP_RATE).getRawValue();
             boolean exactAmount = properties.getValue(PROP_EXACTAMOUNT).getRawValue();
             boolean subset = properties.getValue(PROP_NBT_SUBSET).getRawValue();
@@ -1238,7 +1238,7 @@ public class TunnelAspectWriteBuilders {
         public static final AspectBuilder<ValueTypeOperator.ValueOperator, ValueTypeOperator, Triple<PartTarget, IAspectProperties, ValueTypeOperator.ValueOperator>>
                 BUILDER_OPERATOR = AspectWriteBuilders.BUILDER_OPERATOR.byMod(IntegratedTunnels._instance)
                 .appendKind("world").withProperties(PROPERTIES_CHANNEL);
-        public static final AspectBuilder<ValueTypeNbt.ValueNbt, ValueTypeNbt, Triple<PartTarget, IAspectProperties, Optional<INBT>>>
+        public static final AspectBuilder<ValueTypeNbt.ValueNbt, ValueTypeNbt, Triple<PartTarget, IAspectProperties, Optional<Tag>>>
                 BUILDER_NBT = AspectWriteBuilders.BUILDER_NBT.byMod(IntegratedTunnels._instance)
                 .appendKind("world").handle(AspectWriteBuilders.PROP_GET_NBT).withProperties(PROPERTIES_CHANNEL);
 
@@ -1509,7 +1509,7 @@ public class TunnelAspectWriteBuilders {
                     ITunnelTransfer transfer;
                     if (doImport) {
                         boolean ignorePickupDelay = properties.getValue(PROP_IGNORE_PICK_UP_DELAY).getRawValue();
-                        itemStorage = new ItemHandlerWorldEntityImportWrapper((ServerWorld) target.getPos().getWorld(true),
+                        itemStorage = new ItemHandlerWorldEntityImportWrapper((ServerLevel) target.getPos().getLevel(true),
                                 target.getPos().getBlockPos(), target.getSide(), ignorePickupDelay
                         );
                         transfer = new TunnelTransferComposite(
@@ -1529,7 +1529,7 @@ public class TunnelAspectWriteBuilders {
                         boolean dispense = properties.getValue(PROP_DISPENSE).getRawValue();
                         int channel = properties.getValue(PROP_CHANNEL).getRawValue();
                         itemStorage = new ItemHandlerWorldEntityExportWrapper(
-                                (ServerWorld) target.getPos().getWorld(true),
+                                (ServerLevel) target.getPos().getLevel(true),
                                 target.getPos().getBlockPos(), offsetX, offsetY, offsetZ,
                                 lifespan, delayBeforePickup, facing, velocity, yaw, pitch,
                                 dispense, network.getCapability(ItemNetworkConfig.CAPABILITY).orElse(null).getChannel(channel)
@@ -1745,16 +1745,16 @@ public class TunnelAspectWriteBuilders {
                             FluidHelpers.BUCKET_VOLUME, true);
                     return IFluidTarget.ofBlock(fluidStackPredicate, input.getLeft(), input.getMiddle(), fluidStackPredicate);
                 } else {
-                    ITextComponent current = ValueTypeOperator.getSignature(predicate);
-                    ITextComponent expected = ValueTypeOperator.getSignature(new IValueType[]{ValueTypes.OBJECT_FLUIDSTACK}, ValueTypes.BOOLEAN);
-                    throw new EvaluationException(new TranslationTextComponent(L10NValues.ASPECT_ERROR_INVALIDTYPE,
+                    Component current = ValueTypeOperator.getSignature(predicate);
+                    Component expected = ValueTypeOperator.getSignature(new IValueType[]{ValueTypes.OBJECT_FLUIDSTACK}, ValueTypes.BOOLEAN);
+                    throw new EvaluationException(new TranslatableComponent(L10NValues.ASPECT_ERROR_INVALIDTYPE,
                             expected, current));
                 }
             };
-            public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, Optional<INBT>>, IFluidTarget>
+            public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, Optional<Tag>>, IFluidTarget>
                     PROP_NBT_FLUIDTARGET = input -> {
                 IAspectProperties properties = input.getMiddle();
-                Optional<INBT> tag = input.getRight();
+                Optional<Tag> tag = input.getRight();
                 boolean subset = properties.getValue(TunnelAspectWriteBuilders.Fluid.PROP_NBT_SUBSET).getRawValue();
                 boolean superset = properties.getValue(TunnelAspectWriteBuilders.Fluid.PROP_NBT_SUPERSET).getRawValue();
                 boolean requireNbt = properties.getValue(TunnelAspectWriteBuilders.Fluid.PROP_NBT_REQUIRE).getRawValue();
@@ -1777,7 +1777,7 @@ public class TunnelAspectWriteBuilders {
                             input.getChannel(),
                             input.getConnection(),
                             fluidChannel,
-                            pos.getWorld(true),
+                            pos.getLevel(true),
                             pos.getBlockPos(),
                             input.getFluidStackMatcher(),
                             input.getProperties().getValue(PROP_BLOCK_UPDATE).getRawValue(),
@@ -1801,7 +1801,7 @@ public class TunnelAspectWriteBuilders {
                             input.getChanneledNetwork(),
                             input.getChannel(),
                             input.getConnection(),
-                            target.getPos().getWorld(true),
+                            target.getPos().getLevel(true),
                             target.getPos().getBlockPos(),
                             target.getSide(),
                             fluidChannel,
@@ -2011,8 +2011,8 @@ public class TunnelAspectWriteBuilders {
                 PartPos target = input.getPartTarget().getTarget();
                 IItemNetwork itemNetwork = input.getChanneledNetwork();
                 if (target.getPos().isLoaded() && itemNetwork != null) {
-                    Hand hand = input.getProperties().getValue(PROP_HAND_RIGHT).getRawValue()
-                            ? Hand.MAIN_HAND : Hand.OFF_HAND;
+                    InteractionHand hand = input.getProperties().getValue(PROP_HAND_RIGHT).getRawValue()
+                            ? InteractionHand.MAIN_HAND : InteractionHand.OFF_HAND;
                     boolean blockUpdate = input.getProperties().getValue(PROP_BLOCK_UPDATE).getRawValue();
                     boolean ignoreReplacable = input.getProperties().getValue(PROP_IGNORE_REPLACABLE).getRawValue();
                     TunnelItemHelpers.placeItems(
@@ -2021,7 +2021,7 @@ public class TunnelAspectWriteBuilders {
                             input.getChannel(),
                             input.getConnection(),
                             input.getItemChannel(),
-                            target.getPos().getWorld(true),
+                            target.getPos().getLevel(true),
                             target.getPos().getBlockPos(),
                             target.getSide(),
                             input.getItemStackMatcher(),
@@ -2040,8 +2040,8 @@ public class TunnelAspectWriteBuilders {
                 PartPos target = input.getPartTarget().getTarget();
                 IItemNetwork itemNetwork = input.getChanneledNetwork();
                 if (target.getPos().isLoaded() && itemNetwork != null) {
-                    Hand hand = input.getProperties().getValue(PROP_HAND_RIGHT).getRawValue()
-                            ? Hand.MAIN_HAND : Hand.OFF_HAND;
+                    InteractionHand hand = input.getProperties().getValue(PROP_HAND_RIGHT).getRawValue()
+                            ? InteractionHand.MAIN_HAND : InteractionHand.OFF_HAND;
                     boolean blockUpdate = input.getProperties().getValue(PROP_BLOCK_UPDATE).getRawValue();
                     boolean ignoreReplacable = input.getProperties().getValue(PROP_IGNORE_REPLACABLE).getRawValue();
                     int fortune = 0;
@@ -2052,7 +2052,7 @@ public class TunnelAspectWriteBuilders {
                             input.getChanneledNetwork(),
                             input.getChannel(),
                             input.getConnection(),
-                            target.getPos().getWorld(true),
+                            target.getPos().getLevel(true),
                             target.getPos().getBlockPos(),
                             target.getSide(),
                             input.getItemChannel(),
@@ -2093,7 +2093,7 @@ public class TunnelAspectWriteBuilders {
         public static final AspectBuilder<ValueTypeOperator.ValueOperator, ValueTypeOperator, Triple<PartTarget, IAspectProperties, ValueTypeOperator.ValueOperator>>
                 BUILDER_OPERATOR = AspectWriteBuilders.BUILDER_OPERATOR.byMod(IntegratedTunnels._instance)
                 .appendKind("player").withProperties(PROPERTIES_CHANNEL);
-        public static final AspectBuilder<ValueTypeNbt.ValueNbt, ValueTypeNbt, Triple<PartTarget, IAspectProperties, Optional<INBT>>>
+        public static final AspectBuilder<ValueTypeNbt.ValueNbt, ValueTypeNbt, Triple<PartTarget, IAspectProperties, Optional<Tag>>>
                 BUILDER_NBT = AspectWriteBuilders.BUILDER_NBT.byMod(IntegratedTunnels._instance)
                 .appendKind("player").handle(AspectWriteBuilders.PROP_GET_NBT).withProperties(PROPERTIES_CHANNEL);
 
@@ -2256,8 +2256,8 @@ public class TunnelAspectWriteBuilders {
             if (input.getRight()) {
                 PartTarget partTarget = input.getLeft();
                 IAspectProperties properties = input.getMiddle();
-                Hand hand = properties.getValue(World.PROP_HAND_RIGHT).getRawValue()
-                        ? Hand.MAIN_HAND : Hand.OFF_HAND;
+                InteractionHand hand = properties.getValue(World.PROP_HAND_RIGHT).getRawValue()
+                        ? InteractionHand.MAIN_HAND : InteractionHand.OFF_HAND;
                 boolean rightClick = properties.getValue(PROP_RIGHT_CLICK).getRawValue();
                 boolean continuousClick = properties.getValue(PROP_CONTINUOUS_CLICK).getRawValue();
                 boolean sneak = properties.getValue(PROP_SNEAK).getRawValue();
@@ -2273,7 +2273,7 @@ public class TunnelAspectWriteBuilders {
                 PartStatePlayerSimulator partState = (PartStatePlayerSimulator) PartHelpers.getPart(center).getState();
 
                 IIngredientComponentStorage<ItemStack, Integer> storage = new ItemStoragePlayerWrapper(partState.getPlayer(),
-                        (ServerWorld) target.getPos().getWorld(true), target.getPos().getBlockPos(),
+                        (ServerLevel) target.getPos().getLevel(true), target.getPos().getBlockPos(),
                         offsetX, offsetY, offsetZ, target.getSide(), hand,
                         rightClick, sneak, continuousClick, entityIndex, network.getCapability(ItemNetworkConfig.CAPABILITY).orElse(null).getChannel(channel));
                 storage.insert(ItemStack.EMPTY, false);
@@ -2286,8 +2286,8 @@ public class TunnelAspectWriteBuilders {
             PartTarget partTarget = input.getLeft();
             IAspectProperties properties = input.getMiddle();
             IngredientPredicate<ItemStack, Integer> itemStackMatcher = input.getRight().getIngredientPredicate();
-            Hand hand = input.getMiddle().getValue(World.PROP_HAND_RIGHT).getRawValue()
-                    ? Hand.MAIN_HAND : Hand.OFF_HAND;
+            InteractionHand hand = input.getMiddle().getValue(World.PROP_HAND_RIGHT).getRawValue()
+                    ? InteractionHand.MAIN_HAND : InteractionHand.OFF_HAND;
             boolean rightClick = input.getMiddle().getValue(PROP_RIGHT_CLICK).getRawValue();
             boolean continuousClick = properties.getValue(PROP_CONTINUOUS_CLICK).getRawValue();
             boolean sneak = properties.getValue(PROP_SNEAK).getRawValue();
@@ -2303,7 +2303,7 @@ public class TunnelAspectWriteBuilders {
             PartStatePlayerSimulator partState = (PartStatePlayerSimulator) PartHelpers.getPart(center).getState();
 
             IIngredientComponentStorage<ItemStack, Integer> storage = new ItemStoragePlayerWrapper(partState.getPlayer(),
-                    (ServerWorld) target.getPos().getWorld(true), target.getPos().getBlockPos(),
+                    (ServerLevel) target.getPos().getLevel(true), target.getPos().getBlockPos(),
                     offsetX, offsetY, offsetZ, target.getSide(), hand,
                     rightClick, sneak, continuousClick, entityIndex, network.getCapability(ItemNetworkConfig.CAPABILITY).orElse(null).getChannel(channel));
             ITunnelTransfer transfer = input.getRight().getTransfer();
@@ -2320,7 +2320,7 @@ public class TunnelAspectWriteBuilders {
             public <P extends IPartTypeWriter<P, S>, S extends IPartStateWriter<P>> void onActivate(P partType, PartTarget target, S state) {
                 state.addVolatileCapability(targetCapability, LazyOptional.of(() -> state).cast());
                 DimPos pos = target.getCenter().getPos();
-                NetworkHelpers.getNetwork(pos.getWorld(true), pos.getBlockPos(), target.getCenter().getSide())
+                NetworkHelpers.getNetwork(pos.getLevel(true), pos.getBlockPos(), target.getCenter().getSide())
                         .ifPresent(network -> network.getCapability(networkCapability.get())
                                 .ifPresent(positionedAddonsNetwork -> {
                                     if (state instanceof IPartTypeInterfacePositionedAddon.IState) {
@@ -2334,8 +2334,8 @@ public class TunnelAspectWriteBuilders {
                                     // Notify target neighbour
                                     DimPos originPos = target.getCenter().getPos();
                                     DimPos targetPos = target.getTarget().getPos();
-                                    targetPos.getWorld(true).neighborChanged(targetPos.getBlockPos(),
-                                            targetPos.getWorld(true).getBlockState(targetPos.getBlockPos()).getBlock(), originPos.getBlockPos());
+                                    targetPos.getLevel(true).neighborChanged(targetPos.getBlockPos(),
+                                            targetPos.getLevel(true).getBlockState(targetPos.getBlockPos()).getBlock(), originPos.getBlockPos());
                                 }));
             }
         };
@@ -2348,7 +2348,7 @@ public class TunnelAspectWriteBuilders {
             public <P extends IPartTypeWriter<P, S>, S extends IPartStateWriter<P>> void onDeactivate(P partType, PartTarget target, S state) {
                 state.removeVolatileCapability(targetCapability);
                 DimPos pos = target.getCenter().getPos();
-                NetworkHelpers.getNetwork(pos.getWorld(true), pos.getBlockPos(), target.getCenter().getSide())
+                NetworkHelpers.getNetwork(pos.getLevel(true), pos.getBlockPos(), target.getCenter().getSide())
                         .ifPresent(network -> network.getCapability(networkCapability.get())
                                 .ifPresent(positionedAddonsNetwork -> {
                                     if (state instanceof IPartTypeInterfacePositionedAddon.IState) {
@@ -2362,8 +2362,8 @@ public class TunnelAspectWriteBuilders {
                                     // Notify target neighbour
                                     DimPos originPos = target.getCenter().getPos();
                                     DimPos targetPos = target.getTarget().getPos();
-                                    targetPos.getWorld(true).neighborChanged(targetPos.getBlockPos(),
-                                            targetPos.getWorld(true).getBlockState(targetPos.getBlockPos()).getBlock(), originPos.getBlockPos());
+                                    targetPos.getLevel(true).neighborChanged(targetPos.getBlockPos(),
+                                            targetPos.getLevel(true).getBlockState(targetPos.getBlockPos()).getBlock(), originPos.getBlockPos());
                                 }));
             }
         };

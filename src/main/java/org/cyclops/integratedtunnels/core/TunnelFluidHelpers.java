@@ -1,16 +1,16 @@
 package org.cyclops.integratedtunnels.core;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.FlowingFluidBlock;
-import net.minecraft.block.material.Material;
-import net.minecraft.fluid.Fluids;
-import net.minecraft.nbt.INBT;
-import net.minecraft.util.Direction;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.LiquidBlock;
+import net.minecraft.world.level.material.Material;
+import net.minecraft.world.level.material.Fluids;
+import net.minecraft.nbt.Tag;
+import net.minecraft.core.Direction;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraftforge.fluids.FluidStack;
 import org.cyclops.commoncapabilities.api.capability.fluidhandler.FluidMatch;
 import org.cyclops.commoncapabilities.api.ingredient.IngredientComponent;
@@ -69,7 +69,7 @@ public class TunnelFluidHelpers {
                                                                            final boolean blacklist, final boolean exactAmount) {
         int matchFlags = FluidMatch.ANY;
         if (checkFluid)  matchFlags = matchFlags | FluidMatch.FLUID;
-        if (checkNbt)    matchFlags = matchFlags | FluidMatch.NBT;
+        if (checkNbt)    matchFlags = matchFlags | FluidMatch.TAG;
         if (checkAmount) matchFlags = matchFlags | FluidMatch.AMOUNT;
         return new IngredientPredicate<FluidStack, Integer>(IngredientComponent.FLUIDSTACK, fluidStack != null ? fluidStack.copy() : null, matchFlags, blacklist, fluidStack == null && !blacklist,
                 FluidHelpers.getAmount(fluidStack), exactAmount) {
@@ -95,7 +95,7 @@ public class TunnelFluidHelpers {
         return new IngredientPredicateFluidStackOperator(amount, exactAmount, predicate, partTarget);
     }
 
-    public static IngredientPredicate<FluidStack, Integer> matchNbt(final Optional<INBT> tag, final boolean subset, final boolean superset, final boolean requireNbt, final boolean recursive,
+    public static IngredientPredicate<FluidStack, Integer> matchNbt(final Optional<Tag> tag, final boolean subset, final boolean superset, final boolean requireNbt, final boolean recursive,
                                                                     final boolean blacklist,
                                                                     final int amount, final boolean exactAmount) {
         return new IngredientPredicateFluidStackNbt(blacklist, amount, exactAmount, requireNbt, subset, tag, recursive, superset);
@@ -131,19 +131,19 @@ public class TunnelFluidHelpers {
      */
     public static FluidStack placeFluids(INetwork network, IPositionedAddonsNetworkIngredients<FluidStack, Integer> ingredientsNetwork,
                                          int channel, ITunnelConnection connection,
-                                         IIngredientComponentStorage<FluidStack, Integer> source, final World world, final BlockPos pos,
+                                         IIngredientComponentStorage<FluidStack, Integer> source, final Level world, final BlockPos pos,
                                          IngredientPredicate<FluidStack, Integer> fluidStackMatcher, boolean blockUpdate,
                                          boolean ignoreReplacable, boolean craftIfFailed) throws EvaluationException {
         BlockState destBlockState = world.getBlockState(pos);
         final Material destMaterial = destBlockState.getMaterial();
         final boolean isDestNonSolid = !destMaterial.isSolid();
-        final boolean isDestReplaceable = destBlockState.canBeReplaced(TunnelHelpers.createBlockItemUseContext(world, null, pos, Direction.UP, Hand.MAIN_HAND));
+        final boolean isDestReplaceable = destBlockState.canBeReplaced(TunnelHelpers.createBlockItemUseContext(world, null, pos, Direction.UP, InteractionHand.MAIN_HAND));
         if (!world.isEmptyBlock(pos)
                 && (!isDestNonSolid || !(ignoreReplacable && isDestReplaceable) || destMaterial.isLiquid())) {
             return null;
         }
 
-        IIngredientComponentStorage<FluidStack, Integer> destination = new FluidStorageBlockWrapper((ServerWorld) world, pos, null, blockUpdate);
+        IIngredientComponentStorage<FluidStack, Integer> destination = new FluidStorageBlockWrapper((ServerLevel) world, pos, null, blockUpdate);
         return TunnelHelpers.moveSingleStateOptimized(network, ingredientsNetwork, channel, connection, source,
                 -1, destination, -1, fluidStackMatcher, PartPos.of(world, pos, null), craftIfFailed);
     }
@@ -163,13 +163,13 @@ public class TunnelFluidHelpers {
      * @throws EvaluationException If illegal movement occured and further movement should stop.
      */
     public static FluidStack pickUpFluids(INetwork network, IPositionedAddonsNetworkIngredients<FluidStack, Integer> ingredientsNetwork,
-                                          int channel, ITunnelConnection connection, World world, BlockPos pos, Direction side,
+                                          int channel, ITunnelConnection connection, Level world, BlockPos pos, Direction side,
                                           IIngredientComponentStorage<FluidStack, Integer> destination,
                                           IngredientPredicate<FluidStack, Integer> fluidStackMatcher) throws EvaluationException {
         BlockState state = world.getBlockState(pos);
         Block block = state.getBlock();
-        if (block instanceof FlowingFluidBlock) {
-            IIngredientComponentStorage<FluidStack, Integer> source = new FluidStorageBlockWrapper((ServerWorld) world, pos, side, false);
+        if (block instanceof LiquidBlock) {
+            IIngredientComponentStorage<FluidStack, Integer> source = new FluidStorageBlockWrapper((ServerLevel) world, pos, side, false);
             return TunnelHelpers.moveSingleStateOptimized(network, ingredientsNetwork, channel, connection, source,
                     -1, destination, -1, fluidStackMatcher, PartPos.of(world, pos, side), false);
         }

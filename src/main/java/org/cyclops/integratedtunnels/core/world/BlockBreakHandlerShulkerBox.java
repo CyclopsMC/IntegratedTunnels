@@ -1,17 +1,17 @@
 package org.cyclops.integratedtunnels.core.world;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.block.ShulkerBoxBlock;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.tileentity.LockableLootTileEntity;
-import net.minecraft.tileentity.ShulkerBoxTileEntity;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-import org.cyclops.cyclopscore.helper.TileHelpers;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.ShulkerBoxBlock;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.level.block.entity.RandomizableContainerBlockEntity;
+import net.minecraft.world.level.block.entity.ShulkerBoxBlockEntity;
+import net.minecraft.core.NonNullList;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
+import org.cyclops.cyclopscore.helper.BlockEntityHelpers;
 import org.cyclops.integratedtunnels.api.world.IBlockBreakHandler;
 
 /**
@@ -20,20 +20,17 @@ import org.cyclops.integratedtunnels.api.world.IBlockBreakHandler;
  */
 public class BlockBreakHandlerShulkerBox implements IBlockBreakHandler {
     @Override
-    public boolean shouldApply(BlockState blockState, World world, BlockPos pos, PlayerEntity player) {
+    public boolean shouldApply(BlockState blockState, Level world, BlockPos pos, Player player) {
         return true;
     }
 
     @Override
-    public NonNullList<ItemStack> getDrops(BlockState blockState, World world, BlockPos pos, PlayerEntity player) {
-        return TileHelpers.getSafeTile(world, pos, ShulkerBoxTileEntity.class)
+    public NonNullList<ItemStack> getDrops(BlockState blockState, Level world, BlockPos pos, Player player) {
+        return BlockEntityHelpers.get(world, pos, ShulkerBoxBlockEntity.class)
                 .map(tile -> {
                     if (!tile.isEmpty()) {
                         ItemStack itemStack = ShulkerBoxBlock.getColoredItemStack(tile.getColor());
-                        CompoundNBT compoundnbt = tile.saveToTag(new CompoundNBT());
-                        if (!compoundnbt.isEmpty()) {
-                            itemStack.addTagElement("BlockEntityTag", compoundnbt);
-                        }
+                        tile.saveToItem(itemStack);
 
                         if (tile.hasCustomName()) {
                             itemStack.setHoverName(tile.getName());
@@ -49,9 +46,9 @@ public class BlockBreakHandlerShulkerBox implements IBlockBreakHandler {
     }
 
     @Override
-    public void breakBlock(BlockState blockState, World world, BlockPos pos, PlayerEntity player) {
-        TileHelpers.getSafeTile(world, pos, ShulkerBoxTileEntity.class)
-                .ifPresent(LockableLootTileEntity::clearContent);
-        blockState.getBlock().removedByPlayer(blockState, world, pos, player, false, world.getFluidState(pos));
+    public void breakBlock(BlockState blockState, Level world, BlockPos pos, Player player) {
+        BlockEntityHelpers.get(world, pos, ShulkerBoxBlockEntity.class)
+                .ifPresent(RandomizableContainerBlockEntity::clearContent);
+        blockState.getBlock().onDestroyedByPlayer(blockState, world, pos, player, false, world.getFluidState(pos));
     }
 }

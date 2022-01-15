@@ -1,6 +1,6 @@
 package org.cyclops.integratedtunnels.core.network;
 
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.ItemStack;
 import org.cyclops.commoncapabilities.api.ingredient.IngredientComponent;
 import org.cyclops.integrateddynamics.core.network.PositionedAddonsNetworkIngredients;
 import org.cyclops.integratedtunnels.api.network.IItemNetwork;

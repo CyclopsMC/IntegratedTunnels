@@ -1,8 +1,8 @@
 package org.cyclops.integratedtunnels.part.aspect.listproxy;
 
 import com.google.common.collect.Iterators;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.core.Direction;
 import net.minecraftforge.fluids.FluidStack;
 import org.cyclops.cyclopscore.datastructure.DimPos;
 import org.cyclops.cyclopscore.ingredient.collection.IIngredientCollectionLike;
@@ -34,12 +34,12 @@ public class ValueTypeListProxyPositionedFluidNetwork extends ValueTypeListProxy
         this(null, null, 0);
     }
 
-    public void writeGeneratedFieldsToNBT(CompoundNBT tag) {
+    public void writeGeneratedFieldsToNBT(CompoundTag tag) {
         super.writeGeneratedFieldsToNBT(tag);
         NBTClassType.writeNbt(Integer.class, "channel", this.channel, tag);
     }
 
-    public void readGeneratedFieldsFromNBT(CompoundNBT tag) {
+    public void readGeneratedFieldsFromNBT(CompoundTag tag) {
         super.readGeneratedFieldsFromNBT(tag);
         this.channel = NBTClassType.readNbt(Integer.class, "channel", tag);
     }

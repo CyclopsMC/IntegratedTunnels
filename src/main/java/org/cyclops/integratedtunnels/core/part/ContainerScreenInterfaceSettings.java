@@ -1,11 +1,11 @@
 package org.cyclops.integratedtunnels.core.part;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
+import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.player.Inventory;
 import org.cyclops.cyclopscore.client.gui.component.input.WidgetNumberField;
 import org.cyclops.cyclopscore.helper.Helpers;
 import org.cyclops.cyclopscore.helper.L10NHelpers;
@@ -21,7 +21,7 @@ public class ContainerScreenInterfaceSettings extends ContainerScreenPartSetting
 
     private WidgetNumberField numberFieldChannelInterface = null;
 
-    public ContainerScreenInterfaceSettings(ContainerInterfaceSettings container, PlayerInventory inventory, ITextComponent title) {
+    public ContainerScreenInterfaceSettings(ContainerInterfaceSettings container, Inventory inventory, Component title) {
         super(container, inventory, title);
     }
 
@@ -44,7 +44,7 @@ public class ContainerScreenInterfaceSettings extends ContainerScreenPartSetting
     public void init() {
         super.init();
 
-        numberFieldChannelInterface = new WidgetNumberField(font, leftPos + 106, topPos + 109, 70, 14, true, new TranslationTextComponent("gui.integratedtunnels.partsettings.channel.interface"), true);
+        numberFieldChannelInterface = new WidgetNumberField(font, leftPos + 106, topPos + 109, 70, 14, true, new TranslatableComponent("gui.integratedtunnels.partsettings.channel.interface"), true);
         numberFieldChannelInterface.setPositiveOnly(false);
         numberFieldChannelInterface.setMaxLength(15);
         numberFieldChannelInterface.setVisible(true);
@@ -81,8 +81,8 @@ public class ContainerScreenInterfaceSettings extends ContainerScreenPartSetting
     }
 
     @Override
-    protected void renderBg(MatrixStack matrixStack, float partialTicks, int mouseX, int mouseY) {
-        // super.renderBg(matrixStack, partialTicks, mouseX, mouseY); // TODO: restore
+    protected void renderBg(PoseStack matrixStack, float partialTicks, int mouseX, int mouseY) {
+        super.renderBg(matrixStack, partialTicks, mouseX, mouseY);
         font.draw(matrixStack, L10NHelpers.localize("gui.integratedtunnels.partsettings.channel.interface"),
                 leftPos + 8, topPos + 112, Helpers.RGBToInt(0, 0, 0));
         numberFieldChannelInterface.render(matrixStack, mouseX, mouseY, partialTicks);
@@ -94,7 +94,7 @@ public class ContainerScreenInterfaceSettings extends ContainerScreenPartSetting
     }
 
     @Override
-    public void onUpdate(int valueId, CompoundNBT value) {
+    public void onUpdate(int valueId, CompoundTag value) {
         super.onUpdate(valueId, value);
         if (valueId == getMenu().getLastChannelInterfaceValueId()) {
             numberFieldChannelInterface.setValue(Integer.toString(getMenu().getLastChannelInterfaceValue()));

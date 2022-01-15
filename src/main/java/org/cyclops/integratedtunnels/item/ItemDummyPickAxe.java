@@ -1,12 +1,13 @@
 package org.cyclops.integratedtunnels.item;
 
 import com.google.common.collect.Maps;
-import net.minecraft.block.BlockState;
-import net.minecraft.enchantment.Enchantments;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemTier;
-import net.minecraft.item.ToolItem;
+import net.minecraft.tags.BlockTags;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.item.enchantment.Enchantments;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Tiers;
+import net.minecraft.world.item.DiggerItem;
 import org.cyclops.integratedtunnels.RegistryEntries;
 
 import java.util.Collections;
@@ -17,12 +18,12 @@ import java.util.Objects;
  * A dummy pickaxe that can harvest everything.
  * @author rubensworks
  */
-public class ItemDummyPickAxe extends ToolItem {
+public class ItemDummyPickAxe extends DiggerItem {
 
     private static final Map<EnchantmentData, ItemStack> ITEMSTACKS = Maps.newHashMap();
 
     public ItemDummyPickAxe(Item.Properties properties) {
-        super(1000, 1000, ItemTier.DIAMOND, Collections.emptySet(), properties);
+        super(1000, 1000, Tiers.DIAMOND, BlockTags.MINEABLE_WITH_PICKAXE, properties);
     }
 
     @Override
@@ -31,7 +32,7 @@ public class ItemDummyPickAxe extends ToolItem {
     }
 
     @Override
-    public boolean canHarvestBlock(ItemStack stack, BlockState state) {
+    public boolean isCorrectToolForDrops(ItemStack stack, BlockState state) {
         return true;
     }
 

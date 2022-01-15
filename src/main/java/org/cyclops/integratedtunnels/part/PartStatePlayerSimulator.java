@@ -1,7 +1,7 @@
 package org.cyclops.integratedtunnels.part;
 
-import net.minecraft.world.World;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.world.level.Level;
+import net.minecraft.server.level.ServerLevel;
 import org.cyclops.integrateddynamics.api.part.PartTarget;
 import org.cyclops.integratedtunnels.core.ExtendedFakePlayer;
 import org.cyclops.integratedtunnels.core.ItemStoragePlayerWrapper;
@@ -26,10 +26,10 @@ public class PartStatePlayerSimulator extends PartStateRoundRobin<PartTypePlayer
     }
 
     public void update(PartTarget target) {
-        World world = target.getTarget().getPos().getWorld(false);
+        Level world = target.getTarget().getPos().getLevel(false);
         if (world != null && !world.isClientSide()) {
             if (player == null) {
-                player = new ExtendedFakePlayer((ServerWorld) world);
+                player = new ExtendedFakePlayer((ServerLevel) world);
             }
             ItemStoragePlayerWrapper.cancelDestroyingBlock(player);
         }

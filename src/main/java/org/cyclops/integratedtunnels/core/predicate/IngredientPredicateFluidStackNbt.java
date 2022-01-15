@@ -1,7 +1,7 @@
 package org.cyclops.integratedtunnels.core.predicate;
 
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.INBT;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
 import net.minecraftforge.fluids.FluidStack;
 import org.cyclops.commoncapabilities.api.ingredient.IngredientComponent;
 import org.cyclops.integrateddynamics.core.helper.NbtHelpers;
@@ -16,16 +16,16 @@ public class IngredientPredicateFluidStackNbt extends IngredientPredicate<FluidS
     private final boolean blacklist;
     private final boolean requireNbt;
     private final boolean subset;
-    private final Optional<CompoundNBT> tag;
+    private final Optional<CompoundTag> tag;
     private final boolean recursive;
     private final boolean superset;
 
-    public IngredientPredicateFluidStackNbt(boolean blacklist, int amount, boolean exactAmount, boolean requireNbt, boolean subset, Optional<INBT> tag, boolean recursive, boolean superset) {
+    public IngredientPredicateFluidStackNbt(boolean blacklist, int amount, boolean exactAmount, boolean requireNbt, boolean subset, Optional<Tag> tag, boolean recursive, boolean superset) {
         super(IngredientComponent.FLUIDSTACK, blacklist, false, amount, exactAmount);
         this.blacklist = blacklist;
         this.requireNbt = requireNbt;
         this.subset = subset;
-        this.tag = tag.filter(t -> t instanceof CompoundNBT).map(t -> (CompoundNBT) t);
+        this.tag = tag.filter(t -> t instanceof CompoundTag).map(t -> (CompoundTag) t);
         this.recursive = recursive;
         this.superset = superset;
     }
@@ -35,7 +35,7 @@ public class IngredientPredicateFluidStackNbt extends IngredientPredicate<FluidS
         if (input.hasTag() && requireNbt) {
             return isBlacklist();
         }
-        CompoundNBT itemTag = input.hasTag() ? input.getTag() : new CompoundNBT();
+        CompoundTag itemTag = input.hasTag() ? input.getTag() : new CompoundTag();
         boolean ret = (!subset || tag.map(t -> NbtHelpers.nbtMatchesSubset(t, itemTag, recursive)).orElse(false)
                 && (!superset || tag.map(t -> NbtHelpers.nbtMatchesSubset(itemTag, t, recursive)).orElse(false)));
         if (blacklist) {

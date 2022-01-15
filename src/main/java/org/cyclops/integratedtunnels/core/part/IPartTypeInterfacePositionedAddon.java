@@ -3,7 +3,7 @@ package org.cyclops.integratedtunnels.core.part;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import org.apache.commons.lang3.tuple.Pair;
-import org.cyclops.cyclopscore.helper.TileHelpers;
+import org.cyclops.cyclopscore.helper.BlockEntityHelpers;
 import org.cyclops.integrateddynamics.api.network.INetwork;
 import org.cyclops.integrateddynamics.api.network.IPartNetwork;
 import org.cyclops.integrateddynamics.api.network.IPositionedAddonsNetwork;
@@ -31,7 +31,7 @@ public interface IPartTypeInterfacePositionedAddon<N extends IPositionedAddonsNe
     }
 
     public default LazyOptional<T> getTargetCapabilityInstance(PartPos pos) {
-        return TileHelpers.getCapability(pos.getPos(), pos.getSide(), getTargetCapability());
+        return BlockEntityHelpers.getCapability(pos.getPos(), pos.getSide(), getTargetCapability());
     }
 
     public default void scheduleNetworkObservation(PartTarget target, S state) {

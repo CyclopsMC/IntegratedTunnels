@@ -1,11 +1,11 @@
 package org.cyclops.integratedtunnels.core;
 
-import net.minecraft.block.Blocks;
-import net.minecraft.util.Direction;
-import net.minecraft.util.SoundCategory;
-import net.minecraft.util.SoundEvent;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.core.Direction;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
@@ -23,14 +23,14 @@ import java.util.Iterator;
  */
 public class FluidStorageBlockWrapper implements IIngredientComponentStorage<FluidStack, Integer> {
 
-    private final ServerWorld world;
+    private final ServerLevel world;
     private final BlockPos pos;
     private final Direction side;
     private final boolean blockUpdate;
 
     private final IIngredientComponentStorage<FluidStack, Integer> targetStorage;
 
-    public FluidStorageBlockWrapper(ServerWorld world, BlockPos pos, Direction side, boolean blockUpdate) {
+    public FluidStorageBlockWrapper(ServerLevel world, BlockPos pos, Direction side, boolean blockUpdate) {
         this.world = world;
         this.pos = pos;
         this.side = side;
@@ -49,7 +49,7 @@ public class FluidStorageBlockWrapper implements IIngredientComponentStorage<Flu
     protected void postInsert(FluidStack moved) {
         if (moved != null && GeneralConfig.worldInteractionEvents) {
             SoundEvent soundevent = moved.getFluid().getAttributes().getEmptySound(moved);
-            world.playSound(null, pos, soundevent, SoundCategory.BLOCKS, 1.0F, 1.0F);
+            world.playSound(null, pos, soundevent, SoundSource.BLOCKS, 1.0F, 1.0F);
         }
         if (blockUpdate) {
             sendBlockUpdate();
@@ -59,7 +59,7 @@ public class FluidStorageBlockWrapper implements IIngredientComponentStorage<Flu
     protected void postExtract(FluidStack moved) {
         if (moved != null && GeneralConfig.worldInteractionEvents) {
             SoundEvent soundevent = moved.getFluid().getAttributes().getFillSound(moved);
-            world.playSound(null, pos, soundevent, SoundCategory.BLOCKS, 1.0F, 1.0F);
+            world.playSound(null, pos, soundevent, SoundSource.BLOCKS, 1.0F, 1.0F);
         }
     }
 

@@ -1,12 +1,12 @@
 package org.cyclops.integratedtunnels.core;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.FlowingFluidBlock;
-import net.minecraft.fluid.Fluid;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.LiquidBlock;
+import net.minecraft.world.level.material.Fluid;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.wrappers.BlockWrapper;
@@ -23,10 +23,10 @@ import net.minecraftforge.fluids.capability.IFluidHandler.FluidAction;
 public class FluidHandlerBlock implements IFluidHandler {
 
     private final BlockState state;
-    private final World world;
+    private final Level world;
     private final BlockPos blockPos;
 
-    public FluidHandlerBlock(BlockState state, World world, BlockPos blockPos) {
+    public FluidHandlerBlock(BlockState state, Level world, BlockPos blockPos) {
         this.state = state;
         this.world = world;
         this.blockPos = blockPos;
@@ -41,8 +41,8 @@ public class FluidHandlerBlock implements IFluidHandler {
     @Override
     public FluidStack getFluidInTank(int tank) {
         Block block = this.state.getBlock();
-        if (block instanceof FlowingFluidBlock && this.state.getValue(FlowingFluidBlock.LEVEL) == 0) {
-            return new FluidStack(((FlowingFluidBlock) block).getFluid(), FluidHelpers.BUCKET_VOLUME);
+        if (block instanceof LiquidBlock && this.state.getValue(LiquidBlock.LEVEL) == 0) {
+            return new FluidStack(((LiquidBlock) block).getFluid(), FluidHelpers.BUCKET_VOLUME);
         } else {
             return FluidStack.EMPTY;
         }
@@ -69,8 +69,8 @@ public class FluidHandlerBlock implements IFluidHandler {
     @Override
     public FluidStack drain(FluidStack resource, FluidAction action) {
         Block block = this.state.getBlock();
-        if (block instanceof FlowingFluidBlock
-                && ((FlowingFluidBlock) block).getFluid() == resource.getFluid()) {
+        if (block instanceof LiquidBlock
+                && ((LiquidBlock) block).getFluid() == resource.getFluid()) {
             return this.drain(resource.getAmount(), action);
         }
         return FluidStack.EMPTY;
@@ -80,13 +80,13 @@ public class FluidHandlerBlock implements IFluidHandler {
     @Override
     public FluidStack drain(int maxDrain, FluidAction action) {
         Block block = this.state.getBlock();
-        if (block instanceof FlowingFluidBlock
-                && this.state.getValue(FlowingFluidBlock.LEVEL) == 0
+        if (block instanceof LiquidBlock
+                && this.state.getValue(LiquidBlock.LEVEL) == 0
                 && maxDrain >= FluidHelpers.BUCKET_VOLUME) {
             if (action.execute()) {
                 this.world.setBlock(this.blockPos, Blocks.AIR.defaultBlockState(), 11);
             }
-            return new FluidStack(((FlowingFluidBlock) block).getFluid(), FluidHelpers.BUCKET_VOLUME);
+            return new FluidStack(((LiquidBlock) block).getFluid(), FluidHelpers.BUCKET_VOLUME);
         }
         return FluidStack.EMPTY;
     }

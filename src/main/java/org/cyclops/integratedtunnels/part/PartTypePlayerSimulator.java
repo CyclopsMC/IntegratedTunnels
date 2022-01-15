@@ -1,7 +1,7 @@
 package org.cyclops.integratedtunnels.part;
 
 import com.google.common.collect.Lists;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.world.entity.player.Player;
 import org.cyclops.integrateddynamics.api.network.IPartNetwork;
 import org.cyclops.integrateddynamics.api.part.PartTarget;
 import org.cyclops.integrateddynamics.api.part.aspect.IAspect;
@@ -46,7 +46,7 @@ public class PartTypePlayerSimulator extends PartTypeTunnelAspectsWorld<PartType
     }
 
     @Override
-    public void updateActivation(PartTarget target, PartStatePlayerSimulator state, PlayerEntity player) {
+    public void updateActivation(PartTarget target, PartStatePlayerSimulator state, Player player) {
         state.update(target);
         super.updateActivation(target, state, player);
     }

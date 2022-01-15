@@ -1,18 +1,18 @@
 package org.cyclops.integratedtunnels.core.part;
 
-import net.minecraft.block.Block;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.inventory.container.Container;
-import net.minecraft.inventory.container.INamedContainerProvider;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.IBlockReader;
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.MenuProvider;
+import net.minecraft.world.SimpleContainer;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.block.Block;
 import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.common.util.LazyOptional;
 import org.apache.commons.lang3.tuple.Triple;
 import org.cyclops.integrateddynamics.api.network.INetwork;
@@ -51,19 +51,19 @@ public abstract class PartTypeInterfacePositionedAddonFiltering<N extends IPosit
     }
 
     @Override
-    public Optional<INamedContainerProvider> getContainerProviderSettings(PartPos pos) {
-        return Optional.of(new INamedContainerProvider() {
+    public Optional<MenuProvider> getContainerProviderSettings(PartPos pos) {
+        return Optional.of(new MenuProvider() {
 
             @Override
-            public ITextComponent getDisplayName() {
-                return new TranslationTextComponent(getTranslationKey());
+            public Component getDisplayName() {
+                return new TranslatableComponent(getTranslationKey());
             }
 
             @Nullable
             @Override
-            public Container createMenu(int id, PlayerInventory playerInventory, PlayerEntity playerEntity) {
+            public AbstractContainerMenu createMenu(int id, Inventory playerInventory, Player playerEntity) {
                 Triple<IPartContainer, PartTypeBase, PartTarget> data = PartHelpers.getContainerPartConstructionData(pos);
-                return new ContainerInterfaceSettings(id, playerInventory, new Inventory(0),
+                return new ContainerInterfaceSettings(id, playerInventory, new SimpleContainer(0),
                         data.getRight(), Optional.of(data.getLeft()), data.getMiddle());
             }
         });
@@ -106,7 +106,7 @@ public abstract class PartTypeInterfacePositionedAddonFiltering<N extends IPosit
     }
 
     @Override
-    public void onBlockNeighborChange(INetwork network, IPartNetwork partNetwork, PartTarget target, S state, IBlockReader world, Block neighbourBlock, BlockPos neighbourBlockPos) {
+    public void onBlockNeighborChange(INetwork network, IPartNetwork partNetwork, PartTarget target, S state, BlockGetter world, Block neighbourBlock, BlockPos neighbourBlockPos) {
         super.onBlockNeighborChange(network, partNetwork, target, state, world, neighbourBlock, neighbourBlockPos);
         if (network != null) {
             updateTargetInNetwork(network, target.getTarget(), state.getPriority(), state.getChannelInterface(), state);
@@ -145,15 +145,15 @@ public abstract class PartTypeInterfacePositionedAddonFiltering<N extends IPosit
         }
 
         @Override
-        public void readFromNBT(CompoundNBT tag) {
+        public void readFromNBT(CompoundTag tag) {
             super.readFromNBT(tag);
-            if (tag.contains("channelInterface", Constants.NBT.TAG_INT)) {
+            if (tag.contains("channelInterface", Tag.TAG_INT)) {
                 this.channelInterface = tag.getInt("channelInterface");
             }
         }
 
         @Override
-        public void writeToNBT(CompoundNBT tag) {
+        public void writeToNBT(CompoundTag tag) {
             super.writeToNBT(tag);
             tag.putInt("channelInterface", channelInterface);
         }

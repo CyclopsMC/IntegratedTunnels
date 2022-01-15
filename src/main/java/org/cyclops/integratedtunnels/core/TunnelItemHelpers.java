@@ -1,16 +1,16 @@
 package org.cyclops.integratedtunnels.core;
 
 import com.google.common.collect.Lists;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.material.Material;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.nbt.INBT;
-import net.minecraft.util.Direction;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.Material;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.nbt.Tag;
+import net.minecraft.core.Direction;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
+import net.minecraft.server.level.ServerLevel;
 import org.cyclops.commoncapabilities.api.capability.itemhandler.ItemMatch;
 import org.cyclops.commoncapabilities.api.ingredient.IngredientComponent;
 import org.cyclops.commoncapabilities.api.ingredient.storage.IIngredientComponentStorage;
@@ -74,7 +74,7 @@ public class TunnelItemHelpers {
                                                                          final boolean exactAmount) {
         int matchFlags = ItemMatch.ANY;
         if (checkItem)      matchFlags = matchFlags | ItemMatch.ITEM;
-        if (checkNbt)       matchFlags = matchFlags | ItemMatch.NBT;
+        if (checkNbt)       matchFlags = matchFlags | ItemMatch.TAG;
         if (checkStackSize) matchFlags = matchFlags | ItemMatch.STACKSIZE;
         return new IngredientPredicate<ItemStack, Integer>(IngredientComponent.ITEMSTACK, itemStack.copy(), matchFlags, blacklist, itemStack.isEmpty() && !blacklist,
                 itemStack.getCount(), exactAmount) {
@@ -113,7 +113,7 @@ public class TunnelItemHelpers {
         return new IngredientPredicateBlockOperator(amount, exactAmount, predicate, partTarget);
     }
 
-    public static IngredientPredicate<ItemStack, Integer> matchNbt(final Optional<INBT> tag, final boolean subset, final boolean superset,
+    public static IngredientPredicate<ItemStack, Integer> matchNbt(final Optional<Tag> tag, final boolean subset, final boolean superset,
                                                                    final boolean requireNbt, final boolean recursive, final boolean blacklist,
                                                                    final int amount, final boolean exactAmount) {
         return new IngredientPredicateItemStackNbt(blacklist, amount, exactAmount, requireNbt, subset, tag, recursive, superset);
@@ -153,8 +153,8 @@ public class TunnelItemHelpers {
     public static ItemStack placeItems(INetwork network, IPositionedAddonsNetworkIngredients<ItemStack, Integer> ingredientsNetwork,
                                        int channel, ITunnelConnection connection,
                                        IIngredientComponentStorage<ItemStack, Integer> source,
-                                       World world, BlockPos pos, Direction side,
-                                       IngredientPredicate<ItemStack, Integer> itemStackMatcher, Hand hand,
+                                       Level world, BlockPos pos, Direction side,
+                                       IngredientPredicate<ItemStack, Integer> itemStackMatcher, InteractionHand hand,
                                        boolean blockUpdate, boolean ignoreReplacable, boolean craftIfFailed) throws EvaluationException {
         BlockState destBlockState = world.getBlockState(pos);
         final Material destMaterial = destBlockState.getMaterial();
@@ -166,7 +166,7 @@ public class TunnelItemHelpers {
         }
 
         IIngredientComponentStorage<ItemStack, Integer> destinationBlock = new ItemStorageBlockWrapper(
-                true, (ServerWorld) world, pos, side, hand, blockUpdate, 0, false, ignoreReplacable, true);
+                true, (ServerLevel) world, pos, side, hand, blockUpdate, 0, false, ignoreReplacable, true);
         return TunnelHelpers.moveSingleStateOptimized(network, ingredientsNetwork, channel, connection, source,
                 -1, destinationBlock, -1, itemStackMatcher, PartPos.of(world, pos, side), craftIfFailed);
     }
@@ -192,9 +192,9 @@ public class TunnelItemHelpers {
      * @throws EvaluationException If illegal movement occured and further movement should stop.
      */
     public static List<ItemStack> pickUpItems(INetwork network, IPositionedAddonsNetworkIngredients<ItemStack, Integer> ingredientsNetwork,
-                                              int channel, ITunnelConnection connection, World world, BlockPos pos, Direction side,
+                                              int channel, ITunnelConnection connection, Level world, BlockPos pos, Direction side,
                                               IIngredientComponentStorage<ItemStack, Integer> destination,
-                                              IngredientPredicate<ItemStack, Integer> itemStackMatcher, Hand hand, boolean blockUpdate,
+                                              IngredientPredicate<ItemStack, Integer> itemStackMatcher, InteractionHand hand, boolean blockUpdate,
                                               boolean ignoreReplacable, int fortune, boolean silkTouch,
                                               boolean breakOnNoDrops) throws EvaluationException {
         BlockState destBlockState = world.getBlockState(pos);
@@ -206,7 +206,7 @@ public class TunnelItemHelpers {
         }
 
         ItemStorageBlockWrapper sourceBlock = new ItemStorageBlockWrapper(
-                false, (ServerWorld) world, pos, side, hand, blockUpdate, fortune, silkTouch, ignoreReplacable, breakOnNoDrops);
+                false, (ServerLevel) world, pos, side, hand, blockUpdate, fortune, silkTouch, ignoreReplacable, breakOnNoDrops);
         List<ItemStack> itemStacks = Lists.newArrayList();
         ItemStack itemStack;
         while (!(itemStack = TunnelHelpers.moveSingleStateOptimized(network, ingredientsNetwork, channel, connection, sourceBlock, -1,

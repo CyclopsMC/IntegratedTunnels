@@ -1,6 +1,6 @@
 package org.cyclops.integratedtunnels.core.predicate;
 
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.ItemStack;
 import org.cyclops.commoncapabilities.api.ingredient.IngredientComponent;
 import org.cyclops.cyclopscore.helper.BlockHelpers;
 import org.cyclops.integrateddynamics.api.evaluate.variable.IValueTypeListProxy;

@@ -1,11 +1,12 @@
 package org.cyclops.integratedtunnels.core;
 
-import net.minecraft.entity.item.ItemEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.core.Direction;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
 import org.cyclops.commoncapabilities.api.ingredient.IIngredientMatcher;
 import org.cyclops.commoncapabilities.api.ingredient.IngredientComponent;
 import org.cyclops.commoncapabilities.api.ingredient.storage.IIngredientComponentStorage;
@@ -23,16 +24,16 @@ import java.util.List;
  */
 public class ItemHandlerWorldEntityImportWrapper implements IIngredientComponentStorage<ItemStack, Integer> {
 
-    private final ServerWorld world;
+    private final ServerLevel world;
     private final BlockPos pos;
     private final Direction facing;
     private final List<ItemEntity> entities;
 
-    public ItemHandlerWorldEntityImportWrapper(ServerWorld world, BlockPos pos, Direction facing, final boolean ignorePickupDelay) {
-        this(world, pos, facing, new AxisAlignedBB(pos), ignorePickupDelay);
+    public ItemHandlerWorldEntityImportWrapper(ServerLevel world, BlockPos pos, Direction facing, final boolean ignorePickupDelay) {
+        this(world, pos, facing, new AABB(pos), ignorePickupDelay);
     }
 
-    public ItemHandlerWorldEntityImportWrapper(ServerWorld world, BlockPos pos, Direction facing, AxisAlignedBB area, final boolean ignorePickupDelay) {
+    public ItemHandlerWorldEntityImportWrapper(ServerLevel world, BlockPos pos, Direction facing, AABB area, final boolean ignorePickupDelay) {
         this.world = world;
         this.pos = pos;
         this.facing = facing;
@@ -71,7 +72,7 @@ public class ItemHandlerWorldEntityImportWrapper implements IIngredientComponent
 
     protected void postExtract(ItemEntity entity, ItemStack itemStack) {
         if (itemStack.isEmpty()) {
-            entity.remove();
+            entity.remove(Entity.RemovalReason.DISCARDED);
         } else {
             entity.setItem(itemStack);
         }

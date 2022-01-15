@@ -1,22 +1,22 @@
 package org.cyclops.integratedtunnels.core;
 
 import com.google.common.collect.Iterators;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.inventory.EquipmentSlotType;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemUseContext;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Direction;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.core.Direction;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.ForgeMod;
 import net.minecraftforge.event.ForgeEventFactory;
@@ -42,21 +42,21 @@ public class ItemStoragePlayerWrapper implements IIngredientComponentStorage<Ite
     private static final Predicate<Entity> CAN_BE_ATTACKED = Entity::isAttackable;
 
     private final ExtendedFakePlayer player;
-    private final ServerWorld world;
+    private final ServerLevel world;
     private final BlockPos pos;
     private final double offsetX;
     private final double offsetY;
     private final double offsetZ;
     private final Direction side;
-    private final Hand hand;
+    private final InteractionHand hand;
     private final boolean rightClick;
     private final boolean sneaking;
     private final boolean continuousClick;
     private final int entityIndex;
     private final IIngredientComponentStorage<ItemStack, Integer> playerReturnHandler;
 
-    public ItemStoragePlayerWrapper(@Nullable ExtendedFakePlayer player, ServerWorld world, BlockPos pos,
-                                    double offsetX, double offsetY, double offsetZ, Direction side, Hand hand,
+    public ItemStoragePlayerWrapper(@Nullable ExtendedFakePlayer player, ServerLevel world, BlockPos pos,
+                                    double offsetX, double offsetY, double offsetZ, Direction side, InteractionHand hand,
                                     boolean rightClick, boolean sneaking, boolean continuousClick, int entityIndex,
                                     IIngredientComponentStorage<ItemStack, Integer> playerReturnHandler) {
         this.player = player;
@@ -74,7 +74,7 @@ public class ItemStoragePlayerWrapper implements IIngredientComponentStorage<Ite
         this.playerReturnHandler = playerReturnHandler;
     }
 
-    public static void cancelDestroyingBlock(ServerPlayerEntity player) {
+    public static void cancelDestroyingBlock(ServerPlayer player) {
         player.gameMode.isDestroyingBlock = false;
         player.gameMode.lastSentState = -1;
     }
@@ -86,7 +86,7 @@ public class ItemStoragePlayerWrapper implements IIngredientComponentStorage<Ite
         return entities.get(Math.min(this.entityIndex, entities.size() - 1));
     }
 
-    private void returnPlayerInventory(PlayerEntity player) {
+    private void returnPlayerInventory(Player player) {
         PlayerInventoryIterator it = new PlayerInventoryIterator(player);
         while (it.hasNext()) {
             ItemStack itemStack = it.next();
@@ -139,7 +139,7 @@ public class ItemStoragePlayerWrapper implements IIngredientComponentStorage<Ite
             /* Inspired by PlayerInteractionManager#useItemOn (line 324) */
 
             // Send block right click event
-            BlockRayTraceResult blockRayTraceResult = new BlockRayTraceResult(new Vector3d(offsetX, offsetY, offsetZ), side, pos, false);
+            BlockHitResult blockRayTraceResult = new BlockHitResult(new Vec3(offsetX, offsetY, offsetZ), side, pos, false);
             PlayerInteractEvent.RightClickBlock rightClickBlockActionResult = ForgeHooks.onRightClickBlock(player, hand, pos, blockRayTraceResult);
             if (rightClickBlockActionResult.isCanceled()) {
                 return stack;
@@ -148,9 +148,9 @@ public class ItemStoragePlayerWrapper implements IIngredientComponentStorage<Ite
             // Use item first
             if (rightClickBlockActionResult.getUseItem() != Event.Result.DENY) {
                 if (!stack.isEmpty()) {
-                    ItemUseContext itemUseContext = new ItemUseContext(player, hand, blockRayTraceResult);
-                    ActionResultType actionResult = stack.getItem().onItemUseFirst(stack, itemUseContext);
-                    if (actionResult == ActionResultType.FAIL) {
+                    UseOnContext itemUseContext = new UseOnContext(player, hand, blockRayTraceResult);
+                    InteractionResult actionResult = stack.getItem().onItemUseFirst(stack, itemUseContext);
+                    if (actionResult == InteractionResult.FAIL) {
                         return stack;
                     } else if (actionResult.consumesAction()) {
                         returnPlayerInventory(player);
@@ -177,11 +177,11 @@ public class ItemStoragePlayerWrapper implements IIngredientComponentStorage<Ite
             }
 
             // Interact with entity
-            List<Entity> entities = world.getEntitiesOfClass(Entity.class, new AxisAlignedBB(pos));
+            List<Entity> entities = world.getEntitiesOfClass(Entity.class, new AABB(pos));
             if (entities.size() > 0) {
                 Entity entity = getEntity(entities);
-                ActionResultType actionResult = player.interactOn(entity, hand);
-                if (actionResult == ActionResultType.FAIL) {
+                InteractionResult actionResult = player.interactOn(entity, hand);
+                if (actionResult == InteractionResult.FAIL) {
                     return stack;
                 } else if (actionResult.consumesAction()) {
                     returnPlayerInventory(player);
@@ -191,9 +191,9 @@ public class ItemStoragePlayerWrapper implements IIngredientComponentStorage<Ite
 
             // Use itemstack
             if (rightClickBlockActionResult.getUseItem() != Event.Result.DENY && !stack.isEmpty()) {
-                ActionResultType cancelResult = ForgeHooks.onItemRightClick(player, hand);
+                InteractionResult cancelResult = ForgeHooks.onItemRightClick(player, hand);
                 if (cancelResult != null)  {
-                    if (cancelResult == ActionResultType.FAIL) {
+                    if (cancelResult == InteractionResult.FAIL) {
                         return stack;
                     } else if (cancelResult.consumesAction()) {
                         returnPlayerInventory(player);
@@ -202,8 +202,8 @@ public class ItemStoragePlayerWrapper implements IIngredientComponentStorage<Ite
                     // Otherwise, PASS the logic
                 } else {
                     ItemStack copyBeforeUse = stack.copy();
-                    ActionResult<ItemStack> actionresult = stack.use(world, player, hand);
-                    if (actionresult.getResult() == ActionResultType.FAIL) {
+                    InteractionResultHolder<ItemStack> actionresult = stack.use(world, player, hand);
+                    if (actionresult.getResult() == InteractionResult.FAIL) {
                         return stack;
                     }
                     if (actionresult.getObject().isEmpty()) {
@@ -234,10 +234,10 @@ public class ItemStoragePlayerWrapper implements IIngredientComponentStorage<Ite
                     targetPos = targetPos.relative(side.getOpposite());
                 }
 
-                ItemUseContext itemUseContextReach = new ItemUseContext(player, hand,
-                        new BlockRayTraceResult(new Vector3d(offsetX, offsetY, offsetZ), side, targetPos, false));
-                ActionResultType actionResult = stack.useOn(itemUseContextReach);
-                if (actionResult == ActionResultType.FAIL) {
+                UseOnContext itemUseContextReach = new UseOnContext(player, hand,
+                        new BlockHitResult(new Vec3(offsetX, offsetY, offsetZ), side, targetPos, false));
+                InteractionResult actionResult = stack.useOn(itemUseContextReach);
+                if (actionResult == InteractionResult.FAIL) {
                     return stack;
                 } else if (actionResult.consumesAction()) {
                     returnPlayerInventory(player);
@@ -285,10 +285,10 @@ public class ItemStoragePlayerWrapper implements IIngredientComponentStorage<Ite
                 cancelDestroyingBlock(player);
 
                 // Interact with entity
-                List<Entity> entities = world.getEntitiesOfClass(Entity.class, new AxisAlignedBB(pos), CAN_BE_ATTACKED::test);
+                List<Entity> entities = world.getEntitiesOfClass(Entity.class, new AABB(pos), CAN_BE_ATTACKED::test);
                 if (entities.size() > 0) {
                     Entity entity = getEntity(entities);
-                    EquipmentSlotType equipmentSlotType = hand == Hand.MAIN_HAND ? EquipmentSlotType.MAINHAND : EquipmentSlotType.OFFHAND;
+                    EquipmentSlot equipmentSlotType = hand == InteractionHand.MAIN_HAND ? EquipmentSlot.MAINHAND : EquipmentSlot.OFFHAND;
                     player.getAttributes().addTransientAttributeModifiers(stack.getAttributeModifiers(equipmentSlotType));
                     player.attack(entity);
                     player.getAttributes().removeAttributeModifiers(stack.getAttributeModifiers(equipmentSlotType));

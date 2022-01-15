@@ -4,17 +4,16 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GenericFutureListener;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.network.INetHandler;
-import net.minecraft.network.IPacket;
-import net.minecraft.network.NetworkManager;
-import net.minecraft.network.PacketDirection;
-import net.minecraft.network.ProtocolType;
-import net.minecraft.network.play.ServerPlayNetHandler;
-import net.minecraft.network.play.client.*;
-import net.minecraft.network.play.server.SPlayerPositionLookPacket;
+import net.minecraft.network.Connection;
+import net.minecraft.network.ConnectionProtocol;
+import net.minecraft.network.PacketListener;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.PacketFlow;
+import net.minecraft.network.protocol.game.*;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.text.ITextComponent;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.network.ServerGamePacketListenerImpl;
 
 import javax.annotation.Nullable;
 import javax.crypto.Cipher;
@@ -22,20 +21,20 @@ import java.net.SocketAddress;
 import java.util.Set;
 
 /**
- * A fake {@link ServerPlayNetHandler}.
+ * A fake {@link ServerGamePacketListenerImpl}.
  * @author rubensworks
  */
-public class FakeNetHandlerPlayServer extends ServerPlayNetHandler {
+public class FakeNetHandlerPlayServer extends ServerGamePacketListenerImpl {
 
-    public FakeNetHandlerPlayServer(MinecraftServer server, ServerPlayerEntity player) {
-        super(server, new NetworkManager(PacketDirection.CLIENTBOUND) {
+    public FakeNetHandlerPlayServer(MinecraftServer server, ServerPlayer player) {
+        super(server, new Connection(PacketFlow.CLIENTBOUND) {
             @Override
             public void channelActive(ChannelHandlerContext p_channelActive_1_) throws Exception {
 
             }
 
             @Override
-            public void setProtocol(ProtocolType newState) {
+            public void setProtocol(ConnectionProtocol newState) {
 
             }
 
@@ -50,17 +49,17 @@ public class FakeNetHandlerPlayServer extends ServerPlayNetHandler {
             }
 
             @Override
-            public void setListener(INetHandler handler) {
+            public void setListener(PacketListener handler) {
 
             }
 
             @Override
-            public void send(IPacket<?> packetIn) {
+            public void send(Packet<?> packetIn) {
 
             }
 
             @Override
-            public void send(IPacket<?> packetIn, @Nullable GenericFutureListener<? extends Future<? super Void>> p_201058_2_) {
+            public void send(Packet<?> packetIn, @Nullable GenericFutureListener<? extends Future<? super Void>> p_201058_2_) {
 
             }
 
@@ -85,18 +84,13 @@ public class FakeNetHandlerPlayServer extends ServerPlayNetHandler {
             }
 
             @Override
-            public INetHandler getPacketListener() {
+            public PacketListener getPacketListener() {
                 return null;
             }
 
             @Override
-            public ITextComponent getDisconnectedReason() {
+            public Component getDisconnectedReason() {
                 return null;
-            }
-
-            @Override
-            public void setupCompression(int threshold) {
-
             }
 
             @Override
@@ -122,27 +116,27 @@ public class FakeNetHandlerPlayServer extends ServerPlayNetHandler {
     }
 
     @Override
-    public void disconnect(ITextComponent textComponent) {
+    public void disconnect(Component textComponent) {
 
     }
 
     @Override
-    public void handlePlayerInput(CInputPacket packetIn) {
+    public void handlePlayerInput(ServerboundPlayerInputPacket packetIn) {
 
     }
 
     @Override
-    public void handleMoveVehicle(CMoveVehiclePacket packetIn) {
+    public void handleMoveVehicle(ServerboundMoveVehiclePacket packetIn) {
 
     }
 
     @Override
-    public void handleAcceptTeleportPacket(CConfirmTeleportPacket packetIn) {
+    public void handleAcceptTeleportPacket(ServerboundAcceptTeleportationPacket packetIn) {
 
     }
 
     @Override
-    public void handleMovePlayer(CPlayerPacket packetIn) {
+    public void handleMovePlayer(ServerboundMovePlayerPacket packetIn) {
 
     }
 
@@ -152,132 +146,127 @@ public class FakeNetHandlerPlayServer extends ServerPlayNetHandler {
     }
 
     @Override
-    public void teleport(double x, double y, double z, float yaw, float pitch, Set<SPlayerPositionLookPacket.Flags> relativeSet) {
+    public void teleport(double x, double y, double z, float yaw, float pitch, Set<ClientboundPlayerPositionPacket.RelativeArgument> relativeSet) {
 
     }
 
     @Override
-    public void handlePlayerAction(CPlayerDiggingPacket packetIn) {
+    public void handlePlayerAction(ServerboundPlayerActionPacket packetIn) {
 
     }
 
     @Override
-    public void handleUseItemOn(CPlayerTryUseItemOnBlockPacket packetIn) {
+    public void handleUseItemOn(ServerboundUseItemOnPacket packetIn) {
 
     }
 
     @Override
-    public void handleUseItem(CPlayerTryUseItemPacket packetIn) {
+    public void handleUseItem(ServerboundUseItemPacket packetIn) {
 
     }
 
     @Override
-    public void handleTeleportToEntityPacket(CSpectatePacket packetIn) {
+    public void handleTeleportToEntityPacket(ServerboundTeleportToEntityPacket packetIn) {
 
     }
 
     @Override
-    public void handleResourcePackResponse(CResourcePackStatusPacket packetIn) {
+    public void handleResourcePackResponse(ServerboundResourcePackPacket packetIn) {
 
     }
 
     @Override
-    public void handlePaddleBoat(CSteerBoatPacket packetIn) {
+    public void handlePaddleBoat(ServerboundPaddleBoatPacket packetIn) {
 
     }
 
     @Override
-    public void onDisconnect(ITextComponent reason) {
+    public void onDisconnect(Component reason) {
 
     }
 
     @Override
-    public void send(final IPacket<?> packetIn) {
+    public void send(final Packet<?> packetIn) {
 
     }
 
     @Override
-    public void handleSetCarriedItem(CHeldItemChangePacket packetIn) {
+    public void handleSetCarriedItem(ServerboundSetCarriedItemPacket packetIn) {
 
     }
 
     @Override
-    public void handleChat(CChatMessagePacket packetIn) {
+    public void handleChat(ServerboundChatPacket packetIn) {
 
     }
 
     @Override
-    public void handleAnimate(CAnimateHandPacket packetIn) {
+    public void handleAnimate(ServerboundSwingPacket packetIn) {
 
     }
 
     @Override
-    public void handlePlayerCommand(CEntityActionPacket packetIn) {
+    public void handlePlayerCommand(ServerboundPlayerCommandPacket packetIn) {
 
     }
 
     @Override
-    public void handleInteract(CUseEntityPacket packetIn) {
+    public void handleInteract(ServerboundInteractPacket packetIn) {
 
     }
 
     @Override
-    public void handleClientCommand(CClientStatusPacket packetIn) {
+    public void handleClientCommand(ServerboundClientCommandPacket packetIn) {
 
     }
 
     @Override
-    public void handleContainerClose(CCloseWindowPacket packetIn) {
+    public void handleContainerClose(ServerboundContainerClosePacket packetIn) {
 
     }
 
     @Override
-    public void handleContainerClick(CClickWindowPacket packetIn) {
+    public void handleContainerClick(ServerboundContainerClickPacket packetIn) {
 
     }
 
     @Override
-    public void handleContainerButtonClick(CEnchantItemPacket packetIn) {
+    public void handleContainerButtonClick(ServerboundContainerButtonClickPacket packetIn) {
 
     }
 
     @Override
-    public void handleSetCreativeModeSlot(CCreativeInventoryActionPacket packetIn) {
+    public void handleSetCreativeModeSlot(ServerboundSetCreativeModeSlotPacket packetIn) {
 
     }
 
     @Override
-    public void handleContainerAck(CConfirmTransactionPacket packetIn) {
+    public void handleSignUpdate(ServerboundSignUpdatePacket packetIn) {
 
     }
 
     @Override
-    public void handleSignUpdate(CUpdateSignPacket packetIn) {
+    public void handleKeepAlive(ServerboundKeepAlivePacket packetIn) {
 
     }
 
     @Override
-    public void handleKeepAlive(CKeepAlivePacket packetIn) {
+    public void handlePlayerAbilities(ServerboundPlayerAbilitiesPacket packetIn) {
 
     }
 
     @Override
-    public void handlePlayerAbilities(CPlayerAbilitiesPacket packetIn) {
+    public void handleCustomCommandSuggestions(ServerboundCommandSuggestionPacket packetIn) {
 
     }
 
     @Override
-    public void handleCustomCommandSuggestions(CTabCompletePacket packetIn) {
+    public void handleClientInformation(ServerboundClientInformationPacket packetIn) {
 
     }
 
     @Override
-    public void handleClientInformation(CClientSettingsPacket packetIn) {
-
-    }
-
-    @Override
-    public void handleCustomPayload(CCustomPayloadPacket packetIn) {
+    public void handleCustomPayload(ServerboundCustomPayloadPacket packetIn) {
 
     }
 }

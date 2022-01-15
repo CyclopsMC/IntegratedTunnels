@@ -1,8 +1,8 @@
 package org.cyclops.integratedtunnels.part.aspect;
 
 import com.google.common.collect.Iterators;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.fluids.FluidStack;
 import org.cyclops.commoncapabilities.api.capability.fluidhandler.FluidMatch;
 import org.cyclops.commoncapabilities.api.capability.itemhandler.ItemMatch;

@@ -1,7 +1,7 @@
 package org.cyclops.integratedtunnels.part.aspect;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.tileentity.TileEntity;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.fluids.FluidStack;
 import org.cyclops.commoncapabilities.api.ingredient.storage.IIngredientComponentStorage;
 import org.cyclops.integrateddynamics.api.network.INetwork;
@@ -36,7 +36,7 @@ public interface IFluidTarget extends IChanneledTarget<IFluidNetwork, FluidStack
         PartPos center = partTarget.getCenter();
         PartPos target = partTarget.getTarget();
         INetwork network = IChanneledTarget.getNetworkChecked(center);
-        TileEntity tile = target.getPos().getWorld(true).getBlockEntity(target.getPos().getBlockPos());
+        BlockEntity tile = target.getPos().getLevel(true).getBlockEntity(target.getPos().getBlockPos());
         PartStateRoundRobin<?> partState = IChanneledTarget.getPartState(center);
         return new FluidTargetCapabilityProvider(transfer, network, tile, target.getSide(),
                 fluidStackMatcher, partTarget, properties, partState);
