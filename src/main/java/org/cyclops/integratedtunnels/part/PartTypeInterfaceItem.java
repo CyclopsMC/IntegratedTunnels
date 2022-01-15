@@ -43,7 +43,7 @@ public class PartTypeInterfaceItem extends PartTypeInterfacePositionedAddon<IIte
     protected PartTypeInterfaceItem.State constructDefaultState() {
         return new PartTypeInterfaceItem.State();
     }
-    
+
     @Override
     public int getConsumptionRate(State state) {
         return GeneralConfig.interfaceItemBaseConsumption;

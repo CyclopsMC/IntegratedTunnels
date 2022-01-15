@@ -38,7 +38,7 @@ public class PartTypeInterfaceFluid extends PartTypeInterfacePositionedAddon<IFl
     protected PartTypeInterfaceFluid.State constructDefaultState() {
         return new PartTypeInterfaceFluid.State();
     }
-    
+
     @Override
     public int getConsumptionRate(State state) {
         return GeneralConfig.interfaceFluidBaseConsumption;

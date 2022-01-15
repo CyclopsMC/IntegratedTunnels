@@ -42,7 +42,7 @@ public class PartTypeInterfaceEnergy extends PartTypeInterfacePositionedAddon<IE
     protected PartTypeInterfaceEnergy.State constructDefaultState() {
         return new PartTypeInterfaceEnergy.State();
     }
-    
+
     @Override
     public int getConsumptionRate(State state) {
         return GeneralConfig.interfaceEnergyBaseConsumption;

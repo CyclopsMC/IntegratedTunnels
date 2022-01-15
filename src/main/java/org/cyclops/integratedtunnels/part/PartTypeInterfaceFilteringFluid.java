@@ -43,7 +43,7 @@ public class PartTypeInterfaceFilteringFluid extends PartTypeInterfacePositioned
     protected PartTypeInterfaceFilteringFluid.State constructDefaultState() {
         return new PartTypeInterfaceFilteringFluid.State(Aspects.REGISTRY.getWriteAspects(this).size());
     }
-    
+
     @Override
     public int getConsumptionRate(State state) {
         return GeneralConfig.interfaceFluidBaseConsumption;

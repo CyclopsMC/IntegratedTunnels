@@ -29,7 +29,7 @@ public class PartTypeImporterFluid extends PartTypeTunnelAspects<PartTypeImporte
     protected PartStateFluid<PartTypeImporterFluid> constructDefaultState() {
         return new PartStateFluid<PartTypeImporterFluid>(Aspects.REGISTRY.getWriteAspects(this).size(), true, false);
     }
-    
+
     @Override
     public int getConsumptionRate(PartStateFluid<PartTypeImporterFluid> state) {
         return GeneralConfig.importerFluidBaseConsumption;

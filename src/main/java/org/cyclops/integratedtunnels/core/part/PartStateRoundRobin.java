@@ -1,7 +1,6 @@
 package org.cyclops.integratedtunnels.core.part;
 
 import org.cyclops.integrateddynamics.api.network.IPartPosIteratorHandler;
-import org.cyclops.integrateddynamics.api.network.IPositionedAddonsNetwork;
 import org.cyclops.integrateddynamics.api.part.write.IPartTypeWriter;
 import org.cyclops.integrateddynamics.core.part.write.PartStateWriterBase;
 

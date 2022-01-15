@@ -1,7 +1,6 @@
 package org.cyclops.integratedtunnels.part;
 
 import org.cyclops.integrateddynamics.api.part.write.IPartTypeWriter;
-import org.cyclops.integrateddynamics.core.part.write.PartStateWriterBase;
 import org.cyclops.integratedtunnels.core.part.PartStateRoundRobin;
 
 /**

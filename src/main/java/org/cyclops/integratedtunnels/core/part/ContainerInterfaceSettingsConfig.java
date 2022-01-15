@@ -8,7 +8,6 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import org.cyclops.cyclopscore.client.gui.ScreenFactorySafe;
 import org.cyclops.cyclopscore.config.extendedconfig.GuiConfig;
 import org.cyclops.cyclopscore.inventory.container.ContainerTypeData;
-import org.cyclops.integrateddynamics.core.client.gui.container.ContainerScreenPartSettings;
 import org.cyclops.integratedtunnels.IntegratedTunnels;
 
 /**

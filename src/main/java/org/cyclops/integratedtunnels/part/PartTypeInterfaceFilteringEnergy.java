@@ -47,7 +47,7 @@ public class PartTypeInterfaceFilteringEnergy extends PartTypeInterfacePositione
     protected PartTypeInterfaceFilteringEnergy.State constructDefaultState() {
         return new PartTypeInterfaceFilteringEnergy.State(Aspects.REGISTRY.getWriteAspects(this).size());
     }
-    
+
     @Override
     public int getConsumptionRate(State state) {
         return GeneralConfig.interfaceEnergyBaseConsumption;

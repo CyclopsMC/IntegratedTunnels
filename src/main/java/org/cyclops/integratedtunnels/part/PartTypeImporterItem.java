@@ -30,7 +30,7 @@ public class PartTypeImporterItem extends PartTypeTunnelAspects<PartTypeImporter
     protected PartStateItem<PartTypeImporterItem> constructDefaultState() {
         return new PartStateItem<PartTypeImporterItem>(Aspects.REGISTRY.getWriteAspects(this).size(), true, false);
     }
-    
+
     @Override
     public int getConsumptionRate(PartStateItem<PartTypeImporterItem> state) {
         return GeneralConfig.importerItemBaseConsumption;

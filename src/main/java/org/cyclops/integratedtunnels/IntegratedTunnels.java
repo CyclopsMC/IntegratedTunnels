@@ -17,7 +17,6 @@ import org.cyclops.cyclopscore.init.ModBaseVersionable;
 import org.cyclops.cyclopscore.proxy.IClientProxy;
 import org.cyclops.cyclopscore.proxy.ICommonProxy;
 import org.cyclops.integrateddynamics.IntegratedDynamics;
-import org.cyclops.integrateddynamics.api.part.aspect.IAspect;
 import org.cyclops.integrateddynamics.core.part.aspect.AspectRegistry;
 import org.cyclops.integrateddynamics.infobook.OnTheDynamicsOfIntegrationBook;
 import org.cyclops.integratedtunnels.api.world.IBlockBreakHandlerRegistry;
@@ -45,7 +44,7 @@ import org.cyclops.integratedtunnels.proxy.CommonProxy;
  */
 @Mod(Reference.MOD_ID)
 public class IntegratedTunnels extends ModBaseVersionable<IntegratedTunnels> {
-    
+
     /**
      * The unique instance of this mod.
      */
@@ -141,7 +140,7 @@ public class IntegratedTunnels extends ModBaseVersionable<IntegratedTunnels> {
     public static void clog(String message) {
         clog(Level.INFO, message);
     }
-    
+
     /**
      * Log a new message of the given level for this mod.
      * @param level The level in which the message must be shown.
@@ -150,5 +149,5 @@ public class IntegratedTunnels extends ModBaseVersionable<IntegratedTunnels> {
     public static void clog(Level level, String message) {
         IntegratedTunnels._instance.getLoggerHelper().log(level, message);
     }
-    
+
 }

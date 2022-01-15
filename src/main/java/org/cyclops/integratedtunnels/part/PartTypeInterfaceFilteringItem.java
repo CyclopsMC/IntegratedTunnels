@@ -48,7 +48,7 @@ public class PartTypeInterfaceFilteringItem extends PartTypeInterfacePositionedA
     protected PartTypeInterfaceFilteringItem.State constructDefaultState() {
         return new PartTypeInterfaceFilteringItem.State(Aspects.REGISTRY.getWriteAspects(this).size());
     }
-    
+
     @Override
     public int getConsumptionRate(State state) {
         return GeneralConfig.interfaceItemBaseConsumption;

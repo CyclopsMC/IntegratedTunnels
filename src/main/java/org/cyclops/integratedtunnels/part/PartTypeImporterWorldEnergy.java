@@ -25,7 +25,7 @@ public class PartTypeImporterWorldEnergy extends PartTypeTunnelAspectsWorld<Part
     protected PartStateWorld<PartTypeImporterWorldEnergy> constructDefaultState() {
         return new PartStateWorld<PartTypeImporterWorldEnergy>(Aspects.REGISTRY.getWriteAspects(this).size());
     }
-    
+
     @Override
     public int getConsumptionRate(PartStateWorld<PartTypeImporterWorldEnergy> state) {
         return state.hasVariable() ? GeneralConfig.importerWorldEnergyBaseConsumptionEnabled : GeneralConfig.importerWorldEnergyBaseConsumptionDisabled;

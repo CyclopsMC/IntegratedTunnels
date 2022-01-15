@@ -25,7 +25,7 @@ public class PartTypeExporterEnergy extends PartTypeTunnelAspects<PartTypeExport
     protected PartStateEnergy<PartTypeExporterEnergy> constructDefaultState() {
         return new PartStateEnergy<PartTypeExporterEnergy>(Aspects.REGISTRY.getWriteAspects(this).size(), false, true);
     }
-    
+
     @Override
     public int getConsumptionRate(PartStateEnergy<PartTypeExporterEnergy> state) {
         return GeneralConfig.exporterEnergyBaseConsumption;
