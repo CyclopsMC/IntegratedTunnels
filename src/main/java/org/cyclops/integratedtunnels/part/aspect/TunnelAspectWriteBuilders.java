@@ -293,16 +293,12 @@ public class TunnelAspectWriteBuilders {
                 PROP_EXPORT = input -> {
             // Save this filter into the part state to handle passive exports
             if (input.isPassiveIO()) {
-                try {
-                    input.getPartStatePositionedAddon().setStorageFilter(new PositionedAddonsNetworkIngredientsFilter<>(
-                            (amount) -> amount <= input.getAmount(),
-                            false,
-                            true,
-                            false
-                    ));
-                } catch (ClassCastException e) {
-                    // TODO: only needed for corrupted parts, which can not be created anymore. Remove this in MC 1.17
-                }
+                input.getPartStatePositionedAddon().setStorageFilter(new PositionedAddonsNetworkIngredientsFilter<>(
+                        (amount) -> amount <= input.getAmount(),
+                        false,
+                        true,
+                        false
+                ));
             }
 
             if (input.hasValidTarget() && input.getAmount() != 0) {
@@ -325,16 +321,12 @@ public class TunnelAspectWriteBuilders {
                 PROP_IMPORT = input -> {
             // Save this filter into the part state to handle passive imports
             if (input.isPassiveIO()) {
-                try {
-                    input.getPartStatePositionedAddon().setStorageFilter(new PositionedAddonsNetworkIngredientsFilter<>(
-                            (amount) -> amount <= input.getAmount(),
-                            true,
-                            false,
-                            false
-                    ));
-                } catch (ClassCastException e) {
-                    // TODO: only needed for corrupted parts, which can not be created anymore. Remove this in MC 1.17
-                }
+                input.getPartStatePositionedAddon().setStorageFilter(new PositionedAddonsNetworkIngredientsFilter<>(
+                        (amount) -> amount <= input.getAmount(),
+                        true,
+                        false,
+                        false
+                ));
             }
 
             if (input.hasValidTarget() && input.getAmount() != 0) {
@@ -777,16 +769,12 @@ public class TunnelAspectWriteBuilders {
                 PROP_EXPORT = input -> {
             // Save this filter into the part state to handle passive exports
             if (input.isPassiveIO()) {
-                try {
-                    input.getPartStatePositionedAddon().setStorageFilter(new PositionedAddonsNetworkIngredientsFilter<>(
-                            input.getItemStackMatcher(),
-                            false,
-                            true,
-                            false
-                    ));
-                } catch (ClassCastException e) {
-                    // TODO: only needed for corrupted parts, which can not be created anymore. Remove this in MC 1.17
-                }
+                input.getPartStatePositionedAddon().setStorageFilter(new PositionedAddonsNetworkIngredientsFilter<>(
+                        input.getItemStackMatcher(),
+                        false,
+                        true,
+                        false
+                ));
             }
 
             if (input.hasValidTarget()) {
@@ -809,16 +797,12 @@ public class TunnelAspectWriteBuilders {
                 PROP_IMPORT = input -> {
             // Save this filter into the part state to handle passive imports
             if (input.isPassiveIO()) {
-                try {
-                    input.getPartStatePositionedAddon().setStorageFilter(new PositionedAddonsNetworkIngredientsFilter<>(
-                            input.getItemStackMatcher(),
-                            true,
-                            false,
-                            false
-                    ));
-                } catch (ClassCastException e) {
-                    // TODO: only needed for corrupted parts, which can not be created anymore. Remove this in MC 1.17
-                }
+                input.getPartStatePositionedAddon().setStorageFilter(new PositionedAddonsNetworkIngredientsFilter<>(
+                        input.getItemStackMatcher(),
+                        true,
+                        false,
+                        false
+                ));
             }
 
             if (input.hasValidTarget()) {
@@ -1149,16 +1133,12 @@ public class TunnelAspectWriteBuilders {
                 PROP_EXPORT = input -> {
             // Save this filter into the part state to handle passive exports
             if (input.isPassiveIO()) {
-                try {
-                    input.getPartStatePositionedAddon().setStorageFilter(new PositionedAddonsNetworkIngredientsFilter<>(
-                            input.getFluidStackMatcher(),
-                            false,
-                            true,
-                            false
-                    ));
-                } catch (ClassCastException e) {
-                    // TODO: only needed for corrupted parts, which can not be created anymore. Remove this in MC 1.17
-                }
+                input.getPartStatePositionedAddon().setStorageFilter(new PositionedAddonsNetworkIngredientsFilter<>(
+                        input.getFluidStackMatcher(),
+                        false,
+                        true,
+                        false
+                ));
             }
 
             if (input.hasValidTarget()) {
@@ -1184,16 +1164,12 @@ public class TunnelAspectWriteBuilders {
                 PROP_IMPORT = input -> {
             // Save this filter into the part state to handle passive imports
             if (input.isPassiveIO()) {
-                try {
-                    input.getPartStatePositionedAddon().setStorageFilter(new PositionedAddonsNetworkIngredientsFilter<>(
-                            input.getFluidStackMatcher(),
-                            true,
-                            false,
-                            false
-                    ));
-                } catch (ClassCastException e) {
-                    // TODO: only needed for corrupted parts, which can not be created anymore. Remove this in MC 1.17
-                }
+                input.getPartStatePositionedAddon().setStorageFilter(new PositionedAddonsNetworkIngredientsFilter<>(
+                        input.getFluidStackMatcher(),
+                        true,
+                        false,
+                        false
+                ));
             }
 
             if (input.hasValidTarget()) {
