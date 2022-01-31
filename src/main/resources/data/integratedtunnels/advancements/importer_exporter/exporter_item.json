@@ -17,7 +17,9 @@
       "conditions": {
         "items": [
           {
-            "item": "integratedtunnels:part_exporter_item"
+            "items": [
+              "integratedtunnels:part_exporter_item"
+            ]
           }
         ]
       }

@@ -17,7 +17,9 @@
       "conditions": {
         "items": [
           {
-            "item": "integratedtunnels:part_interface_item"
+            "items": [
+              "integratedtunnels:part_interface_item"
+            ]
           }
         ]
       }

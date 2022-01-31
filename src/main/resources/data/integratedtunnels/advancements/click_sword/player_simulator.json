@@ -17,7 +17,9 @@
       "conditions": {
         "items": [
           {
-            "item": "integratedtunnels:part_player_simulator"
+            "items": [
+              "integratedtunnels:part_player_simulator"
+            ]
           }
         ]
       }
