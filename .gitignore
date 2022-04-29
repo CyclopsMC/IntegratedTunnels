@@ -16,6 +16,7 @@ repo/*
 *.ipr
 *.iws
 out/*
+run*.launch
 keystore.jks
 
 # Ignore mac-specific file(s)
