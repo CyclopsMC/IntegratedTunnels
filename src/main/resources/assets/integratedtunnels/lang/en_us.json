@@ -149,7 +149,7 @@
   "aspect.aspecttypes.integratedtunnels.integer.entityindex": "Entity Index",
   "aspect.aspecttypes.integratedtunnels.integer.entityindex.info": "The n-th entity that will be picked. -1 will always pick a random entity.",
   "aspect.aspecttypes.integratedtunnels.string.world.entityinventory": "Entity Inventory",
-  "aspect.aspecttypes.integratedtunnels.string.world.entityinventory.info": "The inventory to use of the entity.",
+  "aspect.aspecttypes.integratedtunnels.string.world.entityinventory.info": "The inventory to use of the entity e.g. sided, inventory, or armor.",
   "aspect.aspecttypes.integratedtunnels.boolean.player.continuousclick": "Continuous Click",
   "aspect.aspecttypes.integratedtunnels.boolean.player.continuousclick.info": "If a continuous click must be simulated, otherwise each click takes one tick.",
   "aspect.aspecttypes.integratedtunnels.boolean.blacklist": "Blacklist",

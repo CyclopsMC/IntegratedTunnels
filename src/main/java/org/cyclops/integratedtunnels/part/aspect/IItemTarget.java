@@ -3,7 +3,6 @@ package org.cyclops.integratedtunnels.part.aspect;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Direction;
 
 import org.cyclops.commoncapabilities.api.ingredient.storage.IIngredientComponentStorage;
 import org.cyclops.integrateddynamics.api.network.INetwork;
