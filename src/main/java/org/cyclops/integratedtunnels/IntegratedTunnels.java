@@ -17,11 +17,11 @@ import org.cyclops.cyclopscore.init.ModBaseVersionable;
 import org.cyclops.cyclopscore.proxy.IClientProxy;
 import org.cyclops.cyclopscore.proxy.ICommonProxy;
 import org.cyclops.integrateddynamics.IntegratedDynamics;
-import org.cyclops.integrateddynamics.api.part.aspect.IAspect;
 import org.cyclops.integrateddynamics.core.part.aspect.AspectRegistry;
 import org.cyclops.integrateddynamics.infobook.OnTheDynamicsOfIntegrationBook;
 import org.cyclops.integratedtunnels.api.world.IBlockBreakHandlerRegistry;
 import org.cyclops.integratedtunnels.api.world.IBlockPlaceHandlerRegistry;
+import org.cyclops.integratedtunnels.api.world.IEntityIItemTargetProxyRegistry;
 import org.cyclops.integratedtunnels.api.world.IEntityInventoryTypeRegistry;
 import org.cyclops.integratedtunnels.capability.ingredient.TunnelIngredientComponentCapabilities;
 import org.cyclops.integratedtunnels.capability.network.FluidNetworkConfig;
@@ -32,6 +32,8 @@ import org.cyclops.integratedtunnels.core.world.BlockBreakHandlerRegistry;
 import org.cyclops.integratedtunnels.core.world.BlockBreakHandlers;
 import org.cyclops.integratedtunnels.core.world.BlockBreakPlaceRegistry;
 import org.cyclops.integratedtunnels.core.world.BlockPlaceHandlers;
+import org.cyclops.integratedtunnels.core.world.EntityIItemTargetProxies;
+import org.cyclops.integratedtunnels.core.world.EntityIItemTargetProxyRegistry;
 import org.cyclops.integratedtunnels.core.world.EntityInventoryTypeRegistry;
 import org.cyclops.integratedtunnels.core.world.EntityInventoryTypes;
 import org.cyclops.integratedtunnels.item.ItemDummyPickAxeConfig;
@@ -61,6 +63,7 @@ public class IntegratedTunnels extends ModBaseVersionable<IntegratedTunnels> {
         getRegistryManager().addRegistry(IBlockBreakHandlerRegistry.class, BlockBreakHandlerRegistry.getInstance());
         getRegistryManager().addRegistry(IBlockPlaceHandlerRegistry.class, BlockBreakPlaceRegistry.getInstance());
         getRegistryManager().addRegistry(IEntityInventoryTypeRegistry.class, EntityInventoryTypeRegistry.getInstance());
+        getRegistryManager().addRegistry(IEntityIItemTargetProxyRegistry.class, EntityIItemTargetProxyRegistry.getInstance());
 
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::onRegistriesCreate);
     }
@@ -72,6 +75,7 @@ public class IntegratedTunnels extends ModBaseVersionable<IntegratedTunnels> {
         BlockBreakHandlers.load();
         BlockPlaceHandlers.load();
         EntityInventoryTypes.load();
+        EntityIItemTargetProxies.load();
     }
 
     @Override
