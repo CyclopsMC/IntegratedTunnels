@@ -22,9 +22,7 @@ import net.minecraft.util.Direction;
  */
 public interface IEntityIItemTargetProxyRegistry extends IRegistry {
 
-    /**
-     * Multiple handlers may exist that return `true` for #shouldApply; the first one found should be used.
-     */
+    // Multiple handlers may exist that return `true` for #shouldApply; the first one found should be used.
     public IEntityIItemTargetProxy register(IEntityIItemTargetProxy proxy);
 
     public Collection<IEntityIItemTargetProxy> getProxies();
