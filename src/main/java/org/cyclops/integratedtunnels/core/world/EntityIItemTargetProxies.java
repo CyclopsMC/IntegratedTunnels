@@ -4,6 +4,7 @@ import org.cyclops.integrateddynamics.api.network.INetwork;
 import org.cyclops.integrateddynamics.api.part.PartTarget;
 import org.cyclops.integrateddynamics.api.part.aspect.property.IAspectProperties;
 import org.cyclops.integratedtunnels.IntegratedTunnels;
+import org.cyclops.integratedtunnels.Reference;
 import org.cyclops.integratedtunnels.api.world.IEntityIItemTargetProxyRegistry;
 import org.cyclops.integratedtunnels.core.part.PartStateRoundRobin;
 import org.cyclops.integratedtunnels.core.predicate.IngredientPredicate;
@@ -35,8 +36,8 @@ public class EntityIItemTargetProxies {
             }
         });
         
-        REGISTRY.register(new EntityIItemTargetProxySided(EntityInventoryTypes.ARMOR, EntityInventoryTypes.ARMOR_SIDE));
-        REGISTRY.register(new EntityIItemTargetProxySided(EntityInventoryTypes.INVENTORY, EntityInventoryTypes.INVENTORY_SIDE));
+        REGISTRY.register(new EntityIItemTargetProxySided(EntityInventoryTypes.ARMOR, Reference.ENTITY_ARMOR_SIDE));
+        REGISTRY.register(new EntityIItemTargetProxySided(EntityInventoryTypes.INVENTORY, Reference.ENTITY_INVENTORY_SIDE));
     }
     
 }
