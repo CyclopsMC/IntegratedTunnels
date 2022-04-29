@@ -22,6 +22,7 @@ import org.cyclops.integrateddynamics.core.part.aspect.AspectRegistry;
 import org.cyclops.integrateddynamics.infobook.OnTheDynamicsOfIntegrationBook;
 import org.cyclops.integratedtunnels.api.world.IBlockBreakHandlerRegistry;
 import org.cyclops.integratedtunnels.api.world.IBlockPlaceHandlerRegistry;
+import org.cyclops.integratedtunnels.api.world.IEntityInventoryTypeRegistry;
 import org.cyclops.integratedtunnels.capability.ingredient.TunnelIngredientComponentCapabilities;
 import org.cyclops.integratedtunnels.capability.network.FluidNetworkConfig;
 import org.cyclops.integratedtunnels.capability.network.ItemNetworkConfig;
@@ -31,6 +32,8 @@ import org.cyclops.integratedtunnels.core.world.BlockBreakHandlerRegistry;
 import org.cyclops.integratedtunnels.core.world.BlockBreakHandlers;
 import org.cyclops.integratedtunnels.core.world.BlockBreakPlaceRegistry;
 import org.cyclops.integratedtunnels.core.world.BlockPlaceHandlers;
+import org.cyclops.integratedtunnels.core.world.EntityInventoryTypeRegistry;
+import org.cyclops.integratedtunnels.core.world.EntityInventoryTypes;
 import org.cyclops.integratedtunnels.item.ItemDummyPickAxeConfig;
 import org.cyclops.integratedtunnels.part.PartTypes;
 import org.cyclops.integratedtunnels.part.aspect.TunnelAspects;
@@ -57,6 +60,7 @@ public class IntegratedTunnels extends ModBaseVersionable<IntegratedTunnels> {
         // Registries
         getRegistryManager().addRegistry(IBlockBreakHandlerRegistry.class, BlockBreakHandlerRegistry.getInstance());
         getRegistryManager().addRegistry(IBlockPlaceHandlerRegistry.class, BlockBreakPlaceRegistry.getInstance());
+        getRegistryManager().addRegistry(IEntityInventoryTypeRegistry.class, EntityInventoryTypeRegistry.getInstance());
 
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::onRegistriesCreate);
     }
@@ -67,6 +71,7 @@ public class IntegratedTunnels extends ModBaseVersionable<IntegratedTunnels> {
         PartTypes.load();
         BlockBreakHandlers.load();
         BlockPlaceHandlers.load();
+        EntityInventoryTypes.load();
     }
 
     @Override
