@@ -21,11 +21,11 @@ public class EntityInventoryTypes {
     
     // the armor inventory of an entity
     public static final EntityInventoryTypeBase ARMOR = new EntityInventoryType("armor");
-    public static final Direction ARMOR_SIDE = Direction.UP; // TODO verify
+    public static final Direction ARMOR_SIDE = Direction.NORTH;
     
     // the main inventory of an entity
     public static final EntityInventoryTypeBase INVENTORY = new EntityInventoryType("inventory");
-    public static final Direction INVENTORY_SIDE = Direction.NORTH; // TODO verify
+    public static final Direction INVENTORY_SIDE = Direction.UP;
     
     // TODO: ENDERINVENTORY, for players ?
     
