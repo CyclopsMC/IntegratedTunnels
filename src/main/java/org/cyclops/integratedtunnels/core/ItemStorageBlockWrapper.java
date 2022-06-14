@@ -155,6 +155,7 @@ public class ItemStorageBlockWrapper implements IIngredientComponentStorage<Item
                             drops = Lists.newArrayList(ItemStack.EMPTY);
                         } else {
                             // Make sure there are no empty stacks in the list
+                            drops = Lists.newArrayList(drops);
                             drops.removeIf(ItemStack::isEmpty);
                         }
                         return cachedDrops = drops;
