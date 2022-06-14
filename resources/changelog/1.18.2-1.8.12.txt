@@ -1,0 +1,13 @@
+As always, don't forget to backup your world before updating!
+Requires CyclopsCore version 1.13.4 or higher.
+
+Added:
+* Add Korean Localization
+
+Fixes:
+* Fix "Check Stack Size" not working on operator aspects
+  Closes CyclopsMC/IntegratedDynamics#1180
+* Fix crash when breaking some blocks via block importer, Closes #257
+* Fix materialization failure of operator-based network aspects
+  Closes CyclopsMC/IntegratedDynamics#1177
+
