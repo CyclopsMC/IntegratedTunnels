@@ -676,7 +676,9 @@ public class TunnelAspectWriteBuilders {
                     && ValueHelpers.correspondsTo(predicate.getOutputType(), ValueTypes.BOOLEAN)) {
                 IAspectProperties properties = input.getMiddle();
                 int amount = properties.getValue(PROP_RATE).getRawValue();
-                boolean exactAmount = properties.getValue(PROP_EXACTAMOUNT).getRawValue();
+                boolean checkStackSize = properties.getValue(PROP_CHECK_STACKSIZE).getRawValue();
+                boolean exactAmount = properties.getValue(PROP_EXACTAMOUNT).getRawValue()
+                        || checkStackSize; // TODO: restore exact amount
                 IngredientPredicate<ItemStack, Integer> itemStackMatcher = TunnelItemHelpers.matchPredicateItem(input.getLeft(), predicate, amount, exactAmount);
                 int slot = properties.getValue(PROP_SLOT).getRawValue();
                 return Triple.of(input.getLeft(), input.getMiddle(), ChanneledTargetInformation.of(itemStackMatcher, itemStackMatcher, slot));
@@ -1100,7 +1102,9 @@ public class TunnelAspectWriteBuilders {
                     && ValueHelpers.correspondsTo(predicate.getOutputType(), ValueTypes.BOOLEAN)) {
                 IAspectProperties properties = input.getMiddle();
                 int rate = properties.getValue(PROP_RATE).getRawValue();
-                boolean exactAmount = properties.getValue(PROP_EXACTAMOUNT).getRawValue();
+                boolean checkAmount = properties.getValue(PROP_CHECK_AMOUNT).getRawValue();
+                boolean exactAmount = properties.getValue(PROP_EXACTAMOUNT).getRawValue()
+                        || checkAmount; // TODO: restore exact amount
                 IngredientPredicate<FluidStack, Integer> fluidStackMatcher = TunnelFluidHelpers.matchPredicate(input.getLeft(), predicate, rate, exactAmount);
                 return Triple.of(input.getLeft(), input.getMiddle(),
                         ChanneledTargetInformation.of(fluidStackMatcher, fluidStackMatcher, -1));
