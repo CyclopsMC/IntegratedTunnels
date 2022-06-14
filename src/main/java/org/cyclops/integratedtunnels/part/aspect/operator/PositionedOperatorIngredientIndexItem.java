@@ -18,6 +18,11 @@ import org.cyclops.integrateddynamics.core.evaluate.operator.OperatorBase.SafeVa
  * @author rubensworks
  */
 public class PositionedOperatorIngredientIndexItem extends PositionedOperatorIngredientIndex<ItemStack, Integer> {
+
+    public PositionedOperatorIngredientIndexItem() {
+        this(null, Direction.NORTH, -1);
+    }
+
     public PositionedOperatorIngredientIndexItem(DimPos pos, Direction side, int channel) {
         super("countbyitem", new Function(), ValueTypes.OBJECT_ITEMSTACK, ValueTypes.LONG, pos, side, channel);
     }
