@@ -3,7 +3,6 @@ package org.cyclops.integratedtunnels.core.part;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 import org.cyclops.cyclopscore.client.gui.component.input.WidgetNumberField;
@@ -44,7 +43,7 @@ public class ContainerScreenInterfaceSettings extends ContainerScreenPartSetting
     public void init() {
         super.init();
 
-        numberFieldChannelInterface = new WidgetNumberField(font, leftPos + 106, topPos + 109, 70, 14, true, new TranslatableComponent("gui.integratedtunnels.partsettings.channel.interface"), true);
+        numberFieldChannelInterface = new WidgetNumberField(font, leftPos + 106, topPos + 109, 70, 14, true, Component.translatable("gui.integratedtunnels.partsettings.channel.interface"), true);
         numberFieldChannelInterface.setPositiveOnly(false);
         numberFieldChannelInterface.setMaxLength(15);
         numberFieldChannelInterface.setVisible(true);

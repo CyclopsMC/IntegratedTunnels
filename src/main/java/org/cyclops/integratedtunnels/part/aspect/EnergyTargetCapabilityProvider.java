@@ -18,7 +18,6 @@ import javax.annotation.Nullable;
 public class EnergyTargetCapabilityProvider extends ChanneledTargetCapabilityProvider<IEnergyNetwork, Long, Boolean>
         implements IEnergyTarget {
 
-    // TODO: in next breaking change, migrate to long values
     private final long amount;
     private final boolean exactAmount;
 

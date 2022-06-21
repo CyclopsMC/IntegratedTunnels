@@ -9,6 +9,7 @@ import net.minecraft.core.dispenser.DefaultDispenseItemBehavior;
 import net.minecraft.core.dispenser.DispenseItemBehavior;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Blocks;
@@ -212,7 +213,7 @@ public class ItemHandlerWorldEntityExportWrapper implements IIngredientComponent
         }
 
         @Override
-        public int getRandomSlot() {
+        public int getRandomSlot(RandomSource randomSource) {
             return 0;
         }
 

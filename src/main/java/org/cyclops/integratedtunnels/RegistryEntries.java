@@ -11,12 +11,12 @@ import org.cyclops.integratedtunnels.core.part.ContainerInterfaceSettings;
  */
 public class RegistryEntries {
 
-    @ObjectHolder("integratedtunnels:part_interface_item")
+    @ObjectHolder(registryName = "item", value = "integratedtunnels:part_interface_item")
     public static final Item ITEM_PART_INTERFACE = null;
-    @ObjectHolder("integratedtunnels:dummy_pickaxe")
+    @ObjectHolder(registryName = "item", value = "integratedtunnels:dummy_pickaxe")
     public static final Item ITEM_DUMMY_PICKAXE = null;
 
-    @ObjectHolder("integratedtunnels:part_interface_settings")
+    @ObjectHolder(registryName = "menu", value = "integratedtunnels:part_interface_settings")
     public static final MenuType<ContainerInterfaceSettings> CONTAINER_INTERFACE_SETTINGS = null;
 
 }

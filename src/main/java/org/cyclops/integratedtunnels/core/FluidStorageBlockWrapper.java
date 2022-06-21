@@ -6,6 +6,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraftforge.common.SoundActions;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
@@ -48,7 +49,7 @@ public class FluidStorageBlockWrapper implements IIngredientComponentStorage<Flu
 
     protected void postInsert(FluidStack moved) {
         if (moved != null && GeneralConfig.worldInteractionEvents) {
-            SoundEvent soundevent = moved.getFluid().getAttributes().getEmptySound(moved);
+            SoundEvent soundevent = moved.getFluid().getFluidType().getSound(moved, SoundActions.BUCKET_EMPTY);
             world.playSound(null, pos, soundevent, SoundSource.BLOCKS, 1.0F, 1.0F);
         }
         if (blockUpdate) {
@@ -58,7 +59,7 @@ public class FluidStorageBlockWrapper implements IIngredientComponentStorage<Flu
 
     protected void postExtract(FluidStack moved) {
         if (moved != null && GeneralConfig.worldInteractionEvents) {
-            SoundEvent soundevent = moved.getFluid().getAttributes().getFillSound(moved);
+            SoundEvent soundevent = moved.getFluid().getFluidType().getSound(moved, SoundActions.BUCKET_FILL);
             world.playSound(null, pos, soundevent, SoundSource.BLOCKS, 1.0F, 1.0F);
         }
     }
@@ -86,7 +87,7 @@ public class FluidStorageBlockWrapper implements IIngredientComponentStorage<Flu
     @Override
     public FluidStack insert(@Nonnull FluidStack stack, boolean simulate) {
         if (world.dimensionType().ultraWarm()
-                && stack.getFluid().getAttributes().doesVaporize(world, pos, stack)) {
+                && stack.getFluid().getFluidType().isVaporizedOnPlacement(world, pos, stack)) {
             return FluidStack.EMPTY;
         }
 

@@ -1,6 +1,6 @@
 package org.cyclops.integratedtunnels.core;
 
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.Component;
 import org.cyclops.commoncapabilities.api.ingredient.storage.IIngredientComponentStorage;
 import org.cyclops.cyclopscore.ingredient.storage.InconsistentIngredientInsertionException;
 import org.cyclops.cyclopscore.ingredient.storage.IngredientStorageHelpers;
@@ -35,7 +35,7 @@ public class TunnelEnergyHelpers {
             moved = IngredientStorageHelpers.moveIngredients(source, target, amount, exact, false);
         } catch (InconsistentIngredientInsertionException e) {
             // Handle movement errors due to inconsistent simulation.
-            throw new EvaluationException(new TextComponent("Ingredient movement failed " +
+            throw new EvaluationException(Component.literal("Ingredient movement failed " +
                     "due to inconsistent insertion behaviour by destination in simulation " +
                     "and non-simulation mode. This can be caused by invalid network setups. Lost ")
                         .append(e.getIngredientComponent().getMatcher().getDisplayName(e.getRemainder())));

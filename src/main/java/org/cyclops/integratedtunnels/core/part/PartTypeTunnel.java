@@ -1,12 +1,11 @@
 package org.cyclops.integratedtunnels.core.part;
 
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.SimpleContainer;
-import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.MenuProvider;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.MenuProvider;
+import net.minecraft.world.SimpleContainer;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
 import org.apache.commons.lang3.tuple.Triple;
 import org.cyclops.cyclopscore.init.ModBase;
 import org.cyclops.integrateddynamics.api.part.IPartContainer;
@@ -43,7 +42,7 @@ public abstract class PartTypeTunnel<P extends IPartType<P, S>, S extends IPartS
 
             @Override
             public Component getDisplayName() {
-                return new TranslatableComponent(getTranslationKey());
+                return Component.translatable(getTranslationKey());
             }
 
             @Nullable

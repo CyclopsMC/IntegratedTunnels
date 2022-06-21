@@ -4,7 +4,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
@@ -56,7 +55,7 @@ public abstract class PartTypeInterfacePositionedAddonFiltering<N extends IPosit
 
             @Override
             public Component getDisplayName() {
-                return new TranslatableComponent(getTranslationKey());
+                return Component.translatable(getTranslationKey());
             }
 
             @Nullable

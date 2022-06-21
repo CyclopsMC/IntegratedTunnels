@@ -1,16 +1,15 @@
 package org.cyclops.integratedtunnels.part.aspect;
 
 import com.google.common.collect.ImmutableList;
-import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.Tag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.nbt.Tag;
-import net.minecraft.core.Direction;
-import net.minecraft.world.InteractionHand;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.energy.CapabilityEnergy;
@@ -102,18 +101,18 @@ public class TunnelAspectWriteBuilders {
     public static void validateListValues(ValueTypeList.ValueList list, IValueType<?> expectedValueType) throws EvaluationException {
         // For typed lists, just check if they correspond to the expected type
         if (!ValueHelpers.correspondsTo(list.getRawValue().getValueType(), expectedValueType)) {
-            throw new EvaluationException(new TranslatableComponent(L10NValues.VALUETYPE_ERROR_INVALIDLISTVALUETYPE,
-                    new TranslatableComponent(expectedValueType.getTranslationKey()),
-                    new TranslatableComponent(list.getRawValue().getValueType().getTranslationKey())));
+            throw new EvaluationException(Component.translatable(L10NValues.VALUETYPE_ERROR_INVALIDLISTVALUETYPE,
+                    Component.translatable(expectedValueType.getTranslationKey()),
+                    Component.translatable(list.getRawValue().getValueType().getTranslationKey())));
         }
 
         // If we have an ANY list, strictly check each value in the list
         if (list.getRawValue().getValueType() == ValueTypes.CATEGORY_ANY) {
             for (IValue value : (IValueTypeListProxy<ValueTypeCategoryAny, IValue>) list.getRawValue()) {
                 if (value.getType() != expectedValueType) {
-                    throw new EvaluationException(new TranslatableComponent(L10NValues.VALUETYPE_ERROR_INVALIDLISTVALUETYPE,
-                            new TranslatableComponent(expectedValueType.getTranslationKey()),
-                            new TranslatableComponent(value.getType().getTranslationKey())));
+                    throw new EvaluationException(Component.translatable(L10NValues.VALUETYPE_ERROR_INVALIDLISTVALUETYPE,
+                            Component.translatable(expectedValueType.getTranslationKey()),
+                            Component.translatable(value.getType().getTranslationKey())));
                 }
             }
         }
@@ -685,7 +684,7 @@ public class TunnelAspectWriteBuilders {
             } else {
                 Component current = ValueTypeOperator.getSignature(predicate);
                 Component expected = ValueTypeOperator.getSignature(new IValueType[]{ValueTypes.OBJECT_ITEMSTACK}, ValueTypes.BOOLEAN);
-                throw new EvaluationException(new TranslatableComponent(L10NValues.ASPECT_ERROR_INVALIDTYPE,
+                throw new EvaluationException(Component.translatable(L10NValues.ASPECT_ERROR_INVALIDTYPE,
                         expected, current));
             }
         };
@@ -758,7 +757,7 @@ public class TunnelAspectWriteBuilders {
             } else {
                 Component current = ValueTypeOperator.getSignature(predicate);
                 Component expected = ValueTypeOperator.getSignature(new IValueType[]{ValueTypes.OBJECT_BLOCK}, ValueTypes.BOOLEAN);
-                throw new EvaluationException(new TranslatableComponent(L10NValues.ASPECT_ERROR_INVALIDTYPE,
+                throw new EvaluationException(Component.translatable(L10NValues.ASPECT_ERROR_INVALIDTYPE,
                         expected, current));
             }
         };
@@ -1111,7 +1110,7 @@ public class TunnelAspectWriteBuilders {
             } else {
                 Component current = ValueTypeOperator.getSignature(predicate);
                 Component expected = ValueTypeOperator.getSignature(new IValueType[]{ValueTypes.OBJECT_FLUIDSTACK}, ValueTypes.BOOLEAN);
-                throw new EvaluationException(new TranslatableComponent(L10NValues.ASPECT_ERROR_INVALIDTYPE,
+                throw new EvaluationException(Component.translatable(L10NValues.ASPECT_ERROR_INVALIDTYPE,
                         expected, current));
             }
         };
@@ -1736,7 +1735,7 @@ public class TunnelAspectWriteBuilders {
                 } else {
                     Component current = ValueTypeOperator.getSignature(predicate);
                     Component expected = ValueTypeOperator.getSignature(new IValueType[]{ValueTypes.OBJECT_FLUIDSTACK}, ValueTypes.BOOLEAN);
-                    throw new EvaluationException(new TranslatableComponent(L10NValues.ASPECT_ERROR_INVALIDTYPE,
+                    throw new EvaluationException(Component.translatable(L10NValues.ASPECT_ERROR_INVALIDTYPE,
                             expected, current));
                 }
             };

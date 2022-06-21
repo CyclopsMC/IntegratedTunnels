@@ -4,7 +4,7 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -79,12 +79,12 @@ public class TunnelHelpers {
                 // If we are moving items, emit them in the world, otherwise they go lost.
                 if (GeneralConfig.ejectItemsOnInconsistentSimulationMovement && e.getIngredientComponent().equals(IngredientComponent.ITEMSTACK)) {
                     ItemStackHelpers.spawnItemStack(movementPosition.getPos().getLevel(true), movementPosition.getPos().getBlockPos(), e.getRemainder());
-                    throw new EvaluationException(new TextComponent("Ingredient movement failed " +
+                    throw new EvaluationException(Component.literal("Ingredient movement failed " +
                             "due to inconsistent insertion behaviour by destination in simulation " +
                             "and non-simulation mode. This can be caused by invalid network setups. " +
                             "Ejected failed item in world."));
                 }
-                throw new EvaluationException(new TextComponent("Ingredient movement failed " +
+                throw new EvaluationException(Component.literal("Ingredient movement failed " +
                         "due to inconsistent insertion behaviour by destination in simulation " +
                         "and non-simulation mode. This can be caused by invalid network setups. Lost ")
                             .append(e.getIngredientComponent().getMatcher().getDisplayName(e.getRemainder())));

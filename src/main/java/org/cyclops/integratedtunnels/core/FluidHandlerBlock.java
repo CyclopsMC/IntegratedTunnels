@@ -61,7 +61,7 @@ public class FluidHandlerBlock implements IFluidHandler {
     @Override
     public int fill(FluidStack resource, FluidAction action) {
         Fluid fluid = resource.getFluid();
-        BlockState block = fluid.getAttributes().getBlock(world, blockPos, fluid.defaultFluidState());
+        BlockState block = fluid.getFluidType().getBlockForFluidState(world, blockPos, fluid.defaultFluidState());
         return new BlockWrapper(block, world, blockPos).fill(resource, action);
     }
 
