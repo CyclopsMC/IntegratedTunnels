@@ -6,10 +6,13 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.SoundType;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.fluid.FluidState;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.loot.LootContext;
+import net.minecraft.loot.LootParameters;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
@@ -18,8 +21,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
-import net.minecraft.loot.LootContext;
-import net.minecraft.loot.LootParameters;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.world.BlockEvent;
 import org.cyclops.commoncapabilities.api.ingredient.IIngredientMatcher;
@@ -91,7 +92,11 @@ public class ItemStorageBlockWrapper implements IIngredientComponentStorage<Item
         if (blockBreakHandler != null) {
             blockBreakHandler.breakBlock(blockState, world, pos, player);
         } else {
-            blockState.getBlock().removedByPlayer(blockState, world, pos, player, false, world.getFluidState(pos));
+            FluidState fluidState = world.getFluidState(pos);
+            boolean removed = blockState.removedByPlayer(this.world, pos, player, false, fluidState);
+            if (removed) {
+                blockState.getBlock().onPlayerDestroy(this.world, pos, blockState);
+            }
         }
         if (GeneralConfig.worldInteractionEvents) {
             world.playEvent(2001, pos, Block.getStateId(blockState)); // Particles + Sound
