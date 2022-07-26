@@ -1,25 +1,26 @@
 package org.cyclops.integratedtunnels.core;
 
 import com.google.common.collect.Lists;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.SoundType;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BlockItem;
-import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.core.Direction;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.sounds.SoundSource;
-import net.minecraft.core.BlockPos;
-import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
-import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.world.BlockEvent;
 import org.cyclops.commoncapabilities.api.ingredient.IIngredientMatcher;
@@ -91,7 +92,11 @@ public class ItemStorageBlockWrapper implements IIngredientComponentStorage<Item
         if (blockBreakHandler != null) {
             blockBreakHandler.breakBlock(blockState, world, pos, player);
         } else {
-            blockState.getBlock().onDestroyedByPlayer(blockState, world, pos, player, false, world.getFluidState(pos));
+            FluidState fluidState = world.getFluidState(pos);
+            boolean removed = blockState.onDestroyedByPlayer(this.world, pos, player, false, fluidState);
+            if (removed) {
+                blockState.getBlock().destroy(this.world, pos, blockState);
+            }
         }
         if (GeneralConfig.worldInteractionEvents) {
             world.levelEvent(2001, pos, Block.getId(blockState)); // Particles + Sound
