@@ -1,5 +1,5 @@
 modLoader="javafml"
-loaderVersion="[41,)"
+loaderVersion="[43,)"
 issueTrackerURL="https://github.com/CyclopsMC/IntegratedTunnels/issues"
 displayURL="https://www.curseforge.com/minecraft/mc-mods/integrated-tunnels"
 license="MIT"
@@ -16,7 +16,7 @@ Transfer other stuff over Integrated Dynamics networks.
 [[dependencies.integratedtunnels]]
     modId="cyclopscore"
     mandatory=true
-    versionRange="[1.16.1,)"
+    versionRange="[1.17.0,)"
     ordering="NONE"
     side="BOTH"
 [[dependencies.integratedtunnels]]
@@ -28,18 +28,18 @@ Transfer other stuff over Integrated Dynamics networks.
 [[dependencies.integratedtunnels]]
     modId="commoncapabilities"
     mandatory=true
-    versionRange="[2.8.2,)"
+    versionRange="[2.8.3,)"
     ordering="NONE"
     side="BOTH"
 [[dependencies.integratedtunnels]]
     modId="forge"
     mandatory=true
-    versionRange="[41,)"
+    versionRange="[43.0.8,)"
     ordering="NONE"
     side="BOTH"
 [[dependencies.integratedtunnels]]
     modId="minecraft"
     mandatory=true
-    versionRange="[1.19,]"
+    versionRange="[1.19.2,]"
     ordering="NONE"
     side="BOTH"
