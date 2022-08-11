@@ -2,11 +2,10 @@ package org.cyclops.integratedtunnels.core;
 
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.util.concurrent.Future;
-import io.netty.util.concurrent.GenericFutureListener;
 import net.minecraft.network.Connection;
 import net.minecraft.network.ConnectionProtocol;
 import net.minecraft.network.PacketListener;
+import net.minecraft.network.PacketSendListener;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.PacketFlow;
@@ -14,8 +13,8 @@ import net.minecraft.network.protocol.game.*;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nullable;
 import javax.crypto.Cipher;
 import java.net.SocketAddress;
 import java.util.Set;
@@ -59,7 +58,7 @@ public class FakeNetHandlerPlayServer extends ServerGamePacketListenerImpl {
             }
 
             @Override
-            public void send(Packet<?> packetIn, @Nullable GenericFutureListener<? extends Future<? super Void>> p_201058_2_) {
+            public void send(Packet<?> p_243248_, @Nullable PacketSendListener p_243316_) {
 
             }
 
