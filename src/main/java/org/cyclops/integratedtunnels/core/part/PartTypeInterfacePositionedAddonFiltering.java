@@ -51,6 +51,12 @@ public abstract class PartTypeInterfacePositionedAddonFiltering<N extends IPosit
     }
 
     @Override
+    protected void onVariableContentsUpdated(IPartNetwork network, PartTarget target, S state) {
+        super.onVariableContentsUpdated(network, target, state);
+        state.requireAspectUpdate();
+    }
+
+    @Override
     public Optional<INamedContainerProvider> getContainerProviderSettings(PartPos pos) {
         return Optional.of(new INamedContainerProvider() {
 
