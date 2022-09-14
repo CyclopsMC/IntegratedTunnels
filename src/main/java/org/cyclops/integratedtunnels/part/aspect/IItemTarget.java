@@ -3,14 +3,17 @@ package org.cyclops.integratedtunnels.part.aspect;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
+
 import org.cyclops.commoncapabilities.api.ingredient.storage.IIngredientComponentStorage;
 import org.cyclops.integrateddynamics.api.network.INetwork;
 import org.cyclops.integrateddynamics.api.part.PartPos;
 import org.cyclops.integrateddynamics.api.part.PartTarget;
 import org.cyclops.integrateddynamics.api.part.aspect.property.IAspectProperties;
 import org.cyclops.integratedtunnels.api.network.IItemNetwork;
+import org.cyclops.integratedtunnels.api.world.IEntityIItemTargetProxy;
 import org.cyclops.integratedtunnels.core.part.PartStateRoundRobin;
 import org.cyclops.integratedtunnels.core.predicate.IngredientPredicate;
+import org.cyclops.integratedtunnels.core.world.EntityIItemTargetProxies;
 
 import javax.annotation.Nullable;
 
@@ -51,7 +54,14 @@ public interface IItemTarget extends IChanneledTarget<IItemNetwork, ItemStack> {
         PartPos target = partTarget.getTarget();
         INetwork network = IChanneledTarget.getNetworkChecked(center);
         PartStateRoundRobin<?> partState = IChanneledTarget.getPartState(center);
-        return new ItemTargetCapabilityProvider(transfer, network, entity, target.getSide(),
+        
+        IEntityIItemTargetProxy proxy = EntityIItemTargetProxies.REGISTRY.getHandler(transfer, network, entity,
+                target.getSide(), slot, itemStackMatcher, partTarget, properties, partState);
+        if (proxy == null) {
+            return null; // is there a special null IItemTarget?
+        }
+        
+        return proxy.evaluate(transfer, network, entity, target.getSide(),
                 slot, itemStackMatcher, partTarget, properties, partState);
     }
 

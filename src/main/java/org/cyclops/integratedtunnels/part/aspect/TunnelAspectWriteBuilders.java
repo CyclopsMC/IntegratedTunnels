@@ -67,6 +67,8 @@ import org.cyclops.integratedtunnels.core.part.IPartTypeInterfacePositionedAddon
 import org.cyclops.integratedtunnels.core.part.PartStatePositionedAddon;
 import org.cyclops.integratedtunnels.core.part.PartTypeInterfacePositionedAddonFiltering;
 import org.cyclops.integratedtunnels.core.predicate.IngredientPredicate;
+import org.cyclops.integratedtunnels.core.world.EntityInventoryType;
+import org.cyclops.integratedtunnels.core.world.EntityInventoryTypes;
 import org.cyclops.integratedtunnels.part.PartStatePlayerSimulator;
 
 import javax.annotation.Nullable;
@@ -1246,6 +1248,8 @@ public class TunnelAspectWriteBuilders {
                 input -> input.getRawValue() >= -180D && input.getRawValue() <= 180F;
         public static final Predicate<ValueTypeDouble.ValueDouble> VALIDATOR_DOUBLE_OFFSET =
                 input -> input.getRawValue() >= 0.01D && input.getRawValue() <= 1.01F;
+        public static final Predicate<ValueTypeString.ValueString> VALIDATOR_STRING_ENTITYINVENTORY =
+                input -> EntityInventoryTypes.REGISTRY.getTypes().contains(EntityInventoryType.fromString(input.getRawValue())); // is there a better way to do this?
 
         public static final IAspectPropertyTypeInstance<ValueTypeBoolean, ValueTypeBoolean.ValueBoolean> PROP_BLOCK_UPDATE =
                 new AspectPropertyTypeInstance<>(ValueTypes.BOOLEAN, "aspect.aspecttypes.integratedtunnels.boolean.world.blockupdate");
@@ -1280,6 +1284,8 @@ public class TunnelAspectWriteBuilders {
                 new AspectPropertyTypeInstance<>(ValueTypes.DOUBLE, "aspect.aspecttypes.integratedtunnels.double.world.pitch", VALIDATOR_DOUBLE_ANGLE);
         public static final IAspectPropertyTypeInstance<ValueTypeInteger, ValueTypeInteger.ValueInteger> PROPERTY_ENTITYINDEX =
                 new AspectPropertyTypeInstance<>(ValueTypes.INTEGER, "aspect.aspecttypes.integratedtunnels.integer.entityindex");
+        public static final IAspectPropertyTypeInstance<ValueTypeString, ValueTypeString.ValueString> PROPERTY_ENTITYINVENTORY =
+                new AspectPropertyTypeInstance<>(ValueTypes.STRING, "aspect.aspecttypes.integratedtunnels.string.world.entityinventory", VALIDATOR_STRING_ENTITYINVENTORY);
 
         public static final class Energy {
 
@@ -1448,6 +1454,7 @@ public class TunnelAspectWriteBuilders {
 
                 PROPERTIES_ENTITYITEM_PLACELIST.setValue(PROP_BLACKLIST, ValueTypeBoolean.ValueBoolean.of(false));
             }
+            
             public static final IAspectProperties PROPERTIES_RATESLOT = TunnelAspectWriteBuilders.Item.PROPERTIES_RATESLOT.clone();
             public static final IAspectProperties PROPERTIES_SLOT = TunnelAspectWriteBuilders.Item.PROPERTIES_SLOT.clone();
             public static final IAspectProperties PROPERTIES_RATESLOTCHECKS = TunnelAspectWriteBuilders.Item.PROPERTIES_RATESLOTCHECKS.clone();
@@ -1455,21 +1462,31 @@ public class TunnelAspectWriteBuilders {
             public static final IAspectProperties PROPERTIES_NBT = TunnelAspectWriteBuilders.Item.PROPERTIES_NBT.clone();
             static {
                 PROPERTIES_RATESLOT.setValue(World.PROPERTY_ENTITYINDEX, ValueTypeInteger.ValueInteger.of(0));
+                PROPERTIES_RATESLOT.setValue(World.PROPERTY_ENTITYINVENTORY,
+                        ValueTypeString.ValueString.of(EntityInventoryTypes.SIDED.getName()));
                 PROPERTIES_RATESLOT.removeValue(PROP_PASSIVE_IO);
 
                 PROPERTIES_SLOT.setValue(World.PROPERTY_ENTITYINDEX, ValueTypeInteger.ValueInteger.of(0));
+                PROPERTIES_SLOT.setValue(World.PROPERTY_ENTITYINVENTORY,
+                        ValueTypeString.ValueString.of(EntityInventoryTypes.SIDED.getName()));
                 PROPERTIES_SLOT.removeValue(PROP_PASSIVE_IO);
 
                 PROPERTIES_RATESLOTCHECKS.setValue(World.PROPERTY_ENTITYINDEX, ValueTypeInteger.ValueInteger.of(0));
+                PROPERTIES_RATESLOTCHECKS.setValue(World.PROPERTY_ENTITYINVENTORY,
+                        ValueTypeString.ValueString.of(EntityInventoryTypes.SIDED.getName()));
                 PROPERTIES_RATESLOTCHECKS.setValue(PROP_BLACKLIST, ValueTypeBoolean.ValueBoolean.of(false));
                 PROPERTIES_RATESLOTCHECKS.setValue(PROP_EMPTYISANY, ValueTypeBoolean.ValueBoolean.of(false));
                 PROPERTIES_RATESLOTCHECKS.removeValue(PROP_PASSIVE_IO);
 
                 PROPERTIES_RATESLOTCHECKSCRAFT.setValue(World.PROPERTY_ENTITYINDEX, ValueTypeInteger.ValueInteger.of(0));
+                PROPERTIES_RATESLOTCHECKSCRAFT.setValue(World.PROPERTY_ENTITYINVENTORY,
+                        ValueTypeString.ValueString.of(EntityInventoryTypes.SIDED.getName()));
                 PROPERTIES_RATESLOTCHECKSCRAFT.setValue(PROP_BLACKLIST, ValueTypeBoolean.ValueBoolean.of(false));
                 PROPERTIES_RATESLOTCHECKSCRAFT.removeValue(PROP_PASSIVE_IO);
 
                 PROPERTIES_NBT.setValue(World.PROPERTY_ENTITYINDEX, ValueTypeInteger.ValueInteger.of(0));
+                PROPERTIES_NBT.setValue(World.PROPERTY_ENTITYINVENTORY,
+                        ValueTypeString.ValueString.of(EntityInventoryTypes.SIDED.getName()));
                 PROPERTIES_NBT.removeValue(PROP_PASSIVE_IO);
             }
             public static final IAspectProperties PROPERTIES_RATESLOTCHECKSLIST = PROPERTIES_RATESLOTCHECKS.clone();
