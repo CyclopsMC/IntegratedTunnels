@@ -22,7 +22,9 @@
         "variable": {
           "valuetype": "integrateddynamics:itemstack",
           "value": {
-            "item": "minecraft:diamond_sword"
+            "items": [
+              "minecraft:diamond_sword"
+            ]
           }
         }
       }
