@@ -21,9 +21,7 @@
         "aspect": "integratedtunnels:write_block_world_block_block_import",
         "variable": {
           "valuetype": "integrateddynamics:block",
-          "value": {
-            "item": "minecraft:stone$0"
-          }
+          "value": "{Name:\"minecraft:stone\"}"
         }
       }
     }
