@@ -44,6 +44,7 @@ public class ExtendedFakePlayer extends FakePlayer {
 
         this.attackStrengthTicker = (int) (level.getGameTime() - lastSwingUpdateTick);
         this.getInventory().tick();
+        this.getCooldowns().tick();
     }
 
     @Override
