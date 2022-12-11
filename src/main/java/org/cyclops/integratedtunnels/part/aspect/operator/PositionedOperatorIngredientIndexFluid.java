@@ -18,6 +18,11 @@ import org.cyclops.integrateddynamics.core.evaluate.operator.OperatorBase.SafeVa
  * @author rubensworks
  */
 public class PositionedOperatorIngredientIndexFluid extends PositionedOperatorIngredientIndex<FluidStack, Integer> {
+
+    public PositionedOperatorIngredientIndexFluid() {
+        this(null, Direction.NORTH, -1);
+    }
+
     public PositionedOperatorIngredientIndexFluid(DimPos pos, Direction side, int channel) {
         super("countbyfluid", new Function(), ValueTypes.OBJECT_FLUIDSTACK, ValueTypes.LONG, pos, side, channel);
     }
