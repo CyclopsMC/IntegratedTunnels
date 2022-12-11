@@ -1,0 +1,6 @@
+As always, don't forget to backup your world before updating!
+Requires CyclopsCore version 1.13.4 or higher.
+
+Fixes:
+* Fix localization and serialization of Network Count Of Item/Fluid operators, Closes CyclopsMC/IntegratedDynamics#1235
+
