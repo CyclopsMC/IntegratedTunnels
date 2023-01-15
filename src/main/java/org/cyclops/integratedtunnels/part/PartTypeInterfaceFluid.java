@@ -1,8 +1,8 @@
 package org.cyclops.integratedtunnels.part;
 
 import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import org.cyclops.integratedtunnels.GeneralConfig;
 import org.cyclops.integratedtunnels.api.network.IFluidNetwork;
@@ -11,9 +11,6 @@ import org.cyclops.integratedtunnels.core.part.IPartTypeInterfacePositionedAddon
 import org.cyclops.integratedtunnels.core.part.PartTypeInterfacePositionedAddon;
 
 import javax.annotation.Nonnull;
-
-import net.minecraftforge.fluids.capability.IFluidHandler.FluidAction;
-import org.cyclops.integratedtunnels.core.part.IPartTypeInterfacePositionedAddon.IState;
 
 /**
  * Interface for fluid handlers.
@@ -31,7 +28,7 @@ public class PartTypeInterfaceFluid extends PartTypeInterfacePositionedAddon<IFl
 
     @Override
     public Capability<IFluidHandler> getTargetCapability() {
-        return CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY;
+        return ForgeCapabilities.FLUID_HANDLER;
     }
 
     @Override
@@ -48,7 +45,7 @@ public class PartTypeInterfaceFluid extends PartTypeInterfacePositionedAddon<IFl
 
         @Override
         public Capability<IFluidHandler> getTargetCapability() {
-            return CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY;
+            return ForgeCapabilities.FLUID_HANDLER;
         }
 
         @Override
@@ -65,7 +62,7 @@ public class PartTypeInterfaceFluid extends PartTypeInterfacePositionedAddon<IFl
         }
 
         protected IFluidHandler getFluidHandler() {
-            return state.getPositionedAddonsNetwork().getChannelExternal(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, state.getChannel());
+            return state.getPositionedAddonsNetwork().getChannelExternal(ForgeCapabilities.FLUID_HANDLER, state.getChannel());
         }
 
         @Override

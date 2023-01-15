@@ -4,6 +4,7 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import org.apache.commons.lang3.tuple.Pair;
 import org.cyclops.cyclopscore.helper.BlockEntityHelpers;
+import org.cyclops.integrateddynamics.api.evaluate.variable.ValueDeseralizationContext;
 import org.cyclops.integrateddynamics.api.network.INetwork;
 import org.cyclops.integrateddynamics.api.network.IPartNetwork;
 import org.cyclops.integrateddynamics.api.network.IPositionedAddonsNetwork;
@@ -70,7 +71,7 @@ public interface IPartTypeInterfacePositionedAddon<N extends IPositionedAddonsNe
         boolean validTargetCapability = ret.getRight();
         if (networkCapability != null) {
             state.setPositionedAddonsNetwork(networkCapability);
-            state.setNetworks(network, NetworkHelpers.getPartNetworkChecked(network));
+            state.setNetworks(network, NetworkHelpers.getPartNetworkChecked(network), ValueDeseralizationContext.of(posTarget.getPos().getLevel(true)));
             state.setPos(posTarget);
             state.setValidTargetCapability(validTargetCapability);
             if (validTargetCapability) {
@@ -82,7 +83,7 @@ public interface IPartTypeInterfacePositionedAddon<N extends IPositionedAddonsNe
     public default void removeTargetFromNetwork(INetwork network, PartPos pos, S state) {
         removePositionFromNetwork(network, pos, state);
         state.setPositionedAddonsNetwork(null);
-        state.setNetworks(null, null);
+        state.setNetworks(null, null, null);
         state.setPos(null);
         state.setValidTargetCapability(false);
     }
@@ -141,7 +142,7 @@ public interface IPartTypeInterfacePositionedAddon<N extends IPositionedAddonsNe
             return getPositionedAddonsNetwork() != null && isPositionEnabled();
         }
 
-        public void setNetworks(@Nullable INetwork network, @Nullable IPartNetwork partNetwork);
+        public void setNetworks(@Nullable INetwork network, @Nullable IPartNetwork partNetwork, ValueDeseralizationContext valueDeseralizationContext);
         @Nullable
         public INetwork getNetwork();
         @Nullable

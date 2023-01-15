@@ -2,8 +2,8 @@ package org.cyclops.integratedtunnels.part;
 
 import com.google.common.collect.Lists;
 import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import org.cyclops.integrateddynamics.api.network.INetwork;
 import org.cyclops.integrateddynamics.api.network.IPartNetwork;
@@ -41,7 +41,7 @@ public class PartTypeInterfaceFilteringItem extends PartTypeInterfacePositionedA
 
     @Override
     public Capability<IItemHandler> getTargetCapability() {
-        return CapabilityItemHandler.ITEM_HANDLER_CAPABILITY;
+        return ForgeCapabilities.ITEM_HANDLER;
     }
 
     @Override
@@ -62,7 +62,7 @@ public class PartTypeInterfaceFilteringItem extends PartTypeInterfacePositionedA
 
         @Override
         public Capability<IItemHandler> getTargetCapability() {
-            return CapabilityItemHandler.ITEM_HANDLER_CAPABILITY;
+            return ForgeCapabilities.ITEM_HANDLER;
         }
 
         @Override

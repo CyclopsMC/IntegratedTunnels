@@ -1,8 +1,8 @@
 package org.cyclops.integratedtunnels.part;
 
 import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
 import org.cyclops.integrateddynamics.api.network.IEnergyNetwork;
 import org.cyclops.integrateddynamics.api.part.PartPos;
@@ -11,8 +11,6 @@ import org.cyclops.integratedtunnels.Capabilities;
 import org.cyclops.integratedtunnels.GeneralConfig;
 import org.cyclops.integratedtunnels.core.part.IPartTypeInterfacePositionedAddon;
 import org.cyclops.integratedtunnels.core.part.PartTypeInterfacePositionedAddon;
-
-import org.cyclops.integratedtunnels.core.part.IPartTypeInterfacePositionedAddon.IState;
 
 /**
  * Interface for energy storages.
@@ -30,7 +28,7 @@ public class PartTypeInterfaceEnergy extends PartTypeInterfacePositionedAddon<IE
 
     @Override
     public Capability<IEnergyStorage> getTargetCapability() {
-        return CapabilityEnergy.ENERGY;
+        return ForgeCapabilities.ENERGY;
     }
 
     @Override
@@ -52,7 +50,7 @@ public class PartTypeInterfaceEnergy extends PartTypeInterfacePositionedAddon<IE
 
         @Override
         public Capability<IEnergyStorage> getTargetCapability() {
-            return CapabilityEnergy.ENERGY;
+            return ForgeCapabilities.ENERGY;
         }
 
         @Override
@@ -69,7 +67,7 @@ public class PartTypeInterfaceEnergy extends PartTypeInterfacePositionedAddon<IE
         }
 
         protected IEnergyStorage getEnergyStorage() {
-            return state.getPositionedAddonsNetwork().getChannelExternal(CapabilityEnergy.ENERGY, state.getChannel());
+            return state.getPositionedAddonsNetwork().getChannelExternal(ForgeCapabilities.ENERGY, state.getChannel());
         }
 
         @Override

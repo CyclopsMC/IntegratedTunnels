@@ -17,6 +17,7 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import org.apache.commons.lang3.tuple.Triple;
 import org.cyclops.cyclopscore.network.PacketCodec;
+import org.cyclops.integrateddynamics.api.evaluate.variable.ValueDeseralizationContext;
 import org.cyclops.integrateddynamics.api.network.INetwork;
 import org.cyclops.integrateddynamics.api.network.IPartNetwork;
 import org.cyclops.integrateddynamics.api.network.IPositionedAddonsNetwork;
@@ -134,8 +135,8 @@ public abstract class PartTypeInterfacePositionedAddon<N extends IPositionedAddo
         private IPartNetwork partNetwork;
 
         @Override
-        public void readFromNBT(CompoundTag tag) {
-            super.readFromNBT(tag);
+        public void readFromNBT(ValueDeseralizationContext valueDeseralizationContext, CompoundTag tag) {
+            super.readFromNBT(valueDeseralizationContext, tag);
             if (tag.contains("channelInterface", Tag.TAG_INT)) {
                 this.channelInterface = tag.getInt("channelInterface");
             }
@@ -190,7 +191,7 @@ public abstract class PartTypeInterfacePositionedAddon<N extends IPositionedAddo
         }
 
         @Override
-        public void setNetworks(@Nullable INetwork network, @Nullable IPartNetwork partNetwork) {
+        public void setNetworks(@Nullable INetwork network, @Nullable IPartNetwork partNetwork, ValueDeseralizationContext valueDeseralizationContext) {
             this.network = network;
             this.partNetwork = partNetwork;
         }

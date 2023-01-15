@@ -2,8 +2,8 @@ package org.cyclops.integratedtunnels.part;
 
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import org.cyclops.integrateddynamics.api.network.INetwork;
 import org.cyclops.integrateddynamics.api.network.IPartNetwork;
@@ -28,14 +28,14 @@ public class PartStateItem<P extends IPartTypeWriter> extends PartStatePositione
 
     @Override
     public <T2> LazyOptional<T2> getCapability(Capability<T2> capability, INetwork network, IPartNetwork partNetwork, PartTarget target) {
-        if (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
+        if (capability == ForgeCapabilities.ITEM_HANDLER) {
             return LazyOptional.of(() -> this).cast();
         }
         return super.getCapability(capability, network, partNetwork, target);
     }
 
     protected IItemHandler getItemHandler() {
-        return getPositionedAddonsNetwork().getChannelExternal(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, getChannel());
+        return getPositionedAddonsNetwork().getChannelExternal(ForgeCapabilities.ITEM_HANDLER, getChannel());
     }
 
     @Override

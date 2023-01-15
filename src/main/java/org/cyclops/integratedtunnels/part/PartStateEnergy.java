@@ -1,8 +1,8 @@
 package org.cyclops.integratedtunnels.part;
 
 import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
 import org.cyclops.integrateddynamics.GeneralConfig;
 import org.cyclops.integrateddynamics.api.network.IEnergyNetwork;
@@ -25,14 +25,14 @@ public class PartStateEnergy<P extends IPartTypeWriter> extends PartStatePositio
 
     @Override
     public <T2> LazyOptional<T2> getCapability(Capability<T2> capability, INetwork network, IPartNetwork partNetwork, PartTarget target) {
-        if (capability == CapabilityEnergy.ENERGY) {
+        if (capability == ForgeCapabilities.ENERGY) {
             return LazyOptional.of(() -> this).cast();
         }
         return super.getCapability(capability, network, partNetwork, target);
     }
 
     protected IEnergyStorage getEnergyStorage() {
-        return getPositionedAddonsNetwork().getChannelExternal(CapabilityEnergy.ENERGY, getChannel());
+        return getPositionedAddonsNetwork().getChannelExternal(ForgeCapabilities.ENERGY, getChannel());
     }
 
     @Override

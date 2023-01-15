@@ -3,8 +3,8 @@ package org.cyclops.integratedtunnels.part;
 import com.google.common.collect.Iterators;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import org.cyclops.commoncapabilities.api.capability.itemhandler.ISlotlessItemHandler;
 import org.cyclops.integrateddynamics.api.network.INetwork;
@@ -36,7 +36,7 @@ public class PartTypeInterfaceItem extends PartTypeInterfacePositionedAddon<IIte
 
     @Override
     public Capability<IItemHandler> getTargetCapability() {
-        return CapabilityItemHandler.ITEM_HANDLER_CAPABILITY;
+        return ForgeCapabilities.ITEM_HANDLER;
     }
 
     @Override
@@ -53,7 +53,7 @@ public class PartTypeInterfaceItem extends PartTypeInterfacePositionedAddon<IIte
 
         @Override
         public Capability<IItemHandler> getTargetCapability() {
-            return CapabilityItemHandler.ITEM_HANDLER_CAPABILITY;
+            return ForgeCapabilities.ITEM_HANDLER;
         }
 
         @Override
@@ -78,7 +78,7 @@ public class PartTypeInterfaceItem extends PartTypeInterfacePositionedAddon<IIte
         }
 
         protected IItemHandler getItemHandler() {
-            return state.getPositionedAddonsNetwork().getChannelExternal(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, state.getChannel());
+            return state.getPositionedAddonsNetwork().getChannelExternal(ForgeCapabilities.ITEM_HANDLER, state.getChannel());
         }
 
         @Override

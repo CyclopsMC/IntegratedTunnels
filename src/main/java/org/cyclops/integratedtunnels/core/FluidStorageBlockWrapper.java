@@ -1,14 +1,14 @@
 package org.cyclops.integratedtunnels.core;
 
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.core.Direction;
-import net.minecraft.sounds.SoundSource;
-import net.minecraft.sounds.SoundEvent;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraftforge.common.SoundActions;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import org.cyclops.commoncapabilities.api.ingredient.IngredientComponent;
 import org.cyclops.commoncapabilities.api.ingredient.storage.IIngredientComponentStorage;
@@ -39,7 +39,7 @@ public class FluidStorageBlockWrapper implements IIngredientComponentStorage<Flu
 
         IFluidHandler fluidHandler = new FluidHandlerBlock(world.getBlockState(pos), world, pos);
         this.targetStorage = getComponent()
-                .getStorageWrapperHandler(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY)
+                .getStorageWrapperHandler(ForgeCapabilities.FLUID_HANDLER)
                 .wrapComponentStorage(fluidHandler);
     }
 

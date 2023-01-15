@@ -1,9 +1,9 @@
 package org.cyclops.integratedtunnels.part;
 
 import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import org.cyclops.integrateddynamics.api.network.INetwork;
 import org.cyclops.integrateddynamics.api.network.IPartNetwork;
@@ -15,8 +15,6 @@ import org.cyclops.integratedtunnels.api.network.IFluidNetwork;
 import org.cyclops.integratedtunnels.core.part.PartStatePositionedAddon;
 
 import javax.annotation.Nonnull;
-
-import net.minecraftforge.fluids.capability.IFluidHandler.FluidAction;
 
 /**
  * A part state for handling fluid import and export.
@@ -31,14 +29,14 @@ public class PartStateFluid<P extends IPartTypeWriter> extends PartStatePosition
 
     @Override
     public <T2> LazyOptional<T2> getCapability(Capability<T2> capability, INetwork network, IPartNetwork partNetwork, PartTarget target) {
-        if (capability == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY) {
+        if (capability == ForgeCapabilities.FLUID_HANDLER) {
             return LazyOptional.of(() -> this).cast();
         }
         return super.getCapability(capability, network, partNetwork, target);
     }
 
     protected IFluidHandler getFluidHandler() {
-        return getPositionedAddonsNetwork().getChannelExternal(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, getChannel());
+        return getPositionedAddonsNetwork().getChannelExternal(ForgeCapabilities.FLUID_HANDLER, getChannel());
     }
 
     @Override

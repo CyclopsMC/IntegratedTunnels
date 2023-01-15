@@ -11,11 +11,9 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
-import net.minecraftforge.items.CapabilityItemHandler;
 import org.apache.commons.lang3.tuple.Triple;
 import org.cyclops.commoncapabilities.IngredientComponents;
 import org.cyclops.commoncapabilities.api.ingredient.storage.IIngredientComponentStorage;
@@ -206,9 +204,9 @@ public class TunnelAspectWriteBuilders {
     public static final class Energy {
 
         public static final IAspectWriteActivator ACTIVATOR = createPositionedNetworkAddonActivator(
-                () -> Capabilities.NETWORK_ENERGY, CapabilityEnergy.ENERGY);
+                () -> Capabilities.NETWORK_ENERGY, ForgeCapabilities.ENERGY);
         public static final IAspectWriteDeactivator DEACTIVATOR = createPositionedNetworkAddonDeactivator(
-                () -> Capabilities.NETWORK_ENERGY, CapabilityEnergy.ENERGY);
+                () -> Capabilities.NETWORK_ENERGY, ForgeCapabilities.ENERGY);
 
         public static final AspectBuilder<ValueTypeBoolean.ValueBoolean, ValueTypeBoolean, Triple<PartTarget, IAspectProperties, Boolean>>
                 BUILDER_BOOLEAN = AspectWriteBuilders.BUILDER_BOOLEAN.byMod(IntegratedTunnels._instance)
@@ -360,9 +358,9 @@ public class TunnelAspectWriteBuilders {
     public static final class Item {
 
         public static final IAspectWriteActivator ACTIVATOR = createPositionedNetworkAddonActivator(
-                () -> ItemNetworkConfig.CAPABILITY, CapabilityItemHandler.ITEM_HANDLER_CAPABILITY);
+                () -> ItemNetworkConfig.CAPABILITY, ForgeCapabilities.ITEM_HANDLER);
         public static final IAspectWriteDeactivator DEACTIVATOR = createPositionedNetworkAddonDeactivator(
-                () -> ItemNetworkConfig.CAPABILITY, CapabilityItemHandler.ITEM_HANDLER_CAPABILITY);
+                () -> ItemNetworkConfig.CAPABILITY, ForgeCapabilities.ITEM_HANDLER);
 
         public static final AspectBuilder<ValueTypeBoolean.ValueBoolean, ValueTypeBoolean, Triple<PartTarget, IAspectProperties, Boolean>>
                 BUILDER_BOOLEAN = AspectWriteBuilders.BUILDER_BOOLEAN.byMod(IntegratedTunnels._instance)
@@ -829,10 +827,10 @@ public class TunnelAspectWriteBuilders {
 
         public static final IAspectWriteActivator ACTIVATOR = createPositionedNetworkAddonActivator(
             () -> FluidNetworkConfig.CAPABILITY,
-        CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY);
+        ForgeCapabilities.FLUID_HANDLER);
         public static final IAspectWriteDeactivator DEACTIVATOR = createPositionedNetworkAddonDeactivator(
             () -> FluidNetworkConfig.CAPABILITY,
-        CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY);
+        ForgeCapabilities.FLUID_HANDLER);
 
         public static final AspectBuilder<ValueTypeBoolean.ValueBoolean, ValueTypeBoolean, Triple<PartTarget, IAspectProperties, Boolean>>
                 BUILDER_BOOLEAN = AspectWriteBuilders.BUILDER_BOOLEAN.byMod(IntegratedTunnels._instance)

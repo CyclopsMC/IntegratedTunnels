@@ -14,6 +14,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import org.apache.commons.lang3.tuple.Triple;
+import org.cyclops.integrateddynamics.api.evaluate.variable.ValueDeseralizationContext;
 import org.cyclops.integrateddynamics.api.network.INetwork;
 import org.cyclops.integrateddynamics.api.network.IPartNetwork;
 import org.cyclops.integrateddynamics.api.network.IPositionedAddonsNetwork;
@@ -138,6 +139,7 @@ public abstract class PartTypeInterfacePositionedAddonFiltering<N extends IPosit
         private PositionedAddonsNetworkIngredientsFilter<T> targetFilter = null;
         private INetwork network;
         private IPartNetwork partNetwork;
+        private ValueDeseralizationContext valueDeseralizationContext;
         private boolean requireAspectUpdate = true;
 
         public State(int inventorySize) {
@@ -150,8 +152,8 @@ public abstract class PartTypeInterfacePositionedAddonFiltering<N extends IPosit
         }
 
         @Override
-        public void readFromNBT(CompoundTag tag) {
-            super.readFromNBT(tag);
+        public void readFromNBT(ValueDeseralizationContext valueDeseralizationContext, CompoundTag tag) {
+            super.readFromNBT(valueDeseralizationContext, tag);
             if (tag.contains("channelInterface", Tag.TAG_INT)) {
                 this.channelInterface = tag.getInt("channelInterface");
             }
@@ -223,7 +225,7 @@ public abstract class PartTypeInterfacePositionedAddonFiltering<N extends IPosit
             if (targetFilter == null) {
                 this.requireAspectUpdate();
             } else {
-                getVariable(network, partNetwork).addInvalidationListener(this::requireAspectUpdate);
+                getVariable(network, partNetwork, valueDeseralizationContext).addInvalidationListener(this::requireAspectUpdate);
             }
         }
 
@@ -232,9 +234,10 @@ public abstract class PartTypeInterfacePositionedAddonFiltering<N extends IPosit
         }
 
         @Override
-        public void setNetworks(@Nullable INetwork network, @Nullable IPartNetwork partNetwork) {
+        public void setNetworks(@Nullable INetwork network, @Nullable IPartNetwork partNetwork, ValueDeseralizationContext valueDeseralizationContext) {
             this.network = network;
             this.partNetwork = partNetwork;
+            this.valueDeseralizationContext = valueDeseralizationContext;
         }
 
         @Override

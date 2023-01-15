@@ -2,7 +2,7 @@ package org.cyclops.integratedtunnels.part;
 
 import com.google.common.collect.Lists;
 import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import org.cyclops.integrateddynamics.api.part.aspect.IAspect;
 import org.cyclops.integrateddynamics.core.part.aspect.AspectRegistry;
@@ -36,7 +36,7 @@ public class PartTypeInterfaceFilteringFluid extends PartTypeInterfacePositioned
 
     @Override
     public Capability<IFluidHandler> getTargetCapability() {
-        return CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY;
+        return ForgeCapabilities.FLUID_HANDLER;
     }
 
     @Override
@@ -57,7 +57,7 @@ public class PartTypeInterfaceFilteringFluid extends PartTypeInterfacePositioned
 
         @Override
         public Capability<IFluidHandler> getTargetCapability() {
-            return CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY;
+            return ForgeCapabilities.FLUID_HANDLER;
         }
 
         @Override

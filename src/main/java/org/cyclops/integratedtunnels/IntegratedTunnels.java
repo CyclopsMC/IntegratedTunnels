@@ -2,6 +2,7 @@ package org.cyclops.integratedtunnels;
 
 import com.google.common.collect.Lists;
 import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.MinecraftForge;
@@ -13,7 +14,6 @@ import net.minecraftforge.registries.NewRegistryEvent;
 import org.apache.logging.log4j.Level;
 import org.cyclops.cyclopscore.config.ConfigHandler;
 import org.cyclops.cyclopscore.infobook.IInfoBookRegistry;
-import org.cyclops.cyclopscore.init.ItemGroupMod;
 import org.cyclops.cyclopscore.init.ModBaseVersionable;
 import org.cyclops.cyclopscore.proxy.IClientProxy;
 import org.cyclops.cyclopscore.proxy.ICommonProxy;
@@ -108,8 +108,9 @@ public class IntegratedTunnels extends ModBaseVersionable<IntegratedTunnels> {
     }
 
     @Override
-    public CreativeModeTab constructDefaultCreativeModeTab() {
-        return new ItemGroupMod(this, () -> RegistryEntries.ITEM_PART_INTERFACE);
+    protected CreativeModeTab.Builder constructDefaultCreativeModeTab(CreativeModeTab.Builder builder) {
+        return super.constructDefaultCreativeModeTab(builder)
+                .icon(() -> new ItemStack(RegistryEntries.ITEM_PART_INTERFACE));
     }
 
     @Override

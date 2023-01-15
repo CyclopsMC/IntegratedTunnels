@@ -2,8 +2,8 @@ package org.cyclops.integratedtunnels.part;
 
 import com.google.common.collect.Lists;
 import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
 import org.cyclops.integrateddynamics.api.network.IEnergyNetwork;
 import org.cyclops.integrateddynamics.api.part.PartPos;
@@ -35,7 +35,7 @@ public class PartTypeInterfaceFilteringEnergy extends PartTypeInterfacePositione
 
     @Override
     public Capability<IEnergyStorage> getTargetCapability() {
-        return CapabilityEnergy.ENERGY;
+        return ForgeCapabilities.ENERGY;
     }
 
     @Override
@@ -61,7 +61,7 @@ public class PartTypeInterfaceFilteringEnergy extends PartTypeInterfacePositione
 
         @Override
         public Capability<IEnergyStorage> getTargetCapability() {
-            return CapabilityEnergy.ENERGY;
+            return ForgeCapabilities.ENERGY;
         }
 
         @Override
