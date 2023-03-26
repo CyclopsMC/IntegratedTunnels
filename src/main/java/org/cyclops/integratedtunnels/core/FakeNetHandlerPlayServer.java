@@ -13,6 +13,7 @@ import net.minecraft.network.protocol.game.*;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
+import net.minecraft.world.entity.RelativeMovement;
 import org.jetbrains.annotations.Nullable;
 
 import javax.crypto.Cipher;
@@ -145,7 +146,7 @@ public class FakeNetHandlerPlayServer extends ServerGamePacketListenerImpl {
     }
 
     @Override
-    public void teleport(double x, double y, double z, float yaw, float pitch, Set<ClientboundPlayerPositionPacket.RelativeArgument> relativeSet) {
+    public void teleport(double p_9781_, double p_9782_, double p_9783_, float p_9784_, float p_9785_, Set<RelativeMovement> p_9786_) {
 
     }
 
