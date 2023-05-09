@@ -8,7 +8,6 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.NewRegistryEvent;
 import org.apache.logging.log4j.Level;
@@ -18,6 +17,7 @@ import org.cyclops.cyclopscore.init.ModBaseVersionable;
 import org.cyclops.cyclopscore.proxy.IClientProxy;
 import org.cyclops.cyclopscore.proxy.ICommonProxy;
 import org.cyclops.integrateddynamics.IntegratedDynamics;
+import org.cyclops.integrateddynamics.core.event.IntegratedDynamicsSetupEvent;
 import org.cyclops.integrateddynamics.core.part.aspect.AspectRegistry;
 import org.cyclops.integrateddynamics.infobook.OnTheDynamicsOfIntegrationBook;
 import org.cyclops.integratedtunnels.api.world.IBlockBreakHandlerRegistry;
@@ -59,7 +59,7 @@ public class IntegratedTunnels extends ModBaseVersionable<IntegratedTunnels> {
         getRegistryManager().addRegistry(IBlockPlaceHandlerRegistry.class, BlockBreakPlaceRegistry.getInstance());
 
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::onRegistriesCreate);
-        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::afterSetup);
+        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::onSetup);
     }
 
     public void onRegistriesCreate(NewRegistryEvent event) {
@@ -80,7 +80,7 @@ public class IntegratedTunnels extends ModBaseVersionable<IntegratedTunnels> {
         TunnelValueTypeListProxyFactories.load();
     }
 
-    protected void afterSetup(FMLLoadCompleteEvent event) {
+    protected void onSetup(IntegratedDynamicsSetupEvent event) {
         // Initialize info book
         IntegratedDynamics._instance.getRegistryManager().getRegistry(IInfoBookRegistry.class)
                 .registerSection(this,
