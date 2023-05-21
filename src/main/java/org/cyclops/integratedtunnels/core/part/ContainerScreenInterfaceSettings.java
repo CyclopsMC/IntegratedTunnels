@@ -1,15 +1,19 @@
 package org.cyclops.integratedtunnels.core.part;
 
+import com.google.common.collect.Lists;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
+import org.cyclops.cyclopscore.client.gui.component.button.ButtonImage;
 import org.cyclops.cyclopscore.client.gui.component.input.WidgetNumberField;
+import org.cyclops.cyclopscore.client.gui.image.IImage;
 import org.cyclops.cyclopscore.helper.Helpers;
 import org.cyclops.cyclopscore.helper.L10NHelpers;
 import org.cyclops.cyclopscore.helper.ValueNotifierHelpers;
 import org.cyclops.integrateddynamics.core.client.gui.container.ContainerScreenPartSettings;
+import org.cyclops.integrateddynamics.core.inventory.container.ContainerMultipartAspects;
 import org.cyclops.integratedtunnels.Reference;
 import org.lwjgl.glfw.GLFW;
 
@@ -41,6 +45,7 @@ public class ContainerScreenInterfaceSettings extends ContainerScreenPartSetting
 
     @Override
     public void init() {
+        clearWidgets();
         super.init();
 
         numberFieldChannelInterface = new WidgetNumberField(font, leftPos + 106, topPos + 109, 70, 14, true, Component.translatable("gui.integratedtunnels.partsettings.channel.interface"), true);
@@ -49,6 +54,16 @@ public class ContainerScreenInterfaceSettings extends ContainerScreenPartSetting
         numberFieldChannelInterface.setVisible(true);
         numberFieldChannelInterface.setTextColor(16777215);
         numberFieldChannelInterface.setCanLoseFocus(true);
+
+        addRenderableWidget(new ButtonImage(this.leftPos - 20, this.topPos + 0, 18, 18,
+                Component.translatable("gui.integrateddynamics.part_offsets"),
+                createServerPressable(ContainerMultipartAspects.BUTTON_OFFSETS, (button) -> {
+                }),
+                new IImage[]{
+                        org.cyclops.integrateddynamics.client.gui.image.Images.BUTTON_BACKGROUND_INACTIVE,
+                        org.cyclops.integrateddynamics.client.gui.image.Images.BUTTON_MIDDLE_OFFSET
+                },
+                false, 0, 0));
 
         this.refreshValues();
     }
@@ -85,6 +100,15 @@ public class ContainerScreenInterfaceSettings extends ContainerScreenPartSetting
         font.draw(matrixStack, L10NHelpers.localize("gui.integratedtunnels.partsettings.channel.interface"),
                 leftPos + 8, topPos + 112, Helpers.RGBToInt(0, 0, 0));
         numberFieldChannelInterface.render(matrixStack, mouseX, mouseY, partialTicks);
+    }
+
+    @Override
+    protected void renderLabels(PoseStack matrixStack, int mouseX, int mouseY) {
+        super.renderLabels(matrixStack, mouseX, mouseY);
+
+        if (isHovering(-20, 0, 18, 18, mouseX, mouseY)) {
+            drawTooltip(Lists.newArrayList(Component.translatable("gui.integrateddynamics.part_offsets")), matrixStack, mouseX - leftPos, mouseY - topPos);
+        }
     }
 
     @Override
