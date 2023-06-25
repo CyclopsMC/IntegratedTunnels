@@ -18,7 +18,7 @@ import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FluidState;
-import net.minecraft.world.level.storage.loot.LootContext;
+import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.MinecraftForge;
@@ -108,8 +108,7 @@ public class ItemStorageBlockWrapper implements IIngredientComponentStorage<Item
 
     // Modified from Block#getDrops
     public static List<ItemStack> getDrops(BlockState state, ServerLevel worldIn, BlockPos pos, @Nullable BlockEntity tileEntityIn) {
-        LootContext.Builder lootcontext$builder = (new LootContext.Builder(worldIn))
-                .withRandom(worldIn.random)
+        LootParams.Builder lootcontext$builder = (new LootParams.Builder(worldIn))
                 .withParameter(LootContextParams.ORIGIN, new Vec3(pos.getX(), pos.getY(), pos.getZ()))
                 .withParameter(LootContextParams.TOOL, ItemStack.EMPTY)
                 .withParameter(LootContextParams.TOOL, ItemStack.EMPTY)

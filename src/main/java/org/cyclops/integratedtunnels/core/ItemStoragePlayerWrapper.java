@@ -1,22 +1,22 @@
 package org.cyclops.integratedtunnels.core;
 
 import com.google.common.collect.Iterators;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.player.Player;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
-import net.minecraft.world.InteractionResultHolder;
-import net.minecraft.world.InteractionResult;
-import net.minecraft.core.Direction;
-import net.minecraft.world.InteractionHand;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
-import net.minecraft.core.BlockPos;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.ForgeMod;
 import net.minecraftforge.event.ForgeEventFactory;
@@ -228,7 +228,7 @@ public class ItemStoragePlayerWrapper implements IIngredientComponentStorage<Ite
             if (rightClickBlockActionResult.getUseItem() != Event.Result.DENY && !stack.isEmpty()) {
                 // Increase reach position.
                 BlockPos targetPos = pos;
-                double reachDistance = player.getAttribute(ForgeMod.REACH_DISTANCE.get()).getValue() + 3;
+                double reachDistance = player.getAttribute(ForgeMod.BLOCK_REACH.get()).getValue() + 3;
                 int i = 0;
                 while (i++ < reachDistance && world.isEmptyBlock(targetPos)) {
                     targetPos = targetPos.relative(side.getOpposite());
@@ -261,7 +261,7 @@ public class ItemStoragePlayerWrapper implements IIngredientComponentStorage<Ite
                 int durabilityRemaining = player.gameMode.lastSentState;
                 if (durabilityRemaining < 0) {
                     world.getBlockState(pos).attack(world, pos, player);
-                    float relativeBlockHardness = blockState.getDestroyProgress(this.player, this.player.level, pos);
+                    float relativeBlockHardness = blockState.getDestroyProgress(this.player, this.player.level(), pos);
                     if (relativeBlockHardness >= 1.0F) {
                         // Insta-mine
                         player.gameMode.destroyBlock(pos);

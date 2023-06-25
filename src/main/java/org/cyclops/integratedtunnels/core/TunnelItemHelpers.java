@@ -1,16 +1,15 @@
 package org.cyclops.integratedtunnels.core;
 
 import com.google.common.collect.Lists;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.material.Material;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.Tag;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.nbt.Tag;
-import net.minecraft.core.Direction;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
-import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.block.state.BlockState;
 import org.cyclops.commoncapabilities.api.capability.itemhandler.ItemMatch;
 import org.cyclops.commoncapabilities.api.ingredient.IngredientComponent;
 import org.cyclops.commoncapabilities.api.ingredient.storage.IIngredientComponentStorage;
@@ -35,6 +34,7 @@ import org.cyclops.integratedtunnels.part.aspect.ITunnelConnection;
 import javax.annotation.Nullable;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -126,7 +126,7 @@ public class TunnelItemHelpers {
         if (stackA != null && stackB != null) {
             if (checkStackSize && stackA.getCount() != stackB.getCount()) return false;
             if (checkItem && stackA.getItem() != stackB.getItem()) return false;
-            if (checkNbt && !ItemStack.tagMatches(stackA, stackB)) return false;
+            if (checkNbt && !(Objects.equals(stackA.getTag(), stackB.getTag()) && stackA.areCapsCompatible(stackB))) return false;
             return true;
         }
         return false;
@@ -157,8 +157,7 @@ public class TunnelItemHelpers {
                                        IngredientPredicate<ItemStack, Integer> itemStackMatcher, InteractionHand hand,
                                        boolean blockUpdate, boolean ignoreReplacable, boolean craftIfFailed) throws EvaluationException {
         BlockState destBlockState = world.getBlockState(pos);
-        final Material destMaterial = destBlockState.getMaterial();
-        final boolean isDestNonSolid = !destMaterial.isSolid();
+        final boolean isDestNonSolid = !destBlockState.isSolid();
         final boolean isDestReplaceable = destBlockState.canBeReplaced(TunnelHelpers.createBlockItemUseContext(world, null, pos, side, hand));
         if (!world.isEmptyBlock(pos)
                 && (!isDestNonSolid || !(ignoreReplacable && isDestReplaceable))) {
@@ -198,10 +197,9 @@ public class TunnelItemHelpers {
                                               boolean ignoreReplacable, int fortune, boolean silkTouch,
                                               boolean breakOnNoDrops) throws EvaluationException {
         BlockState destBlockState = world.getBlockState(pos);
-        final Material destMaterial = destBlockState.getMaterial();
         final boolean isDestReplaceable = destBlockState.canBeReplaced(TunnelHelpers.createBlockItemUseContext(world, null, pos, side, hand));
         if (world.isEmptyBlock(pos)
-                || ((ignoreReplacable && isDestReplaceable) || destMaterial.isLiquid())) {
+                || ((ignoreReplacable && isDestReplaceable) || destBlockState.liquid())) {
             return null;
         }
 

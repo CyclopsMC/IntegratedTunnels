@@ -1,10 +1,11 @@
 package org.cyclops.integratedtunnels.core;
 
 import com.mojang.authlib.GameProfile;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.world.level.GameType;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.GameType;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.common.util.FakePlayer;
 
 import java.util.UUID;
@@ -36,6 +37,7 @@ public class ExtendedFakePlayer extends FakePlayer {
     public void tick() {
         super.tick();
 
+        Level level = this.level();
         int toTick = (int) (level.getGameTime() - this.lastUpdateTick);
         if (toTick > 0) {
             this.ticksSinceLastTick = toTick;
@@ -50,7 +52,7 @@ public class ExtendedFakePlayer extends FakePlayer {
     @Override
     public void resetAttackStrengthTicker() {
         super.resetAttackStrengthTicker();
-        lastSwingUpdateTick = level.getGameTime();
+        lastSwingUpdateTick = level().getGameTime();
     }
 
     public void updateActiveHandSimulated() {
@@ -66,14 +68,14 @@ public class ExtendedFakePlayer extends FakePlayer {
                         if (!this.useItem.isEmpty()) {
                             useItemRemaining = net.minecraftforge.event.ForgeEventFactory.onItemUseTick(this, useItem, useItemRemaining);
                             if (useItemRemaining > 0)
-                                useItem.getItem().onUsingTick(useItem, this, useItemRemaining);
+                                useItem.getItem().onUseTick(this.level(), this, useItem, useItemRemaining);
                         }
 
                         if (this.getUseItemRemainingTicks() <= 25 && this.getUseItemRemainingTicks() % 4 == 0) {
                             this.triggerItemUseEffects(this.useItem, 5);
                         }
 
-                        if (--this.useItemRemaining <= 0 && !this.level.isClientSide() && !this.useItem.useOnRelease()) {
+                        if (--this.useItemRemaining <= 0 && !this.level().isClientSide() && !this.useItem.useOnRelease()) {
                             this.completeUsingItem();
                             break;
                         }
