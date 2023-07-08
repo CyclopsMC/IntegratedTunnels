@@ -85,7 +85,10 @@ public abstract class PartTypeInterfacePositionedAddonFiltering<N extends IPosit
     @Override
     public void onRemovingPositionFromNetwork(N networkCapability, INetwork network, PartPos pos, S state) {
         networkCapability.removePosition(pos);
-        ((IPositionedAddonsNetworkIngredients<T, ?>) state.getPositionedAddonsNetwork()).setPositionedStorageFilter(pos, null);
+        N addonsNetwork = state.getPositionedAddonsNetwork();
+        if (addonsNetwork != null) {
+            ((IPositionedAddonsNetworkIngredients<T, ?>) addonsNetwork).setPositionedStorageFilter(pos, null);
+        }
     }
 
     // Methods below copied from PartTypeInterfacePositionedAddon
