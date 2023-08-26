@@ -1,7 +1,7 @@
 package org.cyclops.integratedtunnels.part.aspect;
 
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.core.Direction;
+import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import org.cyclops.commoncapabilities.api.ingredient.IngredientComponent;
 import org.cyclops.commoncapabilities.api.ingredient.storage.IIngredientComponentStorage;
@@ -45,7 +45,12 @@ public class ItemTargetCapabilityProvider extends ChanneledTargetCapabilityProvi
 
     @Override
     public IIngredientComponentStorage<ItemStack, Integer> getItemChannel() {
-        return getChanneledNetwork().getChannel(getChannel());
+        if (getItemStackMatcher().hasMatchFlags()) {
+            return getChanneledNetwork().getChannel(getChannel());
+        }
+        // For predicate-based matchers, make sure we can iterate over the contents in a slotted manner,
+        // as the predicate must apply to each slotted ingredient.
+        return getChanneledNetwork().getChannelSlotted(getChannel());
     }
 
     @Override
