@@ -6,7 +6,9 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.IItemHandler;
+import org.cyclops.commoncapabilities.IngredientComponents;
 import org.cyclops.commoncapabilities.api.capability.itemhandler.ISlotlessItemHandler;
+import org.cyclops.cyclopscore.ingredient.collection.FilteredIngredientCollectionIterator;
 import org.cyclops.integrateddynamics.api.network.INetwork;
 import org.cyclops.integrateddynamics.api.network.IPartNetwork;
 import org.cyclops.integrateddynamics.api.part.PartTarget;
@@ -153,7 +155,19 @@ public class PartTypeInterfaceItem extends PartTypeInterfacePositionedAddon<IIte
                 return Iterators.forArray();
             }
             state.disablePosition();
-            Iterator<ItemStack> ret = state.getPositionedAddonsNetwork().getChannel(state.getChannelInterface()).iterator();
+            Iterator<ItemStack> ret;
+            if (!state.getPositionedAddonsNetwork().getChannel(state.getChannelInterface()).iterator().hasNext()) {
+                // If the target is empty, we can safely forward this call to our index.
+                ret = state.getPositionedAddonsNetwork().getChannel(state.getChannelInterface()).iterator();
+            } else {
+                // If the target is not empty, iterate over all positions except for the target to determine items.
+                // If we would not do this, this would result in duplication of index contents, see CyclopsMC/IntegratedTerminals#109
+                IItemNetwork network = state.getPositionedAddonsNetwork();
+                ret = Iterators.concat(network.getPositions(state.getChannel()).stream()
+                        .filter(pos -> !network.isPositionDisabled(pos))
+                        .map(network::getRawInstances)
+                        .toArray(Iterator[]::new));
+            }
             state.enablePosition();
             return ret;
         }
@@ -164,7 +178,15 @@ public class PartTypeInterfaceItem extends PartTypeInterfacePositionedAddon<IIte
                 return Iterators.forArray();
             }
             state.disablePosition();
-            Iterator<ItemStack> ret = state.getPositionedAddonsNetwork().getChannel(state.getChannelInterface()).iterator(stack, matchFlags);
+            Iterator<ItemStack> ret;
+            if (!state.getPositionedAddonsNetwork().getChannel(state.getChannelInterface()).iterator(stack, matchFlags).hasNext()) {
+                // If the target is empty, we can safely forward this call to our index.
+                ret = state.getPositionedAddonsNetwork().getChannel(state.getChannelInterface()).iterator(stack, matchFlags);
+            } else {
+                // If the target is not empty, iterate over all positions except for the target to determine items.
+                // If we would not do this, this would result in duplication of index contents, see CyclopsMC/IntegratedTerminals#109
+                ret = new FilteredIngredientCollectionIterator<>(getItems(), IngredientComponents.ITEMSTACK.getMatcher(), stack, matchFlags);
+            }
             state.enablePosition();
             return ret;
         }
