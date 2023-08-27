@@ -1,0 +1,7 @@
+As always, don't forget to backup your world before updating!
+Requires CyclopsCore version 1.18.4 or higher.
+
+Fixes:
+* Fix predicate-based transfer not considering slots, Closes #271
+* Fix subnetworks causing increasing numbers of ghost items in terminals, Closes CyclopsMC/IntegratedTerminals#109
+
