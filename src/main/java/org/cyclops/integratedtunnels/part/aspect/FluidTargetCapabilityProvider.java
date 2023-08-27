@@ -48,7 +48,12 @@ public class FluidTargetCapabilityProvider extends ChanneledTargetCapabilityProv
 
     @Override
     public IIngredientComponentStorage<FluidStack, Integer> getFluidChannel() {
-        return getChanneledNetwork().getChannel(getChannel());
+        if (getFluidStackMatcher().hasMatchFlags()) {
+            return getChanneledNetwork().getChannel(getChannel());
+        }
+        // For predicate-based matchers, make sure we can iterate over the contents in a slotted manner,
+        // as the predicate must apply to each slotted ingredient.
+        return getChanneledNetwork().getChannelSlotted(getChannel());
     }
 
     @Override
