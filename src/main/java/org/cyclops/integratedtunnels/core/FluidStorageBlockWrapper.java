@@ -50,7 +50,9 @@ public class FluidStorageBlockWrapper implements IIngredientComponentStorage<Flu
     protected void postInsert(FluidStack moved) {
         if (moved != null && GeneralConfig.worldInteractionEvents) {
             SoundEvent soundevent = moved.getFluid().getFluidType().getSound(moved, SoundActions.BUCKET_EMPTY);
-            world.playSound(null, pos, soundevent, SoundSource.BLOCKS, 1.0F, 1.0F);
+            if (soundevent != null) {
+                world.playSound(null, pos, soundevent, SoundSource.BLOCKS, 1.0F, 1.0F);
+            }
         }
         if (blockUpdate) {
             sendBlockUpdate();
@@ -60,7 +62,9 @@ public class FluidStorageBlockWrapper implements IIngredientComponentStorage<Flu
     protected void postExtract(FluidStack moved) {
         if (moved != null && GeneralConfig.worldInteractionEvents) {
             SoundEvent soundevent = moved.getFluid().getFluidType().getSound(moved, SoundActions.BUCKET_FILL);
-            world.playSound(null, pos, soundevent, SoundSource.BLOCKS, 1.0F, 1.0F);
+            if (soundevent != null) {
+                world.playSound(null, pos, soundevent, SoundSource.BLOCKS, 1.0F, 1.0F);
+            }
         }
     }
 
