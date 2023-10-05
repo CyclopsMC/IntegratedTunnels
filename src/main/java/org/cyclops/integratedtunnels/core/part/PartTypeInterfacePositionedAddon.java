@@ -1,6 +1,7 @@
 package org.cyclops.integratedtunnels.core.part;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Vec3i;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.FriendlyByteBuf;
@@ -119,6 +120,21 @@ public abstract class PartTypeInterfacePositionedAddon<N extends IPositionedAddo
         removeTargetFromNetwork(network, target.getTarget(), state);
         super.setPriorityAndChannel(network, partNetwork, target, state, priority, channel);
         addTargetToNetwork(network, target.getTarget(), priority, state.getChannelInterface(), state);
+    }
+
+    @Override
+    public boolean setTargetOffset(S state, PartPos center, Vec3i offset) {
+        // Remove interface before changing offset, and re-add after,
+        // because the target offset might change the interface.
+        INetwork network = state.getNetwork();
+        if (network != null) {
+            removeTargetFromNetwork(network, getTarget(center, state).getTarget(), state);
+        }
+        boolean ret = super.setTargetOffset(state, center, offset);
+        if (network != null) {
+            addTargetToNetwork(network, getTarget(center, state).getTarget(), state.getPriority(), state.getChannelInterface(), state);
+        }
+        return ret;
     }
 
     public static abstract class State<N extends IPositionedAddonsNetwork, T, P extends PartTypeInterfacePositionedAddon<N, T, P, S>, S extends State<N, T, P, S>>
