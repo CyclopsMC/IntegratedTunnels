@@ -27,7 +27,7 @@ public abstract class PositionedOperatorIngredientIndex<T, M> extends Positioned
     public PositionedOperatorIngredientIndex(String name, PositionedOperatorIngredientIndex.Function<T, M> function,
                                              IValueType input, IValueType output,
                                              DimPos pos, Direction side, int channel) {
-        super(name, name, new IValueType[]{input},
+        super(name, name, name, new IValueType[]{input},
                 output, function, IConfigRenderPattern.PREFIX_1, pos, side);
         this.channel = channel;
         ((PositionedOperatorIngredientIndex.Function) this.getFunction()).setOperator(this);
