@@ -121,7 +121,7 @@ public class TunnelAspectWriteBuilders {
 
     public static <T, M> IAspectValuePropagator<Triple<PartTarget, IAspectProperties, ChanneledTargetInformation<T, M>>, Void> propSetFilter() {
         return input -> {
-            // This will only be called once, due to our filter-specific update logic in PartTypeInterfacePositionedAddon
+            // This will only be called once, due to our filter-specific update logic in PartTypeInterfacePositionedAddonFiltering
             PartHelpers.PartStateHolder<?, PartTypeInterfacePositionedAddonFiltering.State<?, T, ?, ?>>
                     partStateHolder = (PartHelpers.PartStateHolder<?, PartTypeInterfacePositionedAddonFiltering.State<?, T, ?, ?>>) PartHelpers
                     .getPart(input.getLeft().getCenter());
@@ -137,14 +137,19 @@ public class TunnelAspectWriteBuilders {
                         properties.getValue(PROP_FILTER_APPLY_TO_EXTRACTIONS).getRawValue(),
                         properties.getValue(PROP_FILTER_ALLOW_ALL_IF_NOT_APPLIED).getRawValue()
                 ));
-                partType.addTargetToNetwork(
-                        partStateHolder.getState().getNetwork(),
-                        target.getTarget(),
-                        partStateHolder.getState().getPriority(),
-                        partStateHolder.getState().getChannelInterface(),
-                        partState
-                );
-                partType.scheduleNetworkObservation(target, partState);
+
+                // Network may be null during chunk loading.
+                // In that case, the network will be set later.
+                if (partStateHolder.getState().getNetwork() != null) {
+                    partType.addTargetToNetwork(
+                            partStateHolder.getState().getNetwork(),
+                            target.getTarget(),
+                            partStateHolder.getState().getPriority(),
+                            partStateHolder.getState().getChannelInterface(),
+                            partState
+                    );
+                    partType.scheduleNetworkObservation(target, partState);
+                }
             }
             return null;
         };
