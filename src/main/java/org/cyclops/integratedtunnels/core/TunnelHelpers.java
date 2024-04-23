@@ -68,8 +68,15 @@ public class TunnelHelpers {
         try {
             try {
                 if (ingredientPredicate.hasMatchFlags()) {
-                    return IngredientStorageHelpers.moveIngredientsSlotted(source, sourceSlot, destination, destinationSlot,
-                            ingredientPredicate.getInstance(), ingredientPredicate.getMatchFlags(), simulate);
+                    IIngredientMatcher<T, M> matcher = ingredientPredicate.getIngredientComponent().getMatcher();
+                    for (T instance : ingredientPredicate.getInstances()) {
+                        T movedInstance = IngredientStorageHelpers.moveIngredientsSlotted(source, sourceSlot, destination, destinationSlot,
+                                instance, ingredientPredicate.getMatchFlags(), simulate);
+                        if (!matcher.isEmpty(movedInstance)) {
+                            return movedInstance;
+                        }
+                    }
+                    return matcher.getEmptyInstance();
                 } else {
                     return IngredientStorageHelpers.moveIngredientsSlotted(source, sourceSlot, destination, destinationSlot,
                             ingredientPredicate, ingredientPredicate.getMaxQuantity(), ingredientPredicate.isExactQuantity(), simulate);
@@ -124,9 +131,12 @@ public class TunnelHelpers {
         IIngredientMatcher<T, M> matcher = source.getComponent().getMatcher();
 
         // Don't craft if we still have a running crafting job for the instance.
-        if (craftIfFailed && isCrafting(network, ingredientsNetwork, channel,
-                ingredientPredicate.getInstance(), ingredientPredicate.getMatchFlags())) {
-            return matcher.getEmptyInstance();
+        if (craftIfFailed) {
+            for (T instance : ingredientPredicate.getInstances()) {
+                if (isCrafting(network, ingredientsNetwork, channel, instance, ingredientPredicate.getMatchFlags())) {
+                    return matcher.getEmptyInstance();
+                }
+            }
         }
 
         // Don't do any expensive transfers if the to-be-moved stack is empty
@@ -151,35 +161,38 @@ public class TunnelHelpers {
 
         // Craft if we moved nothing, and the flag is enabled.
         if (craftIfFailed && matcher.isEmpty(moved)) {
-            // If we don't have to move exact instances,
-            // only request the crafting of 1.
-            T craftInstance = ingredientPredicate.getInstance();
-            if (!ingredientPredicate.isExactQuantity()) {
-                craftInstance = matcher.withQuantity(craftInstance, 1);
-            }
+            for (T instance : ingredientPredicate.getInstances()) {
+                // If we don't have to move exact instances,
+                // only request the crafting of 1.
+                T craftInstance = instance;
+                if (!ingredientPredicate.isExactQuantity()) {
+                    craftInstance = matcher.withQuantity(craftInstance, 1);
+                }
 
-            // Don't allow crafting jobs to be started if we detect a case where movement failed,
-            // but the required ingredient is in fact present in the network.
-            // This is to avoid cases where crafting jobs would be started before a previous movement was observed,
-            // and the crafting job output thereby not being detected upon the next observement.
-            IIngredientPositionsIndex<T, M> index = ingredientsNetwork.getChannelIndex(channel);
-            if (index.getQuantity(ingredientPredicate.getInstance()) >= matcher.getQuantity(craftInstance)) {
-                return moved;
-            }
+                // Don't allow crafting jobs to be started if we detect a case where movement failed,
+                // but the required ingredient is in fact present in the network.
+                // This is to avoid cases where crafting jobs would be started before a previous movement was observed,
+                // and the crafting job output thereby not being detected upon the next observement.
+                IIngredientPositionsIndex<T, M> index = ingredientsNetwork.getChannelIndex(channel);
+                if (index.getQuantity(instance) >= matcher.getQuantity(craftInstance)) {
+                    return moved;
+                }
 
-            // Only craft if the target accepts the crafting output completely
-            boolean targetAcceptsCraftingResult;
-            if (destinationSlot >= 0) {
-                targetAcceptsCraftingResult = destination instanceof IIngredientComponentStorageSlotted
-                        && matcher.isEmpty(((IIngredientComponentStorageSlotted<T, M>) destination)
-                        .insert(destinationSlot, craftInstance, true));
-            } else {
-                targetAcceptsCraftingResult = matcher.isEmpty(destination.insert(craftInstance, true));
-            }
+                // Only craft if the target accepts the crafting output completely
+                boolean targetAcceptsCraftingResult;
+                if (destinationSlot >= 0) {
+                    targetAcceptsCraftingResult = destination instanceof IIngredientComponentStorageSlotted
+                            && matcher.isEmpty(((IIngredientComponentStorageSlotted<T, M>) destination)
+                            .insert(destinationSlot, craftInstance, true));
+                } else {
+                    targetAcceptsCraftingResult = matcher.isEmpty(destination.insert(craftInstance, true));
+                }
 
-            if (targetAcceptsCraftingResult) {
-                requestCrafting(network, ingredientsNetwork, channel,
-                        craftInstance, ingredientPredicate.getMatchFlags());
+                if (targetAcceptsCraftingResult) {
+                    requestCrafting(network, ingredientsNetwork, channel,
+                            craftInstance, ingredientPredicate.getMatchFlags());
+                    break;
+                }
             }
         }
 
