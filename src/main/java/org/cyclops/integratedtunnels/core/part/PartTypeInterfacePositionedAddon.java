@@ -17,6 +17,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import org.apache.commons.lang3.tuple.Triple;
+import org.cyclops.cyclopscore.datastructure.DimPos;
 import org.cyclops.cyclopscore.network.PacketCodec;
 import org.cyclops.integrateddynamics.api.network.INetwork;
 import org.cyclops.integrateddynamics.api.network.IPartNetwork;
@@ -24,7 +25,9 @@ import org.cyclops.integrateddynamics.api.network.IPositionedAddonsNetwork;
 import org.cyclops.integrateddynamics.api.part.IPartContainer;
 import org.cyclops.integrateddynamics.api.part.PartPos;
 import org.cyclops.integrateddynamics.api.part.PartTarget;
+import org.cyclops.integrateddynamics.core.helper.NetworkHelpers;
 import org.cyclops.integrateddynamics.core.helper.PartHelpers;
+import org.cyclops.integrateddynamics.core.network.PartNetworkElement;
 import org.cyclops.integrateddynamics.core.part.PartStateBase;
 import org.cyclops.integrateddynamics.core.part.PartTypeBase;
 
@@ -45,7 +48,8 @@ public abstract class PartTypeInterfacePositionedAddon<N extends IPositionedAddo
 
     @Override
     public boolean isUpdate(S state) {
-        return getConsumptionRate(state) > 0 && org.cyclops.integrateddynamics.GeneralConfig.energyConsumptionMultiplier > 0;
+        return (getConsumptionRate(state) > 0 && org.cyclops.integrateddynamics.GeneralConfig.energyConsumptionMultiplier > 0)
+                || state.requiresOffsetUpdates();
     }
 
     @Override
@@ -135,6 +139,20 @@ public abstract class PartTypeInterfacePositionedAddon<N extends IPositionedAddo
             addTargetToNetwork(network, getTarget(center, state).getTarget(), state.getPriority(), state.getChannelInterface(), state);
         }
         return ret;
+    }
+
+    @Override
+    public void onOffsetVariablesChanged(PartTarget target, S state) {
+        super.onOffsetVariablesChanged(target, state);
+
+        // Force the network element to be re-added,
+        // as a change in offset variable might have influenced whether or not this part is updatable or not,
+        // so we need to let the network re-check it, otherwise the part may not tick while it should.
+        state.initializeOffsets(); // Force the state to sync up with the offset variables inventory.
+        DimPos dimPos = target.getCenter().getPos();
+        INetwork network = NetworkHelpers.getNetworkChecked(dimPos.getLevel(true), dimPos.getBlockPos(), target.getCenter().getSide());
+        PartNetworkElement networkElement = new PartNetworkElement<>((P) this, target.getCenter());
+        network.setPriorityAndChannel(networkElement, getPriority(state), getChannel(state));
     }
 
     public static abstract class State<N extends IPositionedAddonsNetwork, T, P extends PartTypeInterfacePositionedAddon<N, T, P, S>, S extends State<N, T, P, S>>
