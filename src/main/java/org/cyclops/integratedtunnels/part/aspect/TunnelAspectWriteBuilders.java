@@ -1,16 +1,16 @@
 package org.cyclops.integratedtunnels.part.aspect;
 
 import com.google.common.collect.ImmutableList;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.nbt.Tag;
 import net.minecraft.core.Direction;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.phys.AABB;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.energy.CapabilityEnergy;
@@ -786,12 +786,16 @@ public class TunnelAspectWriteBuilders {
 
             if (input.hasValidTarget()) {
                 input.preTransfer();
+                // For predicate-based matchers, make sure we can iterate over the contents in a slotted manner,
+                // as the predicate must apply to each slotted ingredient.
+                // Only do this for exporting, not for importing, as this would otherwise break round-robin imports.
+                IIngredientComponentStorage<ItemStack, Integer> source = input.getItemStackMatcher().hasMatchFlags() ? input.getItemChannel() : input.getItemChannelSlotted();
                 TunnelHelpers.moveSingleStateOptimized(
                         input.getNetwork(),
                         input.getChanneledNetwork(),
                         input.getChannel(),
                         input.getConnection(),
-                        input.getItemChannel(), -1,
+                        source, -1,
                         input.getStorage(), input.getSlot(),
                         input.getItemStackMatcher(),
                         input.getPartTarget().getCenter(),
@@ -1152,12 +1156,16 @@ public class TunnelAspectWriteBuilders {
 
             if (input.hasValidTarget()) {
                 input.preTransfer();
+                // For predicate-based matchers, make sure we can iterate over the contents in a slotted manner,
+                // as the predicate must apply to each slotted ingredient.
+                // Only do this for exporting, not for importing, as this would otherwise break round-robin imports.
+                IIngredientComponentStorage<FluidStack, Integer> source = input.getFluidStackMatcher().hasMatchFlags() ? input.getFluidChannel() : input.getFluidChannelSlotted();
                 TunnelHelpers.moveSingleStateOptimized(
                         input.getNetwork(),
                         input.getChanneledNetwork(),
                         input.getChannel(),
                         input.getConnection(),
-                        input.getFluidChannel(),
+                        source,
                         -1,
                         input.getStorage(),
                         -1,
