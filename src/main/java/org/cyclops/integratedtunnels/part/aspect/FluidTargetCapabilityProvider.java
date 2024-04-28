@@ -5,6 +5,7 @@ import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.fluids.FluidStack;
 import org.cyclops.commoncapabilities.api.ingredient.IngredientComponent;
 import org.cyclops.commoncapabilities.api.ingredient.storage.IIngredientComponentStorage;
+import org.cyclops.commoncapabilities.api.ingredient.storage.IIngredientComponentStorageSlotted;
 import org.cyclops.integrateddynamics.api.network.INetwork;
 import org.cyclops.integrateddynamics.api.part.PartTarget;
 import org.cyclops.integrateddynamics.api.part.aspect.property.IAspectProperties;
@@ -48,11 +49,11 @@ public class FluidTargetCapabilityProvider extends ChanneledTargetCapabilityProv
 
     @Override
     public IIngredientComponentStorage<FluidStack, Integer> getFluidChannel() {
-        if (getFluidStackMatcher().hasMatchFlags()) {
-            return getChanneledNetwork().getChannel(getChannel());
-        }
-        // For predicate-based matchers, make sure we can iterate over the contents in a slotted manner,
-        // as the predicate must apply to each slotted ingredient.
+        return getChanneledNetwork().getChannel(getChannel());
+    }
+
+    @Override
+    public IIngredientComponentStorageSlotted<FluidStack, Integer> getFluidChannelSlotted() {
         return getChanneledNetwork().getChannelSlotted(getChannel());
     }
 

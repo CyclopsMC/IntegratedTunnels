@@ -1,5 +1,6 @@
 package org.cyclops.integratedtunnels.core.predicate;
 
+import com.google.common.collect.Iterables;
 import net.minecraftforge.fluids.FluidStack;
 import org.cyclops.commoncapabilities.api.ingredient.IngredientComponent;
 import org.cyclops.integrateddynamics.api.evaluate.variable.IValueTypeListProxy;
@@ -18,8 +19,8 @@ public class IngredientPredicateFluidStackList extends IngredientPredicate<Fluid
     private final boolean checkAmount;
     private final boolean checkNbt;
 
-    public IngredientPredicateFluidStackList(boolean blacklist, int amount, boolean exactAmount, IValueTypeListProxy<ValueObjectTypeFluidStack, ValueObjectTypeFluidStack.ValueFluidStack> fluidStacks, boolean checkFluid, boolean checkAmount, boolean checkNbt) {
-        super(IngredientComponent.FLUIDSTACK, blacklist, false, amount, exactAmount);
+    public IngredientPredicateFluidStackList(boolean blacklist, int amount, boolean exactAmount, IValueTypeListProxy<ValueObjectTypeFluidStack, ValueObjectTypeFluidStack.ValueFluidStack> fluidStacks, int matchFlags, boolean checkFluid, boolean checkAmount, boolean checkNbt) {
+        super(IngredientComponent.FLUIDSTACK, Iterables.transform(fluidStacks, ValueObjectTypeFluidStack.ValueFluidStack::getRawValue), matchFlags, blacklist, false, amount, exactAmount);
         this.blacklist = blacklist;
         this.fluidStacks = fluidStacks;
         this.checkFluid = checkFluid;
