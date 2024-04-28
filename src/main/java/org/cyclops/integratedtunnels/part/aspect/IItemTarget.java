@@ -4,6 +4,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import org.cyclops.commoncapabilities.api.ingredient.storage.IIngredientComponentStorage;
+import org.cyclops.commoncapabilities.api.ingredient.storage.IIngredientComponentStorageSlotted;
 import org.cyclops.integrateddynamics.api.network.INetwork;
 import org.cyclops.integrateddynamics.api.part.PartPos;
 import org.cyclops.integrateddynamics.api.part.PartTarget;
@@ -20,6 +21,8 @@ import javax.annotation.Nullable;
 public interface IItemTarget extends IChanneledTarget<IItemNetwork, ItemStack> {
 
     public IIngredientComponentStorage<ItemStack, Integer> getItemChannel();
+
+    public IIngredientComponentStorageSlotted<ItemStack, Integer> getItemChannelSlotted();
 
     public IIngredientComponentStorage<ItemStack, Integer> getStorage();
 

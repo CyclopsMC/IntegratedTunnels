@@ -2,6 +2,7 @@ package org.cyclops.integratedtunnels.part.aspect;
 
 import net.minecraftforge.fluids.FluidStack;
 import org.cyclops.commoncapabilities.api.ingredient.storage.IIngredientComponentStorage;
+import org.cyclops.commoncapabilities.api.ingredient.storage.IIngredientComponentStorageSlotted;
 import org.cyclops.integrateddynamics.api.network.INetwork;
 import org.cyclops.integrateddynamics.api.part.PartTarget;
 import org.cyclops.integrateddynamics.api.part.aspect.property.IAspectProperties;
@@ -42,6 +43,11 @@ public class FluidTargetStorage extends ChanneledTarget<IFluidNetwork, FluidStac
     @Override
     public IIngredientComponentStorage<FluidStack, Integer> getFluidChannel() {
         return getChanneledNetwork().getChannel(getChannel());
+    }
+
+    @Override
+    public IIngredientComponentStorageSlotted<FluidStack, Integer> getFluidChannelSlotted() {
+        return getChanneledNetwork().getChannelSlotted(getChannel());
     }
 
     @Override

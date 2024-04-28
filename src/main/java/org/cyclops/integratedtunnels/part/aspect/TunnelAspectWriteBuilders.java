@@ -785,12 +785,16 @@ public class TunnelAspectWriteBuilders {
 
             if (input.hasValidTarget()) {
                 input.preTransfer();
+                // For predicate-based matchers, make sure we can iterate over the contents in a slotted manner,
+                // as the predicate must apply to each slotted ingredient.
+                // Only do this for exporting, not for importing, as this would otherwise break round-robin imports.
+                IIngredientComponentStorage<ItemStack, Integer> source = input.getItemStackMatcher().hasMatchFlags() ? input.getItemChannel() : input.getItemChannelSlotted();
                 TunnelHelpers.moveSingleStateOptimized(
                         input.getNetwork(),
                         input.getChanneledNetwork(),
                         input.getChannel(),
                         input.getConnection(),
-                        input.getItemChannel(), -1,
+                        source, -1,
                         input.getStorage(), input.getSlot(),
                         input.getItemStackMatcher(),
                         input.getPartTarget().getCenter(),
@@ -1151,12 +1155,16 @@ public class TunnelAspectWriteBuilders {
 
             if (input.hasValidTarget()) {
                 input.preTransfer();
+                // For predicate-based matchers, make sure we can iterate over the contents in a slotted manner,
+                // as the predicate must apply to each slotted ingredient.
+                // Only do this for exporting, not for importing, as this would otherwise break round-robin imports.
+                IIngredientComponentStorage<FluidStack, Integer> source = input.getFluidStackMatcher().hasMatchFlags() ? input.getFluidChannel() : input.getFluidChannelSlotted();
                 TunnelHelpers.moveSingleStateOptimized(
                         input.getNetwork(),
                         input.getChanneledNetwork(),
                         input.getChannel(),
                         input.getConnection(),
-                        input.getFluidChannel(),
+                        source,
                         -1,
                         input.getStorage(),
                         -1,

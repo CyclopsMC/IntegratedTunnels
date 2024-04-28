@@ -4,6 +4,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.fluids.FluidStack;
 import org.cyclops.commoncapabilities.api.ingredient.storage.IIngredientComponentStorage;
+import org.cyclops.commoncapabilities.api.ingredient.storage.IIngredientComponentStorageSlotted;
 import org.cyclops.integrateddynamics.api.network.INetwork;
 import org.cyclops.integrateddynamics.api.part.PartPos;
 import org.cyclops.integrateddynamics.api.part.PartTarget;
@@ -20,6 +21,8 @@ import javax.annotation.Nullable;
 public interface IFluidTarget extends IChanneledTarget<IFluidNetwork, FluidStack> {
 
     public IIngredientComponentStorage<FluidStack, Integer> getFluidChannel();
+
+    public IIngredientComponentStorageSlotted<FluidStack, Integer> getFluidChannelSlotted();
 
     public IIngredientComponentStorage<FluidStack, Integer> getStorage();
 
