@@ -20,7 +20,7 @@ public class IngredientPredicateItemStackList extends IngredientPredicate<ItemSt
     private final boolean checkNbt;
 
     public IngredientPredicateItemStackList(boolean blacklist, int amount, boolean exactAmount, IValueTypeListProxy<ValueObjectTypeItemStack, ValueObjectTypeItemStack.ValueItemStack> itemStacks, int matchFlags, boolean checkStackSize, boolean checkItem, boolean checkNbt) {
-        super(IngredientComponent.ITEMSTACK, Iterables.transform(itemStacks, ValueObjectTypeItemStack.ValueItemStack::getRawValue), matchFlags, blacklist, false, amount, exactAmount);
+        super(IngredientComponent.ITEMSTACK, Iterables.transform(itemStacks, stack -> TunnelItemHelpers.prototypeWithCount(stack.getRawValue(), amount)), matchFlags, blacklist, false, amount, exactAmount);
         this.blacklist = blacklist;
         this.itemStacks = itemStacks;
         this.checkStackSize = checkStackSize;
