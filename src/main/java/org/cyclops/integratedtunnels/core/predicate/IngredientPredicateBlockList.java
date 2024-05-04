@@ -24,7 +24,7 @@ public class IngredientPredicateBlockList extends IngredientPredicate<ItemStack,
         super(IngredientComponent.ITEMSTACK,
                 Iterables.transform(
                         Iterables.filter(blocks, block -> block.getRawValue().isPresent()),
-                        block -> BlockHelpers.getItemStackFromBlockState(block.getRawValue().get())),
+                        block -> TunnelItemHelpers.prototypeWithCount(BlockHelpers.getItemStackFromBlockState(block.getRawValue().get()), amount)),
                 matchFlags, blacklist, false, amount, exactAmount);
         this.blacklist = blacklist;
         this.blocks = blocks;
