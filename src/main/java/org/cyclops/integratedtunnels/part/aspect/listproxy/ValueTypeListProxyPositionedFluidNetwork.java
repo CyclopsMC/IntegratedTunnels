@@ -1,9 +1,9 @@
 package org.cyclops.integratedtunnels.part.aspect.listproxy;
 
 import com.google.common.collect.Iterators;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.core.Direction;
-import net.minecraftforge.fluids.FluidStack;
+import net.minecraft.nbt.CompoundTag;
+import net.neoforged.neoforge.fluids.FluidStack;
 import org.cyclops.cyclopscore.datastructure.DimPos;
 import org.cyclops.cyclopscore.ingredient.collection.IIngredientCollectionLike;
 import org.cyclops.cyclopscore.persist.nbt.INBTProvider;
@@ -12,7 +12,7 @@ import org.cyclops.integrateddynamics.api.ingredient.IIngredientPositionsIndex;
 import org.cyclops.integrateddynamics.core.evaluate.variable.ValueObjectTypeFluidStack;
 import org.cyclops.integrateddynamics.core.evaluate.variable.ValueTypeListProxyPositioned;
 import org.cyclops.integrateddynamics.core.evaluate.variable.ValueTypes;
-import org.cyclops.integratedtunnels.capability.network.FluidNetworkConfig;
+import org.cyclops.integratedtunnels.Capabilities;
 import org.cyclops.integratedtunnels.part.aspect.TunnelAspectReadBuilders;
 
 import java.util.Iterator;
@@ -45,7 +45,7 @@ public class ValueTypeListProxyPositionedFluidNetwork extends ValueTypeListProxy
     }
 
     protected Optional<IIngredientPositionsIndex<FluidStack, Integer>> getChannelIndex() {
-        return TunnelAspectReadBuilders.Network.getChannelIndex(FluidNetworkConfig.CAPABILITY, getPos(), getSide(), channel);
+        return TunnelAspectReadBuilders.Network.getChannelIndex(Capabilities.FluidNetwork.NETWORK, getPos(), getSide(), channel);
     }
 
     @Override

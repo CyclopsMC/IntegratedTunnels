@@ -1,16 +1,19 @@
 package org.cyclops.integratedtunnels.part;
 
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.energy.IEnergyStorage;
+import net.minecraft.core.Direction;
+import net.neoforged.neoforge.capabilities.BlockCapability;
+import net.neoforged.neoforge.energy.IEnergyStorage;
 import org.cyclops.integrateddynamics.api.network.IEnergyNetwork;
+import org.cyclops.integrateddynamics.api.network.NetworkCapability;
+import org.cyclops.integrateddynamics.api.part.PartCapability;
 import org.cyclops.integrateddynamics.api.part.PartPos;
 import org.cyclops.integrateddynamics.core.helper.EnergyHelpers;
 import org.cyclops.integratedtunnels.Capabilities;
 import org.cyclops.integratedtunnels.GeneralConfig;
 import org.cyclops.integratedtunnels.core.part.IPartTypeInterfacePositionedAddon;
 import org.cyclops.integratedtunnels.core.part.PartTypeInterfacePositionedAddon;
+
+import java.util.Optional;
 
 /**
  * Interface for energy storages.
@@ -22,17 +25,22 @@ public class PartTypeInterfaceEnergy extends PartTypeInterfacePositionedAddon<IE
     }
 
     @Override
-    public Capability<IEnergyNetwork> getNetworkCapability() {
-        return Capabilities.NETWORK_ENERGY;
+    public NetworkCapability<IEnergyNetwork> getNetworkCapability() {
+        return org.cyclops.integrateddynamics.Capabilities.EnergyNetwork.NETWORK;
     }
 
     @Override
-    public Capability<IEnergyStorage> getTargetCapability() {
-        return ForgeCapabilities.ENERGY;
+    public PartCapability<IEnergyStorage> getPartCapability() {
+        return Capabilities.EnergyStorage.PART;
     }
 
     @Override
-    public LazyOptional<IEnergyStorage> getTargetCapabilityInstance(PartPos pos) {
+    public BlockCapability<IEnergyStorage, Direction> getBlockCapability() {
+        return net.neoforged.neoforge.capabilities.Capabilities.EnergyStorage.BLOCK;
+    }
+
+    @Override
+    public Optional<IEnergyStorage> getTargetCapabilityInstance(PartPos pos) {
         return EnergyHelpers.getEnergyStorage(pos);
     }
 
@@ -49,8 +57,8 @@ public class PartTypeInterfaceEnergy extends PartTypeInterfacePositionedAddon<IE
     public static class State extends PartTypeInterfacePositionedAddon.State<IEnergyNetwork, IEnergyStorage, PartTypeInterfaceEnergy, PartTypeInterfaceEnergy.State> {
 
         @Override
-        public Capability<IEnergyStorage> getTargetCapability() {
-            return ForgeCapabilities.ENERGY;
+        public PartCapability<IEnergyStorage> getTargetCapability() {
+            return Capabilities.EnergyStorage.PART;
         }
 
         @Override
@@ -67,7 +75,7 @@ public class PartTypeInterfaceEnergy extends PartTypeInterfacePositionedAddon<IE
         }
 
         protected IEnergyStorage getEnergyStorage() {
-            return state.getPositionedAddonsNetwork().getChannelExternal(ForgeCapabilities.ENERGY, state.getChannel());
+            return state.getPositionedAddonsNetwork().getChannelExternal(net.neoforged.neoforge.capabilities.Capabilities.EnergyStorage.BLOCK, state.getChannel());
         }
 
         @Override

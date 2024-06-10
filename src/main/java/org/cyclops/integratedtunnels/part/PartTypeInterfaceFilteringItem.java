@@ -1,12 +1,13 @@
 package org.cyclops.integratedtunnels.part;
 
 import com.google.common.collect.Lists;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.items.IItemHandler;
+import net.minecraft.core.Direction;
+import net.neoforged.neoforge.capabilities.BlockCapability;
+import net.neoforged.neoforge.items.IItemHandler;
 import org.cyclops.integrateddynamics.api.network.INetwork;
 import org.cyclops.integrateddynamics.api.network.IPartNetwork;
+import org.cyclops.integrateddynamics.api.network.NetworkCapability;
+import org.cyclops.integrateddynamics.api.part.PartCapability;
 import org.cyclops.integrateddynamics.api.part.PartTarget;
 import org.cyclops.integrateddynamics.api.part.aspect.IAspect;
 import org.cyclops.integrateddynamics.core.part.aspect.AspectRegistry;
@@ -14,9 +15,10 @@ import org.cyclops.integrateddynamics.part.aspect.Aspects;
 import org.cyclops.integratedtunnels.Capabilities;
 import org.cyclops.integratedtunnels.GeneralConfig;
 import org.cyclops.integratedtunnels.api.network.IItemNetwork;
-import org.cyclops.integratedtunnels.capability.network.ItemNetworkConfig;
 import org.cyclops.integratedtunnels.core.part.PartTypeInterfacePositionedAddonFiltering;
 import org.cyclops.integratedtunnels.part.aspect.TunnelAspects;
+
+import java.util.Optional;
 
 /**
  * Interface for filtering item handlers.
@@ -35,13 +37,18 @@ public class PartTypeInterfaceFilteringItem extends PartTypeInterfacePositionedA
     }
 
     @Override
-    public Capability<IItemNetwork> getNetworkCapability() {
-        return ItemNetworkConfig.CAPABILITY;
+    public NetworkCapability<IItemNetwork> getNetworkCapability() {
+        return Capabilities.ItemNetwork.NETWORK;
     }
 
     @Override
-    public Capability<IItemHandler> getTargetCapability() {
-        return ForgeCapabilities.ITEM_HANDLER;
+    public PartCapability<IItemHandler> getPartCapability() {
+        return Capabilities.ItemHandler.PART;
+    }
+
+    @Override
+    public BlockCapability<IItemHandler, Direction> getBlockCapability() {
+        return net.neoforged.neoforge.capabilities.Capabilities.ItemHandler.BLOCK;
     }
 
     @Override
@@ -61,8 +68,8 @@ public class PartTypeInterfaceFilteringItem extends PartTypeInterfacePositionedA
         }
 
         @Override
-        public Capability<IItemHandler> getTargetCapability() {
-            return ForgeCapabilities.ITEM_HANDLER;
+        public PartCapability<IItemHandler> getTargetCapability() {
+            return Capabilities.ItemHandler.PART;
         }
 
         @Override
@@ -71,11 +78,11 @@ public class PartTypeInterfaceFilteringItem extends PartTypeInterfacePositionedA
         }
 
         @Override
-        public <T2> LazyOptional<T2> getCapability(Capability<T2> capability, INetwork network, IPartNetwork partNetwork, PartTarget target) {
-            if (isNetworkAndPositionValid() && capability == Capabilities.SLOTLESS_ITEMHANDLER) {
-                return LazyOptional.of(this::getCapabilityInstance).cast();
+        public <T> Optional<T> getCapability(PartTypeInterfaceFilteringItem partType, PartCapability<T> capability, INetwork network, IPartNetwork partNetwork, PartTarget target) {
+            if (isNetworkAndPositionValid() && capability == Capabilities.ItemHandler.PART) {
+                return Optional.of((T) this.getCapabilityInstance());
             }
-            return super.getCapability(capability, network, partNetwork, target);
+            return super.getCapability(partType, capability, network, partNetwork, target);
         }
     }
 }

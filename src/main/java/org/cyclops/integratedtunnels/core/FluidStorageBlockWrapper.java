@@ -6,10 +6,10 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraftforge.common.SoundActions;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.capability.IFluidHandler;
+import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.common.SoundActions;
+import net.neoforged.neoforge.fluids.FluidStack;
+import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import org.cyclops.commoncapabilities.api.ingredient.IngredientComponent;
 import org.cyclops.commoncapabilities.api.ingredient.storage.IIngredientComponentStorage;
 import org.cyclops.cyclopscore.helper.FluidHelpers;
@@ -39,7 +39,7 @@ public class FluidStorageBlockWrapper implements IIngredientComponentStorage<Flu
 
         IFluidHandler fluidHandler = new FluidHandlerBlock(world.getBlockState(pos), world, pos);
         this.targetStorage = getComponent()
-                .getStorageWrapperHandler(ForgeCapabilities.FLUID_HANDLER)
+                .getStorageWrapperHandler(Capabilities.FluidHandler.BLOCK)
                 .wrapComponentStorage(fluidHandler);
     }
 

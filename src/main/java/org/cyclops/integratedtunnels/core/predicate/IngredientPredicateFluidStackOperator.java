@@ -1,7 +1,7 @@
 package org.cyclops.integratedtunnels.core.predicate;
 
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraftforge.fluids.FluidStack;
+import net.neoforged.neoforge.fluids.FluidStack;
 import org.cyclops.commoncapabilities.api.ingredient.IngredientComponent;
 import org.cyclops.integrateddynamics.api.evaluate.EvaluationException;
 import org.cyclops.integrateddynamics.api.evaluate.operator.IOperator;

@@ -6,7 +6,9 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.common.util.FakePlayer;
+import net.neoforged.neoforge.common.CommonHooks;
+import net.neoforged.neoforge.common.util.FakePlayer;
+import net.neoforged.neoforge.event.EventHooks;
 
 import java.util.UUID;
 
@@ -60,13 +62,13 @@ public class ExtendedFakePlayer extends FakePlayer {
             for (int i = 0; i < this.ticksSinceLastTick; i++) {
                 if (this.isUsingItem()) {
                     ItemStack itemstack = this.getItemInHand(this.getUsedItemHand());
-                    if (net.minecraftforge.common.ForgeHooks.canContinueUsing(this.useItem, itemstack)) {
+                    if (CommonHooks.canContinueUsing(this.useItem, itemstack)) {
                         this.useItem = itemstack;
                     }
                     // Based on LivingEntity#updateActiveHand
                     if (itemstack == this.useItem) {
                         if (!this.useItem.isEmpty()) {
-                            useItemRemaining = net.minecraftforge.event.ForgeEventFactory.onItemUseTick(this, useItem, useItemRemaining);
+                            useItemRemaining = EventHooks.onItemUseTick(this, useItem, useItemRemaining);
                             if (useItemRemaining > 0)
                                 useItem.getItem().onUseTick(this.level(), this, useItem, useItemRemaining);
                         }

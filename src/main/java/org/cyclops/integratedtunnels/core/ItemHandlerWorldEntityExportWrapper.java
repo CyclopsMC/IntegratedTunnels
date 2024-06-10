@@ -2,9 +2,9 @@ package org.cyclops.integratedtunnels.core;
 
 import com.google.common.collect.Iterators;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.BlockSource;
 import net.minecraft.core.Direction;
 import net.minecraft.core.NonNullList;
+import net.minecraft.core.dispenser.BlockSource;
 import net.minecraft.core.dispenser.DefaultDispenseItemBehavior;
 import net.minecraft.core.dispenser.DispenseItemBehavior;
 import net.minecraft.server.level.ServerLevel;
@@ -19,16 +19,18 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import org.cyclops.commoncapabilities.api.ingredient.IngredientComponent;
 import org.cyclops.commoncapabilities.api.ingredient.storage.IIngredientComponentStorage;
+import org.cyclops.cyclopscore.datastructure.Wrapper;
 import org.cyclops.integratedtunnels.GeneralConfig;
 
 import javax.annotation.Nonnull;
 import java.util.Iterator;
+import java.util.function.Supplier;
 
 /**
  * An item storage for exporting item entities to the world.
  * @author rubensworks
  */
-public class ItemHandlerWorldEntityExportWrapper implements IIngredientComponentStorage<ItemStack, Integer>, BlockSource {
+public class ItemHandlerWorldEntityExportWrapper implements IIngredientComponentStorage<ItemStack, Integer> {
 
     private final ServerLevel world;
     private final BlockPos pos;
@@ -92,41 +94,20 @@ public class ItemHandlerWorldEntityExportWrapper implements IIngredientComponent
         }
     }
 
-    @Override
-    public double x() {
-        return getPos().getX() + offsetX;
+    public BlockSource getBlockSource() {
+        Wrapper<BlockSource> blockSourceWrapper = new Wrapper<>();
+        blockSourceWrapper.set(new BlockSource(world, getPos().offset((int) offsetX, (int) offsetY, (int) offsetZ), getBlockState(), new SimulatedTileEntityDispenser(dispenseResultHandler, blockSourceWrapper::get)));
+        return blockSourceWrapper.get();
     }
 
-    @Override
-    public double y() {
-        return getPos().getY() + offsetY;
-    }
-
-    @Override
-    public double z() {
-        return getPos().getZ() + offsetZ;
-    }
-
-    @Override
     public BlockPos getPos() {
         return this.pos.relative(this.facing.getOpposite());
     }
 
-    @Override
     public BlockState getBlockState() {
         return Blocks.DISPENSER.defaultBlockState()
                 .setValue(DispenserBlock.TRIGGERED, false)
                 .setValue(DispenserBlock.FACING, this.facing);
-    }
-
-    @Override
-    public DispenserBlockEntity getEntity() {
-        return new SimulatedTileEntityDispenser(dispenseResultHandler, this);
-    }
-
-    @Override
-    public ServerLevel getLevel() {
-        return world;
     }
 
     @Override
@@ -155,9 +136,10 @@ public class ItemHandlerWorldEntityExportWrapper implements IIngredientComponent
             if (this.dispense) {
                 DispenseItemBehavior behaviorDispenseItem = DispenserBlock.DISPENSER_REGISTRY.get(stack.getItem());
                 if (behaviorDispenseItem.getClass() != DefaultDispenseItemBehavior.class) {
-                    ItemStack result = behaviorDispenseItem.dispense(this, stack.copy());
+                    BlockSource blockSource = getBlockSource();
+                    ItemStack result = behaviorDispenseItem.dispense(blockSource, stack.copy());
                     if (!result.isEmpty()) {
-                        handleDispenseResult(this.dispenseResultHandler, this, result);
+                        handleDispenseResult(this.dispenseResultHandler, blockSource, result);
                     }
                     return ItemStack.EMPTY;
                 }
@@ -199,9 +181,9 @@ public class ItemHandlerWorldEntityExportWrapper implements IIngredientComponent
     protected static class SimulatedTileEntityDispenser extends DispenserBlockEntity {
 
         private final IIngredientComponentStorage<ItemStack, Integer> dispenseResultHandler;
-        private final BlockSource blockSource;
+        private final Supplier<BlockSource> blockSource;
 
-        public SimulatedTileEntityDispenser(IIngredientComponentStorage<ItemStack, Integer> dispenseResultHandler, BlockSource blockSource) {
+        public SimulatedTileEntityDispenser(IIngredientComponentStorage<ItemStack, Integer> dispenseResultHandler, Supplier<BlockSource> blockSource) {
             super(BlockPos.ZERO, Blocks.DISPENSER.defaultBlockState());
             this.dispenseResultHandler = dispenseResultHandler;
             this.blockSource = blockSource;
@@ -224,7 +206,7 @@ public class ItemHandlerWorldEntityExportWrapper implements IIngredientComponent
 
         @Override
         public int addItem(ItemStack stack) {
-            handleDispenseResult(this.dispenseResultHandler, this.blockSource, stack);
+            handleDispenseResult(this.dispenseResultHandler, this.blockSource.get(), stack);
             return 0;
         }
 

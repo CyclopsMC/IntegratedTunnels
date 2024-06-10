@@ -1,7 +1,7 @@
 package org.cyclops.integratedtunnels.core.part;
 
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.util.LazyOptional;
+import net.minecraft.core.Direction;
+import net.neoforged.neoforge.capabilities.BlockCapability;
 import org.apache.commons.lang3.tuple.Pair;
 import org.cyclops.cyclopscore.helper.BlockEntityHelpers;
 import org.cyclops.integrateddynamics.api.evaluate.variable.ValueDeseralizationContext;
@@ -9,13 +9,16 @@ import org.cyclops.integrateddynamics.api.network.INetwork;
 import org.cyclops.integrateddynamics.api.network.IPartNetwork;
 import org.cyclops.integrateddynamics.api.network.IPositionedAddonsNetwork;
 import org.cyclops.integrateddynamics.api.network.IPositionedAddonsNetworkIngredients;
+import org.cyclops.integrateddynamics.api.network.NetworkCapability;
 import org.cyclops.integrateddynamics.api.part.IPartState;
 import org.cyclops.integrateddynamics.api.part.IPartType;
+import org.cyclops.integrateddynamics.api.part.PartCapability;
 import org.cyclops.integrateddynamics.api.part.PartPos;
 import org.cyclops.integrateddynamics.api.part.PartTarget;
 import org.cyclops.integrateddynamics.core.helper.NetworkHelpers;
 
 import javax.annotation.Nullable;
+import java.util.Optional;
 
 /**
  * Interface for positioned network addons.
@@ -23,16 +26,18 @@ import javax.annotation.Nullable;
  */
 public interface IPartTypeInterfacePositionedAddon<N extends IPositionedAddonsNetwork, T, P extends IPartTypeInterfacePositionedAddon<N, T, P, S>, S extends IPartTypeInterfacePositionedAddon.IState<N, T, P, S>> extends IPartType<P, S> {
 
-    public Capability<N> getNetworkCapability();
+    public NetworkCapability<N> getNetworkCapability();
 
-    public Capability<T> getTargetCapability();
+    public PartCapability<T> getPartCapability();
+
+    public BlockCapability<T, Direction> getBlockCapability();
 
     public default boolean isTargetCapabilityValid(T capability) {
         return capability != null;
     }
 
-    public default LazyOptional<T> getTargetCapabilityInstance(PartPos pos) {
-        return BlockEntityHelpers.getCapability(pos.getPos(), pos.getSide(), getTargetCapability());
+    public default Optional<T> getTargetCapabilityInstance(PartPos pos) {
+        return BlockEntityHelpers.getCapability(pos.getPos(), pos.getSide(), getBlockCapability());
     }
 
     public default void scheduleNetworkObservation(PartTarget target, S state) {
@@ -105,7 +110,7 @@ public interface IPartTypeInterfacePositionedAddon<N extends IPositionedAddonsNe
     public static interface IState<N extends IPositionedAddonsNetwork, T, P extends IPartTypeInterfacePositionedAddon<N, T, P, S>, S extends IPartTypeInterfacePositionedAddon.IState<N, T, P, S>> extends IPartState<P> {
         public void setChannelInterface(int channelInterface);
         public int getChannelInterface();
-        public Capability<T> getTargetCapability();
+        public PartCapability<T> getTargetCapability();
         public N getPositionedAddonsNetwork();
         public void setPositionedAddonsNetwork(N positionedAddonsNetwork);
         public boolean isValidTargetCapability();

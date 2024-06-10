@@ -1,12 +1,14 @@
 package org.cyclops.integratedtunnels.part;
 
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.capability.IFluidHandler;
+import net.minecraft.core.Direction;
+import net.neoforged.neoforge.capabilities.BlockCapability;
+import net.neoforged.neoforge.fluids.FluidStack;
+import net.neoforged.neoforge.fluids.capability.IFluidHandler;
+import org.cyclops.integrateddynamics.api.network.NetworkCapability;
+import org.cyclops.integrateddynamics.api.part.PartCapability;
+import org.cyclops.integratedtunnels.Capabilities;
 import org.cyclops.integratedtunnels.GeneralConfig;
 import org.cyclops.integratedtunnels.api.network.IFluidNetwork;
-import org.cyclops.integratedtunnels.capability.network.FluidNetworkConfig;
 import org.cyclops.integratedtunnels.core.part.IPartTypeInterfacePositionedAddon;
 import org.cyclops.integratedtunnels.core.part.PartTypeInterfacePositionedAddon;
 
@@ -22,13 +24,18 @@ public class PartTypeInterfaceFluid extends PartTypeInterfacePositionedAddon<IFl
     }
 
     @Override
-    public Capability<IFluidNetwork> getNetworkCapability() {
-        return FluidNetworkConfig.CAPABILITY;
+    public NetworkCapability<IFluidNetwork> getNetworkCapability() {
+        return Capabilities.FluidNetwork.NETWORK;
     }
 
     @Override
-    public Capability<IFluidHandler> getTargetCapability() {
-        return ForgeCapabilities.FLUID_HANDLER;
+    public PartCapability<IFluidHandler> getPartCapability() {
+        return Capabilities.FluidHandler.PART;
+    }
+
+    @Override
+    public BlockCapability<IFluidHandler, Direction> getBlockCapability() {
+        return net.neoforged.neoforge.capabilities.Capabilities.FluidHandler.BLOCK;
     }
 
     @Override
@@ -44,8 +51,8 @@ public class PartTypeInterfaceFluid extends PartTypeInterfacePositionedAddon<IFl
     public static class State extends PartTypeInterfacePositionedAddon.State<IFluidNetwork, IFluidHandler, PartTypeInterfaceFluid, PartTypeInterfaceFluid.State> {
 
         @Override
-        public Capability<IFluidHandler> getTargetCapability() {
-            return ForgeCapabilities.FLUID_HANDLER;
+        public PartCapability<IFluidHandler> getTargetCapability() {
+            return Capabilities.FluidHandler.PART;
         }
 
         @Override
@@ -62,7 +69,7 @@ public class PartTypeInterfaceFluid extends PartTypeInterfacePositionedAddon<IFl
         }
 
         protected IFluidHandler getFluidHandler() {
-            return state.getPositionedAddonsNetwork().getChannelExternal(ForgeCapabilities.FLUID_HANDLER, state.getChannel());
+            return state.getPositionedAddonsNetwork().getChannelExternal(net.neoforged.neoforge.capabilities.Capabilities.FluidHandler.BLOCK, state.getChannel());
         }
 
         @Override

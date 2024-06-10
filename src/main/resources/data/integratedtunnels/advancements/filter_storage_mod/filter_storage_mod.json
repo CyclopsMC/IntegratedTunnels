@@ -16,34 +16,31 @@
     "criteria_0": {
       "trigger": "integrateddynamics:part_writer_aspect",
       "conditions": {
-        "parttype": "integratedtunnels:interface_filter_item",
+        "part_type": "integratedtunnels:interface_filter_item",
         "aspect": "integratedtunnels:write_operator_item_filter",
         "variable": {
-          "type": "integrateddynamics:operator",
+          "type": "operator",
           "operator": "integrateddynamics:operator_pipe",
           "input": {
             "0": {
-              "type": "integrateddynamics:valuetype",
-              "valuetype": "integrateddynamics:operator",
-              "value": {
-                "operator": "integrateddynamics:itemstack_mod"
-              }
+              "type": "operator",
+              "operator": "integrateddynamics:itemstack_mod"
             },
             "1": {
-              "type": "integrateddynamics:operator",
+              "type": "operator",
               "operator": "integrateddynamics:operator_apply",
               "input": {
                 "0": {
-                  "type": "integrateddynamics:valuetype",
-                  "valuetype": "integrateddynamics:operator",
-                  "value": {
-                    "operator": "integrateddynamics:relational_equals"
-                  }
+                  "type": "operator",
+                  "operator": "integrateddynamics:relational_equals"
                 },
                 "1": {
-                  "type": "integrateddynamics:valuetype",
-                  "valuetype": "integrateddynamics:string",
-                  "value": "{Primitive:\"IntegratedDynamics\"}"
+                  "type": "value_type",
+                  "value": {
+                    "type": "serialized",
+                    "value_type": "integrateddynamics:string",
+                    "value": "{Primitive:\"IntegratedDynamics\"}"
+                  }
                 }
               }
             }

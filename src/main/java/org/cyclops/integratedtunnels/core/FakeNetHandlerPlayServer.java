@@ -3,15 +3,19 @@ package org.cyclops.integratedtunnels.core;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import net.minecraft.network.Connection;
-import net.minecraft.network.ConnectionProtocol;
 import net.minecraft.network.PacketListener;
 import net.minecraft.network.PacketSendListener;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.PacketFlow;
+import net.minecraft.network.protocol.common.ServerboundClientInformationPacket;
+import net.minecraft.network.protocol.common.ServerboundCustomPayloadPacket;
+import net.minecraft.network.protocol.common.ServerboundKeepAlivePacket;
+import net.minecraft.network.protocol.common.ServerboundResourcePackPacket;
 import net.minecraft.network.protocol.game.*;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.network.CommonListenerCookie;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.world.entity.RelativeMovement;
 import org.jetbrains.annotations.Nullable;
@@ -30,11 +34,6 @@ public class FakeNetHandlerPlayServer extends ServerGamePacketListenerImpl {
         super(server, new Connection(PacketFlow.CLIENTBOUND) {
             @Override
             public void channelActive(ChannelHandlerContext p_channelActive_1_) throws Exception {
-
-            }
-
-            @Override
-            public void setProtocol(ConnectionProtocol newState) {
 
             }
 
@@ -107,7 +106,7 @@ public class FakeNetHandlerPlayServer extends ServerGamePacketListenerImpl {
             public Channel channel() {
                 return super.channel();
             }
-        }, player);
+        }, player, new CommonListenerCookie(null, 1, null, true));
     }
 
     @Override
@@ -171,9 +170,10 @@ public class FakeNetHandlerPlayServer extends ServerGamePacketListenerImpl {
     }
 
     @Override
-    public void handleResourcePackResponse(ServerboundResourcePackPacket packetIn) {
+    public void handleResourcePackResponse(ServerboundResourcePackPacket p_295695_) {
 
     }
+
 
     @Override
     public void handlePaddleBoat(ServerboundPaddleBoatPacket packetIn) {

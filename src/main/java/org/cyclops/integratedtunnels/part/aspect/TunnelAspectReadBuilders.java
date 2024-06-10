@@ -1,15 +1,15 @@
 package org.cyclops.integratedtunnels.part.aspect;
 
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.core.Direction;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.fluids.FluidStack;
+import net.minecraft.world.item.ItemStack;
+import net.neoforged.neoforge.fluids.FluidStack;
 import org.apache.commons.lang3.tuple.Pair;
 import org.cyclops.commoncapabilities.api.ingredient.storage.IIngredientComponentStorage;
 import org.cyclops.cyclopscore.datastructure.DimPos;
 import org.cyclops.integrateddynamics.api.ingredient.IIngredientPositionsIndex;
 import org.cyclops.integrateddynamics.api.network.INetwork;
 import org.cyclops.integrateddynamics.api.network.IPositionedAddonsNetworkIngredients;
+import org.cyclops.integrateddynamics.api.network.NetworkCapability;
 import org.cyclops.integrateddynamics.api.part.PartTarget;
 import org.cyclops.integrateddynamics.api.part.aspect.property.IAspectProperties;
 import org.cyclops.integrateddynamics.core.evaluate.variable.ValueTypeInteger;
@@ -20,9 +20,8 @@ import org.cyclops.integrateddynamics.core.helper.NetworkHelpers;
 import org.cyclops.integrateddynamics.core.part.aspect.build.AspectBuilder;
 import org.cyclops.integrateddynamics.core.part.aspect.build.IAspectValuePropagator;
 import org.cyclops.integrateddynamics.part.aspect.read.AspectReadBuilders;
+import org.cyclops.integratedtunnels.Capabilities;
 import org.cyclops.integratedtunnels.IntegratedTunnels;
-import org.cyclops.integratedtunnels.capability.network.FluidNetworkConfig;
-import org.cyclops.integratedtunnels.capability.network.ItemNetworkConfig;
 import org.cyclops.integratedtunnels.part.aspect.listproxy.ValueTypeListProxyPositionedFluidNetwork;
 import org.cyclops.integratedtunnels.part.aspect.listproxy.ValueTypeListProxyPositionedItemNetwork;
 
@@ -35,7 +34,7 @@ public class TunnelAspectReadBuilders {
 
     public static final class Network {
 
-        public static <T, M> Optional<IIngredientComponentStorage<T, M>> getChannel(Capability<? extends IPositionedAddonsNetworkIngredients<T, M>> networkCapability,
+        public static <T, M> Optional<IIngredientComponentStorage<T, M>> getChannel(NetworkCapability<? extends IPositionedAddonsNetworkIngredients<T, M>> networkCapability,
                                                                                     DimPos dimPos, Direction side, int channel) {
             INetwork network = NetworkHelpers.getNetwork(dimPos.getLevel(true), dimPos.getBlockPos(), side).orElse(null);
             return Optional.ofNullable(network != null ? network.getCapability(networkCapability)
@@ -46,7 +45,7 @@ public class TunnelAspectReadBuilders {
                     .orElse(null) : null);
         }
 
-        public static <T, M> Optional<IIngredientPositionsIndex<T, M>> getChannelIndex(Capability<? extends IPositionedAddonsNetworkIngredients<T, M>> networkCapability,
+        public static <T, M> Optional<IIngredientPositionsIndex<T, M>> getChannelIndex(NetworkCapability<? extends IPositionedAddonsNetworkIngredients<T, M>> networkCapability,
                                                                                        DimPos dimPos, Direction side, int channel) {
             INetwork network = NetworkHelpers.getNetwork(dimPos.getLevel(true), dimPos.getBlockPos(), side).orElse(null);
             return Optional.ofNullable(network != null ? network.getCapability(networkCapability)
@@ -77,11 +76,11 @@ public class TunnelAspectReadBuilders {
 
             public static final IAspectValuePropagator<Pair<PartTarget, IAspectProperties>, IIngredientComponentStorage<ItemStack, Integer>> PROP_GET_CHANNEL = input -> {
                 int channel = input.getRight().getValue(AspectReadBuilders.Network.PROPERTY_CHANNEL).getRawValue();
-                return getChannel(ItemNetworkConfig.CAPABILITY, input.getLeft().getTarget().getPos(), input.getLeft().getTarget().getSide(), channel).orElse(null);
+                return getChannel(Capabilities.ItemNetwork.NETWORK, input.getLeft().getTarget().getPos(), input.getLeft().getTarget().getSide(), channel).orElse(null);
             };
             public static final IAspectValuePropagator<Pair<PartTarget, IAspectProperties>, IIngredientPositionsIndex<ItemStack, Integer>> PROP_GET_CHANNELINDEX = input -> {
                 int channel = input.getRight().getValue(AspectReadBuilders.Network.PROPERTY_CHANNEL).getRawValue();
-                return getChannelIndex(ItemNetworkConfig.CAPABILITY, input.getLeft().getTarget().getPos(), input.getLeft().getTarget().getSide(), channel).orElse(null);
+                return getChannelIndex(Capabilities.ItemNetwork.NETWORK, input.getLeft().getTarget().getPos(), input.getLeft().getTarget().getSide(), channel).orElse(null);
             };
 
             public static final IAspectValuePropagator<Pair<PartTarget, IAspectProperties>, ValueTypeList.ValueList>
@@ -111,11 +110,11 @@ public class TunnelAspectReadBuilders {
 
             public static final IAspectValuePropagator<Pair<PartTarget, IAspectProperties>, IIngredientComponentStorage<FluidStack, Integer>> PROP_GET_CHANNEL = input -> {
                 int channel = input.getRight().getValue(AspectReadBuilders.Network.PROPERTY_CHANNEL).getRawValue();
-                return getChannel(FluidNetworkConfig.CAPABILITY, input.getLeft().getTarget().getPos(), input.getLeft().getTarget().getSide(), channel).orElse(null);
+                return getChannel(Capabilities.FluidNetwork.NETWORK, input.getLeft().getTarget().getPos(), input.getLeft().getTarget().getSide(), channel).orElse(null);
             };
             public static final IAspectValuePropagator<Pair<PartTarget, IAspectProperties>, IIngredientPositionsIndex<FluidStack, Integer>> PROP_GET_CHANNELINDEX = input -> {
                 int channel = input.getRight().getValue(AspectReadBuilders.Network.PROPERTY_CHANNEL).getRawValue();
-                return getChannelIndex(FluidNetworkConfig.CAPABILITY, input.getLeft().getTarget().getPos(), input.getLeft().getTarget().getSide(), channel).orElse(null);
+                return getChannelIndex(Capabilities.FluidNetwork.NETWORK, input.getLeft().getTarget().getPos(), input.getLeft().getTarget().getSide(), channel).orElse(null);
             };
 
             public static final IAspectValuePropagator<Pair<PartTarget, IAspectProperties>, ValueTypeList.ValueList>

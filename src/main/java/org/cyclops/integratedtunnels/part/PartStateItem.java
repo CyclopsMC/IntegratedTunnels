@@ -1,19 +1,19 @@
 package org.cyclops.integratedtunnels.part;
 
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.items.IItemHandler;
+import net.neoforged.neoforge.items.IItemHandler;
 import org.cyclops.integrateddynamics.api.network.INetwork;
 import org.cyclops.integrateddynamics.api.network.IPartNetwork;
 import org.cyclops.integrateddynamics.api.network.PositionedAddonsNetworkIngredientsFilter;
+import org.cyclops.integrateddynamics.api.part.PartCapability;
 import org.cyclops.integrateddynamics.api.part.PartTarget;
 import org.cyclops.integrateddynamics.api.part.write.IPartTypeWriter;
+import org.cyclops.integratedtunnels.Capabilities;
 import org.cyclops.integratedtunnels.api.network.IItemNetwork;
 import org.cyclops.integratedtunnels.core.part.PartStatePositionedAddon;
 
 import javax.annotation.Nonnull;
+import java.util.Optional;
 
 /**
  * A part state for handling item import and export.
@@ -27,15 +27,15 @@ public class PartStateItem<P extends IPartTypeWriter> extends PartStatePositione
     }
 
     @Override
-    public <T2> LazyOptional<T2> getCapability(Capability<T2> capability, INetwork network, IPartNetwork partNetwork, PartTarget target) {
-        if (capability == ForgeCapabilities.ITEM_HANDLER) {
-            return LazyOptional.of(() -> this).cast();
+    public <T> Optional<T> getCapability(P partType, PartCapability<T> capability, INetwork network, IPartNetwork partNetwork, PartTarget target) {
+        if (capability == Capabilities.ItemHandler.PART) {
+            return Optional.of((T) this);
         }
-        return super.getCapability(capability, network, partNetwork, target);
+        return super.getCapability(partType, capability, network, partNetwork, target);
     }
 
     protected IItemHandler getItemHandler() {
-        return getPositionedAddonsNetwork().getChannelExternal(ForgeCapabilities.ITEM_HANDLER, getChannel());
+        return getPositionedAddonsNetwork().getChannelExternal(net.neoforged.neoforge.capabilities.Capabilities.ItemHandler.BLOCK, getChannel());
     }
 
     @Override

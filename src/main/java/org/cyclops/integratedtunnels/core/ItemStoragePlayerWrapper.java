@@ -3,6 +3,7 @@ package org.cyclops.integratedtunnels.core;
 import com.google.common.collect.Iterators;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.network.protocol.game.ServerboundPlayerActionPacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
@@ -17,11 +18,11 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.common.ForgeHooks;
-import net.minecraftforge.common.ForgeMod;
-import net.minecraftforge.event.ForgeEventFactory;
-import net.minecraftforge.event.entity.player.PlayerInteractEvent;
-import net.minecraftforge.eventbus.api.Event;
+import net.neoforged.bus.api.Event;
+import net.neoforged.neoforge.common.CommonHooks;
+import net.neoforged.neoforge.common.NeoForgeMod;
+import net.neoforged.neoforge.event.EventHooks;
+import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import org.cyclops.commoncapabilities.api.ingredient.IngredientComponent;
 import org.cyclops.commoncapabilities.api.ingredient.storage.IIngredientComponentStorage;
 import org.cyclops.cyclopscore.helper.ItemStackHelpers;
@@ -140,7 +141,7 @@ public class ItemStoragePlayerWrapper implements IIngredientComponentStorage<Ite
 
             // Send block right click event
             BlockHitResult blockRayTraceResult = new BlockHitResult(new Vec3(offsetX, offsetY, offsetZ), side, pos, false);
-            PlayerInteractEvent.RightClickBlock rightClickBlockActionResult = ForgeHooks.onRightClickBlock(player, hand, pos, blockRayTraceResult);
+            PlayerInteractEvent.RightClickBlock rightClickBlockActionResult = CommonHooks.onRightClickBlock(player, hand, pos, blockRayTraceResult);
             if (rightClickBlockActionResult.isCanceled()) {
                 return stack;
             }
@@ -191,7 +192,7 @@ public class ItemStoragePlayerWrapper implements IIngredientComponentStorage<Ite
 
             // Use itemstack
             if (rightClickBlockActionResult.getUseItem() != Event.Result.DENY && !stack.isEmpty()) {
-                InteractionResult cancelResult = ForgeHooks.onItemRightClick(player, hand);
+                InteractionResult cancelResult = CommonHooks.onItemRightClick(player, hand);
                 if (cancelResult != null)  {
                     if (cancelResult == InteractionResult.FAIL) {
                         return stack;
@@ -208,7 +209,7 @@ public class ItemStoragePlayerWrapper implements IIngredientComponentStorage<Ite
                     }
                     if (actionresult.getObject().isEmpty()) {
                         PlayerHelpers.setHeldItemSilent(player, hand, ItemStack.EMPTY);
-                        ForgeEventFactory.onPlayerDestroyItem(player, copyBeforeUse, hand);
+                        EventHooks.onPlayerDestroyItem(player, copyBeforeUse, hand);
                     } else {
                         PlayerHelpers.setHeldItemSilent(player, hand, actionresult.getObject());
                     }
@@ -228,7 +229,7 @@ public class ItemStoragePlayerWrapper implements IIngredientComponentStorage<Ite
             if (rightClickBlockActionResult.getUseItem() != Event.Result.DENY && !stack.isEmpty()) {
                 // Increase reach position.
                 BlockPos targetPos = pos;
-                double reachDistance = player.getAttribute(ForgeMod.BLOCK_REACH.get()).getValue() + 3;
+                double reachDistance = player.getAttribute(NeoForgeMod.BLOCK_REACH.value()).getValue() + 3;
                 int i = 0;
                 while (i++ < reachDistance && world.isEmptyBlock(targetPos)) {
                     targetPos = targetPos.relative(side.getOpposite());
@@ -249,9 +250,9 @@ public class ItemStoragePlayerWrapper implements IIngredientComponentStorage<Ite
             /* Inspired by PlayerInteractionManager#handleBlockBreakAction (line 120) */
 
             // Check if left clicking is allowed
-            PlayerInteractEvent.LeftClickBlock event = net.minecraftforge.common.ForgeHooks.onLeftClickBlock(player, pos, side);
+            PlayerInteractEvent.LeftClickBlock event = CommonHooks.onLeftClickBlock(player, pos, side, ServerboundPlayerActionPacket.Action.START_DESTROY_BLOCK);
             BlockState blockState = world.getBlockState(pos);
-            if (event.isCanceled() || (event.getUseItem() == net.minecraftforge.eventbus.api.Event.Result.DENY)) { // Restore block and te data
+            if (event.isCanceled() || (event.getUseItem() == Event.Result.DENY)) { // Restore block and te data
                 world.sendBlockUpdated(pos, blockState, world.getBlockState(pos), 3);
                 return stack;
             }

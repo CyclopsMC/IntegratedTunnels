@@ -2,7 +2,9 @@ package org.cyclops.integratedtunnels.part.aspect;
 
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import org.cyclops.commoncapabilities.api.ingredient.capability.ICapabilityGetter;
 import org.cyclops.commoncapabilities.api.ingredient.storage.IIngredientComponentStorage;
 import org.cyclops.integrateddynamics.api.network.INetwork;
 import org.cyclops.integrateddynamics.api.part.PartPos;
@@ -40,7 +42,7 @@ public interface IItemTarget extends IChanneledTarget<IItemNetwork, ItemStack> {
         INetwork network = IChanneledTarget.getNetworkChecked(center);
         BlockEntity tile = target.getPos().getLevel(true).getBlockEntity(target.getPos().getBlockPos());
         PartStateRoundRobin<?> partState = IChanneledTarget.getPartState(center);
-        return new ItemTargetCapabilityProvider(transfer, network, tile, target.getSide(),
+        return new ItemTargetCapabilityProvider(transfer, network, Block.class, tile == null ? null : ICapabilityGetter.forBlockEntity(tile), tile, target.getSide(),
                 slot, itemStackMatcher, partTarget, properties, partState);
     }
 
@@ -51,7 +53,7 @@ public interface IItemTarget extends IChanneledTarget<IItemNetwork, ItemStack> {
         PartPos target = partTarget.getTarget();
         INetwork network = IChanneledTarget.getNetworkChecked(center);
         PartStateRoundRobin<?> partState = IChanneledTarget.getPartState(center);
-        return new ItemTargetCapabilityProvider(transfer, network, entity, target.getSide(),
+        return new ItemTargetCapabilityProvider(transfer, network, Entity.class, entity == null ? null : ICapabilityGetter.forEntity(entity), entity, target.getSide(),
                 slot, itemStackMatcher, partTarget, properties, partState);
     }
 
@@ -61,7 +63,7 @@ public interface IItemTarget extends IChanneledTarget<IItemNetwork, ItemStack> {
         PartPos target = partTarget.getTarget();
         INetwork network = IChanneledTarget.getNetworkChecked(center);
         PartStateRoundRobin<?> partState = IChanneledTarget.getPartState(center);
-        return new ItemTargetCapabilityProvider(transfer, network, null, target.getSide(),
+        return new ItemTargetCapabilityProvider(transfer, network, Block.class, ICapabilityGetter.forBlock(target.getPos().getLevel(true), target.getPos().getBlockPos(), null, null), null, target.getSide(),
                 slot, itemStackMatcher, partTarget, properties, partState);
     }
 

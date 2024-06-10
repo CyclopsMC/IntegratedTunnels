@@ -1,8 +1,7 @@
 package org.cyclops.integratedtunnels.part.aspect.operator;
 
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.core.Direction;
-import net.minecraftforge.common.capabilities.Capability;
+import net.minecraft.nbt.CompoundTag;
 import org.cyclops.cyclopscore.datastructure.DimPos;
 import org.cyclops.cyclopscore.persist.nbt.NBTClassType;
 import org.cyclops.integrateddynamics.api.evaluate.operator.IOperator;
@@ -10,12 +9,11 @@ import org.cyclops.integrateddynamics.api.evaluate.variable.IValueType;
 import org.cyclops.integrateddynamics.api.ingredient.IIngredientPositionsIndex;
 import org.cyclops.integrateddynamics.api.logicprogrammer.IConfigRenderPattern;
 import org.cyclops.integrateddynamics.api.network.IPositionedAddonsNetworkIngredients;
+import org.cyclops.integrateddynamics.api.network.NetworkCapability;
 import org.cyclops.integrateddynamics.core.evaluate.operator.PositionedOperator;
 import org.cyclops.integratedtunnels.part.aspect.TunnelAspectReadBuilders;
 
 import java.util.Optional;
-
-import org.cyclops.integrateddynamics.core.evaluate.operator.OperatorBase.IFunction;
 
 /**
  * @author rubensworks
@@ -57,7 +55,7 @@ public abstract class PositionedOperatorIngredientIndex<T, M> extends Positioned
         return TunnelAspectReadBuilders.Network.getChannelIndex(getNetworkCapability(), getPos(), getSide(), channel);
     }
 
-    protected abstract Capability<? extends IPositionedAddonsNetworkIngredients<T, M>> getNetworkCapability();
+    protected abstract NetworkCapability<? extends IPositionedAddonsNetworkIngredients<T, M>> getNetworkCapability();
 
     public static abstract class Function<T, M> implements IFunction {
 

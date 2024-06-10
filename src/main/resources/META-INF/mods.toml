@@ -1,5 +1,5 @@
 modLoader="javafml"
-loaderVersion="[47,)"
+loaderVersion="[2,)"
 issueTrackerURL="https://github.com/CyclopsMC/IntegratedTunnels/issues"
 displayURL="https://www.curseforge.com/minecraft/mc-mods/integrated-tunnels"
 license="MIT"
@@ -13,33 +13,35 @@ updateJSONURL="https://raw.githubusercontent.com/CyclopsMC/Versions/master/forge
 description='''
 Transfer other stuff over Integrated Dynamics networks.
 '''
+[[accessTransformers]]
+    file="META-INF/accesstransformer.cfg"
 [[dependencies.integratedtunnels]]
     modId="cyclopscore"
-    mandatory=true
-    versionRange="[1.18.4,)"
+    type="required"
+    versionRange="[1.19.0,)"
     ordering="NONE"
     side="BOTH"
 [[dependencies.integratedtunnels]]
     modId="integrateddynamics"
-    mandatory=true
+    type="required"
     versionRange="[1.21.0,)"
     ordering="NONE"
     side="BOTH"
 [[dependencies.integratedtunnels]]
     modId="commoncapabilities"
-    mandatory=true
+    type="required"
     versionRange="[2.9.0,)"
     ordering="NONE"
     side="BOTH"
 [[dependencies.integratedtunnels]]
-    modId="forge"
-    mandatory=true
-    versionRange="[47.0.1,)"
+    modId="neoforge"
+    type="required"
+    versionRange="[20.4,)"
     ordering="NONE"
     side="BOTH"
 [[dependencies.integratedtunnels]]
     modId="minecraft"
-    mandatory=true
-    versionRange="[1.20.1,]"
+    type="required"
+    versionRange="[1.20.4,]"
     ordering="NONE"
     side="BOTH"

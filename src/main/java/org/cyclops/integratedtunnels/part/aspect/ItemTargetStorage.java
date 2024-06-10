@@ -5,8 +5,8 @@ import org.cyclops.commoncapabilities.api.ingredient.storage.IIngredientComponen
 import org.cyclops.integrateddynamics.api.network.INetwork;
 import org.cyclops.integrateddynamics.api.part.PartTarget;
 import org.cyclops.integrateddynamics.api.part.aspect.property.IAspectProperties;
+import org.cyclops.integratedtunnels.Capabilities;
 import org.cyclops.integratedtunnels.api.network.IItemNetwork;
-import org.cyclops.integratedtunnels.capability.network.ItemNetworkConfig;
 import org.cyclops.integratedtunnels.core.part.PartStateRoundRobin;
 import org.cyclops.integratedtunnels.core.predicate.IngredientPredicate;
 
@@ -28,7 +28,7 @@ public class ItemTargetStorage extends ChanneledTarget<IItemNetwork, ItemStack> 
                              IIngredientComponentStorage<ItemStack, Integer> storage, int slot,
                              IngredientPredicate<ItemStack, Integer> itemStackMatcher, PartTarget partTarget,
                              IAspectProperties properties, @Nullable PartStateRoundRobin<?> partState) {
-        super(network, network.getCapability(ItemNetworkConfig.CAPABILITY).orElse(null), partState,
+        super(network, network.getCapability(Capabilities.ItemNetwork.NETWORK).orElse(null), partState,
                 properties.getValue(TunnelAspectWriteBuilders.PROP_CHANNEL).getRawValue(),
                 properties.getValue(TunnelAspectWriteBuilders.PROP_ROUNDROBIN).getRawValue(),
                 properties.getValue(TunnelAspectWriteBuilders.PROP_CRAFT).getRawValue(),

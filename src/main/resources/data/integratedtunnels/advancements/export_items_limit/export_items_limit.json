@@ -17,18 +17,19 @@
     "criteria_0": {
       "trigger": "integrateddynamics:part_writer_aspect",
       "conditions": {
-        "parttype": "integratedtunnels:exporter_item",
+        "part_type": "integratedtunnels:exporter_item",
         "aspect": "integratedtunnels:write_boolean_item_export",
         "variable": {
-          "type": "integrateddynamics:operator",
+          "type": "operator",
           "operator": "integrateddynamics:relational_lt",
           "inputs": {
             "0": {
-              "type": "integrateddynamics:aspect",
+              "type": "aspect",
               "aspect": "integrateddynamics:read_integer_inventory_count"
             },
             "1": {
-              "valuetype": "integrateddynamics:integer",
+              "type": "value_type",
+              "value_type": "integrateddynamics:integer",
               "value": "10"
             }
           }

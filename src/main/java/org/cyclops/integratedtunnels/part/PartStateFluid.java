@@ -1,20 +1,20 @@
 package org.cyclops.integratedtunnels.part;
 
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.capability.IFluidHandler;
+import net.neoforged.neoforge.fluids.FluidStack;
+import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import org.cyclops.integrateddynamics.api.network.INetwork;
 import org.cyclops.integrateddynamics.api.network.IPartNetwork;
 import org.cyclops.integrateddynamics.api.network.PositionedAddonsNetworkIngredientsFilter;
+import org.cyclops.integrateddynamics.api.part.PartCapability;
 import org.cyclops.integrateddynamics.api.part.PartTarget;
 import org.cyclops.integrateddynamics.api.part.write.IPartTypeWriter;
+import org.cyclops.integratedtunnels.Capabilities;
 import org.cyclops.integratedtunnels.GeneralConfig;
 import org.cyclops.integratedtunnels.api.network.IFluidNetwork;
 import org.cyclops.integratedtunnels.core.part.PartStatePositionedAddon;
 
 import javax.annotation.Nonnull;
+import java.util.Optional;
 
 /**
  * A part state for handling fluid import and export.
@@ -28,15 +28,15 @@ public class PartStateFluid<P extends IPartTypeWriter> extends PartStatePosition
     }
 
     @Override
-    public <T2> LazyOptional<T2> getCapability(Capability<T2> capability, INetwork network, IPartNetwork partNetwork, PartTarget target) {
-        if (capability == ForgeCapabilities.FLUID_HANDLER) {
-            return LazyOptional.of(() -> this).cast();
+    public <T> Optional<T> getCapability(P partType, PartCapability<T> capability, INetwork network, IPartNetwork partNetwork, PartTarget target) {
+        if (capability == Capabilities.FluidHandler.PART) {
+            return Optional.of((T) this);
         }
-        return super.getCapability(capability, network, partNetwork, target);
+        return super.getCapability(partType, capability, network, partNetwork, target);
     }
 
     protected IFluidHandler getFluidHandler() {
-        return getPositionedAddonsNetwork().getChannelExternal(ForgeCapabilities.FLUID_HANDLER, getChannel());
+        return getPositionedAddonsNetwork().getChannelExternal(net.neoforged.neoforge.capabilities.Capabilities.FluidHandler.BLOCK, getChannel());
     }
 
     @Override

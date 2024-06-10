@@ -17,14 +17,15 @@
     "criteria_0": {
       "trigger": "integrateddynamics:part_writer_aspect",
       "conditions": {
-        "parttype": "integratedtunnels:player_simulator",
+        "part_type": "integratedtunnels:player_simulator",
         "aspect": "integratedtunnels:write_itemstack_player_click",
         "variable": {
-          "valuetype": "integrateddynamics:itemstack",
+          "type": "value_type",
           "value": {
-            "items": [
-              "minecraft:diamond_sword"
-            ]
+            "type": "itemstack",
+            "item": {
+              "item": "minecraft:diamond_sword"
+            }
           }
         }
       }

@@ -1,6 +1,6 @@
 package org.cyclops.integratedtunnels.api.network;
 
-import net.minecraftforge.fluids.FluidStack;
+import net.neoforged.neoforge.fluids.FluidStack;
 import org.cyclops.integrateddynamics.api.network.IPositionedAddonsNetworkIngredients;
 
 /**

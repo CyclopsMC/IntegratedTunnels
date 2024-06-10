@@ -1,6 +1,5 @@
 package org.cyclops.integratedtunnels.part.aspect;
 
-import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import org.cyclops.integrateddynamics.api.network.INetwork;
 import org.cyclops.integrateddynamics.api.part.PartPos;
 
@@ -14,11 +13,11 @@ import java.util.Objects;
 public class TunnelConnectionPositionedNetworkCapabilityProvider extends TunnelConnectionPositionedNetwork {
 
     @Nullable
-    private final ICapabilityProvider capabilityProvider;
+    private final Object capabilityProvider;
 
     public TunnelConnectionPositionedNetworkCapabilityProvider(INetwork network, int channel, PartPos pos,
                                                                ITunnelTransfer transfer,
-                                                               @Nullable ICapabilityProvider capabilityProvider) {
+                                                               @Nullable Object capabilityProvider) {
         super(network, channel, pos, transfer);
         this.capabilityProvider = capabilityProvider;
     }

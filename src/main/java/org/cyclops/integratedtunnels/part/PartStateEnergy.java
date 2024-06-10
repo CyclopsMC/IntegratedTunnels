@@ -1,16 +1,17 @@
 package org.cyclops.integratedtunnels.part;
 
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.energy.IEnergyStorage;
+import net.neoforged.neoforge.energy.IEnergyStorage;
 import org.cyclops.integrateddynamics.GeneralConfig;
 import org.cyclops.integrateddynamics.api.network.IEnergyNetwork;
 import org.cyclops.integrateddynamics.api.network.INetwork;
 import org.cyclops.integrateddynamics.api.network.IPartNetwork;
+import org.cyclops.integrateddynamics.api.part.PartCapability;
 import org.cyclops.integrateddynamics.api.part.PartTarget;
 import org.cyclops.integrateddynamics.api.part.write.IPartTypeWriter;
+import org.cyclops.integratedtunnels.Capabilities;
 import org.cyclops.integratedtunnels.core.part.PartStatePositionedAddon;
+
+import java.util.Optional;
 
 /**
  * A part state for handling energy import and export.
@@ -24,15 +25,15 @@ public class PartStateEnergy<P extends IPartTypeWriter> extends PartStatePositio
     }
 
     @Override
-    public <T2> LazyOptional<T2> getCapability(Capability<T2> capability, INetwork network, IPartNetwork partNetwork, PartTarget target) {
-        if (capability == ForgeCapabilities.ENERGY) {
-            return LazyOptional.of(() -> this).cast();
+    public <T> Optional<T> getCapability(P partType, PartCapability<T> capability, INetwork network, IPartNetwork partNetwork, PartTarget target) {
+        if (capability == Capabilities.EnergyStorage.PART) {
+            return Optional.of((T) this);
         }
-        return super.getCapability(capability, network, partNetwork, target);
+        return super.getCapability(partType, capability, network, partNetwork, target);
     }
 
     protected IEnergyStorage getEnergyStorage() {
-        return getPositionedAddonsNetwork().getChannelExternal(ForgeCapabilities.ENERGY, getChannel());
+        return getPositionedAddonsNetwork().getChannelExternal(net.neoforged.neoforge.capabilities.Capabilities.EnergyStorage.BLOCK, getChannel());
     }
 
     @Override

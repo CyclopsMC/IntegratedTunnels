@@ -15,13 +15,9 @@
     "criteria_0": {
       "trigger": "cyclopscore:item_crafted",
       "conditions": {
-        "items": [
-          {
-            "items": [
-              "integratedtunnels:part_exporter_world_block"
-            ]
-          }
-        ]
+        "item": {
+          "item": "integratedtunnels:part_exporter_world_block"
+        }
       }
     }
   }

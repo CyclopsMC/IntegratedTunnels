@@ -17,13 +17,11 @@
     "criteria_0": {
       "trigger": "integrateddynamics:part_writer_aspect",
       "conditions": {
-        "parttype": "integratedtunnels:exporter_item",
+        "part_type": "integratedtunnels:exporter_item",
         "aspect": "integratedtunnels:write_operator_item_export",
         "variable": {
-          "valuetype": "integrateddynamics:operator",
-          "value": {
-            "operator": "integrateddynamics:itemstack_enchantable"
-          }
+          "type": "operator",
+          "operator": "integrateddynamics:itemstack_enchantable"
         }
       }
     }

@@ -17,11 +17,15 @@
     "criteria_0": {
       "trigger": "integrateddynamics:part_writer_aspect",
       "conditions": {
-        "parttype": "integratedtunnels:importer_world_item",
+        "part_type": "integratedtunnels:importer_world_item",
         "aspect": "integratedtunnels:write_integer_world_entityitem_import",
         "variable": {
-          "valuetype": "integrateddynamics:integer",
-          "value": "{Primitive:5}"
+          "type": "value_type",
+          "value": {
+            "type": "serialized",
+            "value_type": "integrateddynamics:integer",
+            "value": "{Primitive:5}"
+          }
         }
       }
     }

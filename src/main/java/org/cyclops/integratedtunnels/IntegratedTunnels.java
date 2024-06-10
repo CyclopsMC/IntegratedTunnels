@@ -3,13 +3,12 @@ package org.cyclops.integratedtunnels;
 import com.google.common.collect.Lists;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.registries.NewRegistryEvent;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.neoforged.neoforge.registries.NewRegistryEvent;
 import org.apache.logging.log4j.Level;
 import org.cyclops.cyclopscore.config.ConfigHandler;
 import org.cyclops.cyclopscore.infobook.IInfoBookRegistry;
@@ -23,8 +22,6 @@ import org.cyclops.integrateddynamics.infobook.OnTheDynamicsOfIntegrationBook;
 import org.cyclops.integratedtunnels.api.world.IBlockBreakHandlerRegistry;
 import org.cyclops.integratedtunnels.api.world.IBlockPlaceHandlerRegistry;
 import org.cyclops.integratedtunnels.capability.ingredient.TunnelIngredientComponentCapabilities;
-import org.cyclops.integratedtunnels.capability.network.FluidNetworkConfig;
-import org.cyclops.integratedtunnels.capability.network.ItemNetworkConfig;
 import org.cyclops.integratedtunnels.capability.network.TunnelNetworkCapabilityConstructors;
 import org.cyclops.integratedtunnels.core.part.ContainerInterfaceSettingsConfig;
 import org.cyclops.integratedtunnels.core.world.BlockBreakHandlerRegistry;
@@ -51,15 +48,17 @@ public class IntegratedTunnels extends ModBaseVersionable<IntegratedTunnels> {
      */
     public static IntegratedTunnels _instance;
 
-    public IntegratedTunnels() {
-        super(Reference.MOD_ID, (instance) -> _instance = instance);
+    public IntegratedTunnels(IEventBus modEventBus) {
+        super(Reference.MOD_ID, (instance) -> _instance = instance, modEventBus);
 
         // Registries
         getRegistryManager().addRegistry(IBlockBreakHandlerRegistry.class, BlockBreakHandlerRegistry.getInstance());
         getRegistryManager().addRegistry(IBlockPlaceHandlerRegistry.class, BlockBreakPlaceRegistry.getInstance());
 
-        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::onRegistriesCreate);
-        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::onSetup);
+        modEventBus.addListener(this::onRegistriesCreate);
+        modEventBus.addListener(this::onSetup);
+        modEventBus.addListener(Capabilities::registerPartCapabilities);
+        modEventBus.register(new TunnelNetworkCapabilityConstructors());
     }
 
     public void onRegistriesCreate(NewRegistryEvent event) {
@@ -73,8 +72,6 @@ public class IntegratedTunnels extends ModBaseVersionable<IntegratedTunnels> {
     @Override
     protected void setup(FMLCommonSetupEvent event) {
         super.setup(event);
-
-        MinecraftForge.EVENT_BUS.register(new TunnelNetworkCapabilityConstructors());
 
         // Register value list proxies
         TunnelValueTypeListProxyFactories.load();
@@ -118,9 +115,6 @@ public class IntegratedTunnels extends ModBaseVersionable<IntegratedTunnels> {
         super.onConfigsRegister(configHandler);
 
         configHandler.addConfigurable(new GeneralConfig());
-
-        configHandler.addConfigurable(new ItemNetworkConfig());
-        configHandler.addConfigurable(new FluidNetworkConfig());
 
         configHandler.addConfigurable(new ItemDummyPickAxeConfig());
 

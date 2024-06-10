@@ -17,7 +17,7 @@
     "criteria_0": {
       "trigger": "integrateddynamics:part_writer_aspect",
       "conditions": {
-        "parttype": "integratedtunnels:importer_item",
+        "part_type": "integratedtunnels:importer_item",
         "aspect": "integratedtunnels:write_list_item_import"
       }
     }

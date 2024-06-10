@@ -2,17 +2,15 @@ package org.cyclops.integratedtunnels.part.aspect.operator;
 
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.core.Direction;
-import net.minecraftforge.common.capabilities.Capability;
 import org.cyclops.cyclopscore.datastructure.DimPos;
 import org.cyclops.integrateddynamics.api.evaluate.EvaluationException;
 import org.cyclops.integrateddynamics.api.evaluate.variable.IValue;
 import org.cyclops.integrateddynamics.api.network.IPositionedAddonsNetworkIngredients;
+import org.cyclops.integrateddynamics.api.network.NetworkCapability;
 import org.cyclops.integrateddynamics.core.evaluate.variable.ValueObjectTypeItemStack;
 import org.cyclops.integrateddynamics.core.evaluate.variable.ValueTypeLong;
 import org.cyclops.integrateddynamics.core.evaluate.variable.ValueTypes;
-import org.cyclops.integratedtunnels.capability.network.ItemNetworkConfig;
-
-import org.cyclops.integrateddynamics.core.evaluate.operator.OperatorBase.SafeVariablesGetter;
+import org.cyclops.integratedtunnels.Capabilities;
 
 /**
  * @author rubensworks
@@ -28,8 +26,8 @@ public class PositionedOperatorIngredientIndexItem extends PositionedOperatorIng
     }
 
     @Override
-    protected Capability<? extends IPositionedAddonsNetworkIngredients<ItemStack, Integer>> getNetworkCapability() {
-        return ItemNetworkConfig.CAPABILITY;
+    protected NetworkCapability<? extends IPositionedAddonsNetworkIngredients<ItemStack, Integer>> getNetworkCapability() {
+        return Capabilities.ItemNetwork.NETWORK;
     }
 
     public static class Function extends PositionedOperatorIngredientIndex.Function<ItemStack, Integer> {

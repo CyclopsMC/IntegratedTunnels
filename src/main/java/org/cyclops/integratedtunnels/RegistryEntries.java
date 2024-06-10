@@ -1,8 +1,10 @@
 package org.cyclops.integratedtunnels;
 
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.Item;
-import net.minecraftforge.registries.ObjectHolder;
+import net.neoforged.neoforge.registries.DeferredHolder;
 import org.cyclops.integratedtunnels.core.part.ContainerInterfaceSettings;
 
 /**
@@ -11,12 +13,9 @@ import org.cyclops.integratedtunnels.core.part.ContainerInterfaceSettings;
  */
 public class RegistryEntries {
 
-    @ObjectHolder(registryName = "item", value = "integratedtunnels:part_interface_item")
-    public static final Item ITEM_PART_INTERFACE = null;
-    @ObjectHolder(registryName = "item", value = "integratedtunnels:dummy_pickaxe")
-    public static final Item ITEM_DUMMY_PICKAXE = null;
+    public static final DeferredHolder<Item, Item> ITEM_PART_INTERFACE = DeferredHolder.create(Registries.ITEM, new ResourceLocation("integratedtunnels:part_interface_item"));
+    public static final DeferredHolder<Item, Item> ITEM_DUMMY_PICKAXE = DeferredHolder.create(Registries.ITEM, new ResourceLocation("integratedtunnels:dummy_pickaxe"));
 
-    @ObjectHolder(registryName = "menu", value = "integratedtunnels:part_interface_settings")
-    public static final MenuType<ContainerInterfaceSettings> CONTAINER_INTERFACE_SETTINGS = null;
+    public static final DeferredHolder<MenuType<?>, MenuType<ContainerInterfaceSettings>> CONTAINER_INTERFACE_SETTINGS = DeferredHolder.create(Registries.MENU, new ResourceLocation("integratedtunnels:part_interface_settings"));
 
 }

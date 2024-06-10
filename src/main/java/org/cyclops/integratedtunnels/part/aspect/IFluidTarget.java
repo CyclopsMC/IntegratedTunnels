@@ -1,8 +1,10 @@
 package org.cyclops.integratedtunnels.part.aspect;
 
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.fluids.FluidStack;
+import net.neoforged.neoforge.fluids.FluidStack;
+import org.cyclops.commoncapabilities.api.ingredient.capability.ICapabilityGetter;
 import org.cyclops.commoncapabilities.api.ingredient.storage.IIngredientComponentStorage;
 import org.cyclops.integrateddynamics.api.network.INetwork;
 import org.cyclops.integrateddynamics.api.part.PartPos;
@@ -38,7 +40,7 @@ public interface IFluidTarget extends IChanneledTarget<IFluidNetwork, FluidStack
         INetwork network = IChanneledTarget.getNetworkChecked(center);
         BlockEntity tile = target.getPos().getLevel(true).getBlockEntity(target.getPos().getBlockPos());
         PartStateRoundRobin<?> partState = IChanneledTarget.getPartState(center);
-        return new FluidTargetCapabilityProvider(transfer, network, tile, target.getSide(),
+        return new FluidTargetCapabilityProvider(transfer, network, Block.class, tile == null ? null : ICapabilityGetter.forBlockEntity(tile), tile, target.getSide(),
                 fluidStackMatcher, partTarget, properties, partState);
     }
 
@@ -49,7 +51,7 @@ public interface IFluidTarget extends IChanneledTarget<IFluidNetwork, FluidStack
         PartPos target = partTarget.getTarget();
         INetwork network = IChanneledTarget.getNetworkChecked(center);
         PartStateRoundRobin<?> partState = IChanneledTarget.getPartState(center);
-        return new FluidTargetCapabilityProvider(transfer, network, entity, target.getSide(),
+        return new FluidTargetCapabilityProvider(transfer, network, Entity.class, entity == null ? null : ICapabilityGetter.forEntity(entity), entity, target.getSide(),
                 fluidStackMatcher, partTarget, properties, partState);
     }
 
@@ -59,7 +61,7 @@ public interface IFluidTarget extends IChanneledTarget<IFluidNetwork, FluidStack
         PartPos target = partTarget.getTarget();
         INetwork network = IChanneledTarget.getNetworkChecked(center);
         PartStateRoundRobin<?> partState = IChanneledTarget.getPartState(center);
-        return new FluidTargetCapabilityProvider(transfer, network, null, target.getSide(),
+        return new FluidTargetCapabilityProvider(transfer, network, Block.class, ICapabilityGetter.forBlock(target.getPos().getLevel(true), target.getPos().getBlockPos(), null, null), null, target.getSide(),
                 fluidStackMatcher, partTarget, properties, partState);
     }
 

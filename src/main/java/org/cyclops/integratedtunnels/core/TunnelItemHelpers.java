@@ -126,7 +126,7 @@ public class TunnelItemHelpers {
         if (stackA != null && stackB != null) {
             if (checkStackSize && stackA.getCount() != stackB.getCount()) return false;
             if (checkItem && stackA.getItem() != stackB.getItem()) return false;
-            if (checkNbt && !(Objects.equals(stackA.getTag(), stackB.getTag()) && stackA.areCapsCompatible(stackB))) return false;
+            if (checkNbt && !(Objects.equals(stackA.getTag(), stackB.getTag()) && stackA.areAttachmentsCompatible(stackB))) return false;
             return true;
         }
         return false;

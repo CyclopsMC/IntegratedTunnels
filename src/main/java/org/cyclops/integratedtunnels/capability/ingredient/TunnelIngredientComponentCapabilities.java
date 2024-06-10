@@ -1,18 +1,16 @@
 package org.cyclops.integratedtunnels.capability.ingredient;
 
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.common.capabilities.ICapabilityProvider;
-import net.minecraftforge.fluids.FluidStack;
+import net.neoforged.neoforge.capabilities.ICapabilityProvider;
+import net.neoforged.neoforge.fluids.FluidStack;
 import org.cyclops.commoncapabilities.api.ingredient.IngredientComponent;
 import org.cyclops.commoncapabilities.api.ingredient.capability.IngredientComponentCapabilityAttacherAdapter;
 import org.cyclops.commoncapabilities.api.ingredient.capability.IngredientComponentCapabilityAttacherManager;
-import org.cyclops.cyclopscore.modcompat.capabilities.DefaultCapabilityProvider;
-import org.cyclops.integrateddynamics.Reference;
+import org.cyclops.integrateddynamics.api.network.INetwork;
 import org.cyclops.integrateddynamics.capability.ingredient.IngredientComponentCapabilities;
-import org.cyclops.integrateddynamics.capability.network.PositionedAddonsNetworkIngredientsHandlerConfig;
-import org.cyclops.integratedtunnels.capability.network.FluidNetworkConfig;
-import org.cyclops.integratedtunnels.capability.network.ItemNetworkConfig;
+import org.cyclops.integratedtunnels.Capabilities;
+import org.cyclops.integratedtunnels.api.network.IFluidNetwork;
+import org.cyclops.integratedtunnels.api.network.IItemNetwork;
 
 /**
  * Value handlers for ingredient components.
@@ -24,19 +22,16 @@ public class TunnelIngredientComponentCapabilities {
         IngredientComponentCapabilityAttacherManager attacherManager = new IngredientComponentCapabilityAttacherManager();
 
         // Network handler
-        ResourceLocation networkHandler = new ResourceLocation(Reference.MOD_ID, "network_handler");
-        attacherManager.addAttacher(new IngredientComponentCapabilityAttacherAdapter<ItemStack, Integer>(IngredientComponentCapabilities.INGREDIENT_ITEMSTACK_NAME, networkHandler) {
+        attacherManager.addAttacher(new IngredientComponentCapabilityAttacherAdapter<ItemStack, Integer>(IngredientComponentCapabilities.INGREDIENT_ITEMSTACK_NAME, org.cyclops.integrateddynamics.Capabilities.PositionedAddonsNetworkIngredientsHandler.INGREDIENT) {
             @Override
-            public ICapabilityProvider createCapabilityProvider(IngredientComponent<ItemStack, Integer> ingredientComponent) {
-                return new DefaultCapabilityProvider<>(() -> PositionedAddonsNetworkIngredientsHandlerConfig.CAPABILITY,
-                        (network) -> network.getCapability(ItemNetworkConfig.CAPABILITY));
+            public ICapabilityProvider<INetwork, Void, IItemNetwork> createCapabilityProvider(IngredientComponent<ItemStack, Integer> ingredientComponent) {
+                return (network, context) -> network.getCapability(Capabilities.ItemNetwork.NETWORK).orElse(null);
             }
         });
-        attacherManager.addAttacher(new IngredientComponentCapabilityAttacherAdapter<FluidStack, Integer>(IngredientComponentCapabilities.INGREDIENT_FLUIDSTACK_NAME, networkHandler) {
+        attacherManager.addAttacher(new IngredientComponentCapabilityAttacherAdapter<FluidStack, Integer>(IngredientComponentCapabilities.INGREDIENT_FLUIDSTACK_NAME, org.cyclops.integrateddynamics.Capabilities.PositionedAddonsNetworkIngredientsHandler.INGREDIENT) {
             @Override
-            public ICapabilityProvider createCapabilityProvider(IngredientComponent<FluidStack, Integer> ingredientComponent) {
-                return new DefaultCapabilityProvider<>(() -> PositionedAddonsNetworkIngredientsHandlerConfig.CAPABILITY,
-                        (network) -> network.getCapability(FluidNetworkConfig.CAPABILITY));
+            public ICapabilityProvider<INetwork, Void, IFluidNetwork> createCapabilityProvider(IngredientComponent<FluidStack, Integer> ingredientComponent) {
+                return (network, context) -> network.getCapability(Capabilities.FluidNetwork.NETWORK).orElse(null);
             }
         });
     }

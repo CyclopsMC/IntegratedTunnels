@@ -21,8 +21,8 @@ import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.level.BlockEvent;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.level.BlockEvent;
 import org.cyclops.commoncapabilities.api.ingredient.IIngredientMatcher;
 import org.cyclops.commoncapabilities.api.ingredient.IngredientComponent;
 import org.cyclops.commoncapabilities.api.ingredient.storage.IIngredientComponentStorage;
@@ -149,7 +149,7 @@ public class ItemStorageBlockWrapper implements IIngredientComponentStorage<Item
                     cachedDrops = blockBreakHandler.getDrops(blockState, world, pos, player);
                 } else {
                     BlockEvent.BreakEvent blockBreakEvent = new BlockEvent.BreakEvent(world, pos, blockState, player);
-                    if (!MinecraftForge.EVENT_BUS.post(blockBreakEvent)) {
+                    if (!NeoForge.EVENT_BUS.post(blockBreakEvent).isCanceled()) {
                         List<ItemStack> drops = Block.getDrops(blockState, world, pos, world.getBlockEntity(pos), null, ItemDummyPickAxe.getItemStack(silkTouch, fortune));
                         if (drops.size() == 0) {
                             // Remove the block if it dropped nothing (and will drop nothing)

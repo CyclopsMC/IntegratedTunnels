@@ -17,16 +17,19 @@
     "criteria_0": {
       "trigger": "integrateddynamics:part_writer_aspect",
       "conditions": {
-        "parttype": "integratedtunnels:exporter_world_block",
+        "part_type": "integratedtunnels:exporter_world_block",
         "aspect": "integratedtunnels:write_list_world_item_block_export",
         "variable": {
-          "type": "integrateddynamics:operator",
+          "type": "operator",
           "operator": "integrateddynamics:string_tag",
           "input": {
             "0": {
-              "valuetype": "integrateddynamics:string",
+              "type": "value_type",
               "value": {
-                "item": "logs"
+                "type": "itemstack",
+                "item": {
+                  "item": "logs"
+                }
               }
             }
           }

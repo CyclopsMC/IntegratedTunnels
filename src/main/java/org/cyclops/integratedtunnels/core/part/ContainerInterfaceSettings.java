@@ -29,7 +29,7 @@ public class ContainerInterfaceSettings extends ContainerPartSettings {
 
     public ContainerInterfaceSettings(int id, Inventory playerInventory, Container inventory,
                                       PartTarget target, Optional<IPartContainer> partContainer, IPartType partType) {
-        super(RegistryEntries.CONTAINER_INTERFACE_SETTINGS, id, playerInventory, inventory, target, partContainer, partType);
+        super(RegistryEntries.CONTAINER_INTERFACE_SETTINGS.get(), id, playerInventory, inventory, target, partContainer, partType);
         lastChannelInterfaceValueId = getNextValueId();
 
         putButtonAction(ContainerMultipartAspects.BUTTON_OFFSETS, (s, containerExtended) -> {

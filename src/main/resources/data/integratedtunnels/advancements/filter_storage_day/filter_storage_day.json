@@ -16,10 +16,10 @@
     "criteria_0": {
       "trigger": "integrateddynamics:part_writer_aspect",
       "conditions": {
-        "parttype": "integratedtunnels:interface_filter_item",
+        "part_type": "integratedtunnels:interface_filter_item",
         "aspect": "integratedtunnels:write_boolean_item_filter",
         "variable": {
-          "type": "integrateddynamics:aspect",
+          "type": "aspect",
           "aspect": "integrateddynamics:read_boolean_world_isday"
         }
       }

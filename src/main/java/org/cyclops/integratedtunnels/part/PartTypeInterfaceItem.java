@@ -1,26 +1,27 @@
 package org.cyclops.integratedtunnels.part;
 
 import com.google.common.collect.Iterators;
+import net.minecraft.core.Direction;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.items.IItemHandler;
+import net.neoforged.neoforge.capabilities.BlockCapability;
+import net.neoforged.neoforge.items.IItemHandler;
 import org.cyclops.commoncapabilities.IngredientComponents;
 import org.cyclops.commoncapabilities.api.capability.itemhandler.ISlotlessItemHandler;
 import org.cyclops.cyclopscore.ingredient.collection.FilteredIngredientCollectionIterator;
 import org.cyclops.integrateddynamics.api.network.INetwork;
 import org.cyclops.integrateddynamics.api.network.IPartNetwork;
+import org.cyclops.integrateddynamics.api.network.NetworkCapability;
+import org.cyclops.integrateddynamics.api.part.PartCapability;
 import org.cyclops.integrateddynamics.api.part.PartTarget;
 import org.cyclops.integratedtunnels.Capabilities;
 import org.cyclops.integratedtunnels.GeneralConfig;
 import org.cyclops.integratedtunnels.api.network.IItemNetwork;
-import org.cyclops.integratedtunnels.capability.network.ItemNetworkConfig;
 import org.cyclops.integratedtunnels.core.part.IPartTypeInterfacePositionedAddon;
 import org.cyclops.integratedtunnels.core.part.PartTypeInterfacePositionedAddon;
 
 import javax.annotation.Nonnull;
 import java.util.Iterator;
+import java.util.Optional;
 
 /**
  * Interface for item handlers.
@@ -32,13 +33,18 @@ public class PartTypeInterfaceItem extends PartTypeInterfacePositionedAddon<IIte
     }
 
     @Override
-    public Capability<IItemNetwork> getNetworkCapability() {
-        return ItemNetworkConfig.CAPABILITY;
+    public NetworkCapability<IItemNetwork> getNetworkCapability() {
+        return Capabilities.ItemNetwork.NETWORK;
     }
 
     @Override
-    public Capability<IItemHandler> getTargetCapability() {
-        return ForgeCapabilities.ITEM_HANDLER;
+    public PartCapability<IItemHandler> getPartCapability() {
+        return Capabilities.ItemHandler.PART;
+    }
+
+    @Override
+    public BlockCapability<IItemHandler, Direction> getBlockCapability() {
+        return net.neoforged.neoforge.capabilities.Capabilities.ItemHandler.BLOCK;
     }
 
     @Override
@@ -54,8 +60,8 @@ public class PartTypeInterfaceItem extends PartTypeInterfacePositionedAddon<IIte
     public static class State extends PartTypeInterfacePositionedAddon.State<IItemNetwork, IItemHandler, PartTypeInterfaceItem, PartTypeInterfaceItem.State> {
 
         @Override
-        public Capability<IItemHandler> getTargetCapability() {
-            return ForgeCapabilities.ITEM_HANDLER;
+        public PartCapability<IItemHandler> getTargetCapability() {
+            return Capabilities.ItemHandler.PART;
         }
 
         @Override
@@ -64,11 +70,11 @@ public class PartTypeInterfaceItem extends PartTypeInterfacePositionedAddon<IIte
         }
 
         @Override
-        public <T2> LazyOptional<T2> getCapability(Capability<T2> capability, INetwork network, IPartNetwork partNetwork, PartTarget target) {
-            if (isNetworkAndPositionValid() && capability == Capabilities.SLOTLESS_ITEMHANDLER) {
-                return LazyOptional.of(this::getCapabilityInstance).cast();
+        public <T> Optional<T> getCapability(PartTypeInterfaceItem partType, PartCapability<T> capability, INetwork network, IPartNetwork partNetwork, PartTarget target) {
+            if (isNetworkAndPositionValid() && capability == Capabilities.ItemHandler.PART) {
+                return Optional.of((T) this.getCapabilityInstance());
             }
-            return super.getCapability(capability, network, partNetwork, target);
+            return super.getCapability(partType, capability, network, partNetwork, target);
         }
     }
 
@@ -80,7 +86,7 @@ public class PartTypeInterfaceItem extends PartTypeInterfacePositionedAddon<IIte
         }
 
         protected IItemHandler getItemHandler() {
-            return state.getPositionedAddonsNetwork().getChannelExternal(ForgeCapabilities.ITEM_HANDLER, state.getChannel());
+            return state.getPositionedAddonsNetwork().getChannelExternal(net.neoforged.neoforge.capabilities.Capabilities.ItemHandler.BLOCK, state.getChannel());
         }
 
         @Override

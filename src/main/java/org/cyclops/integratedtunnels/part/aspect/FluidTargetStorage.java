@@ -1,12 +1,12 @@
 package org.cyclops.integratedtunnels.part.aspect;
 
-import net.minecraftforge.fluids.FluidStack;
+import net.neoforged.neoforge.fluids.FluidStack;
 import org.cyclops.commoncapabilities.api.ingredient.storage.IIngredientComponentStorage;
 import org.cyclops.integrateddynamics.api.network.INetwork;
 import org.cyclops.integrateddynamics.api.part.PartTarget;
 import org.cyclops.integrateddynamics.api.part.aspect.property.IAspectProperties;
+import org.cyclops.integratedtunnels.Capabilities;
 import org.cyclops.integratedtunnels.api.network.IFluidNetwork;
-import org.cyclops.integratedtunnels.capability.network.FluidNetworkConfig;
 import org.cyclops.integratedtunnels.core.part.PartStateRoundRobin;
 import org.cyclops.integratedtunnels.core.predicate.IngredientPredicate;
 
@@ -27,7 +27,7 @@ public class FluidTargetStorage extends ChanneledTarget<IFluidNetwork, FluidStac
                               IIngredientComponentStorage<FluidStack, Integer> storage,
                               IngredientPredicate<FluidStack, Integer> fluidStackMatcher, PartTarget partTarget,
                               IAspectProperties properties, @Nullable PartStateRoundRobin<?> partState) {
-        super(network, network.getCapability(FluidNetworkConfig.CAPABILITY).orElse(null), partState,
+        super(network, network.getCapability(Capabilities.FluidNetwork.NETWORK).orElse(null), partState,
                 properties.getValue(TunnelAspectWriteBuilders.PROP_CHANNEL).getRawValue(),
                 properties.getValue(TunnelAspectWriteBuilders.PROP_ROUNDROBIN).getRawValue(),
                 properties.getValue(TunnelAspectWriteBuilders.PROP_CRAFT).getRawValue(),

@@ -1,15 +1,17 @@
 package org.cyclops.integratedtunnels.part;
 
 import com.google.common.collect.Lists;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.fluids.capability.IFluidHandler;
+import net.minecraft.core.Direction;
+import net.neoforged.neoforge.capabilities.BlockCapability;
+import net.neoforged.neoforge.fluids.capability.IFluidHandler;
+import org.cyclops.integrateddynamics.api.network.NetworkCapability;
+import org.cyclops.integrateddynamics.api.part.PartCapability;
 import org.cyclops.integrateddynamics.api.part.aspect.IAspect;
 import org.cyclops.integrateddynamics.core.part.aspect.AspectRegistry;
 import org.cyclops.integrateddynamics.part.aspect.Aspects;
+import org.cyclops.integratedtunnels.Capabilities;
 import org.cyclops.integratedtunnels.GeneralConfig;
 import org.cyclops.integratedtunnels.api.network.IFluidNetwork;
-import org.cyclops.integratedtunnels.capability.network.FluidNetworkConfig;
 import org.cyclops.integratedtunnels.core.part.PartTypeInterfacePositionedAddonFiltering;
 import org.cyclops.integratedtunnels.part.aspect.TunnelAspects;
 
@@ -30,13 +32,18 @@ public class PartTypeInterfaceFilteringFluid extends PartTypeInterfacePositioned
     }
 
     @Override
-    public Capability<IFluidNetwork> getNetworkCapability() {
-        return FluidNetworkConfig.CAPABILITY;
+    public NetworkCapability<IFluidNetwork> getNetworkCapability() {
+        return Capabilities.FluidNetwork.NETWORK;
     }
 
     @Override
-    public Capability<IFluidHandler> getTargetCapability() {
-        return ForgeCapabilities.FLUID_HANDLER;
+    public PartCapability<IFluidHandler> getPartCapability() {
+        return Capabilities.FluidHandler.PART;
+    }
+
+    @Override
+    public BlockCapability<IFluidHandler, Direction> getBlockCapability() {
+        return net.neoforged.neoforge.capabilities.Capabilities.FluidHandler.BLOCK;
     }
 
     @Override
@@ -56,8 +63,8 @@ public class PartTypeInterfaceFilteringFluid extends PartTypeInterfacePositioned
         }
 
         @Override
-        public Capability<IFluidHandler> getTargetCapability() {
-            return ForgeCapabilities.FLUID_HANDLER;
+        public PartCapability<IFluidHandler> getTargetCapability() {
+            return Capabilities.FluidHandler.PART;
         }
 
         @Override
