@@ -6,11 +6,12 @@ import net.neoforged.neoforge.fluids.FluidStack;
 import org.cyclops.commoncapabilities.api.ingredient.IngredientComponent;
 import org.cyclops.commoncapabilities.api.ingredient.capability.IngredientComponentCapabilityAttacherAdapter;
 import org.cyclops.commoncapabilities.api.ingredient.capability.IngredientComponentCapabilityAttacherManager;
-import org.cyclops.integrateddynamics.api.network.INetwork;
+import org.cyclops.cyclopscore.modcompat.capabilities.DefaultCapabilityProvider;
+import org.cyclops.integrateddynamics.api.ingredient.capability.IPositionedAddonsNetworkIngredientsHandler;
 import org.cyclops.integrateddynamics.capability.ingredient.IngredientComponentCapabilities;
 import org.cyclops.integratedtunnels.Capabilities;
-import org.cyclops.integratedtunnels.api.network.IFluidNetwork;
-import org.cyclops.integratedtunnels.api.network.IItemNetwork;
+
+import java.util.Optional;
 
 /**
  * Value handlers for ingredient components.
@@ -24,14 +25,14 @@ public class TunnelIngredientComponentCapabilities {
         // Network handler
         attacherManager.addAttacher(new IngredientComponentCapabilityAttacherAdapter<ItemStack, Integer>(IngredientComponentCapabilities.INGREDIENT_ITEMSTACK_NAME, org.cyclops.integrateddynamics.Capabilities.PositionedAddonsNetworkIngredientsHandler.INGREDIENT) {
             @Override
-            public ICapabilityProvider<INetwork, Void, IItemNetwork> createCapabilityProvider(IngredientComponent<ItemStack, Integer> ingredientComponent) {
-                return (network, context) -> network.getCapability(Capabilities.ItemNetwork.NETWORK).orElse(null);
+            public ICapabilityProvider<IngredientComponent<ItemStack, Integer>, Void, IPositionedAddonsNetworkIngredientsHandler<ItemStack, Integer>> createCapabilityProvider(IngredientComponent<ItemStack, Integer> ingredientComponent) {
+                return new DefaultCapabilityProvider<>(network -> (Optional) network.getCapability(Capabilities.ItemNetwork.NETWORK));
             }
         });
         attacherManager.addAttacher(new IngredientComponentCapabilityAttacherAdapter<FluidStack, Integer>(IngredientComponentCapabilities.INGREDIENT_FLUIDSTACK_NAME, org.cyclops.integrateddynamics.Capabilities.PositionedAddonsNetworkIngredientsHandler.INGREDIENT) {
             @Override
-            public ICapabilityProvider<INetwork, Void, IFluidNetwork> createCapabilityProvider(IngredientComponent<FluidStack, Integer> ingredientComponent) {
-                return (network, context) -> network.getCapability(Capabilities.FluidNetwork.NETWORK).orElse(null);
+            public ICapabilityProvider<IngredientComponent<FluidStack, Integer>, Void, IPositionedAddonsNetworkIngredientsHandler<FluidStack, Integer>> createCapabilityProvider(IngredientComponent<FluidStack, Integer> ingredientComponent) {
+                return new DefaultCapabilityProvider<>(network -> (Optional) network.getCapability(Capabilities.FluidNetwork.NETWORK));
             }
         });
     }
