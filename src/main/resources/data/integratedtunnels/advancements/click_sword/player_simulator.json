@@ -16,7 +16,7 @@
       "trigger": "cyclopscore:item_crafted",
       "conditions": {
         "item": {
-          "item": "integratedtunnels:part_player_simulator"
+          "items": ["integratedtunnels:part_player_simulator"]
         }
       }
     }

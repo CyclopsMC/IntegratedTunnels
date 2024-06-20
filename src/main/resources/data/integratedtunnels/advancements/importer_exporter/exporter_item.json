@@ -16,7 +16,7 @@
       "trigger": "cyclopscore:item_crafted",
       "conditions": {
         "item": {
-          "item": "integratedtunnels:part_exporter_item"
+          "items": ["integratedtunnels:part_exporter_item"]
         }
       }
     }

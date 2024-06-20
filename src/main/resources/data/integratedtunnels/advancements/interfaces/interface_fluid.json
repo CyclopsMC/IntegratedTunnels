@@ -16,7 +16,7 @@
       "trigger": "cyclopscore:item_crafted",
       "conditions": {
         "item": {
-          "item": "integratedtunnels:part_interface_fluid"
+          "items": ["integratedtunnels:part_interface_fluid"]
         }
       }
     }
