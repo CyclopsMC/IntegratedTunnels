@@ -1,0 +1,14 @@
+As always, don't forget to backup your world before updating!
+Requires CyclopsCore version 1.18.4 or higher.
+
+Changes:
+* Optimize list-based ingredient movement
+  This makes importers and exporters configured with
+  a list aspect make better use of internal indexes
+  to significantly reduce server load.
+  Closes #286
+
+
+Fixes:
+* Fix predicate-based importing ignoring round-robin, Closes #288
+* Fix variable-based offsets not working in interfaces, Closes #289

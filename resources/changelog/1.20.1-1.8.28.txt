@@ -1,0 +1,8 @@
+As always, don't forget to backup your world before updating!
+Requires CyclopsCore version 1.18.4 or higher.
+
+Fixes:
+* Fix list-based aspects only moving one ingredient at a time
+  Closes CyclopsMC/IntegratedDynamics#1349
+  Related to #286
+

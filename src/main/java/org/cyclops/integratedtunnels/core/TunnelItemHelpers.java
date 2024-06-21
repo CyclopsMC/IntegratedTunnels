@@ -68,15 +68,19 @@ public class TunnelItemHelpers {
         };
     }
 
-    public static IngredientPredicate<ItemStack, Integer> matchItemStack(final ItemStack itemStack, final boolean checkItem,
-                                                                         final boolean checkStackSize,
-                                                                         final boolean checkNbt, final boolean blacklist,
-                                                                         final boolean exactAmount) {
+    protected static int getItemStackMatchFlags(boolean checkItem, boolean checkStackSize, boolean checkNbt) {
         int matchFlags = ItemMatch.ANY;
         if (checkItem)      matchFlags = matchFlags | ItemMatch.ITEM;
         if (checkNbt)       matchFlags = matchFlags | ItemMatch.TAG;
         if (checkStackSize) matchFlags = matchFlags | ItemMatch.STACKSIZE;
-        return new IngredientPredicate<ItemStack, Integer>(IngredientComponent.ITEMSTACK, itemStack.copy(), matchFlags, blacklist, itemStack.isEmpty() && !blacklist,
+        return matchFlags;
+    }
+
+    public static IngredientPredicate<ItemStack, Integer> matchItemStack(final ItemStack itemStack, final boolean checkItem,
+                                                                         final boolean checkStackSize,
+                                                                         final boolean checkNbt, final boolean blacklist,
+                                                                         final boolean exactAmount) {
+        return new IngredientPredicate<ItemStack, Integer>(IngredientComponent.ITEMSTACK, itemStack.copy(), getItemStackMatchFlags(checkItem, checkStackSize, checkNbt), blacklist, itemStack.isEmpty() && !blacklist,
                 itemStack.getCount(), exactAmount) {
             @Override
             public boolean test(@Nullable ItemStack input) {
@@ -93,7 +97,7 @@ public class TunnelItemHelpers {
                                                                           final boolean checkItem, final boolean checkStackSize,
                                                                           final boolean checkNbt,
                                                                           final boolean blacklist, final int amount, final boolean exactAmount) {
-        return new IngredientPredicateItemStackList(blacklist, amount, exactAmount, itemStacks, checkStackSize, checkItem, checkNbt);
+        return new IngredientPredicateItemStackList(blacklist, amount, exactAmount, itemStacks, getItemStackMatchFlags(checkItem, checkStackSize, checkNbt), checkStackSize, checkItem, checkNbt);
     }
 
     public static IngredientPredicate<ItemStack, Integer> matchPredicateItem(final PartTarget partTarget, final IOperator predicate,
@@ -105,7 +109,7 @@ public class TunnelItemHelpers {
                                                                       final boolean checkItem, final boolean checkStackSize,
                                                                       final boolean checkNbt,
                                                                       final boolean blacklist, final int amount, final boolean exactAmount) {
-        return new IngredientPredicateBlockList(blacklist, amount, exactAmount, blocks, checkStackSize, checkItem, checkNbt);
+        return new IngredientPredicateBlockList(blacklist, amount, exactAmount, blocks, getItemStackMatchFlags(checkItem, checkStackSize, checkNbt), checkStackSize, checkItem, checkNbt);
     }
 
     public static IngredientPredicate<ItemStack, Integer> matchPredicateBlock(final PartTarget partTarget, final IOperator predicate,

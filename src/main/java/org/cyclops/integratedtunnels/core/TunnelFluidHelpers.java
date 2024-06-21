@@ -37,7 +37,7 @@ import java.util.Optional;
  */
 public class TunnelFluidHelpers {
 
-    public static final IngredientPredicate<FluidStack, Integer> MATCH_NONE = new IngredientPredicate<FluidStack, Integer>(IngredientComponent.FLUIDSTACK, null, FluidMatch.EXACT, false, true, 0, false) {
+    public static final IngredientPredicate<FluidStack, Integer> MATCH_NONE = new IngredientPredicate<FluidStack, Integer>(IngredientComponent.FLUIDSTACK, FluidStack.EMPTY, FluidMatch.EXACT, false, true, 0, false) {
         @Override
         public boolean test(FluidStack input) {
             return false;
@@ -63,14 +63,18 @@ public class TunnelFluidHelpers {
         };
     }
 
-    public static IngredientPredicate<FluidStack, Integer> matchFluidStack(final FluidStack fluidStack, final boolean checkFluid,
-                                                                           final boolean checkAmount, final boolean checkNbt,
-                                                                           final boolean blacklist, final boolean exactAmount) {
+    protected static int getFluidStackMatchFlags(final boolean checkFluid, final boolean checkAmount, final boolean checkNbt) {
         int matchFlags = FluidMatch.ANY;
         if (checkFluid)  matchFlags = matchFlags | FluidMatch.FLUID;
         if (checkNbt)    matchFlags = matchFlags | FluidMatch.TAG;
         if (checkAmount) matchFlags = matchFlags | FluidMatch.AMOUNT;
-        return new IngredientPredicate<FluidStack, Integer>(IngredientComponent.FLUIDSTACK, fluidStack != null ? fluidStack.copy() : null, matchFlags, blacklist, fluidStack == null && !blacklist,
+        return matchFlags;
+    }
+
+    public static IngredientPredicate<FluidStack, Integer> matchFluidStack(final FluidStack fluidStack, final boolean checkFluid,
+                                                                           final boolean checkAmount, final boolean checkNbt,
+                                                                           final boolean blacklist, final boolean exactAmount) {
+        return new IngredientPredicate<FluidStack, Integer>(IngredientComponent.FLUIDSTACK, fluidStack != null ? fluidStack.copy() : null, getFluidStackMatchFlags(checkFluid, checkAmount, checkNbt), blacklist, fluidStack == null && !blacklist,
                 FluidHelpers.getAmount(fluidStack), exactAmount) {
             @Override
             public boolean test(@Nullable FluidStack input) {
@@ -86,7 +90,7 @@ public class TunnelFluidHelpers {
     public static IngredientPredicate<FluidStack, Integer> matchFluidStacks(final IValueTypeListProxy<ValueObjectTypeFluidStack, ValueObjectTypeFluidStack.ValueFluidStack> fluidStacks,
                                                                             final boolean checkFluid, final boolean checkAmount, final boolean checkNbt,
                                                                             final boolean blacklist, final int amount, final boolean exactAmount) {
-        return new IngredientPredicateFluidStackList(blacklist, amount, exactAmount, fluidStacks, checkFluid, checkAmount, checkNbt);
+        return new IngredientPredicateFluidStackList(blacklist, amount, exactAmount, fluidStacks, getFluidStackMatchFlags(checkFluid, checkAmount, checkNbt), checkFluid, checkAmount, checkNbt);
     }
 
     public static IngredientPredicate<FluidStack, Integer> matchPredicate(final PartTarget partTarget, final IOperator predicate,

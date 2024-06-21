@@ -1,5 +1,6 @@
 package org.cyclops.integratedtunnels.core.predicate;
 
+import com.google.common.collect.Iterables;
 import net.minecraft.world.item.ItemStack;
 import org.cyclops.commoncapabilities.api.ingredient.IngredientComponent;
 import org.cyclops.cyclopscore.helper.BlockHelpers;
@@ -19,8 +20,12 @@ public class IngredientPredicateBlockList extends IngredientPredicate<ItemStack,
     private final boolean checkItem;
     private final boolean checkNbt;
 
-    public IngredientPredicateBlockList(boolean blacklist, int amount, boolean exactAmount, IValueTypeListProxy<ValueObjectTypeBlock, ValueObjectTypeBlock.ValueBlock> blocks, boolean checkStackSize, boolean checkItem, boolean checkNbt) {
-        super(IngredientComponent.ITEMSTACK, blacklist, false, amount, exactAmount);
+    public IngredientPredicateBlockList(boolean blacklist, int amount, boolean exactAmount, IValueTypeListProxy<ValueObjectTypeBlock, ValueObjectTypeBlock.ValueBlock> blocks, int matchFlags, boolean checkStackSize, boolean checkItem, boolean checkNbt) {
+        super(IngredientComponent.ITEMSTACK,
+                Iterables.transform(
+                        Iterables.filter(blocks, block -> block.getRawValue().isPresent()),
+                        block -> TunnelItemHelpers.prototypeWithCount(BlockHelpers.getItemStackFromBlockState(block.getRawValue().get()), amount)),
+                matchFlags, blacklist, false, amount, exactAmount);
         this.blacklist = blacklist;
         this.blocks = blocks;
         this.checkStackSize = checkStackSize;
