@@ -102,16 +102,15 @@ dependencies {
     }
 	
     // Add something like 'integratedtunnelscompat_version_local=0.1.0-DEV' to your gradle.properties if you want to use a custom local Integrated Tunnels Compat version.
-    // TODO
-//    if(secrets.integratedtunnelscompat_version_local) {
-//        shadow("org.cyclops.integratedtunnelscompat:integratedtunnelscompat-${project.minecraft_version}-neoforge:${secrets.integratedtunnelscompat_version_local}") {
-//            transitive = false
-//        }
-//    } else {
-//        shadow("org.cyclops.integratedtunnelscompat:integratedtunnelscompat-${project.minecraft_version}-neoforge:${project.integratedtunnelscompat_version}") {
-//            transitive = false
-//        }
-//    }
+    if(secrets.integratedtunnelscompat_version_local) {
+        shadow("org.cyclops.integratedtunnelscompat:integratedtunnelscompat-${project.minecraft_version}-neoforge:${secrets.integratedtunnelscompat_version_local}") {
+            transitive = false
+        }
+    } else {
+        shadow("org.cyclops.integratedtunnelscompat:integratedtunnelscompat-${project.minecraft_version}-neoforge:${project.integratedtunnelscompat_version}") {
+            transitive = false
+        }
+    }
 
     if(secrets.commoncapabilities_version_local) {
         implementation "org.cyclops.commoncapabilities:commoncapabilities-${project.minecraft_version}-neoforge:${secrets.commoncapabilities_version_local}:deobf"
