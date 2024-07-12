@@ -162,8 +162,8 @@ public abstract class PartTypeInterfacePositionedAddonFiltering<N extends IPosit
         }
 
         @Override
-        public void writeToNBT(CompoundTag tag) {
-            super.writeToNBT(tag);
+        public void writeToNBT(ValueDeseralizationContext valueDeseralizationContext, CompoundTag tag) {
+            super.writeToNBT(valueDeseralizationContext, tag);
             tag.putInt("channelInterface", channelInterface);
         }
 

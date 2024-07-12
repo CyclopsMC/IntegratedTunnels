@@ -18,10 +18,10 @@
       "item": "integratedtunnels:part_exporter_world_block"
     },
     "X": {
-      "tag": "forge:gems/emerald"
+      "tag": "c:gems/emerald"
     }
   },
   "result": {
-    "item": "integratedtunnels:part_player_simulator"
+    "id": "integratedtunnels:part_player_simulator"
   }
 }

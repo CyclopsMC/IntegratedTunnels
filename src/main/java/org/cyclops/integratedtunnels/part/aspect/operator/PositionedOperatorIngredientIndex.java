@@ -1,6 +1,7 @@
 package org.cyclops.integratedtunnels.part.aspect.operator;
 
 import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import org.cyclops.cyclopscore.datastructure.DimPos;
 import org.cyclops.cyclopscore.persist.nbt.NBTClassType;
@@ -31,14 +32,16 @@ public abstract class PositionedOperatorIngredientIndex<T, M> extends Positioned
         ((PositionedOperatorIngredientIndex.Function) this.getFunction()).setOperator(this);
     }
 
-    public void writeGeneratedFieldsToNBT(CompoundTag tag) {
-        super.writeGeneratedFieldsToNBT(tag);
-        NBTClassType.writeNbt(Integer.class, "channel", this.channel, tag);
+    @Override
+    public void writeGeneratedFieldsToNBT(CompoundTag tag, HolderLookup.Provider holderLookupProvider) {
+        super.writeGeneratedFieldsToNBT(tag, holderLookupProvider);
+        NBTClassType.writeNbt(Integer.class, "channel", this.channel, tag, holderLookupProvider);
     }
 
-    public void readGeneratedFieldsFromNBT(CompoundTag tag) {
-        super.readGeneratedFieldsFromNBT(tag);
-        this.channel = NBTClassType.readNbt(Integer.class, "channel", tag);
+    @Override
+    public void readGeneratedFieldsFromNBT(CompoundTag tag, HolderLookup.Provider holderLookupProvider) {
+        super.readGeneratedFieldsFromNBT(tag, holderLookupProvider);
+        this.channel = NBTClassType.readNbt(Integer.class, "channel", tag, holderLookupProvider);
     }
 
     @Override

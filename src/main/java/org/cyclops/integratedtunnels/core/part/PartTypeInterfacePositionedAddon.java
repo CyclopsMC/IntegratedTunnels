@@ -4,7 +4,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.MenuProvider;
@@ -72,7 +72,7 @@ public abstract class PartTypeInterfacePositionedAddon<N extends IPositionedAddo
     }
 
     @Override
-    public void writeExtraGuiData(FriendlyByteBuf packetBuffer, PartPos pos, ServerPlayer player) {
+    public void writeExtraGuiData(RegistryFriendlyByteBuf packetBuffer, PartPos pos, ServerPlayer player) {
         PacketCodec.write(packetBuffer, pos);
         packetBuffer.writeUtf(this.getUniqueName().toString());
     }
@@ -176,8 +176,8 @@ public abstract class PartTypeInterfacePositionedAddon<N extends IPositionedAddo
         }
 
         @Override
-        public void writeToNBT(CompoundTag tag) {
-            super.writeToNBT(tag);
+        public void writeToNBT(ValueDeseralizationContext valueDeseralizationContext, CompoundTag tag) {
+            super.writeToNBT(valueDeseralizationContext, tag);
             tag.putInt("channelInterface", channelInterface);
         }
 

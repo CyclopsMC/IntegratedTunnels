@@ -12,6 +12,6 @@
     }
   ],
   "result": {
-    "item": "integratedtunnels:part_interface_filter_item"
+    "id": "integratedtunnels:part_interface_filter_item"
   }
 }

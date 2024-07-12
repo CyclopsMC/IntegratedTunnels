@@ -1,16 +1,22 @@
 package org.cyclops.integratedtunnels.core;
 
+import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Iterators;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.Holder;
 import net.minecraft.network.protocol.game.ServerboundPlayerActionPacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
@@ -18,9 +24,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.bus.api.Event;
 import net.neoforged.neoforge.common.CommonHooks;
-import net.neoforged.neoforge.common.NeoForgeMod;
+import net.neoforged.neoforge.common.util.TriState;
 import net.neoforged.neoforge.event.EventHooks;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import org.cyclops.commoncapabilities.api.ingredient.IngredientComponent;
@@ -147,7 +152,7 @@ public class ItemStoragePlayerWrapper implements IIngredientComponentStorage<Ite
             }
 
             // Use item first
-            if (rightClickBlockActionResult.getUseItem() != Event.Result.DENY) {
+            if (rightClickBlockActionResult.getUseItem() != TriState.FALSE) {
                 if (!stack.isEmpty()) {
                     UseOnContext itemUseContext = new UseOnContext(player, hand, blockRayTraceResult);
                     InteractionResult actionResult = stack.getItem().onItemUseFirst(stack, itemUseContext);
@@ -166,13 +171,21 @@ public class ItemStoragePlayerWrapper implements IIngredientComponentStorage<Ite
             boolean flag1 = (player.isSecondaryUseActive() && playerHasHeldItem)
                     && !(player.getMainHandItem().doesSneakBypassUse(world, pos, player)
                     && player.getOffhandItem().doesSneakBypassUse(world, pos, player));
-            if (rightClickBlockActionResult.getUseBlock() == Event.Result.ALLOW
-                    || (rightClickBlockActionResult.getUseBlock() != Event.Result.DENY && !flag1)) {
+            if (rightClickBlockActionResult.getUseBlock() == TriState.TRUE
+                    || (rightClickBlockActionResult.getUseBlock() != TriState.FALSE && !flag1)) {
                 BlockState blockState = world.getBlockState(pos);
                 if (!player.isCrouching() || stack.isEmpty()) {
-                    if (blockState.use(world, player, hand, blockRayTraceResult).consumesAction()) {
+                    ItemInteractionResult iteminteractionresult = blockState.useItemOn(player.getItemInHand(hand), world, player, hand, blockRayTraceResult);
+                    if (iteminteractionresult.consumesAction()) {
                         returnPlayerInventory(player);
                         return ItemStack.EMPTY;
+                    }
+
+                    if (iteminteractionresult == ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION && hand == InteractionHand.MAIN_HAND) {
+                        if (blockState.useWithoutItem(world, player, blockRayTraceResult).consumesAction()) {
+                            returnPlayerInventory(player);
+                            return ItemStack.EMPTY;
+                        }
                     }
                 }
             }
@@ -191,7 +204,7 @@ public class ItemStoragePlayerWrapper implements IIngredientComponentStorage<Ite
             }
 
             // Use itemstack
-            if (rightClickBlockActionResult.getUseItem() != Event.Result.DENY && !stack.isEmpty()) {
+            if (rightClickBlockActionResult.getUseItem() != TriState.FALSE && !stack.isEmpty()) {
                 InteractionResult cancelResult = CommonHooks.onItemRightClick(player, hand);
                 if (cancelResult != null)  {
                     if (cancelResult == InteractionResult.FAIL) {
@@ -226,10 +239,10 @@ public class ItemStoragePlayerWrapper implements IIngredientComponentStorage<Ite
             }
 
             // Use item
-            if (rightClickBlockActionResult.getUseItem() != Event.Result.DENY && !stack.isEmpty()) {
+            if (rightClickBlockActionResult.getUseItem() != TriState.FALSE && !stack.isEmpty()) {
                 // Increase reach position.
                 BlockPos targetPos = pos;
-                double reachDistance = player.getAttribute(NeoForgeMod.BLOCK_REACH.value()).getValue() + 3;
+                double reachDistance = player.getAttribute(Attributes.BLOCK_INTERACTION_RANGE).getValue() + 3;
                 int i = 0;
                 while (i++ < reachDistance && world.isEmptyBlock(targetPos)) {
                     targetPos = targetPos.relative(side.getOpposite());
@@ -252,7 +265,7 @@ public class ItemStoragePlayerWrapper implements IIngredientComponentStorage<Ite
             // Check if left clicking is allowed
             PlayerInteractEvent.LeftClickBlock event = CommonHooks.onLeftClickBlock(player, pos, side, ServerboundPlayerActionPacket.Action.START_DESTROY_BLOCK);
             BlockState blockState = world.getBlockState(pos);
-            if (event.isCanceled() || (event.getUseItem() == Event.Result.DENY)) { // Restore block and te data
+            if (event.isCanceled() || (event.getUseItem() == TriState.FALSE)) { // Restore block and te data
                 world.sendBlockUpdated(pos, blockState, world.getBlockState(pos), 3);
                 return stack;
             }
@@ -290,9 +303,11 @@ public class ItemStoragePlayerWrapper implements IIngredientComponentStorage<Ite
                 if (entities.size() > 0) {
                     Entity entity = getEntity(entities);
                     EquipmentSlot equipmentSlotType = hand == InteractionHand.MAIN_HAND ? EquipmentSlot.MAINHAND : EquipmentSlot.OFFHAND;
-                    player.getAttributes().addTransientAttributeModifiers(stack.getAttributeModifiers(equipmentSlotType));
+                    HashMultimap<Holder<Attribute>, AttributeModifier> modifiers = HashMultimap.create();
+                    stack.getAttributeModifiers().forEach(equipmentSlotType, modifiers::put);
+                    player.getAttributes().addTransientAttributeModifiers(modifiers);
                     player.attack(entity);
-                    player.getAttributes().removeAttributeModifiers(stack.getAttributeModifiers(equipmentSlotType));
+                    player.getAttributes().removeAttributeModifiers(modifiers);
                     returnPlayerInventory(player);
                     return ItemStack.EMPTY;
                 } else {

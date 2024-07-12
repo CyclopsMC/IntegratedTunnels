@@ -30,6 +30,7 @@ import org.cyclops.integratedtunnels.core.predicate.IngredientPredicateFluidStac
 import org.cyclops.integratedtunnels.part.aspect.ITunnelConnection;
 
 import javax.annotation.Nullable;
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -66,7 +67,7 @@ public class TunnelFluidHelpers {
     protected static int getFluidStackMatchFlags(final boolean checkFluid, final boolean checkAmount, final boolean checkNbt) {
         int matchFlags = FluidMatch.ANY;
         if (checkFluid)  matchFlags = matchFlags | FluidMatch.FLUID;
-        if (checkNbt)    matchFlags = matchFlags | FluidMatch.TAG;
+        if (checkNbt)    matchFlags = matchFlags | FluidMatch.DATA;
         if (checkAmount) matchFlags = matchFlags | FluidMatch.AMOUNT;
         return matchFlags;
     }
@@ -110,7 +111,7 @@ public class TunnelFluidHelpers {
         if (stackA != null && stackB != null) {
             if (checkAmount && stackA.getAmount() != stackB.getAmount()) return false;
             if (checkFluid && stackA.getFluid() != stackB.getFluid()) return false;
-            if (checkNbt && !FluidStack.areFluidStackTagsEqual(stackA, stackB)) return false;
+            if (checkNbt && !Objects.equals(stackA.getComponents(), stackB.getComponents())) return false;
             return true;
         }
         return false;
@@ -189,7 +190,7 @@ public class TunnelFluidHelpers {
             if (prototype == null) {
                 return count == 0 ? null : new FluidStack(Fluids.WATER, count);
             } else {
-                prototype = new FluidStack(prototype, count);
+                prototype = new FluidStack(prototype.getFluidHolder(), count, prototype.getComponentsPatch());
             }
         }
         return prototype;

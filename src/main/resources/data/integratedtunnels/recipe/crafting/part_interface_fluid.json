@@ -1,19 +1,19 @@
 {
   "type": "minecraft:crafting_shaped",
   "pattern": [
-    "CTC",
+    "CBC",
     "CCC"
   ],
   "key": {
     "C": {
       "item": "integrateddynamics:crystalized_menril_chunk"
     },
-    "T": {
-      "tag": "forge:chests/wooden"
+    "B": {
+      "item": "minecraft:bucket"
     }
   },
   "result": {
-    "item": "integratedtunnels:part_interface_item",
+    "id": "integratedtunnels:part_interface_fluid",
     "count": 4
   }
 }

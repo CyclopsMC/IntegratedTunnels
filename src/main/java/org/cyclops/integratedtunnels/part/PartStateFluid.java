@@ -68,7 +68,7 @@ public class PartStateFluid<P extends IPartTypeWriter> extends PartStatePosition
 
     protected FluidStack rateLimitFluid(FluidStack fluidStack) {
         if (fluidStack != null && fluidStack.getAmount() > GeneralConfig.fluidRateLimit) {
-            return new FluidStack(fluidStack, GeneralConfig.fluidRateLimit);
+            return new FluidStack(fluidStack.getFluidHolder(), GeneralConfig.fluidRateLimit, fluidStack.getComponentsPatch());
         }
         return fluidStack;
     }

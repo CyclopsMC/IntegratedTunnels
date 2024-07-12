@@ -71,7 +71,7 @@ public class TunnelItemHelpers {
     protected static int getItemStackMatchFlags(boolean checkItem, boolean checkStackSize, boolean checkNbt) {
         int matchFlags = ItemMatch.ANY;
         if (checkItem)      matchFlags = matchFlags | ItemMatch.ITEM;
-        if (checkNbt)       matchFlags = matchFlags | ItemMatch.TAG;
+        if (checkNbt)       matchFlags = matchFlags | ItemMatch.DATA;
         if (checkStackSize) matchFlags = matchFlags | ItemMatch.STACKSIZE;
         return matchFlags;
     }
@@ -130,7 +130,7 @@ public class TunnelItemHelpers {
         if (stackA != null && stackB != null) {
             if (checkStackSize && stackA.getCount() != stackB.getCount()) return false;
             if (checkItem && stackA.getItem() != stackB.getItem()) return false;
-            if (checkNbt && !(Objects.equals(stackA.getTag(), stackB.getTag()) && stackA.areAttachmentsCompatible(stackB))) return false;
+            if (checkNbt && !(Objects.equals(stackA.getComponents(), stackB.getComponents()))) return false;
             return true;
         }
         return false;

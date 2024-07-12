@@ -42,7 +42,7 @@ public class FluidHandlerBlock implements IFluidHandler {
     public FluidStack getFluidInTank(int tank) {
         Block block = this.state.getBlock();
         if (block instanceof LiquidBlock && this.state.getValue(LiquidBlock.LEVEL) == 0) {
-            return new FluidStack(((LiquidBlock) block).getFluid(), FluidHelpers.BUCKET_VOLUME);
+            return new FluidStack(((LiquidBlock) block).fluid, FluidHelpers.BUCKET_VOLUME);
         } else {
             return FluidStack.EMPTY;
         }
@@ -70,7 +70,7 @@ public class FluidHandlerBlock implements IFluidHandler {
     public FluidStack drain(FluidStack resource, FluidAction action) {
         Block block = this.state.getBlock();
         if (block instanceof LiquidBlock
-                && ((LiquidBlock) block).getFluid() == resource.getFluid()) {
+                && ((LiquidBlock) block).fluid == resource.getFluid()) {
             return this.drain(resource.getAmount(), action);
         }
         return FluidStack.EMPTY;
@@ -86,7 +86,7 @@ public class FluidHandlerBlock implements IFluidHandler {
             if (action.execute()) {
                 this.world.setBlock(this.blockPos, Blocks.AIR.defaultBlockState(), 11);
             }
-            return new FluidStack(((LiquidBlock) block).getFluid(), FluidHelpers.BUCKET_VOLUME);
+            return new FluidStack(((LiquidBlock) block).fluid, FluidHelpers.BUCKET_VOLUME);
         }
         return FluidStack.EMPTY;
     }

@@ -6,9 +6,12 @@
     },
     {
       "item": "integrateddynamics:logic_director"
+    },
+    {
+      "item": "minecraft:diamond_pickaxe"
     }
   ],
   "result": {
-    "item": "integratedtunnels:part_importer_world_item"
+    "id": "integratedtunnels:part_importer_world_block"
   }
 }

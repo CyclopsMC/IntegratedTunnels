@@ -1,8 +1,11 @@
 package org.cyclops.integratedtunnels.core.predicate;
 
+import net.minecraft.core.component.DataComponentPatch;
+import net.minecraft.nbt.NbtOps;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
+import net.neoforged.neoforge.server.ServerLifecycleHooks;
 import org.cyclops.commoncapabilities.api.ingredient.IngredientComponent;
 import org.cyclops.integrateddynamics.core.helper.NbtHelpers;
 
@@ -32,10 +35,10 @@ public class IngredientPredicateItemStackNbt extends IngredientPredicate<ItemSta
 
     @Override
     public boolean test(@Nullable ItemStack input) {
-        if (!input.hasTag() && requireNbt) {
+        if (input.getComponents().isEmpty() && requireNbt) {
             return isBlacklist();
         }
-        CompoundTag itemTag = input.hasTag() ? input.getTag() : new CompoundTag();
+        CompoundTag itemTag = (CompoundTag) DataComponentPatch.CODEC.encodeStart(ServerLifecycleHooks.getCurrentServer().registryAccess().createSerializationContext(NbtOps.INSTANCE), input.getComponentsPatch()).getOrThrow();
         boolean ret = (!subset || tag.map(t -> NbtHelpers.nbtMatchesSubset(t, itemTag, recursive)).orElse(false)
                 && (!superset || tag.map(t -> NbtHelpers.nbtMatchesSubset(itemTag, t, recursive)).orElse(false)));
         if (blacklist) {

@@ -1,13 +1,15 @@
 package org.cyclops.integratedtunnels.item;
 
 import com.google.common.collect.Maps;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.tags.BlockTags;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.item.enchantment.Enchantments;
+import net.minecraft.world.item.DiggerItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Tiers;
-import net.minecraft.world.item.DiggerItem;
+import net.minecraft.world.item.enchantment.Enchantments;
+import net.minecraft.world.level.block.state.BlockState;
+import net.neoforged.neoforge.server.ServerLifecycleHooks;
 import org.cyclops.integratedtunnels.RegistryEntries;
 
 import java.util.Map;
@@ -22,12 +24,7 @@ public class ItemDummyPickAxe extends DiggerItem {
     private static final Map<EnchantmentData, ItemStack> ITEMSTACKS = Maps.newHashMap();
 
     public ItemDummyPickAxe(Item.Properties properties) {
-        super(1000, 1000, Tiers.DIAMOND, BlockTags.MINEABLE_WITH_PICKAXE, properties);
-    }
-
-    @Override
-    public boolean isCorrectToolForDrops(BlockState blockIn) {
-        return true;
+        super(Tiers.DIAMOND, BlockTags.MINEABLE_WITH_PICKAXE, properties);
     }
 
     @Override
@@ -40,10 +37,10 @@ public class ItemDummyPickAxe extends DiggerItem {
         return ITEMSTACKS.computeIfAbsent(data, (key) -> {
             ItemStack itemStack = new ItemStack(RegistryEntries.ITEM_DUMMY_PICKAXE, 1);
             if (silkTouch) {
-                itemStack.enchant(Enchantments.SILK_TOUCH, 1);
+                itemStack.enchant(ServerLifecycleHooks.getCurrentServer().registryAccess().registry(Registries.ENCHANTMENT).get().getHolderOrThrow(Enchantments.SILK_TOUCH), 1);
             }
             if (fortune > 0) {
-                itemStack.enchant(Enchantments.BLOCK_FORTUNE, fortune);
+                itemStack.enchant(ServerLifecycleHooks.getCurrentServer().registryAccess().registry(Registries.ENCHANTMENT).get().getHolderOrThrow(Enchantments.FORTUNE), fortune);
             }
             return itemStack;
         });

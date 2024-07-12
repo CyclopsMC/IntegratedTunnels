@@ -1,14 +1,15 @@
 package org.cyclops.integratedtunnels.core.world;
 
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.ShulkerBoxBlock;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.NonNullList;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.ShulkerBoxBlock;
 import net.minecraft.world.level.block.entity.RandomizableContainerBlockEntity;
 import net.minecraft.world.level.block.entity.ShulkerBoxBlockEntity;
-import net.minecraft.core.NonNullList;
-import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
 import org.cyclops.cyclopscore.helper.BlockEntityHelpers;
 import org.cyclops.integratedtunnels.api.world.IBlockBreakHandler;
 
@@ -28,10 +29,10 @@ public class BlockBreakHandlerShulkerBox implements IBlockBreakHandler {
                 .map(tile -> {
                     if (!tile.isEmpty()) {
                         ItemStack itemStack = ShulkerBoxBlock.getColoredItemStack(tile.getColor());
-                        tile.saveToItem(itemStack);
+                        tile.saveToItem(itemStack, world.registryAccess());
 
                         if (tile.hasCustomName()) {
-                            itemStack.setHoverName(tile.getName());
+                            itemStack.set(DataComponents.CUSTOM_NAME, tile.getName());
                         }
 
                         NonNullList<ItemStack> list = NonNullList.create();

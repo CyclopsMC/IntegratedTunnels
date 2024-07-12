@@ -5,10 +5,10 @@
       "item": "integratedtunnels:part_interface_fluid"
     },
     {
-      "item": "integrateddynamics:variable_transformer_input"
+      "item": "integrateddynamics:variable_transformer_output"
     }
   ],
   "result": {
-    "item": "integratedtunnels:part_importer_fluid"
+    "id": "integratedtunnels:part_exporter_fluid"
   }
 }

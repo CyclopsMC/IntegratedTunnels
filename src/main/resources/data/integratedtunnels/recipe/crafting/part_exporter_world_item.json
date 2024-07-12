@@ -2,13 +2,13 @@
   "type": "minecraft:crafting_shapeless",
   "ingredients": [
     {
-      "item": "integratedtunnels:part_exporter_fluid"
+      "item": "integratedtunnels:part_exporter_item"
     },
     {
       "item": "integrateddynamics:logic_director"
     }
   ],
   "result": {
-    "item": "integratedtunnels:part_exporter_world_fluid"
+    "id": "integratedtunnels:part_exporter_world_item"
   }
 }

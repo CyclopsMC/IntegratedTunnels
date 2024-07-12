@@ -13,9 +13,9 @@ import org.cyclops.integratedtunnels.core.part.ContainerInterfaceSettings;
  */
 public class RegistryEntries {
 
-    public static final DeferredHolder<Item, Item> ITEM_PART_INTERFACE = DeferredHolder.create(Registries.ITEM, new ResourceLocation("integratedtunnels:part_interface_item"));
-    public static final DeferredHolder<Item, Item> ITEM_DUMMY_PICKAXE = DeferredHolder.create(Registries.ITEM, new ResourceLocation("integratedtunnels:dummy_pickaxe"));
+    public static final DeferredHolder<Item, Item> ITEM_PART_INTERFACE = DeferredHolder.create(Registries.ITEM, ResourceLocation.parse("integratedtunnels:part_interface_item"));
+    public static final DeferredHolder<Item, Item> ITEM_DUMMY_PICKAXE = DeferredHolder.create(Registries.ITEM, ResourceLocation.parse("integratedtunnels:dummy_pickaxe"));
 
-    public static final DeferredHolder<MenuType<?>, MenuType<ContainerInterfaceSettings>> CONTAINER_INTERFACE_SETTINGS = DeferredHolder.create(Registries.MENU, new ResourceLocation("integratedtunnels:part_interface_settings"));
+    public static final DeferredHolder<MenuType<?>, MenuType<ContainerInterfaceSettings>> CONTAINER_INTERFACE_SETTINGS = DeferredHolder.create(Registries.MENU, ResourceLocation.parse("integratedtunnels:part_interface_settings"));
 
 }

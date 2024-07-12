@@ -2,13 +2,13 @@
   "type": "minecraft:crafting_shapeless",
   "ingredients": [
     {
-      "item": "integratedtunnels:part_interface_item"
+      "item": "integratedtunnels:part_interface_energy"
     },
     {
       "item": "integrateddynamics:variable_transformer_output"
     }
   ],
   "result": {
-    "item": "integratedtunnels:part_exporter_item"
+    "id": "integratedtunnels:part_exporter_energy"
   }
 }

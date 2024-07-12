@@ -18,10 +18,10 @@ public class TunnelValueTypeListProxyFactories {
     public static void load() {
         if (POSITIONED_ITEM_NETWORK == null) {
             POSITIONED_ITEM_NETWORK = ValueTypeListProxyFactories.REGISTRY.register(new ValueTypeListProxyNBTFactory<>(
-                    new ResourceLocation(Reference.MOD_ID, "positioned_item_network"),
+                    ResourceLocation.fromNamespaceAndPath(Reference.MOD_ID, "positioned_item_network"),
                     ValueTypeListProxyPositionedItemNetwork.class));
             POSITIONED_FLUID_NETWORK = ValueTypeListProxyFactories.REGISTRY.register(new ValueTypeListProxyNBTFactory<>(
-                    new ResourceLocation(Reference.MOD_ID, "positioned_fluid_network"),
+                    ResourceLocation.fromNamespaceAndPath(Reference.MOD_ID, "positioned_fluid_network"),
                     ValueTypeListProxyPositionedFluidNetwork.class));
         }
     }

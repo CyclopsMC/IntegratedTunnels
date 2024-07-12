@@ -48,11 +48,6 @@ public class FakeNetHandlerPlayServer extends ServerGamePacketListenerImpl {
             }
 
             @Override
-            public void setListener(PacketListener handler) {
-
-            }
-
-            @Override
             public void send(Packet<?> packetIn) {
 
             }
@@ -84,11 +79,6 @@ public class FakeNetHandlerPlayServer extends ServerGamePacketListenerImpl {
 
             @Override
             public PacketListener getPacketListener() {
-                return null;
-            }
-
-            @Override
-            public Component getDisconnectedReason() {
                 return null;
             }
 
@@ -177,11 +167,6 @@ public class FakeNetHandlerPlayServer extends ServerGamePacketListenerImpl {
 
     @Override
     public void handlePaddleBoat(ServerboundPaddleBoatPacket packetIn) {
-
-    }
-
-    @Override
-    public void onDisconnect(Component reason) {
 
     }
 

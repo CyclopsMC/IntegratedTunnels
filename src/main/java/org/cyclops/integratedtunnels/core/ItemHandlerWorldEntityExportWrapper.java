@@ -205,9 +205,9 @@ public class ItemHandlerWorldEntityExportWrapper implements IIngredientComponent
         }
 
         @Override
-        public int addItem(ItemStack stack) {
+        public ItemStack insertItem(ItemStack stack) {
             handleDispenseResult(this.dispenseResultHandler, this.blockSource.get(), stack);
-            return 0;
+            return ItemStack.EMPTY;
         }
 
         @Override

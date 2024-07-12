@@ -5,10 +5,13 @@
       "item": "integratedtunnels:part_interface_energy"
     },
     {
-      "item": "integrateddynamics:variable_transformer_output"
+      "item": "integratedtunnels:part_interface_energy"
+    },
+    {
+      "item": "minecraft:hopper"
     }
   ],
   "result": {
-    "item": "integratedtunnels:part_exporter_energy"
+    "id": "integratedtunnels:part_interface_filter_energy"
   }
 }

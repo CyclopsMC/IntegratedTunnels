@@ -61,7 +61,7 @@ public class TunnelAspects {
                     .buildRead();
             static {
                 Operators.REGISTRY.registerSerializer(new PositionedOperator.Serializer(
-                        PositionedOperatorIngredientIndexItem.class, new ResourceLocation(Reference.MOD_ID, "positioned_ingredient_index_item")));
+                        PositionedOperatorIngredientIndexItem.class, ResourceLocation.fromNamespaceAndPath(Reference.MOD_ID, "positioned_ingredient_index_item")));
             }
         }
 
@@ -99,7 +99,7 @@ public class TunnelAspects {
                     .buildRead();
             static {
                 Operators.REGISTRY.registerSerializer(new PositionedOperator.Serializer(
-                        PositionedOperatorIngredientIndexFluid.class, new ResourceLocation(Reference.MOD_ID, "positioned_ingredient_index_fluid")));
+                        PositionedOperatorIngredientIndexFluid.class, ResourceLocation.fromNamespaceAndPath(Reference.MOD_ID, "positioned_ingredient_index_fluid")));
             }
         }
 

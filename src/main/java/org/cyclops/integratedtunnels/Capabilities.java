@@ -22,24 +22,24 @@ import org.cyclops.integratedtunnels.api.network.IItemNetwork;
  */
 public class Capabilities {
     public static final class ItemNetwork {
-        public static final NetworkCapability<IItemNetwork> NETWORK = NetworkCapability.create(new ResourceLocation(Reference.MOD_ID, "item_network"), IItemNetwork.class);
+        public static final NetworkCapability<IItemNetwork> NETWORK = NetworkCapability.create(ResourceLocation.fromNamespaceAndPath(Reference.MOD_ID, "item_network"), IItemNetwork.class);
     }
     public static final class ItemHandler {
-        public static final NetworkCapability<IItemHandler> NETWORK = NetworkCapability.create(new ResourceLocation(Reference.MOD_ID, "item_handler"), IItemHandler.class);
-        public static final PartCapability<IItemHandler> PART = PartCapability.create(new ResourceLocation(Reference.MOD_ID, "item_handler"), IItemHandler.class);
+        public static final NetworkCapability<IItemHandler> NETWORK = NetworkCapability.create(ResourceLocation.fromNamespaceAndPath(Reference.MOD_ID, "item_handler"), IItemHandler.class);
+        public static final PartCapability<IItemHandler> PART = PartCapability.create(ResourceLocation.fromNamespaceAndPath(Reference.MOD_ID, "item_handler"), IItemHandler.class);
     }
     public static final class SlotlessItemHandler {
-        public static final PartCapability<ISlotlessItemHandler> PART = PartCapability.create(new ResourceLocation(Reference.MOD_ID, "slotless_item_handler"), ISlotlessItemHandler.class);
+        public static final PartCapability<ISlotlessItemHandler> PART = PartCapability.create(ResourceLocation.fromNamespaceAndPath(Reference.MOD_ID, "slotless_item_handler"), ISlotlessItemHandler.class);
     }
     public static final class FluidNetwork {
-        public static final NetworkCapability<IFluidNetwork> NETWORK = NetworkCapability.create(new ResourceLocation(Reference.MOD_ID, "fluid_network"), IFluidNetwork.class);
+        public static final NetworkCapability<IFluidNetwork> NETWORK = NetworkCapability.create(ResourceLocation.fromNamespaceAndPath(Reference.MOD_ID, "fluid_network"), IFluidNetwork.class);
     }
     public static final class FluidHandler {
-        public static final NetworkCapability<IFluidHandler> NETWORK = NetworkCapability.create(new ResourceLocation(Reference.MOD_ID, "fluid_handler"), IFluidHandler.class);
-        public static final PartCapability<IFluidHandler> PART = PartCapability.create(new ResourceLocation(Reference.MOD_ID, "fluid_handler"), IFluidHandler.class);
+        public static final NetworkCapability<IFluidHandler> NETWORK = NetworkCapability.create(ResourceLocation.fromNamespaceAndPath(Reference.MOD_ID, "fluid_handler"), IFluidHandler.class);
+        public static final PartCapability<IFluidHandler> PART = PartCapability.create(ResourceLocation.fromNamespaceAndPath(Reference.MOD_ID, "fluid_handler"), IFluidHandler.class);
     }
     public static final class EnergyStorage {
-        public static final PartCapability<IEnergyStorage> PART = PartCapability.create(new ResourceLocation(Reference.MOD_ID, "energy_storage"), IEnergyStorage.class);
+        public static final PartCapability<IEnergyStorage> PART = PartCapability.create(ResourceLocation.fromNamespaceAndPath(Reference.MOD_ID, "energy_storage"), IEnergyStorage.class);
     }
 
     public static void registerPartCapabilities(RegisterPartCapabilitiesEvent event) {
