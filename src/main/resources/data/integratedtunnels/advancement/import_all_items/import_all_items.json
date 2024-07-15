@@ -1,7 +1,7 @@
 {
   "display": {
     "icon": {
-      "item": "integrateddynamics:variable",
+      "id": "integrateddynamics:variable",
       "nbt": "{\"aspectName\":\"integratedtunnels:write_boolean_item_import\",\"partId\":1,\"_type\":\"integrateddynamics:aspect\",\"_id\":1}"
     },
     "title": {

@@ -1,7 +1,7 @@
 {
   "display": {
     "icon": {
-      "item": "integratedtunnels:part_interface_item"
+      "id": "integratedtunnels:part_interface_item"
     },
     "title": {
       "translate": "itemGroup.integratedtunnels"

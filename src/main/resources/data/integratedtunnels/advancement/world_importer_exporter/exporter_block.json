@@ -1,7 +1,7 @@
 {
   "display": {
     "icon": {
-      "item": "integratedtunnels:part_exporter_world_block"
+      "id": "integratedtunnels:part_exporter_world_block"
     },
     "title": {
       "translate": "advancement.integratedtunnels.exporter_world_block"
