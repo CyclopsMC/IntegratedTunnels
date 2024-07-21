@@ -1,0 +1,10 @@
+As always, don't forget to backup your world before updating!
+Requires CyclopsCore version 1.19.0 or higher.
+
+Fixes:
+* Fix rotation not being set in Player Simulator
+  This caused issues with items that consider player rotation, such as buckets.
+  Closes CyclopsMC/IntegratedDynamics#1357
+* Fix crash when using world block importer/exporter, Closes #292
+
+
