@@ -1,11 +1,11 @@
 package org.cyclops.integratedtunnels.core;
 
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.core.Direction;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.core.BlockPos;
-import net.minecraft.server.level.ServerLevel;
 import net.neoforged.neoforge.common.util.FakePlayer;
 
 import java.util.Map;
@@ -29,13 +29,12 @@ public class PlayerHelpers {
 
     public static void setPlayerState(Player player, InteractionHand hand, BlockPos pos,
                                       double offsetX, double offsetY, double offsetZ, Direction side, boolean sneaking) {
-        offsetY = side == Direction.DOWN ? -offsetY : offsetY;
         player.setPos(pos.getX() + offsetX, pos.getY() + offsetY, pos.getZ() + offsetZ);
         player.xo = player.getX();
         player.yo = player.getY();
         player.zo = player.getZ();
-        player.yRotO = side.getOpposite().toYRot();
-        player.xRotO = side == Direction.UP ? 90F : (side == Direction.DOWN ? -90F : 0F);
+        player.setYRot(side.getOpposite().toYRot());
+        player.setXRot(side == Direction.UP ? 90F : (side == Direction.DOWN ? -90F : 0F));
         player.eyeHeight = 0F;
         player.setShiftKeyDown(sneaking);
         setHeldItemSilent(player, hand, ItemStack.EMPTY);

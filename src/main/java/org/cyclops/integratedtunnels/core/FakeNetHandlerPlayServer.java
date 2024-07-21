@@ -18,6 +18,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.CommonListenerCookie;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.world.entity.RelativeMovement;
+import net.neoforged.neoforge.network.connection.ConnectionType;
 import org.jetbrains.annotations.Nullable;
 
 import javax.crypto.Cipher;
@@ -96,7 +97,7 @@ public class FakeNetHandlerPlayServer extends ServerGamePacketListenerImpl {
             public Channel channel() {
                 return super.channel();
             }
-        }, player, new CommonListenerCookie(null, 1, null, true));
+        }, player, new CommonListenerCookie(null, 1, null, ConnectionType.NEOFORGE));
     }
 
     @Override
