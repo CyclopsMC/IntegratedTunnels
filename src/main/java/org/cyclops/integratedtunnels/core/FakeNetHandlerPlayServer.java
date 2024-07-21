@@ -97,7 +97,7 @@ public class FakeNetHandlerPlayServer extends ServerGamePacketListenerImpl {
             public Channel channel() {
                 return super.channel();
             }
-        }, player, new CommonListenerCookie(null, 1, null, ConnectionType.NEOFORGE));
+        }, player, new CommonListenerCookie(null, 1, null, false, ConnectionType.NEOFORGE));
     }
 
     @Override

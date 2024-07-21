@@ -36,7 +36,7 @@ Transfer other stuff over Integrated Dynamics networks.
 [[dependencies.integratedtunnels]]
     modId="neoforge"
     type="required"
-    versionRange="[21.0.43-beta,)"
+    versionRange="[21.0.113-beta,)"
     ordering="NONE"
     side="BOTH"
 [[dependencies.integratedtunnels]]
