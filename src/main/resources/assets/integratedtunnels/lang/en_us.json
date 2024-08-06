@@ -537,8 +537,8 @@
   "info_book.integratedtunnels.tutorials.break_stone": "Break Only Stone Blocks",
   "info_book.integratedtunnels.tutorials.break_stone.text1": "Make a &lVariable Card&r containing a reference to the &8Stone&0 item value. Place this inside a &lWorld Block Importer&r to break only Stone blocks. Also have a look at the various aspect properties to see if you can manage to silk touch the Stone to avoid receiving just Cobblestone.",
 
-  "info_book.integratedtunnels.tutorials.place_logwood": "Place Logs",
-  "info_book.integratedtunnels.tutorials.place_logwood.text1": "Try creating a system using the &lWorld Block Exporter&r that only places wooden logs. Do this using the &lOredictionary Values&r operator to retrieve a list of all items in the &ologs&r tag.",
+  "info_book.integratedtunnels.tutorials.place_logwood": "Place Items by Tag",
+  "info_book.integratedtunnels.tutorials.place_logwood.text1": "Try creating a system using the &lWorld Block Exporter&r that only places wooden logs. Do this using the &lTag Values&r operator to retrieve a list of all items in the &ologs&r tag.",
 
   "info_book.integratedtunnels.tutorials.click_sword": "Click with Sword",
   "info_book.integratedtunnels.tutorials.click_sword.text1": "All this clicking and such can be quite boring, why not let a &lPlayer Simulator&r do it for you? Start by crafting one, and insert a &lVariable Card&r containing a &oDiamond Sword&r to let it attack autonomously using &oDiamond Swords&r from your item network."
