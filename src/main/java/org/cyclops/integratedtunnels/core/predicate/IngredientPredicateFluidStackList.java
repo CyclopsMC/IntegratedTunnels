@@ -20,7 +20,10 @@ public class IngredientPredicateFluidStackList extends IngredientPredicate<Fluid
     private final boolean checkNbt;
 
     public IngredientPredicateFluidStackList(boolean blacklist, int amount, boolean exactAmount, IValueTypeListProxy<ValueObjectTypeFluidStack, ValueObjectTypeFluidStack.ValueFluidStack> fluidStacks, int matchFlags, boolean checkFluid, boolean checkAmount, boolean checkNbt) {
-        super(IngredientComponent.FLUIDSTACK, Iterables.transform(fluidStacks, stack -> TunnelFluidHelpers.prototypeWithCount(stack.getRawValue(), amount)), matchFlags, blacklist, false, amount, exactAmount);
+        super(IngredientComponent.FLUIDSTACK,
+                Iterables.transform(
+                        Iterables.filter(fluidStacks, fluidStack -> !fluidStack.getRawValue().isEmpty()),
+                        stack -> TunnelFluidHelpers.prototypeWithCount(stack.getRawValue(), amount)), matchFlags, blacklist, false, amount, exactAmount);
         this.blacklist = blacklist;
         this.fluidStacks = fluidStacks;
         this.checkFluid = checkFluid;
