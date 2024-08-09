@@ -18,19 +18,19 @@ Transfer other stuff over Integrated Dynamics networks.
 [[dependencies.integratedtunnels]]
     modId="cyclopscore"
     type="required"
-    versionRange="[1.19.10,)"
+    versionRange="[1.19.11,)"
     ordering="NONE"
     side="BOTH"
 [[dependencies.integratedtunnels]]
     modId="integrateddynamics"
     type="required"
-    versionRange="[1.23.1,)"
+    versionRange="[1.23.2,)"
     ordering="NONE"
     side="BOTH"
 [[dependencies.integratedtunnels]]
     modId="commoncapabilities"
     type="required"
-    versionRange="[2.9.2,)"
+    versionRange="[2.9.3,)"
     ordering="NONE"
     side="BOTH"
 [[dependencies.integratedtunnels]]
