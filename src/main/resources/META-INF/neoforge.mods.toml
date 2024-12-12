@@ -1,47 +1,45 @@
 modLoader="javafml"
-loaderVersion="[2,)"
-issueTrackerURL="https://github.com/CyclopsMC/IntegratedTunnels/issues"
-displayURL="https://www.curseforge.com/minecraft/mc-mods/integrated-tunnels"
-license="MIT"
+loaderVersion="${neoforge_loader_version_range}"
+issueTrackerURL="${issue_tracker_url}"
+displayURL="${display_url}"
+license="${license}"
 logoFile="logo.png"
-authors="rubensworks (aka kroeser)"
+authors="${mod_author}"
 [[mods]]
-modId="integratedtunnels"
-version="${file.jarVersion}"
-displayName="IntegratedTunnels"
-updateJSONURL="https://raw.githubusercontent.com/CyclopsMC/Versions/master/neoforge_update/integrated-tunnels.json"
-description='''
-Transfer other stuff over Integrated Dynamics networks.
-'''
+modId="${mod_id}"
+version="${mod_version}"
+displayName="${mod_name}"
+updateJSONURL="${neoforge_update_json_url}"
+description="${description}"
 [[accessTransformers]]
     file="META-INF/accesstransformer.cfg"
-[[dependencies.integratedtunnels]]
+[[dependencies.${mod_id}]]
     modId="cyclopscore"
     type="required"
-    versionRange="[1.25.1,)"
+    versionRange="[${cyclopscore_version_semver},)"
     ordering="NONE"
     side="BOTH"
-[[dependencies.integratedtunnels]]
+[[dependencies.${mod_id}]]
     modId="integrateddynamics"
     type="required"
-    versionRange="[1.23.2,)"
+    versionRange="[${integrateddynamics_version_semver},)"
     ordering="NONE"
     side="BOTH"
-[[dependencies.integratedtunnels]]
+[[dependencies.${mod_id}]]
     modId="commoncapabilities"
     type="required"
-    versionRange="[2.9.3,)"
+    versionRange="[${commoncapabilities_version_semver},)"
     ordering="NONE"
     side="BOTH"
-[[dependencies.integratedtunnels]]
+[[dependencies.${mod_id}]]
     modId="neoforge"
     type="required"
-    versionRange="[21.1.2,)"
+    versionRange="[${neoforge_version},)"
     ordering="NONE"
     side="BOTH"
-[[dependencies.integratedtunnels]]
+[[dependencies.${mod_id}]]
     modId="minecraft"
     type="required"
-    versionRange="[1.21.1,]"
+    versionRange="[${minecraft_version},]"
     ordering="NONE"
     side="BOTH"
