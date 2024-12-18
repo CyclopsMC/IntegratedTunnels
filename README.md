@@ -1,6 +1,7 @@
 ## Integrated Tunnels
 
 [![Build Status](https://github.com/CyclopsMC/IntegratedTunnels/workflows/CI/badge.svg)](https://github.com/CyclopsMC/IntegratedTunnels/actions?query=workflow%3ACI)
+[![Coverage Status](https://coveralls.io/repos/github/CyclopsMC/IntegratedTunnels/badge.svg)](https://coveralls.io/github/CyclopsMC/IntegratedTunnels)
 [![Download](https://img.shields.io/static/v1?label=Maven&message=GitHub%20Packages&color=blue)](https://github.com/CyclopsMC/packages/packages/770038)
 [![Crowdin](https://badges.crowdin.net/cyclopsmc-integratedtunnels/localized.svg)](https://crowdin.com/project/cyclopsmc-integratedtunnels)
 [![CurseForge](http://cf.way2muchnoise.eu/full_251389_downloads.svg)](http://minecraft.curseforge.com/projects/251389)
