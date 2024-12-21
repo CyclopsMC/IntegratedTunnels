@@ -482,7 +482,7 @@
   "info_book.integratedtunnels.world.fluid.text1": "With &lFluid World Importers&r and &lFluid World Exporters&r, you can place fluid source blocks, pick them up and interact with entities that are a tank, such as dropped tank items. Various aspect properties exists to change things like whether or not a block update should be caused.",
 
   "info_book.integratedtunnels.world.energy": "Energy",
-  "info_book.integratedtunnels.world.energy.text1": "The &lEnergy World Importers&r and &lFluid World Exporters&r help you interact with entities that have an energy buffer, such as dropped batteries.",
+  "info_book.integratedtunnels.world.energy.text1": "The &lEnergy World Importers&r and &lEnergy World Exporters&r help you interact with entities that have an energy buffer, such as dropped batteries.",
 
   "info_book.integratedtunnels.world.block": "Block",
   "info_book.integratedtunnels.world.block.text1": "The &lBlock World Importers&r and &lBlock World Exporters&r allow you to place blocks and break them. Various aspect properties such as silk touching are available.",
