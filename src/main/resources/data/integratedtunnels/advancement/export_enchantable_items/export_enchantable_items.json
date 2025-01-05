@@ -20,8 +20,11 @@
         "part_type": "integratedtunnels:exporter_item",
         "aspect": "integratedtunnels:write_operator_item_export",
         "variable": {
-          "type": "operator",
-          "operator": "integrateddynamics:itemstack_enchantable"
+          "type": "value_type",
+          "value": {
+            "type": "operator",
+            "operator": "integrateddynamics:itemstack_enchantable"
+          }
         }
       }
     }

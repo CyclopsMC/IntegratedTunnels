@@ -23,16 +23,22 @@
           "operator": "integrateddynamics:operator_pipe",
           "input": {
             "0": {
-              "type": "operator",
-              "operator": "integrateddynamics:itemstack_mod"
+              "type": "value_type",
+              "value": {
+                "type": "operator",
+                "operator": "integrateddynamics:itemstack_mod"
+              }
             },
             "1": {
               "type": "operator",
               "operator": "integrateddynamics:operator_apply",
               "input": {
                 "0": {
-                  "type": "operator",
-                  "operator": "integrateddynamics:relational_equals"
+                  "type": "value_type",
+                  "value": {
+                    "type": "operator",
+                    "operator": "integrateddynamics:relational_equals"
+                  }
                 },
                 "1": {
                   "type": "value_type",
