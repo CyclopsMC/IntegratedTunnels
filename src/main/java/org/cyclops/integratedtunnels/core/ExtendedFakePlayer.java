@@ -1,6 +1,7 @@
 package org.cyclops.integratedtunnels.core;
 
 import com.mojang.authlib.GameProfile;
+import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.item.ItemStack;
@@ -88,5 +89,10 @@ public class ExtendedFakePlayer extends FakePlayer {
         } else {
             this.stopUsingItem();
         }
+    }
+
+    @Override
+    public void startSleeping(BlockPos blockPos) {
+        // Do nothing
     }
 }
