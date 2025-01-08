@@ -91,6 +91,6 @@ public class ExtendedFakePlayer extends FakePlayer {
 
     @Override
     public void startSleeping(BlockPos blockPos) {
-        // Dp nothing
+        // Do nothing
     }
 }

@@ -19,6 +19,8 @@ public class GeneralConfig extends DummyConfig {
     @ConfigurableProperty(category = "core", comment = "If the version checker should be enabled.")
     public static boolean versionChecker = true;
 
+    @ConfigurableProperty(category = "core", comment = "For how many ticks importers/exporters should fail to process before they can start sleeping.", configLocation = ModConfig.Type.SERVER)
+    public static int inventoryUnchangedTickCount = 3;
     @ConfigurableProperty(category = "core", comment = "How many ticks importers/exporters should sleep until checking targets again when they were previously unchanged.", configLocation = ModConfig.Type.SERVER)
     public static int inventoryUnchangedTickTimeout = 10;
 
