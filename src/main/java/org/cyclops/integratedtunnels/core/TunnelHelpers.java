@@ -45,8 +45,8 @@ import java.util.concurrent.TimeUnit;
  */
 public class TunnelHelpers {
 
-    private static final Cache<ITunnelConnection, Boolean> CACHE_INV_CHECKS = CacheBuilder.newBuilder()
-            .expireAfterWrite(GeneralConfig.inventoryUnchangedTickTimeout * (1000 / MinecraftHelpers.SECOND_IN_TICKS),
+    private static final Cache<ITunnelConnection, Integer> CACHE_INV_CHECKS = CacheBuilder.newBuilder()
+            .expireAfterWrite((GeneralConfig.inventoryUnchangedTickCount + GeneralConfig.inventoryUnchangedTickTimeout) * (1000 / MinecraftHelpers.SECOND_IN_TICKS),
                     TimeUnit.MILLISECONDS).build();
 
     /**
@@ -149,7 +149,8 @@ public class TunnelHelpers {
         }
 
         // Don't do anything if we are sleeping for this connection
-        if (CACHE_INV_CHECKS.getIfPresent(connection) != null) {
+        Integer sleepCheck = CACHE_INV_CHECKS.getIfPresent(connection);
+        if (sleepCheck != null && sleepCheck >= GeneralConfig.inventoryUnchangedTickCount) {
             return matcher.getEmptyInstance();
         }
 
@@ -157,7 +158,9 @@ public class TunnelHelpers {
         T moved = moveSingle(source, sourceSlot, destination, destinationSlot, ingredientPredicate, movementPosition, false);
         if (matcher.isEmpty(moved)) {
             // Mark this connection as 'sleeping' if nothing was moved
-            CACHE_INV_CHECKS.put(connection, true);
+            CACHE_INV_CHECKS.put(connection, sleepCheck == null ? 1 : sleepCheck + 1);
+        } else if (sleepCheck != null) {
+            CACHE_INV_CHECKS.invalidate(connection);
         }
 
         // Schedule a new observation for the network, as its contents may have changed
