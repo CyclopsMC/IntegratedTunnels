@@ -129,7 +129,7 @@ public class ItemStoragePlayerWrapper implements IIngredientComponentStorage<Ite
         }
 
         PlayerHelpers.setPlayerState(player, hand, pos, offsetX, offsetY, offsetZ, side, sneaking);
-        PlayerHelpers.setHeldItemSilent(player, hand, stack);
+        PlayerHelpers.setHeldItemSilent(player, hand, stack.copy());
 
         if (!continuousClick) {
             cancelDestroyingBlock(player);
