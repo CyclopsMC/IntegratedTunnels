@@ -1,0 +1,7 @@
+As always, don't forget to backup your world before updating!
+Requires CyclopsCore version 1.18.4 or higher.
+
+Fixes:
+* Fix Player Simulator not using Brush correctly, Closes #324
+* Fix world fluid exporter voiding non-placable fluids, Closes #323
+* Fix world offset not being configurable to zero, Closes #322
