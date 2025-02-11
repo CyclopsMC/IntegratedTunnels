@@ -1,7 +1,6 @@
 package org.cyclops.integratedtunnels.core.part;
 
 import com.google.common.collect.Lists;
-import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -10,8 +9,7 @@ import net.minecraft.world.entity.player.Inventory;
 import org.cyclops.cyclopscore.client.gui.component.button.ButtonImage;
 import org.cyclops.cyclopscore.client.gui.component.input.WidgetNumberField;
 import org.cyclops.cyclopscore.client.gui.image.IImage;
-import org.cyclops.cyclopscore.helper.Helpers;
-import org.cyclops.cyclopscore.helper.L10NHelpers;
+import org.cyclops.cyclopscore.helper.IModHelpers;
 import org.cyclops.cyclopscore.helper.ValueNotifierHelpers;
 import org.cyclops.integrateddynamics.core.client.gui.container.ContainerScreenPartSettings;
 import org.cyclops.integrateddynamics.core.inventory.container.ContainerMultipartAspects;
@@ -98,9 +96,8 @@ public class ContainerScreenInterfaceSettings extends ContainerScreenPartSetting
     @Override
     protected void renderBg(GuiGraphics guiGraphics, float partialTicks, int mouseX, int mouseY) {
         super.renderBg(guiGraphics, partialTicks, mouseX, mouseY);
-        font.drawInBatch(L10NHelpers.localize("gui.integratedtunnels.partsettings.channel.interface"),
-                leftPos + 8, topPos + 112, Helpers.RGBToInt(0, 0, 0), false,
-                guiGraphics.pose().last().pose(), guiGraphics.bufferSource(), Font.DisplayMode.NORMAL, 0, 15728880);
+        guiGraphics.drawString(font, IModHelpers.get().getL10NHelpers().localize("gui.integratedtunnels.partsettings.channel.interface"),
+                leftPos + 8, topPos + 112, IModHelpers.get().getBaseHelpers().RGBToInt(0, 0, 0), false);
         numberFieldChannelInterface.render(guiGraphics, mouseX, mouseY, partialTicks);
     }
 

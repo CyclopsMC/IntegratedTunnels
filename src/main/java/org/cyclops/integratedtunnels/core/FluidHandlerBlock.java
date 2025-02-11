@@ -1,20 +1,18 @@
 package org.cyclops.integratedtunnels.core;
 
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.LiquidBlock;
-import net.minecraft.world.level.material.Fluid;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.LiquidBlock;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.Fluid;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import net.neoforged.neoforge.fluids.capability.wrappers.BlockWrapper;
-import org.cyclops.cyclopscore.helper.FluidHelpers;
+import org.cyclops.cyclopscore.helper.IModHelpersNeoForge;
 
 import javax.annotation.Nonnull;
-
-import net.neoforged.neoforge.fluids.capability.IFluidHandler.FluidAction;
 
 /**
  * A fluid handler that wraps around a fluid block for draining and filling it,
@@ -42,7 +40,7 @@ public class FluidHandlerBlock implements IFluidHandler {
     public FluidStack getFluidInTank(int tank) {
         Block block = this.state.getBlock();
         if (block instanceof LiquidBlock && this.state.getValue(LiquidBlock.LEVEL) == 0) {
-            return new FluidStack(((LiquidBlock) block).fluid, FluidHelpers.BUCKET_VOLUME);
+            return new FluidStack(((LiquidBlock) block).fluid, IModHelpersNeoForge.get().getFluidHelpers().getBucketVolume());
         } else {
             return FluidStack.EMPTY;
         }
@@ -50,7 +48,7 @@ public class FluidHandlerBlock implements IFluidHandler {
 
     @Override
     public int getTankCapacity(int tank) {
-        return FluidHelpers.BUCKET_VOLUME;
+        return IModHelpersNeoForge.get().getFluidHelpers().getBucketVolume();
     }
 
     @Override
@@ -82,11 +80,11 @@ public class FluidHandlerBlock implements IFluidHandler {
         Block block = this.state.getBlock();
         if (block instanceof LiquidBlock
                 && this.state.getValue(LiquidBlock.LEVEL) == 0
-                && maxDrain >= FluidHelpers.BUCKET_VOLUME) {
+                && maxDrain >= IModHelpersNeoForge.get().getFluidHelpers().getBucketVolume()) {
             if (action.execute()) {
                 this.world.setBlock(this.blockPos, Blocks.AIR.defaultBlockState(), 11);
             }
-            return new FluidStack(((LiquidBlock) block).fluid, FluidHelpers.BUCKET_VOLUME);
+            return new FluidStack(((LiquidBlock) block).fluid, IModHelpersNeoForge.get().getFluidHelpers().getBucketVolume());
         }
         return FluidStack.EMPTY;
     }

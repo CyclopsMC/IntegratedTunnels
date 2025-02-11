@@ -1,6 +1,5 @@
 package org.cyclops.integratedtunnels.core.part;
 
-import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
@@ -10,14 +9,9 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.level.BlockGetter;
-import net.minecraft.world.level.block.Block;
 import org.apache.commons.lang3.tuple.Triple;
 import org.cyclops.integrateddynamics.api.evaluate.variable.ValueDeseralizationContext;
-import org.cyclops.integrateddynamics.api.network.INetwork;
-import org.cyclops.integrateddynamics.api.network.IPartNetwork;
-import org.cyclops.integrateddynamics.api.network.IPositionedAddonsNetwork;
-import org.cyclops.integrateddynamics.api.network.IPositionedAddonsNetworkIngredients;
-import org.cyclops.integrateddynamics.api.network.PositionedAddonsNetworkIngredientsFilter;
+import org.cyclops.integrateddynamics.api.network.*;
 import org.cyclops.integrateddynamics.api.part.IPartContainer;
 import org.cyclops.integrateddynamics.api.part.PartCapability;
 import org.cyclops.integrateddynamics.api.part.PartPos;
@@ -114,8 +108,8 @@ public abstract class PartTypeInterfacePositionedAddonFiltering<N extends IPosit
     }
 
     @Override
-    public void onBlockNeighborChange(INetwork network, IPartNetwork partNetwork, PartTarget target, S state, BlockGetter world, Block neighbourBlock, BlockPos neighbourBlockPos) {
-        super.onBlockNeighborChange(network, partNetwork, target, state, world, neighbourBlock, neighbourBlockPos);
+    public void onBlockNeighborChange(INetwork network, IPartNetwork partNetwork, PartTarget target, S state, BlockGetter world) {
+        super.onBlockNeighborChange(network, partNetwork, target, state, world);
         if (network != null) {
             updateTargetInNetwork(network, target.getTarget(), state.getPriority(), state.getChannelInterface(), state);
         }

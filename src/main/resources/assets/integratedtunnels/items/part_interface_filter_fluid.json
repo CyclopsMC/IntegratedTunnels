@@ -1,0 +1,6 @@
+{
+  "model": {
+    "type": "minecraft:model",
+    "model": "integratedtunnels:block/part_interface_filter_fluid_active"
+  }
+}

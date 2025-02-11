@@ -1,5 +1,5 @@
 plugins {
-	id 'net.neoforged.gradle.userdev' version '7.0.145'
+	id 'net.neoforged.gradle.userdev' version '7.0.171'
     id 'net.darkhax.curseforgegradle' version '1.0.8'
 	id 'com.github.kt3k.coveralls' version '2.12.0'
     id 'com.diffplug.spotless' version '6.25.0'
@@ -135,15 +135,16 @@ dependencies {
     }
 
     // Add something like 'integratedtunnelscompat_version_local=0.1.0-DEV' to your gradle.properties if you want to use a custom local Integrated Tunnels Compat version.
-    if(secrets.integratedtunnelscompat_version_local) {
-        shadow("org.cyclops.integratedtunnelscompat:integratedtunnelscompat-${project.minecraft_version}-neoforge:${secrets.integratedtunnelscompat_version_local}") {
-            transitive = false
-        }
-    } else {
-        shadow("org.cyclops.integratedtunnelscompat:integratedtunnelscompat-${project.minecraft_version}-neoforge:${project.integratedtunnelscompat_version}") {
-            transitive = false
-        }
-    }
+    // TODO: re-enable compat
+//    if(secrets.integratedtunnelscompat_version_local) {
+//        shadow("org.cyclops.integratedtunnelscompat:integratedtunnelscompat-${project.minecraft_version}-neoforge:${secrets.integratedtunnelscompat_version_local}") {
+//            transitive = false
+//        }
+//    } else {
+//        shadow("org.cyclops.integratedtunnelscompat:integratedtunnelscompat-${project.minecraft_version}-neoforge:${project.integratedtunnelscompat_version}") {
+//            transitive = false
+//        }
+//    }
 
     if(secrets.commoncapabilities_version_local) {
         implementation "org.cyclops.commoncapabilities:commoncapabilities-${project.minecraft_version}-neoforge:${secrets.commoncapabilities_version_local}:deobf"
@@ -198,15 +199,15 @@ runs {
 
     server {
         systemProperty 'neoforge.enabledGameTestNamespaces', "cyclopscore,${mod_id}"
-        programArgument '--nogui'
+        argument '--nogui'
     }
 
     gameTestServer {
         systemProperty 'neoforge.enabledGameTestNamespaces', "cyclopscore,${mod_id}"
     }
 
-    data {
-        programArguments.addAll '--mod', project.mod_id, '--all', '--output', file('src/generated/resources/').getAbsolutePath(), '--existing', file('src/main/resources/').getAbsolutePath()
+    clientData {
+        arguments.addAll '--mod', project.mod_id, '--all', '--output', file('src/generated/resources/').getAbsolutePath(), '--existing', file('src/main/resources/').getAbsolutePath()
     }
 }
 

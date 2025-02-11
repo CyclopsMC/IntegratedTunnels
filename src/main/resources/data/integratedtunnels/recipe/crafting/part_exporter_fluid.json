@@ -1,12 +1,8 @@
 {
   "type": "minecraft:crafting_shapeless",
   "ingredients": [
-    {
-      "item": "integratedtunnels:part_interface_fluid"
-    },
-    {
-      "item": "integrateddynamics:variable_transformer_output"
-    }
+    "integratedtunnels:part_interface_fluid",
+    "integrateddynamics:variable_transformer_output"
   ],
   "result": {
     "id": "integratedtunnels:part_exporter_fluid"

@@ -9,24 +9,22 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.redstone.ExperimentalRedstoneUtils;
+import net.minecraft.world.level.redstone.Orientation;
 import net.minecraft.world.phys.AABB;
 import net.neoforged.neoforge.fluids.FluidStack;
 import org.apache.commons.lang3.tuple.Triple;
 import org.cyclops.commoncapabilities.IngredientComponents;
 import org.cyclops.commoncapabilities.api.ingredient.storage.IIngredientComponentStorage;
 import org.cyclops.cyclopscore.datastructure.DimPos;
-import org.cyclops.cyclopscore.helper.BlockHelpers;
-import org.cyclops.cyclopscore.helper.FluidHelpers;
+import org.cyclops.cyclopscore.helper.IModHelpers;
+import org.cyclops.cyclopscore.helper.IModHelpersNeoForge;
 import org.cyclops.integrateddynamics.api.evaluate.EvaluationException;
 import org.cyclops.integrateddynamics.api.evaluate.operator.IOperator;
 import org.cyclops.integrateddynamics.api.evaluate.variable.IValue;
 import org.cyclops.integrateddynamics.api.evaluate.variable.IValueType;
 import org.cyclops.integrateddynamics.api.evaluate.variable.IValueTypeListProxy;
-import org.cyclops.integrateddynamics.api.network.INetwork;
-import org.cyclops.integrateddynamics.api.network.IPositionedAddonsNetwork;
-import org.cyclops.integrateddynamics.api.network.IPositionedAddonsNetworkIngredients;
-import org.cyclops.integrateddynamics.api.network.NetworkCapability;
-import org.cyclops.integrateddynamics.api.network.PositionedAddonsNetworkIngredientsFilter;
+import org.cyclops.integrateddynamics.api.network.*;
 import org.cyclops.integrateddynamics.api.part.PartCapability;
 import org.cyclops.integrateddynamics.api.part.PartPos;
 import org.cyclops.integrateddynamics.api.part.PartTarget;
@@ -50,13 +48,7 @@ import org.cyclops.integratedtunnels.Capabilities;
 import org.cyclops.integratedtunnels.GeneralConfig;
 import org.cyclops.integratedtunnels.IntegratedTunnels;
 import org.cyclops.integratedtunnels.api.network.IItemNetwork;
-import org.cyclops.integratedtunnels.core.ItemHandlerWorldEntityExportWrapper;
-import org.cyclops.integratedtunnels.core.ItemHandlerWorldEntityImportWrapper;
-import org.cyclops.integratedtunnels.core.ItemStoragePlayerWrapper;
-import org.cyclops.integratedtunnels.core.TunnelEnergyHelpers;
-import org.cyclops.integratedtunnels.core.TunnelFluidHelpers;
-import org.cyclops.integratedtunnels.core.TunnelHelpers;
-import org.cyclops.integratedtunnels.core.TunnelItemHelpers;
+import org.cyclops.integratedtunnels.core.*;
 import org.cyclops.integratedtunnels.core.part.IPartTypeInterfacePositionedAddon;
 import org.cyclops.integratedtunnels.core.part.PartStatePositionedAddon;
 import org.cyclops.integratedtunnels.core.part.PartTypeInterfacePositionedAddonFiltering;
@@ -713,7 +705,7 @@ public class TunnelAspectWriteBuilders {
             boolean blacklist = properties.getValue(PROP_BLACKLIST).getRawValue();
             int amount = 1;
             boolean exactAmount = false;
-            ItemStack itemBlock = input.getRight() == null ? ItemStack.EMPTY : BlockHelpers.getItemStackFromBlockState(input.getRight());
+            ItemStack itemBlock = input.getRight() == null ? ItemStack.EMPTY : IModHelpers.get().getBlockHelpers().getItemStackFromBlockState(input.getRight());
             ItemStack prototype = TunnelItemHelpers.prototypeWithCount(itemBlock, amount);
             boolean checkItem = true;
 
@@ -1692,7 +1684,7 @@ public class TunnelAspectWriteBuilders {
             public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, Boolean>, IFluidTarget>
                     PROP_BOOLEAN_FLUIDTARGET = input -> {
                 IngredientPredicate<FluidStack, Integer> fluidStackPredicate = input.getRight() ? TunnelFluidHelpers
-                        .matchAll(FluidHelpers.BUCKET_VOLUME, false)
+                        .matchAll(IModHelpersNeoForge.get().getFluidHelpers().getBucketVolume(), false)
                         : TunnelFluidHelpers.MATCH_NONE;
                 return IFluidTarget.ofCapabilityProvider(
                         fluidStackPredicate,
@@ -1705,7 +1697,7 @@ public class TunnelAspectWriteBuilders {
                 IAspectProperties properties = input.getMiddle();
                 boolean checkNbt = properties.getValue(TunnelAspectWriteBuilders.Fluid.PROP_CHECK_NBT).getRawValue();
                 boolean blacklist = properties.getValue(PROP_BLACKLIST).getRawValue();
-                int amount = FluidHelpers.BUCKET_VOLUME;
+                int amount = IModHelpersNeoForge.get().getFluidHelpers().getBucketVolume();
                 FluidStack prototype = TunnelFluidHelpers.prototypeWithCount(input.getRight(), amount);
                 boolean checkFluid = true;
 
@@ -1731,7 +1723,7 @@ public class TunnelAspectWriteBuilders {
                 IAspectProperties properties = input.getMiddle();
                 boolean checkNbt = properties.getValue(TunnelAspectWriteBuilders.Fluid.PROP_CHECK_NBT).getRawValue();
                 boolean blacklist = properties.getValue(PROP_BLACKLIST).getRawValue();
-                IngredientPredicate<FluidStack, Integer> fluidStackPredicate = TunnelFluidHelpers.matchFluidStacks(list.getRawValue(), false, false, checkNbt, blacklist, FluidHelpers.BUCKET_VOLUME, true);
+                IngredientPredicate<FluidStack, Integer> fluidStackPredicate = TunnelFluidHelpers.matchFluidStacks(list.getRawValue(), false, false, checkNbt, blacklist, IModHelpersNeoForge.get().getFluidHelpers().getBucketVolume(), true);
                 return IFluidTarget.ofBlock(fluidStackPredicate, input.getLeft(), input.getMiddle(), fluidStackPredicate);
             };
             public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, ValueTypeOperator.ValueOperator>, IFluidTarget>
@@ -1741,7 +1733,7 @@ public class TunnelAspectWriteBuilders {
                         && ValueHelpers.correspondsTo(predicate.getInputTypes()[0], ValueTypes.OBJECT_FLUIDSTACK)
                         && ValueHelpers.correspondsTo(predicate.getOutputType(), ValueTypes.BOOLEAN)) {
                     IngredientPredicate<FluidStack, Integer> fluidStackPredicate = TunnelFluidHelpers.matchPredicate(input.getLeft(), predicate,
-                            FluidHelpers.BUCKET_VOLUME, true);
+                            IModHelpersNeoForge.get().getFluidHelpers().getBucketVolume(), true);
                     return IFluidTarget.ofBlock(fluidStackPredicate, input.getLeft(), input.getMiddle(), fluidStackPredicate);
                 } else {
                     Component current = ValueTypeOperator.getSignature(predicate);
@@ -1759,7 +1751,7 @@ public class TunnelAspectWriteBuilders {
                 boolean requireNbt = properties.getValue(TunnelAspectWriteBuilders.Fluid.PROP_NBT_REQUIRE).getRawValue();
                 boolean recursive = properties.getValue(TunnelAspectWriteBuilders.Fluid.PROP_NBT_RECURSIVE).getRawValue();
                 boolean blacklist = properties.getValue(PROP_BLACKLIST).getRawValue();
-                IngredientPredicate<FluidStack, Integer> fluidStackMatcher = TunnelFluidHelpers.matchNbt(tag, subset, superset, requireNbt, recursive, blacklist, FluidHelpers.BUCKET_VOLUME, true);
+                IngredientPredicate<FluidStack, Integer> fluidStackMatcher = TunnelFluidHelpers.matchNbt(tag, subset, superset, requireNbt, recursive, blacklist, IModHelpersNeoForge.get().getFluidHelpers().getBucketVolume(), true);
                 return IFluidTarget.ofBlock(fluidStackMatcher, input.getLeft(), input.getMiddle(), fluidStackMatcher);
             };
 
@@ -2333,8 +2325,12 @@ public class TunnelAspectWriteBuilders {
                                     // Notify target neighbour
                                     DimPos originPos = target.getCenter().getPos();
                                     DimPos targetPos = target.getTarget().getPos();
+                                    Orientation orientation = null;
+                                    if (target.getTarget().getSide() != null && originPos.getBlockPos().equals(targetPos.getBlockPos().relative(target.getTarget().getSide().getOpposite()))) {
+                                        orientation = ExperimentalRedstoneUtils.initialOrientation(targetPos.getLevel(true), target.getTarget().getSide(), null);
+                                    }
                                     targetPos.getLevel(true).neighborChanged(targetPos.getBlockPos(),
-                                            targetPos.getLevel(true).getBlockState(targetPos.getBlockPos()).getBlock(), originPos.getBlockPos());
+                                            targetPos.getLevel(true).getBlockState(targetPos.getBlockPos()).getBlock(), orientation);
                                 }));
             }
         };
@@ -2361,8 +2357,12 @@ public class TunnelAspectWriteBuilders {
                                     // Notify target neighbour
                                     DimPos originPos = target.getCenter().getPos();
                                     DimPos targetPos = target.getTarget().getPos();
+                                    Orientation orientation = null;
+                                    if (target.getTarget().getSide() != null && originPos.getBlockPos().equals(targetPos.getBlockPos().relative(target.getTarget().getSide().getOpposite()))) {
+                                        orientation = ExperimentalRedstoneUtils.initialOrientation(targetPos.getLevel(true), target.getTarget().getSide(), null);
+                                    }
                                     targetPos.getLevel(true).neighborChanged(targetPos.getBlockPos(),
-                                            targetPos.getLevel(true).getBlockState(targetPos.getBlockPos()).getBlock(), originPos.getBlockPos());
+                                            targetPos.getLevel(true).getBlockState(targetPos.getBlockPos()).getBlock(), orientation);
                                 }));
             }
         };

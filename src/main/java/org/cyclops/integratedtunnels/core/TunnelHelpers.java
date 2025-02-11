@@ -16,8 +16,7 @@ import org.cyclops.commoncapabilities.api.ingredient.IIngredientMatcher;
 import org.cyclops.commoncapabilities.api.ingredient.IngredientComponent;
 import org.cyclops.commoncapabilities.api.ingredient.storage.IIngredientComponentStorage;
 import org.cyclops.commoncapabilities.api.ingredient.storage.IIngredientComponentStorageSlotted;
-import org.cyclops.cyclopscore.helper.ItemStackHelpers;
-import org.cyclops.cyclopscore.helper.MinecraftHelpers;
+import org.cyclops.cyclopscore.helper.IModHelpers;
 import org.cyclops.cyclopscore.ingredient.storage.InconsistentIngredientInsertionException;
 import org.cyclops.cyclopscore.ingredient.storage.IngredientStorageHelpers;
 import org.cyclops.integrateddynamics.IntegratedDynamics;
@@ -46,7 +45,7 @@ import java.util.concurrent.TimeUnit;
 public class TunnelHelpers {
 
     private static final Cache<ITunnelConnection, Boolean> CACHE_INV_CHECKS = CacheBuilder.newBuilder()
-            .expireAfterWrite(GeneralConfig.inventoryUnchangedTickTimeout * (1000 / MinecraftHelpers.SECOND_IN_TICKS),
+            .expireAfterWrite(GeneralConfig.inventoryUnchangedTickTimeout * (1000 / IModHelpers.get().getMinecraftHelpers().getSecondInTicks()),
                     TimeUnit.MILLISECONDS).build();
 
     /**
@@ -89,7 +88,7 @@ public class TunnelHelpers {
                 // Handle movement errors due to inconsistent simulation.
                 // If we are moving items, emit them in the world, otherwise they go lost.
                 if (GeneralConfig.ejectItemsOnInconsistentSimulationMovement && e.getIngredientComponent().equals(IngredientComponent.ITEMSTACK)) {
-                    ItemStackHelpers.spawnItemStack(movementPosition.getPos().getLevel(true), movementPosition.getPos().getBlockPos(), e.getRemainder());
+                    IModHelpers.get().getItemStackHelpers().spawnItemStack(movementPosition.getPos().getLevel(true), movementPosition.getPos().getBlockPos(), e.getRemainder());
                     throw new EvaluationException(Component.literal("Ingredient movement failed " +
                             "due to inconsistent insertion behaviour by destination in simulation " +
                             "and non-simulation mode. This can be caused by invalid network setups. " +

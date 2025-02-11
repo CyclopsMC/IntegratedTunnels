@@ -3,7 +3,7 @@ package org.cyclops.integratedtunnels.core.predicate;
 import com.google.common.collect.Iterables;
 import net.minecraft.world.item.ItemStack;
 import org.cyclops.commoncapabilities.api.ingredient.IngredientComponent;
-import org.cyclops.cyclopscore.helper.BlockHelpers;
+import org.cyclops.cyclopscore.helper.IModHelpers;
 import org.cyclops.integrateddynamics.api.evaluate.variable.IValueTypeListProxy;
 import org.cyclops.integrateddynamics.core.evaluate.variable.ValueObjectTypeBlock;
 import org.cyclops.integratedtunnels.core.TunnelItemHelpers;
@@ -24,7 +24,7 @@ public class IngredientPredicateBlockList extends IngredientPredicate<ItemStack,
         super(IngredientComponent.ITEMSTACK,
                 Iterables.transform(
                         Iterables.filter(blocks, block -> block.getRawValue().isPresent()),
-                        block -> TunnelItemHelpers.prototypeWithCount(BlockHelpers.getItemStackFromBlockState(block.getRawValue().get()), amount)),
+                        block -> TunnelItemHelpers.prototypeWithCount(IModHelpers.get().getBlockHelpers().getItemStackFromBlockState(block.getRawValue().get()), amount)),
                 matchFlags, blacklist, false, amount, exactAmount);
         this.blacklist = blacklist;
         this.blocks = blocks;
@@ -37,7 +37,7 @@ public class IngredientPredicateBlockList extends IngredientPredicate<ItemStack,
     public boolean test(@Nullable ItemStack input) {
         for (ValueObjectTypeBlock.ValueBlock block : blocks) {
             if (block.getRawValue().isPresent()
-                    && TunnelItemHelpers.areItemStackEqual(input, BlockHelpers.getItemStackFromBlockState(block.getRawValue().get()), checkStackSize, checkItem, checkNbt)) {
+                    && TunnelItemHelpers.areItemStackEqual(input, IModHelpers.get().getBlockHelpers().getItemStackFromBlockState(block.getRawValue().get()), checkStackSize, checkItem, checkNbt)) {
                 return !blacklist;
             }
         }

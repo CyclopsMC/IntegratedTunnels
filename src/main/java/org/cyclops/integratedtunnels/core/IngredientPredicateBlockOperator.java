@@ -4,7 +4,7 @@ import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.network.chat.MutableComponent;
 import org.cyclops.commoncapabilities.api.ingredient.IngredientComponent;
-import org.cyclops.cyclopscore.helper.BlockHelpers;
+import org.cyclops.cyclopscore.helper.IModHelpers;
 import org.cyclops.integrateddynamics.api.evaluate.EvaluationException;
 import org.cyclops.integrateddynamics.api.evaluate.operator.IOperator;
 import org.cyclops.integrateddynamics.api.evaluate.variable.IValue;
@@ -34,7 +34,7 @@ public class IngredientPredicateBlockOperator extends IngredientPredicate<ItemSt
     @Override
     public boolean test(@Nullable ItemStack input) {
         ValueObjectTypeBlock.ValueBlock valueBlock = ValueObjectTypeBlock.ValueBlock.of(
-                input.getItem() instanceof BlockItem ? BlockHelpers.getBlockStateFromItemStack(input) : null);
+                input.getItem() instanceof BlockItem ? IModHelpers.get().getBlockHelpers().getBlockStateFromItemStack(input) : null);
         try {
             IValue result = ValueHelpers.evaluateOperator(predicate, valueBlock);
             ValueHelpers.validatePredicateOutput(predicate, result);

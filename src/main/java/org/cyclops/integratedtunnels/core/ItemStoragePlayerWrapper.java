@@ -10,8 +10,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.InteractionResultHolder;
-import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.ai.attributes.Attribute;
@@ -30,7 +28,7 @@ import net.neoforged.neoforge.event.EventHooks;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import org.cyclops.commoncapabilities.api.ingredient.IngredientComponent;
 import org.cyclops.commoncapabilities.api.ingredient.storage.IIngredientComponentStorage;
-import org.cyclops.cyclopscore.helper.ItemStackHelpers;
+import org.cyclops.cyclopscore.helper.IModHelpers;
 import org.cyclops.cyclopscore.inventory.PlayerInventoryIterator;
 
 import javax.annotation.Nonnull;
@@ -98,7 +96,7 @@ public class ItemStoragePlayerWrapper implements IIngredientComponentStorage<Ite
             ItemStack itemStack = it.next();
             if (!itemStack.isEmpty()) {
                 ItemStack remaining = this.playerReturnHandler.insert(itemStack, false);
-                ItemStackHelpers.spawnItemStackToPlayer(world, pos, remaining, player);
+                IModHelpers.get().getItemStackHelpers().spawnItemStackToPlayer(world, pos, remaining, player);
                 it.remove();
             }
         }
@@ -175,13 +173,13 @@ public class ItemStoragePlayerWrapper implements IIngredientComponentStorage<Ite
                     || (rightClickBlockActionResult.getUseBlock() != TriState.FALSE && !flag1)) {
                 BlockState blockState = world.getBlockState(pos);
                 if (!player.isCrouching() || stack.isEmpty()) {
-                    ItemInteractionResult iteminteractionresult = blockState.useItemOn(player.getItemInHand(hand), world, player, hand, blockRayTraceResult);
+                    InteractionResult iteminteractionresult = blockState.useItemOn(player.getItemInHand(hand), world, player, hand, blockRayTraceResult);
                     if (iteminteractionresult.consumesAction()) {
                         returnPlayerInventory(player);
                         return ItemStack.EMPTY;
                     }
 
-                    if (iteminteractionresult == ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION && hand == InteractionHand.MAIN_HAND) {
+                    if (iteminteractionresult instanceof InteractionResult.TryEmptyHandInteraction && hand == InteractionHand.MAIN_HAND) {
                         if (blockState.useWithoutItem(world, player, blockRayTraceResult).consumesAction()) {
                             returnPlayerInventory(player);
                             return ItemStack.EMPTY;
@@ -216,17 +214,19 @@ public class ItemStoragePlayerWrapper implements IIngredientComponentStorage<Ite
                     // Otherwise, PASS the logic
                 } else {
                     ItemStack copyBeforeUse = stack.copy();
-                    InteractionResultHolder<ItemStack> actionresult = stack.use(world, player, hand);
-                    if (actionresult.getResult() == InteractionResult.FAIL) {
+                    InteractionResult actionresult = stack.use(world, player, hand);
+                    if (actionresult == InteractionResult.FAIL) {
                         return stack;
                     }
-                    if (actionresult.getObject().isEmpty()) {
-                        PlayerHelpers.setHeldItemSilent(player, hand, ItemStack.EMPTY);
-                        EventHooks.onPlayerDestroyItem(player, copyBeforeUse, hand);
-                    } else {
-                        PlayerHelpers.setHeldItemSilent(player, hand, actionresult.getObject());
+                    if (actionresult instanceof InteractionResult.Success success) {
+                        if (success.itemContext().heldItemTransformedTo().isEmpty()) {
+                            PlayerHelpers.setHeldItemSilent(player, hand, ItemStack.EMPTY);
+                            EventHooks.onPlayerDestroyItem(player, copyBeforeUse, hand);
+                        } else {
+                            PlayerHelpers.setHeldItemSilent(player, hand, success.itemContext().heldItemTransformedTo());
+                        }
                     }
-                    if (actionresult.getResult().consumesAction()) {
+                    if (actionresult.consumesAction()) {
                         // If the hand was activated, simulate the activated hand for a number of ticks, and deactivate.
                         if (player.isUsingItem()) {
                             player.updateActiveHandSimulated();

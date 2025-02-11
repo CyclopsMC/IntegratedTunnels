@@ -9,14 +9,9 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import org.apache.commons.lang3.tuple.Triple;
-import org.cyclops.cyclopscore.init.ModBase;
-import org.cyclops.cyclopscore.network.PacketCodec;
-import org.cyclops.integrateddynamics.api.part.IPartContainer;
-import org.cyclops.integrateddynamics.api.part.IPartState;
-import org.cyclops.integrateddynamics.api.part.IPartType;
-import org.cyclops.integrateddynamics.api.part.PartPos;
-import org.cyclops.integrateddynamics.api.part.PartRenderPosition;
-import org.cyclops.integrateddynamics.api.part.PartTarget;
+import org.cyclops.cyclopscore.init.ModBaseNeoForge;
+import org.cyclops.cyclopscore.network.PacketCodecs;
+import org.cyclops.integrateddynamics.api.part.*;
 import org.cyclops.integrateddynamics.core.helper.PartHelpers;
 import org.cyclops.integrateddynamics.core.inventory.container.ContainerPartOffset;
 import org.cyclops.integrateddynamics.core.part.PartTypeBase;
@@ -36,7 +31,7 @@ public abstract class PartTypeTunnel<P extends IPartType<P, S>, S extends IPartS
     }
 
     @Override
-    public ModBase getMod() {
+    public ModBaseNeoForge<?> getMod() {
         return IntegratedTunnels._instance;
     }
 
@@ -80,7 +75,7 @@ public abstract class PartTypeTunnel<P extends IPartType<P, S>, S extends IPartS
 
     @Override
     public void writeExtraGuiDataOffsets(RegistryFriendlyByteBuf packetBuffer, PartPos pos, ServerPlayer player) {
-        PacketCodec.write(packetBuffer, pos);
+        PacketCodecs.write(packetBuffer, pos);
         packetBuffer.writeUtf(this.getUniqueName().toString());
     }
 

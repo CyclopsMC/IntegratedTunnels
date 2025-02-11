@@ -14,7 +14,7 @@ import net.neoforged.neoforge.fluids.FluidStack;
 import org.cyclops.commoncapabilities.api.capability.fluidhandler.FluidMatch;
 import org.cyclops.commoncapabilities.api.ingredient.IngredientComponent;
 import org.cyclops.commoncapabilities.api.ingredient.storage.IIngredientComponentStorage;
-import org.cyclops.cyclopscore.helper.FluidHelpers;
+import org.cyclops.cyclopscore.helper.IModHelpersNeoForge;
 import org.cyclops.integrateddynamics.api.evaluate.EvaluationException;
 import org.cyclops.integrateddynamics.api.evaluate.operator.IOperator;
 import org.cyclops.integrateddynamics.api.evaluate.variable.IValueTypeListProxy;
@@ -76,7 +76,7 @@ public class TunnelFluidHelpers {
                                                                            final boolean checkAmount, final boolean checkNbt,
                                                                            final boolean blacklist, final boolean exactAmount) {
         return new IngredientPredicate<FluidStack, Integer>(IngredientComponent.FLUIDSTACK, fluidStack != null ? fluidStack.copy() : null, getFluidStackMatchFlags(checkFluid, checkAmount, checkNbt), blacklist, fluidStack == null && !blacklist,
-                FluidHelpers.getAmount(fluidStack), exactAmount) {
+                IModHelpersNeoForge.get().getFluidHelpers().getAmount(fluidStack), exactAmount) {
             @Override
             public boolean test(@Nullable FluidStack input) {
                 boolean result = areFluidStackEqual(input, fluidStack, checkFluid, checkAmount, checkNbt);

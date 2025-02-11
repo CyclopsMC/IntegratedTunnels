@@ -1,16 +1,16 @@
 package org.cyclops.integratedtunnels.core;
 
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.core.Direction;
 import net.minecraft.world.phys.AABB;
-import net.minecraft.core.BlockPos;
-import net.minecraft.server.level.ServerLevel;
 import org.cyclops.commoncapabilities.api.ingredient.IIngredientMatcher;
 import org.cyclops.commoncapabilities.api.ingredient.IngredientComponent;
 import org.cyclops.commoncapabilities.api.ingredient.storage.IIngredientComponentStorage;
-import org.cyclops.cyclopscore.helper.Helpers;
+import org.cyclops.cyclopscore.helper.IModHelpers;
 import org.cyclops.cyclopscore.ingredient.collection.FilteredIngredientCollectionIterator;
 import org.cyclops.integratedtunnels.GeneralConfig;
 
@@ -98,7 +98,7 @@ public class ItemHandlerWorldEntityImportWrapper implements IIngredientComponent
             if (matcher.matches(prototype, itemStack, subMatchCondition)
                     && (!matcher.hasCondition(matchCondition, quantityFlag) || itemStack.getCount() >= prototype.getCount())) {
                 itemStack = itemStack.copy();
-                ItemStack ret = itemStack.split(Helpers.castSafe(prototype.getCount()));
+                ItemStack ret = itemStack.split(IModHelpers.get().getBaseHelpers().castSafe(prototype.getCount()));
 
                 // Check if all items have been extracted, if so, remove block
                 if (!simulate) {
@@ -121,7 +121,7 @@ public class ItemHandlerWorldEntityImportWrapper implements IIngredientComponent
         ItemEntity entity = this.entities.get(0);
         ItemStack itemStack = entity.getItem();
         itemStack = itemStack.copy();
-        ItemStack ret = itemStack.split(Helpers.castSafe(maxQuantity));
+        ItemStack ret = itemStack.split(IModHelpers.get().getBaseHelpers().castSafe(maxQuantity));
         if (!simulate) {
             postExtract(entity, itemStack);
         }

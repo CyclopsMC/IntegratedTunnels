@@ -1,15 +1,9 @@
 {
   "type": "minecraft:crafting_shapeless",
   "ingredients": [
-    {
-      "item": "integratedtunnels:part_interface_energy"
-    },
-    {
-      "item": "integratedtunnels:part_interface_energy"
-    },
-    {
-      "item": "minecraft:hopper"
-    }
+    "integratedtunnels:part_interface_energy",
+    "integratedtunnels:part_interface_energy",
+    "minecraft:hopper"
   ],
   "result": {
     "id": "integratedtunnels:part_interface_filter_energy"

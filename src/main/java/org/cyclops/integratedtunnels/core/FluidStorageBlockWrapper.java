@@ -12,7 +12,7 @@ import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import org.cyclops.commoncapabilities.api.ingredient.IngredientComponent;
 import org.cyclops.commoncapabilities.api.ingredient.storage.IIngredientComponentStorage;
-import org.cyclops.cyclopscore.helper.FluidHelpers;
+import org.cyclops.cyclopscore.helper.IModHelpersNeoForge;
 import org.cyclops.integratedtunnels.GeneralConfig;
 
 import javax.annotation.Nonnull;
@@ -44,7 +44,7 @@ public class FluidStorageBlockWrapper implements IIngredientComponentStorage<Flu
     }
 
     protected void sendBlockUpdate() {
-        world.neighborChanged(pos, Blocks.AIR, pos);
+        world.neighborChanged(pos, Blocks.AIR, null);
     }
 
     protected void postInsert(FluidStack moved) {
@@ -85,7 +85,7 @@ public class FluidStorageBlockWrapper implements IIngredientComponentStorage<Flu
 
     @Override
     public long getMaxQuantity() {
-        return FluidHelpers.BUCKET_VOLUME;
+        return IModHelpersNeoForge.get().getFluidHelpers().getBucketVolume();
     }
 
     @Override

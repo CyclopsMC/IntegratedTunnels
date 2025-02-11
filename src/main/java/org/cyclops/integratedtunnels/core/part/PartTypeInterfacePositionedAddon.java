@@ -1,6 +1,5 @@
 package org.cyclops.integratedtunnels.core.part;
 
-import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
@@ -13,10 +12,9 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.level.BlockGetter;
-import net.minecraft.world.level.block.Block;
 import org.apache.commons.lang3.tuple.Triple;
 import org.cyclops.cyclopscore.datastructure.DimPos;
-import org.cyclops.cyclopscore.network.PacketCodec;
+import org.cyclops.cyclopscore.network.PacketCodecs;
 import org.cyclops.integrateddynamics.api.evaluate.variable.ValueDeseralizationContext;
 import org.cyclops.integrateddynamics.api.network.INetwork;
 import org.cyclops.integrateddynamics.api.network.IPartNetwork;
@@ -73,7 +71,7 @@ public abstract class PartTypeInterfacePositionedAddon<N extends IPositionedAddo
 
     @Override
     public void writeExtraGuiData(RegistryFriendlyByteBuf packetBuffer, PartPos pos, ServerPlayer player) {
-        PacketCodec.write(packetBuffer, pos);
+        PacketCodecs.write(packetBuffer, pos);
         packetBuffer.writeUtf(this.getUniqueName().toString());
     }
 
@@ -110,8 +108,8 @@ public abstract class PartTypeInterfacePositionedAddon<N extends IPositionedAddo
     }
 
     @Override
-    public void onBlockNeighborChange(INetwork network, IPartNetwork partNetwork, PartTarget target, S state, BlockGetter world, Block neighbourBlock, BlockPos neighbourBlockPos) {
-        super.onBlockNeighborChange(network, partNetwork, target, state, world, neighbourBlock, neighbourBlockPos);
+    public void onBlockNeighborChange(INetwork network, IPartNetwork partNetwork, PartTarget target, S state, BlockGetter world) {
+        super.onBlockNeighborChange(network, partNetwork, target, state, world);
         if (network != null) {
             updateTargetInNetwork(network, target.getTarget(), state.getPriority(), state.getChannelInterface(), state);
         }

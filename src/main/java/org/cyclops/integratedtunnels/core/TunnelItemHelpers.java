@@ -13,7 +13,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.cyclops.commoncapabilities.api.capability.itemhandler.ItemMatch;
 import org.cyclops.commoncapabilities.api.ingredient.IngredientComponent;
 import org.cyclops.commoncapabilities.api.ingredient.storage.IIngredientComponentStorage;
-import org.cyclops.cyclopscore.helper.ItemStackHelpers;
+import org.cyclops.cyclopscore.helper.IModHelpers;
 import org.cyclops.integrateddynamics.api.evaluate.EvaluationException;
 import org.cyclops.integrateddynamics.api.evaluate.operator.IOperator;
 import org.cyclops.integrateddynamics.api.evaluate.variable.IValueTypeListProxy;
@@ -226,7 +226,7 @@ public class TunnelItemHelpers {
                 if (!cachedStack.isEmpty()) {
                     ItemStack remaining = destination.insert(cachedStack, false);
                     if (GeneralConfig.ejectItemsOnBlockDropOverflow) {
-                        ItemStackHelpers.spawnItemStack(world, pos, remaining);
+                        IModHelpers.get().getItemStackHelpers().spawnItemStack(world, pos, remaining);
                     }
                     it.remove();
                 }

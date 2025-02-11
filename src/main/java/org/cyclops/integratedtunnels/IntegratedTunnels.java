@@ -10,9 +10,9 @@ import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.registries.NewRegistryEvent;
 import org.apache.logging.log4j.Level;
-import org.cyclops.cyclopscore.config.ConfigHandler;
+import org.cyclops.cyclopscore.config.ConfigHandlerCommon;
 import org.cyclops.cyclopscore.infobook.IInfoBookRegistry;
-import org.cyclops.cyclopscore.init.ModBaseVersionable;
+import org.cyclops.cyclopscore.init.ModBaseNeoForge;
 import org.cyclops.cyclopscore.proxy.IClientProxy;
 import org.cyclops.cyclopscore.proxy.ICommonProxy;
 import org.cyclops.integrateddynamics.IntegratedDynamics;
@@ -41,7 +41,7 @@ import org.cyclops.integratedtunnels.proxy.CommonProxy;
  *
  */
 @Mod(Reference.MOD_ID)
-public class IntegratedTunnels extends ModBaseVersionable<IntegratedTunnels> {
+public class IntegratedTunnels extends ModBaseNeoForge<IntegratedTunnels> {
 
     /**
      * The unique instance of this mod.
@@ -111,7 +111,7 @@ public class IntegratedTunnels extends ModBaseVersionable<IntegratedTunnels> {
     }
 
     @Override
-    public void onConfigsRegister(ConfigHandler configHandler) {
+    public void onConfigsRegister(ConfigHandlerCommon configHandler) {
         super.onConfigsRegister(configHandler);
 
         configHandler.addConfigurable(new GeneralConfig());

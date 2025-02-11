@@ -73,10 +73,6 @@ public class ExtendedFakePlayer extends FakePlayer {
                                 useItem.getItem().onUseTick(this.level(), this, useItem, useItemRemaining);
                         }
 
-                        if (this.getUseItemRemainingTicks() <= 25 && this.getUseItemRemainingTicks() % 4 == 0) {
-                            this.triggerItemUseEffects(this.useItem, 5);
-                        }
-
                         if (--this.useItemRemaining <= 0 && !this.level().isClientSide() && !this.useItem.useOnRelease()) {
                             this.completeUsingItem();
                             break;

@@ -5,12 +5,8 @@
     "CCC"
   ],
   "key": {
-    "C": {
-      "item": "integrateddynamics:crystalized_menril_chunk"
-    },
-    "B": {
-      "item": "integrateddynamics:energy_battery"
-    }
+    "C": "integrateddynamics:crystalized_menril_chunk",
+    "B": "integrateddynamics:energy_battery"
   },
   "result": {
     "id": "integratedtunnels:part_interface_energy",

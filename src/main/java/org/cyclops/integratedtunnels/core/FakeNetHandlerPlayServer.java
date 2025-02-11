@@ -17,7 +17,8 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.CommonListenerCookie;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
-import net.minecraft.world.entity.RelativeMovement;
+import net.minecraft.world.entity.PositionMoveRotation;
+import net.minecraft.world.entity.Relative;
 import net.neoforged.neoforge.network.connection.ConnectionType;
 import org.jetbrains.annotations.Nullable;
 
@@ -136,8 +137,8 @@ public class FakeNetHandlerPlayServer extends ServerGamePacketListenerImpl {
     }
 
     @Override
-    public void teleport(double p_9781_, double p_9782_, double p_9783_, float p_9784_, float p_9785_, Set<RelativeMovement> p_9786_) {
-
+    public void teleport(PositionMoveRotation posMoveRotation, Set<Relative> relatives) {
+        super.teleport(posMoveRotation, relatives);
     }
 
     @Override

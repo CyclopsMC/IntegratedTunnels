@@ -15,5 +15,8 @@
                 "down": { "texture": "#texture", "uv": [ 3.0, 0.0, 13.0, 3.0 ] }
             }
         }
-    ]
+    ],
+    "textures": {
+        "particle": "integrateddynamics:block/cable"
+    }
 }

@@ -26,8 +26,7 @@ import net.neoforged.neoforge.event.level.BlockEvent;
 import org.cyclops.commoncapabilities.api.ingredient.IIngredientMatcher;
 import org.cyclops.commoncapabilities.api.ingredient.IngredientComponent;
 import org.cyclops.commoncapabilities.api.ingredient.storage.IIngredientComponentStorage;
-import org.cyclops.cyclopscore.helper.BlockHelpers;
-import org.cyclops.cyclopscore.helper.Helpers;
+import org.cyclops.cyclopscore.helper.IModHelpers;
 import org.cyclops.cyclopscore.ingredient.collection.FilteredIngredientCollectionIterator;
 import org.cyclops.integratedtunnels.GeneralConfig;
 import org.cyclops.integratedtunnels.IntegratedTunnels;
@@ -80,7 +79,7 @@ public class ItemStorageBlockWrapper implements IIngredientComponentStorage<Item
     }
 
     protected void sendBlockUpdate() {
-        world.neighborChanged(pos, Blocks.AIR, pos);
+        world.neighborChanged(pos, Blocks.AIR, null);
     }
 
     protected IBlockBreakHandler getBlockBreakHandler(BlockState blockState, Level world, BlockPos pos, Player player) {
@@ -131,7 +130,7 @@ public class ItemStorageBlockWrapper implements IIngredientComponentStorage<Item
                 boolean isDestReplaceable = world.getBlockState(pos).canBeReplaced(TunnelHelpers.createBlockItemUseContext(world, null, pos, side, hand));
                 if (!isDestReplaceable || !ignoreReplacable) {
                     BlockState blockState = world.getBlockState(pos);
-                    return Lists.newArrayList(BlockHelpers.getItemStackFromBlockState(blockState));
+                    return Lists.newArrayList(IModHelpers.get().getBlockHelpers().getItemStackFromBlockState(blockState));
                 }
             }
         } else {
@@ -286,7 +285,7 @@ public class ItemStorageBlockWrapper implements IIngredientComponentStorage<Item
             if (matcher.matches(prototype, itemStack, subMatchCondition)
                     && (!matcher.hasCondition(matchCondition, quantityFlag) || itemStack.getCount() >= prototype.getCount())) {
                 itemStack = itemStack.copy();
-                ItemStack ret = itemStack.split(Helpers.castSafe(prototype.getCount()));
+                ItemStack ret = itemStack.split(IModHelpers.get().getBaseHelpers().castSafe(prototype.getCount()));
                 if (!simulate) {
                     if (itemStack.isEmpty()) {
                         it.remove();
@@ -316,7 +315,7 @@ public class ItemStorageBlockWrapper implements IIngredientComponentStorage<Item
         }
         ItemStack itemStack = itemStacks.get(0);
         itemStack = itemStack.copy();
-        ItemStack ret = itemStack.split(Helpers.castSafe(maxQuantity));
+        ItemStack ret = itemStack.split(IModHelpers.get().getBaseHelpers().castSafe(maxQuantity));
         if (!simulate) {
             if (itemStack.isEmpty()) {
                 itemStacks.remove(0);

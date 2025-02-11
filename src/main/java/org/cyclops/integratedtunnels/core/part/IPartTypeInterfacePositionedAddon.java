@@ -3,18 +3,10 @@ package org.cyclops.integratedtunnels.core.part;
 import net.minecraft.core.Direction;
 import net.neoforged.neoforge.capabilities.BlockCapability;
 import org.apache.commons.lang3.tuple.Pair;
-import org.cyclops.cyclopscore.helper.BlockEntityHelpers;
+import org.cyclops.cyclopscore.helper.IModHelpersNeoForge;
 import org.cyclops.integrateddynamics.api.evaluate.variable.ValueDeseralizationContext;
-import org.cyclops.integrateddynamics.api.network.INetwork;
-import org.cyclops.integrateddynamics.api.network.IPartNetwork;
-import org.cyclops.integrateddynamics.api.network.IPositionedAddonsNetwork;
-import org.cyclops.integrateddynamics.api.network.IPositionedAddonsNetworkIngredients;
-import org.cyclops.integrateddynamics.api.network.NetworkCapability;
-import org.cyclops.integrateddynamics.api.part.IPartState;
-import org.cyclops.integrateddynamics.api.part.IPartType;
-import org.cyclops.integrateddynamics.api.part.PartCapability;
-import org.cyclops.integrateddynamics.api.part.PartPos;
-import org.cyclops.integrateddynamics.api.part.PartTarget;
+import org.cyclops.integrateddynamics.api.network.*;
+import org.cyclops.integrateddynamics.api.part.*;
 import org.cyclops.integrateddynamics.core.helper.NetworkHelpers;
 
 import javax.annotation.Nullable;
@@ -37,7 +29,7 @@ public interface IPartTypeInterfacePositionedAddon<N extends IPositionedAddonsNe
     }
 
     public default Optional<T> getTargetCapabilityInstance(PartPos pos) {
-        return BlockEntityHelpers.getCapability(pos.getPos(), pos.getSide(), getBlockCapability());
+        return IModHelpersNeoForge.get().getCapabilityHelpers().getCapability(pos.getPos(), pos.getSide(), getBlockCapability());
     }
 
     public default void scheduleNetworkObservation(PartTarget target, S state) {

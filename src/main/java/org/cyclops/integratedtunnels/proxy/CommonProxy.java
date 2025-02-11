@@ -1,6 +1,6 @@
 package org.cyclops.integratedtunnels.proxy;
 
-import org.cyclops.cyclopscore.init.ModBase;
+import org.cyclops.cyclopscore.init.ModBaseNeoForge;
 import org.cyclops.cyclopscore.proxy.CommonProxyComponent;
 import org.cyclops.integratedtunnels.IntegratedTunnels;
 
@@ -12,7 +12,7 @@ import org.cyclops.integratedtunnels.IntegratedTunnels;
 public class CommonProxy extends CommonProxyComponent {
 
     @Override
-    public ModBase getMod() {
+    public ModBaseNeoForge<?> getMod() {
         return IntegratedTunnels._instance;
     }
 

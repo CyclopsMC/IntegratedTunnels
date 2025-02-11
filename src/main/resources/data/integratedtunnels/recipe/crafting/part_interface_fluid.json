@@ -5,12 +5,8 @@
     "CCC"
   ],
   "key": {
-    "C": {
-      "item": "integrateddynamics:crystalized_menril_chunk"
-    },
-    "B": {
-      "item": "minecraft:bucket"
-    }
+    "C": "integrateddynamics:crystalized_menril_chunk",
+    "B": "minecraft:bucket"
   },
   "result": {
     "id": "integratedtunnels:part_interface_fluid",
