@@ -191,7 +191,7 @@ public class ItemStorageBlockWrapper implements IIngredientComponentStorage<Item
                 if (blockPlaceHandler != null) {
                     blockPlaceHandler.placeBlock(itemStack, world, pos, side.getOpposite(), 0, 0, 0, player);
                 } else {
-                    BlockPlaceContext blockItemUseContext = TunnelHelpers.createBlockItemUseContext(world, player, pos, side.getOpposite(), hand);
+                    BlockPlaceContext blockItemUseContext = TunnelHelpers.createBlockItemUseContext(world, player, pos, side.getOpposite(), hand, itemStack);
                     BlockState blockState = itemBlock.getBlock().getStateForPlacement(blockItemUseContext);
                     if (blockState != null && (simulate || itemBlock.placeBlock(blockItemUseContext, blockState))) {
                         if (!simulate) {
