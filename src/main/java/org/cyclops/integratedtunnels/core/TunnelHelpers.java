@@ -250,7 +250,21 @@ public class TunnelHelpers {
      * @return A new BlockItemUseContext
      */
     public static BlockPlaceContext createBlockItemUseContext(Level world, @Nullable Player playerEntity, BlockPos pos, Direction side, InteractionHand hand) {
-        return new BlockPlaceContext(world, playerEntity, hand, ItemStack.EMPTY,
+        return createBlockItemUseContext(world, playerEntity, pos, side, hand, ItemStack.EMPTY);
+    }
+
+    /**
+     * Create a new block item use context for use during tunnel movement.
+     * @param world The world.
+     * @param playerEntity The optional player.
+     * @param pos The position.
+     * @param side The side.
+     * @param hand A hand.
+     * @param itemStack The item stack.
+     * @return A new BlockItemUseContext
+     */
+    public static BlockPlaceContext createBlockItemUseContext(Level world, @Nullable Player playerEntity, BlockPos pos, Direction side, InteractionHand hand, ItemStack itemStack) {
+        return new BlockPlaceContext(world, playerEntity, hand, itemStack,
                 new BlockHitResult(new Vec3((double)pos.getX() + 0.5D + (double)side.getStepX() * 0.5D,
                         (double)pos.getY() + 0.5D + (double)side.getStepY() * 0.5D,
                         (double)pos.getZ() + 0.5D + (double)side.getStepZ() * 0.5D), side, pos, false));
