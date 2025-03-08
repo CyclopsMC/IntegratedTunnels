@@ -133,7 +133,7 @@ public class ItemStoragePlayerWrapper implements IIngredientComponentStorage<Ite
         }
 
         PlayerHelpers.setPlayerState(player, hand, pos, offsetX, offsetY, offsetZ, side, sneaking);
-        PlayerHelpers.setHeldItemSilent(player, hand, stack);
+        PlayerHelpers.setHeldItemSilent(player, hand, stack.copy());
 
         if (!continuousClick) {
             cancelDestroyingBlock(player);
@@ -254,6 +254,11 @@ public class ItemStoragePlayerWrapper implements IIngredientComponentStorage<Ite
                 if (actionResult == InteractionResult.FAIL) {
                     return stack;
                 } else if (actionResult.consumesAction()) {
+                    // If the hand was activated, simulate the activated hand for a number of ticks, and deactivate.
+                    if (player.isUsingItem()) {
+                        player.updateActiveHandSimulated();
+                        player.releaseUsingItem();
+                    }
                     returnPlayerInventory(player);
                     return ItemStack.EMPTY;
                 }

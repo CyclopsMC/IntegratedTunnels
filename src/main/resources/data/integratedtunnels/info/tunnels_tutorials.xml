@@ -86,7 +86,7 @@
     <section name="info_book.integratedtunnels.tutorials.export_enchantable_items">
         <paragraph>info_book.integratedtunnels.tutorials.export_enchantable_items.text1</paragraph>
         <appendix type="integrateddynamics:operator">integrateddynamics:itemstack_enchantable</appendix>
-        <appendix type="integrateddynamics:aspect">integratedtunnels:write_operator_item_import</appendix>
+        <appendix type="integrateddynamics:aspect">integratedtunnels:write_operator_item_export</appendix>
         <appendix type="advancement_rewards" id="integratedtunnels:export_enchantable_items">
             <advancements>
                 <advancement id="integratedtunnels:export_enchantable_items/export_enchantable_items" />

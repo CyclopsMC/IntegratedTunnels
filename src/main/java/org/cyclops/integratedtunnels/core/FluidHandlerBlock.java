@@ -60,6 +60,9 @@ public class FluidHandlerBlock implements IFluidHandler {
     public int fill(FluidStack resource, FluidAction action) {
         Fluid fluid = resource.getFluid();
         BlockState block = fluid.getFluidType().getBlockForFluidState(world, blockPos, fluid.defaultFluidState());
+        if (block.isAir()) {
+            return 0;
+        }
         return new BlockWrapper(block, world, blockPos).fill(resource, action);
     }
 

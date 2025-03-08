@@ -12,12 +12,8 @@ import org.cyclops.cyclopscore.init.IModBase;
  */
 public class GeneralConfig extends DummyConfigCommon<IModBase> {
 
-    @ConfigurablePropertyCommon(category = "core", comment = "If an anonymous mod startup analytics request may be sent to our analytics service.")
-    public static boolean analytics = true;
-
-    @ConfigurablePropertyCommon(category = "core", comment = "If the version checker should be enabled.")
-    public static boolean versionChecker = true;
-
+    @ConfigurablePropertyCommon(category = "core", comment = "For how many ticks importers/exporters should fail to process before they can start sleeping.", configLocation = ModConfigLocation.SERVER)
+    public static int inventoryUnchangedTickCount = 3;
     @ConfigurablePropertyCommon(category = "core", comment = "How many ticks importers/exporters should sleep until checking targets again when they were previously unchanged.", configLocation = ModConfigLocation.SERVER)
     public static int inventoryUnchangedTickTimeout = 10;
 

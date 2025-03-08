@@ -1,0 +1,11 @@
+As always, don't forget to backup your world before updating!
+Requires CyclopsCore version 1.25.5 or higher.
+
+Fixes:
+* Fix chained world block exporter/exporter not able to work every tick
+  This is done by making the exporter/importer sleep optimization only
+  take effect if these parts were unable to move anything for at least
+  three ticks.
+  Closes #319
+* Disallow Player Simulator from sleeping in beds, Closes CyclopsMC/IntegratedDynamics/issues/1454
+* Fix player simulator not ticking fast enough with snowballs, #319

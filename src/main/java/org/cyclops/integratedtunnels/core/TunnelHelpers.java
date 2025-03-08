@@ -44,8 +44,8 @@ import java.util.concurrent.TimeUnit;
  */
 public class TunnelHelpers {
 
-    private static final Cache<ITunnelConnection, Boolean> CACHE_INV_CHECKS = CacheBuilder.newBuilder()
-            .expireAfterWrite(GeneralConfig.inventoryUnchangedTickTimeout * (1000 / IModHelpers.get().getMinecraftHelpers().getSecondInTicks()),
+    private static final Cache<ITunnelConnection, Integer> CACHE_INV_CHECKS = CacheBuilder.newBuilder()
+            .expireAfterWrite((GeneralConfig.inventoryUnchangedTickCount + GeneralConfig.inventoryUnchangedTickTimeout) * (1000 / IModHelpers.get().getMinecraftHelpers().getSecondInTicks()),
                     TimeUnit.MILLISECONDS).build();
 
     /**
@@ -148,7 +148,8 @@ public class TunnelHelpers {
         }
 
         // Don't do anything if we are sleeping for this connection
-        if (CACHE_INV_CHECKS.getIfPresent(connection) != null) {
+        Integer sleepCheck = CACHE_INV_CHECKS.getIfPresent(connection);
+        if (sleepCheck != null && sleepCheck >= GeneralConfig.inventoryUnchangedTickCount) {
             return matcher.getEmptyInstance();
         }
 
@@ -156,7 +157,9 @@ public class TunnelHelpers {
         T moved = moveSingle(source, sourceSlot, destination, destinationSlot, ingredientPredicate, movementPosition, false);
         if (matcher.isEmpty(moved)) {
             // Mark this connection as 'sleeping' if nothing was moved
-            CACHE_INV_CHECKS.put(connection, true);
+            CACHE_INV_CHECKS.put(connection, sleepCheck == null ? 1 : sleepCheck + 1);
+        } else if (sleepCheck != null) {
+            CACHE_INV_CHECKS.invalidate(connection);
         }
 
         // Schedule a new observation for the network, as its contents may have changed
@@ -246,7 +249,21 @@ public class TunnelHelpers {
      * @return A new BlockItemUseContext
      */
     public static BlockPlaceContext createBlockItemUseContext(Level world, @Nullable Player playerEntity, BlockPos pos, Direction side, InteractionHand hand) {
-        return new BlockPlaceContext(world, playerEntity, hand, ItemStack.EMPTY,
+        return createBlockItemUseContext(world, playerEntity, pos, side, hand, ItemStack.EMPTY);
+    }
+
+    /**
+     * Create a new block item use context for use during tunnel movement.
+     * @param world The world.
+     * @param playerEntity The optional player.
+     * @param pos The position.
+     * @param side The side.
+     * @param hand A hand.
+     * @param itemStack The item stack.
+     * @return A new BlockItemUseContext
+     */
+    public static BlockPlaceContext createBlockItemUseContext(Level world, @Nullable Player playerEntity, BlockPos pos, Direction side, InteractionHand hand, ItemStack itemStack) {
+        return new BlockPlaceContext(world, playerEntity, hand, itemStack,
                 new BlockHitResult(new Vec3((double)pos.getX() + 0.5D + (double)side.getStepX() * 0.5D,
                         (double)pos.getY() + 0.5D + (double)side.getStepY() * 0.5D,
                         (double)pos.getZ() + 0.5D + (double)side.getStepZ() * 0.5D), side, pos, false));
