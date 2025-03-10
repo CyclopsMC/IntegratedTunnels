@@ -194,6 +194,7 @@ public class ItemStorageBlockWrapper implements IIngredientComponentStorage<Item
                     if (blockState != null && (simulate || itemBlock.placeBlock(blockItemUseContext, blockState))) {
                         if (!simulate) {
                             itemBlock.updateCustomBlockEntityTag(pos, world, blockItemUseContext.getPlayer(), itemStack, blockState);
+                            updateBlockEntityComponents(world, pos, itemStack);
                             itemBlock.getBlock().setPlacedBy(world, pos, blockState, player, itemStack);
                             if (GeneralConfig.worldInteractionEvents) {
                                 SoundType soundtype = world.getBlockState(pos).getBlock().getSoundType(world.getBlockState(pos), world, pos, player);
@@ -209,6 +210,15 @@ public class ItemStorageBlockWrapper implements IIngredientComponentStorage<Item
             }
         }
         return itemStack;
+    }
+
+    // Copied from BlockItem
+    private static void updateBlockEntityComponents(Level pLevel, BlockPos pPoa, ItemStack pStack) {
+        BlockEntity blockentity = pLevel.getBlockEntity(pPoa);
+        if (blockentity != null) {
+            blockentity.applyComponentsFromItemStack(pStack);
+            blockentity.setChanged();
+        }
     }
 
     @Override
