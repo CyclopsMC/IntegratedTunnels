@@ -5,7 +5,9 @@ import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.entity.ShulkerBoxBlockEntity;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import org.cyclops.integrateddynamics.RegistryEntries;
@@ -149,6 +151,45 @@ public class GameTestsWorldBlock {
             helper.assertBlockPresent(Blocks.STONE, POS.west());
             helper.assertContainerEmpty(POS.west());
             helper.assertBlockNotPresent(Blocks.COBBLESTONE, POS.east().north());
+        });
+    }
+
+    @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
+    public void testWorldBlockImporterToInterfaceToExporterShulkerBox(GameTestHelper helper) {
+        // Place cable
+        helper.setBlock(POS, RegistryEntries.BLOCK_CABLE.value());
+        helper.setBlock(POS.east(), RegistryEntries.BLOCK_CABLE.value());
+
+        // Place world block importer
+        PartHelpers.addPart(helper.getLevel(), helper.absolutePos(POS), Direction.WEST, PartTypes.IMPORTER_WORLD_BLOCK, new ItemStack(PartTypes.IMPORTER_WORLD_BLOCK.getItem()));
+
+        // Place item interface
+        PartHelpers.addPart(helper.getLevel(), helper.absolutePos(POS.east()), Direction.EAST, PartTypes.INTERFACE_ITEM, new ItemStack(PartTypes.INTERFACE_ITEM.getItem()));
+
+        // Place world block exporter
+        PartHelpers.addPart(helper.getLevel(), helper.absolutePos(POS.east()), Direction.NORTH, PartTypes.EXPORTER_WORLD_BLOCK, new ItemStack(PartTypes.EXPORTER_WORLD_BLOCK.getItem()));
+
+        // Place chest for interface
+        helper.setBlock(POS.east().east(), Blocks.CHEST);
+
+        // Place shulker box before importer
+        helper.setBlock(POS.west(), Blocks.SHULKER_BOX);
+        ShulkerBoxBlockEntity shulkerBoxStart = helper.getBlockEntity(POS.west());
+        shulkerBoxStart.setItem(0, new ItemStack(Items.APPLE));
+        shulkerBoxStart.setItem(1, new ItemStack(Items.DIRT));
+
+        // Place empty variable in importer and exporter
+        ItemStack variableAspect = new ItemStack(RegistryEntries.ITEM_VARIABLE);
+        placeVariableInWriter(helper.getLevel(), PartPos.of(helper.getLevel(), helper.absolutePos(POS), Direction.WEST), TunnelAspects.Write.World.BLOCK_BOOLEAN_IMPORT, variableAspect);
+        placeVariableInWriter(helper.getLevel(), PartPos.of(helper.getLevel(), helper.absolutePos(POS.east()), Direction.NORTH), TunnelAspects.Write.World.BLOCK_BOOLEAN_EXPORT, variableAspect);
+
+        helper.succeedWhen(() -> {
+            // Check if items are moved
+            helper.assertBlockNotPresent(Blocks.STONE, POS.west());
+            helper.assertContainerEmpty(POS.west());
+            helper.assertBlockPresent(Blocks.SHULKER_BOX, POS.east().north());
+            helper.assertContainerContains(POS.east().north(), Items.APPLE);
+            helper.assertContainerContains(POS.east().north(), Items.DIRT);
         });
     }
 
