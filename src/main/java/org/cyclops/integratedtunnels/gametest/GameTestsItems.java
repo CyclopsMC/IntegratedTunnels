@@ -299,4 +299,133 @@ public class GameTestsItems {
         });
     }
 
+    @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
+    public void testItemsImporterToFilteredInterfaceBoolean(GameTestHelper helper) {
+        // Place cable
+        helper.setBlock(POS, RegistryEntries.BLOCK_CABLE.value());
+        helper.setBlock(POS.east(), RegistryEntries.BLOCK_CABLE.value());
+
+        // Place item importer
+        PartHelpers.addPart(helper.getLevel(), helper.absolutePos(POS), Direction.WEST, PartTypes.IMPORTER_ITEM, new ItemStack(PartTypes.IMPORTER_ITEM.getItem()));
+
+        // Place item interface
+        PartHelpers.addPart(helper.getLevel(), helper.absolutePos(POS.east()), Direction.EAST, PartTypes.INTERFACE_FILTERING_ITEM, new ItemStack(PartTypes.INTERFACE_FILTERING_ITEM.getItem()));
+
+        // Place chests
+        helper.setBlock(POS.west(), Blocks.CHEST);
+        helper.setBlock(POS.east().east(), Blocks.CHEST);
+
+        // Insert items in importer chest
+        ChestBlockEntity chestIn = helper.getBlockEntity(POS.west());
+        chestIn.setItem(0, new ItemStack(Items.WHITE_WOOL));
+        chestIn.setItem(1, new ItemStack(Items.ACACIA_LEAVES));
+        chestIn.setItem(2, new ItemStack(Items.DIAMOND_PICKAXE));
+
+        // Place empty variable in importer
+        ItemStack variableAspectImporter = new ItemStack(RegistryEntries.ITEM_VARIABLE);
+        placeVariableInWriter(helper.getLevel(), PartPos.of(helper.getLevel(), helper.absolutePos(POS), Direction.WEST), TunnelAspects.Write.Item.BOOLEAN_IMPORT, variableAspectImporter);
+
+        // Place empty variable in filtering interface
+        ItemStack variableAspectInterface = new ItemStack(RegistryEntries.ITEM_VARIABLE);
+        placeVariableInWriter(helper.getLevel(), PartPos.of(helper.getLevel(), helper.absolutePos(POS.east()), Direction.EAST), TunnelAspects.Write.ItemFilter.BOOLEAN_SET_FILTER, variableAspectInterface);
+
+        helper.succeedWhen(() -> {
+            // Check if items are moved
+            helper.assertContainerContains(POS.east().east(), Items.WHITE_WOOL);
+            helper.assertContainerContains(POS.east().east(), Items.ACACIA_LEAVES);
+            helper.assertContainerContains(POS.east().east(), Items.DIAMOND_PICKAXE);
+            helper.assertContainerEmpty(POS.west());
+
+            // Check importer state
+            IPartStateWriter partStateWriter = (IPartStateWriter) PartHelpers.getPart(PartPos.of(helper.getLevel(), helper.absolutePos(POS), Direction.WEST)).getState();
+            helper.assertFalse(partStateWriter.isDeactivated(), "Importer is deactivated");
+            helper.assertValueEqual(
+                    PartTypes.IMPORTER_ITEM.getBlockState(PartHelpers.getPartContainerChecked(PartPos.of(helper.getLevel(), helper.absolutePos(POS), Direction.WEST)), Direction.WEST).getValue(IgnoredBlockStatus.STATUS),
+                    IgnoredBlockStatus.Status.ACTIVE,
+                    "Block status importer is incorrect"
+            );
+            helper.assertValueEqual(partStateWriter.getActiveAspect(), TunnelAspects.Write.Item.BOOLEAN_IMPORT, "Active aspect importer is incorrect");
+            helper.assertTrue(partStateWriter.getErrors(TunnelAspects.Write.Item.BOOLEAN_IMPORT).isEmpty(), "Active aspect importer has errors");
+
+            // Check filtering interface state
+            IPartStateWriter partStateInterface = (IPartStateWriter) PartHelpers.getPart(PartPos.of(helper.getLevel(), helper.absolutePos(POS.east()), Direction.EAST)).getState();
+            helper.assertFalse(partStateInterface.isDeactivated(), "Filtering interface is deactivated");
+            helper.assertValueEqual(
+                    PartTypes.INTERFACE_FILTERING_ITEM.getBlockState(PartHelpers.getPartContainerChecked(PartPos.of(helper.getLevel(), helper.absolutePos(POS.east()), Direction.EAST)), Direction.EAST).getValue(IgnoredBlockStatus.STATUS),
+                    IgnoredBlockStatus.Status.ACTIVE,
+                    "Block status filtering interface is incorrect"
+            );
+            helper.assertValueEqual(partStateInterface.getActiveAspect(), TunnelAspects.Write.ItemFilter.BOOLEAN_SET_FILTER, "Active aspect filtering interface is incorrect");
+            helper.assertTrue(partStateInterface.getErrors(TunnelAspects.Write.ItemFilter.BOOLEAN_SET_FILTER).isEmpty(), "Active aspect filtering interface has errors");
+        });
+    }
+
+    @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
+    public void testItemsImporterToFilteredInterfaceItem(GameTestHelper helper) {
+        // Place cable
+        helper.setBlock(POS, RegistryEntries.BLOCK_CABLE.value());
+        helper.setBlock(POS.east(), RegistryEntries.BLOCK_CABLE.value());
+
+        // Place item importer
+        PartHelpers.addPart(helper.getLevel(), helper.absolutePos(POS), Direction.WEST, PartTypes.IMPORTER_ITEM, new ItemStack(PartTypes.IMPORTER_ITEM.getItem()));
+
+        // Place item interface
+        PartHelpers.addPart(helper.getLevel(), helper.absolutePos(POS.east()), Direction.EAST, PartTypes.INTERFACE_FILTERING_ITEM, new ItemStack(PartTypes.INTERFACE_FILTERING_ITEM.getItem()));
+
+        // Place chests
+        helper.setBlock(POS.west(), Blocks.CHEST);
+        helper.setBlock(POS.east().east(), Blocks.CHEST);
+
+        // Insert items in importer chest
+        ChestBlockEntity chestIn = helper.getBlockEntity(POS.west());
+        chestIn.setItem(0, new ItemStack(Items.WHITE_WOOL));
+        chestIn.setItem(1, new ItemStack(Items.ACACIA_LEAVES));
+        chestIn.setItem(2, new ItemStack(Items.DIAMOND_PICKAXE));
+
+        // Place empty variable in importer
+        ItemStack variableAspectImporter = new ItemStack(RegistryEntries.ITEM_VARIABLE);
+        placeVariableInWriter(helper.getLevel(), PartPos.of(helper.getLevel(), helper.absolutePos(POS), Direction.WEST), TunnelAspects.Write.Item.BOOLEAN_IMPORT, variableAspectImporter);
+
+        // Place empty variable in filtering interface
+        ItemStack variableAspectInterface = createVariableForValue(helper.getLevel(), ValueTypes.OBJECT_ITEMSTACK, ValueObjectTypeItemStack.ValueItemStack.of(new ItemStack(Items.ACACIA_LEAVES)));
+        placeVariableInWriter(helper.getLevel(), PartPos.of(helper.getLevel(), helper.absolutePos(POS.east()), Direction.EAST), TunnelAspects.Write.ItemFilter.ITEMSTACK_SET_FILTER, variableAspectInterface);
+
+        helper.succeedWhen(() -> {
+            // Check if items are moved
+            ChestBlockEntity chestOut = helper.getBlockEntity(POS.east().east());
+            helper.assertFalse(chestIn.getItem(0).isEmpty(), "Incorrect input item was moved");
+            helper.assertTrue(chestIn.getItem(1).isEmpty(), "Incorrect input item was moved");
+            helper.assertFalse(chestIn.getItem(2).isEmpty(), "Incorrect input item was moved");
+            helper.assertFalse(chestOut.getItem(0).isEmpty(), "Incorrect output item was moved");
+            helper.assertTrue(chestOut.getItem(1).isEmpty(), "Incorrect output item was moved");
+            helper.assertContainerContains(POS.west(), Items.WHITE_WOOL);
+            helper.assertContainerContains(POS.east().east(), Items.ACACIA_LEAVES);
+            helper.assertContainerContains(POS.west(), Items.DIAMOND_PICKAXE);
+
+            // Check importer state
+            IPartStateWriter partStateWriter = (IPartStateWriter) PartHelpers.getPart(PartPos.of(helper.getLevel(), helper.absolutePos(POS), Direction.WEST)).getState();
+            helper.assertFalse(partStateWriter.isDeactivated(), "Importer is deactivated");
+            helper.assertValueEqual(
+                    PartTypes.IMPORTER_ITEM.getBlockState(PartHelpers.getPartContainerChecked(PartPos.of(helper.getLevel(), helper.absolutePos(POS), Direction.WEST)), Direction.WEST).getValue(IgnoredBlockStatus.STATUS),
+                    IgnoredBlockStatus.Status.ACTIVE,
+                    "Block status importer is incorrect"
+            );
+            helper.assertValueEqual(partStateWriter.getActiveAspect(), TunnelAspects.Write.Item.BOOLEAN_IMPORT, "Active aspect importer is incorrect");
+            helper.assertTrue(partStateWriter.getErrors(TunnelAspects.Write.Item.BOOLEAN_IMPORT).isEmpty(), "Active aspect importer has errors");
+
+            // Check filtering interface state
+            IPartStateWriter partStateInterface = (IPartStateWriter) PartHelpers.getPart(PartPos.of(helper.getLevel(), helper.absolutePos(POS.east()), Direction.EAST)).getState();
+            helper.assertFalse(partStateInterface.isDeactivated(), "Filtering interface is deactivated");
+            helper.assertValueEqual(
+                    PartTypes.INTERFACE_FILTERING_ITEM.getBlockState(PartHelpers.getPartContainerChecked(PartPos.of(helper.getLevel(), helper.absolutePos(POS.east()), Direction.EAST)), Direction.EAST).getValue(IgnoredBlockStatus.STATUS),
+                    IgnoredBlockStatus.Status.ACTIVE,
+                    "Block status filtering interface is incorrect"
+            );
+            helper.assertValueEqual(partStateInterface.getActiveAspect(), TunnelAspects.Write.ItemFilter.ITEMSTACK_SET_FILTER, "Active aspect filtering interface is incorrect");
+            helper.assertTrue(partStateInterface.getErrors(TunnelAspects.Write.ItemFilter.ITEMSTACK_SET_FILTER).isEmpty(), "Active aspect filtering interface has errors");
+        });
+    }
+
+    // TODO: when done, copy to energy and fluid
+
 }

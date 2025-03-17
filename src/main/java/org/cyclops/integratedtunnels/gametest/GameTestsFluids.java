@@ -224,4 +224,178 @@ public class GameTestsFluids {
         });
     }
 
+    @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
+    public void testFluidsImporterToFilteredInterfaceBoolean(GameTestHelper helper) {
+        // Place cable
+        helper.setBlock(POS, RegistryEntries.BLOCK_CABLE.value());
+        helper.setBlock(POS.east(), RegistryEntries.BLOCK_CABLE.value());
+
+        // Place fluid importer
+        PartHelpers.addPart(helper.getLevel(), helper.absolutePos(POS), Direction.WEST, PartTypes.IMPORTER_FLUID, new ItemStack(PartTypes.IMPORTER_FLUID.getItem()));
+
+        // Place fluid interface
+        PartHelpers.addPart(helper.getLevel(), helper.absolutePos(POS.east()), Direction.EAST, PartTypes.INTERFACE_FILTERING_FLUID, new ItemStack(PartTypes.INTERFACE_FILTERING_FLUID.getItem()));
+
+        // Place drying basins
+        helper.setBlock(POS.west(), RegistryEntries.BLOCK_DRYING_BASIN.get());
+        helper.setBlock(POS.east().east(), RegistryEntries.BLOCK_DRYING_BASIN.get());
+
+        // Insert fluids in importer basin
+        BlockEntityDryingBasin basinIn = helper.getBlockEntity(POS.west());
+        basinIn.getTank().setFluid(new FluidStack(Fluids.WATER, 1_000));
+
+        // Place empty variable in importer
+        ItemStack variableAspectImporter = new ItemStack(RegistryEntries.ITEM_VARIABLE);
+        placeVariableInWriter(helper.getLevel(), PartPos.of(helper.getLevel(), helper.absolutePos(POS), Direction.WEST), TunnelAspects.Write.Fluid.BOOLEAN_IMPORT, variableAspectImporter);
+
+        // Place empty variable in filtering interface
+        ItemStack variableAspectInterface = new ItemStack(RegistryEntries.ITEM_VARIABLE);
+        placeVariableInWriter(helper.getLevel(), PartPos.of(helper.getLevel(), helper.absolutePos(POS.east()), Direction.EAST), TunnelAspects.Write.FluidFilter.BOOLEAN_SET_FILTER, variableAspectInterface);
+
+        helper.succeedWhen(() -> {
+            // Check if fluid is moved
+            BlockEntityDryingBasin basinOut = helper.getBlockEntity(POS.east().east());
+            helper.assertValueEqual(basinOut.getTank().getFluidAmount(), 1_000, "Basin out does not contain energy");
+            helper.assertValueEqual(basinIn.getTank().getFluidAmount(), 0, "Basin in was not drained");
+
+            // Check importer state
+            IPartStateWriter partStateWriter = (IPartStateWriter) PartHelpers.getPart(PartPos.of(helper.getLevel(), helper.absolutePos(POS), Direction.WEST)).getState();
+            helper.assertFalse(partStateWriter.isDeactivated(), "Importer is deactivated");
+            helper.assertValueEqual(
+                    PartTypes.IMPORTER_FLUID.getBlockState(PartHelpers.getPartContainerChecked(PartPos.of(helper.getLevel(), helper.absolutePos(POS), Direction.WEST)), Direction.WEST).getValue(IgnoredBlockStatus.STATUS),
+                    IgnoredBlockStatus.Status.ACTIVE,
+                    "Block status importer is incorrect"
+            );
+            helper.assertValueEqual(partStateWriter.getActiveAspect(), TunnelAspects.Write.Fluid.BOOLEAN_IMPORT, "Active aspect importer is incorrect");
+            helper.assertTrue(partStateWriter.getErrors(TunnelAspects.Write.Fluid.BOOLEAN_IMPORT).isEmpty(), "Active aspect importer has errors");
+
+            // Check filtering interface state
+            IPartStateWriter partStateInterface = (IPartStateWriter) PartHelpers.getPart(PartPos.of(helper.getLevel(), helper.absolutePos(POS.east()), Direction.EAST)).getState();
+            helper.assertFalse(partStateInterface.isDeactivated(), "Filtering interface is deactivated");
+            helper.assertValueEqual(
+                    PartTypes.INTERFACE_FILTERING_FLUID.getBlockState(PartHelpers.getPartContainerChecked(PartPos.of(helper.getLevel(), helper.absolutePos(POS.east()), Direction.EAST)), Direction.EAST).getValue(IgnoredBlockStatus.STATUS),
+                    IgnoredBlockStatus.Status.ACTIVE,
+                    "Block status filtering interface is incorrect"
+            );
+            helper.assertValueEqual(partStateInterface.getActiveAspect(), TunnelAspects.Write.FluidFilter.BOOLEAN_SET_FILTER, "Active aspect filtering interface is incorrect");
+            helper.assertTrue(partStateInterface.getErrors(TunnelAspects.Write.FluidFilter.BOOLEAN_SET_FILTER).isEmpty(), "Active aspect filtering interface has errors");
+        });
+    }
+
+    @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
+    public void testFluidsImporterToFilteredInterfaceFluidCorrect(GameTestHelper helper) {
+        // Place cable
+        helper.setBlock(POS, RegistryEntries.BLOCK_CABLE.value());
+        helper.setBlock(POS.east(), RegistryEntries.BLOCK_CABLE.value());
+
+        // Place fluid importer
+        PartHelpers.addPart(helper.getLevel(), helper.absolutePos(POS), Direction.WEST, PartTypes.IMPORTER_FLUID, new ItemStack(PartTypes.IMPORTER_FLUID.getItem()));
+
+        // Place fluid interface
+        PartHelpers.addPart(helper.getLevel(), helper.absolutePos(POS.east()), Direction.EAST, PartTypes.INTERFACE_FILTERING_FLUID, new ItemStack(PartTypes.INTERFACE_FILTERING_FLUID.getItem()));
+
+        // Place drying basins
+        helper.setBlock(POS.west(), RegistryEntries.BLOCK_DRYING_BASIN.get());
+        helper.setBlock(POS.east().east(), RegistryEntries.BLOCK_DRYING_BASIN.get());
+
+        // Insert fluids in importer basin
+        BlockEntityDryingBasin basinIn = helper.getBlockEntity(POS.west());
+        basinIn.getTank().setFluid(new FluidStack(Fluids.WATER, 1_000));
+
+        // Place empty variable in importer
+        ItemStack variableAspectImporter = new ItemStack(RegistryEntries.ITEM_VARIABLE);
+        placeVariableInWriter(helper.getLevel(), PartPos.of(helper.getLevel(), helper.absolutePos(POS), Direction.WEST), TunnelAspects.Write.Fluid.BOOLEAN_IMPORT, variableAspectImporter);
+
+        // Place empty variable in filtering interface
+        ItemStack variableAspectInterface = createVariableForValue(helper.getLevel(), ValueTypes.OBJECT_FLUIDSTACK, ValueObjectTypeFluidStack.ValueFluidStack.of(new FluidStack(Fluids.WATER, 100)));
+        placeVariableInWriter(helper.getLevel(), PartPos.of(helper.getLevel(), helper.absolutePos(POS.east()), Direction.EAST), TunnelAspects.Write.FluidFilter.FLUIDSTACK_SET_FILTER, variableAspectInterface);
+
+        helper.succeedWhen(() -> {
+            // Check if fluid is moved
+            BlockEntityDryingBasin basinOut = helper.getBlockEntity(POS.east().east());
+            helper.assertValueEqual(basinOut.getTank().getFluidAmount(), 1_000, "Basin out does not contain energy");
+            helper.assertValueEqual(basinIn.getTank().getFluidAmount(), 0, "Basin in was not drained");
+
+            // Check importer state
+            IPartStateWriter partStateWriter = (IPartStateWriter) PartHelpers.getPart(PartPos.of(helper.getLevel(), helper.absolutePos(POS), Direction.WEST)).getState();
+            helper.assertFalse(partStateWriter.isDeactivated(), "Importer is deactivated");
+            helper.assertValueEqual(
+                    PartTypes.IMPORTER_FLUID.getBlockState(PartHelpers.getPartContainerChecked(PartPos.of(helper.getLevel(), helper.absolutePos(POS), Direction.WEST)), Direction.WEST).getValue(IgnoredBlockStatus.STATUS),
+                    IgnoredBlockStatus.Status.ACTIVE,
+                    "Block status importer is incorrect"
+            );
+            helper.assertValueEqual(partStateWriter.getActiveAspect(), TunnelAspects.Write.Fluid.BOOLEAN_IMPORT, "Active aspect importer is incorrect");
+            helper.assertTrue(partStateWriter.getErrors(TunnelAspects.Write.Fluid.BOOLEAN_IMPORT).isEmpty(), "Active aspect importer has errors");
+
+            // Check filtering interface state
+            IPartStateWriter partStateInterface = (IPartStateWriter) PartHelpers.getPart(PartPos.of(helper.getLevel(), helper.absolutePos(POS.east()), Direction.EAST)).getState();
+            helper.assertFalse(partStateInterface.isDeactivated(), "Filtering interface is deactivated");
+            helper.assertValueEqual(
+                    PartTypes.INTERFACE_FILTERING_FLUID.getBlockState(PartHelpers.getPartContainerChecked(PartPos.of(helper.getLevel(), helper.absolutePos(POS.east()), Direction.EAST)), Direction.EAST).getValue(IgnoredBlockStatus.STATUS),
+                    IgnoredBlockStatus.Status.ACTIVE,
+                    "Block status filtering interface is incorrect"
+            );
+            helper.assertValueEqual(partStateInterface.getActiveAspect(), TunnelAspects.Write.FluidFilter.FLUIDSTACK_SET_FILTER, "Active aspect filtering interface is incorrect");
+            helper.assertTrue(partStateInterface.getErrors(TunnelAspects.Write.FluidFilter.FLUIDSTACK_SET_FILTER).isEmpty(), "Active aspect filtering interface has errors");
+        });
+    }
+
+    @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
+    public void testFluidsImporterToFilteredInterfaceFluidIncorrect(GameTestHelper helper) {
+        // Place cable
+        helper.setBlock(POS, RegistryEntries.BLOCK_CABLE.value());
+        helper.setBlock(POS.east(), RegistryEntries.BLOCK_CABLE.value());
+
+        // Place fluid importer
+        PartHelpers.addPart(helper.getLevel(), helper.absolutePos(POS), Direction.WEST, PartTypes.IMPORTER_FLUID, new ItemStack(PartTypes.IMPORTER_FLUID.getItem()));
+
+        // Place fluid interface
+        PartHelpers.addPart(helper.getLevel(), helper.absolutePos(POS.east()), Direction.EAST, PartTypes.INTERFACE_FILTERING_FLUID, new ItemStack(PartTypes.INTERFACE_FILTERING_FLUID.getItem()));
+
+        // Place drying basins
+        helper.setBlock(POS.west(), RegistryEntries.BLOCK_DRYING_BASIN.get());
+        helper.setBlock(POS.east().east(), RegistryEntries.BLOCK_DRYING_BASIN.get());
+
+        // Insert fluids in importer basin
+        BlockEntityDryingBasin basinIn = helper.getBlockEntity(POS.west());
+        basinIn.getTank().setFluid(new FluidStack(Fluids.WATER, 1_000));
+
+        // Place empty variable in importer
+        ItemStack variableAspectImporter = new ItemStack(RegistryEntries.ITEM_VARIABLE);
+        placeVariableInWriter(helper.getLevel(), PartPos.of(helper.getLevel(), helper.absolutePos(POS), Direction.WEST), TunnelAspects.Write.Fluid.BOOLEAN_IMPORT, variableAspectImporter);
+
+        // Place empty variable in filtering interface
+        ItemStack variableAspectInterface = createVariableForValue(helper.getLevel(), ValueTypes.OBJECT_FLUIDSTACK, ValueObjectTypeFluidStack.ValueFluidStack.of(new FluidStack(Fluids.LAVA, 100)));
+        placeVariableInWriter(helper.getLevel(), PartPos.of(helper.getLevel(), helper.absolutePos(POS.east()), Direction.EAST), TunnelAspects.Write.FluidFilter.FLUIDSTACK_SET_FILTER, variableAspectInterface);
+
+        helper.succeedWhen(() -> {
+            // Check if fluid is moved
+            BlockEntityDryingBasin basinOut = helper.getBlockEntity(POS.east().east());
+            helper.assertValueEqual(basinOut.getTank().getFluidAmount(), 0, "Basin out contains fluids");
+            helper.assertValueEqual(basinIn.getTank().getFluidAmount(), 1_000, "Basin in was drained");
+
+            // Check importer state
+            IPartStateWriter partStateWriter = (IPartStateWriter) PartHelpers.getPart(PartPos.of(helper.getLevel(), helper.absolutePos(POS), Direction.WEST)).getState();
+            helper.assertFalse(partStateWriter.isDeactivated(), "Importer is deactivated");
+            helper.assertValueEqual(
+                    PartTypes.IMPORTER_FLUID.getBlockState(PartHelpers.getPartContainerChecked(PartPos.of(helper.getLevel(), helper.absolutePos(POS), Direction.WEST)), Direction.WEST).getValue(IgnoredBlockStatus.STATUS),
+                    IgnoredBlockStatus.Status.ACTIVE,
+                    "Block status importer is incorrect"
+            );
+            helper.assertValueEqual(partStateWriter.getActiveAspect(), TunnelAspects.Write.Fluid.BOOLEAN_IMPORT, "Active aspect importer is incorrect");
+            helper.assertTrue(partStateWriter.getErrors(TunnelAspects.Write.Fluid.BOOLEAN_IMPORT).isEmpty(), "Active aspect importer has errors");
+
+            // Check filtering interface state
+            IPartStateWriter partStateInterface = (IPartStateWriter) PartHelpers.getPart(PartPos.of(helper.getLevel(), helper.absolutePos(POS.east()), Direction.EAST)).getState();
+            helper.assertFalse(partStateInterface.isDeactivated(), "Filtering interface is deactivated");
+            helper.assertValueEqual(
+                    PartTypes.INTERFACE_FILTERING_FLUID.getBlockState(PartHelpers.getPartContainerChecked(PartPos.of(helper.getLevel(), helper.absolutePos(POS.east()), Direction.EAST)), Direction.EAST).getValue(IgnoredBlockStatus.STATUS),
+                    IgnoredBlockStatus.Status.ACTIVE,
+                    "Block status filtering interface is incorrect"
+            );
+            helper.assertValueEqual(partStateInterface.getActiveAspect(), TunnelAspects.Write.FluidFilter.FLUIDSTACK_SET_FILTER, "Active aspect filtering interface is incorrect");
+            helper.assertTrue(partStateInterface.getErrors(TunnelAspects.Write.FluidFilter.FLUIDSTACK_SET_FILTER).isEmpty(), "Active aspect filtering interface has errors");
+        });
+    }
+
 }
