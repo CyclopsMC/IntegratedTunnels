@@ -36,7 +36,7 @@ public class GameTestsPlayerSimulator {
 
     public static final String TEMPLATE_EMPTY = "empty10";
     public static final int TIMEOUT = 2000;
-    public static final BlockPos POS = BlockPos.ZERO.offset(2, 0, 2);
+    public static final BlockPos POS = BlockPos.ZERO.offset(2, 1, 2);
 
     @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
     public void testPlayerSimulatorMilkCow(GameTestHelper helper) {
@@ -54,7 +54,8 @@ public class GameTestsPlayerSimulator {
         helper.setBlock(POS.east().east(), Blocks.CHEST);
 
         // Place cow before player simulator
-        helper.spawn(EntityType.COW, POS.west());
+        helper.spawnWithNoFreeWill(EntityType.COW, POS.west());
+        helper.setBlock(POS.west().below(), Blocks.STONE);
 
         // Insert some items into interface
         ChestBlockEntity chestIn = helper.getBlockEntity(POS.east().east());
@@ -105,6 +106,7 @@ public class GameTestsPlayerSimulator {
 
         // Place cow before player simulator
         helper.spawnWithNoFreeWill(EntityType.COW, POS.west());
+        helper.setBlock(POS.west().below(), Blocks.STONE);
 
         // Build prison around cow
         helper.setBlock(POS.west().north(), Blocks.ACACIA_FENCE);
@@ -115,7 +117,7 @@ public class GameTestsPlayerSimulator {
 
         // Insert some items into interface
         ChestBlockEntity chestIn = helper.getBlockEntity(POS.east().east());
-        chestIn.setItem(0, new ItemStack(Items.DIAMOND_PICKAXE));
+        chestIn.setItem(0, new ItemStack(Items.DIAMOND_SWORD));
 
         // Enable click any item aspect
         PartPos posPlayerSimulator = PartPos.of(helper.getLevel(), helper.absolutePos(POS), Direction.WEST);
@@ -129,7 +131,7 @@ public class GameTestsPlayerSimulator {
 
         helper.succeedWhen(() -> {
             // Check sword still exists
-            helper.assertContainerContains(POS.east().east(), Items.DIAMOND_PICKAXE);
+            helper.assertContainerContains(POS.east().east(), Items.DIAMOND_SWORD);
 
             // Check cow is dead
             helper.assertEntityNotPresent(EntityType.COW);
@@ -196,6 +198,83 @@ public class GameTestsPlayerSimulator {
 
             // Check water is placed
             helper.assertBlockPresent(Blocks.WATER, POS.west());
+        });
+    }
+
+    @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
+    public void testPlayerSimulatorBreakBlockPickaxe(GameTestHelper helper) {
+        // Place cable
+        helper.setBlock(POS, RegistryEntries.BLOCK_CABLE.value());
+        helper.setBlock(POS.east(), RegistryEntries.BLOCK_CABLE.value());
+
+        // Place player simulator
+        PartHelpers.addPart(helper.getLevel(), helper.absolutePos(POS), Direction.WEST, PartTypes.PLAYER_SIMULATOR, new ItemStack(PartTypes.PLAYER_SIMULATOR.getItem()));
+
+        // Place item interface
+        PartHelpers.addPart(helper.getLevel(), helper.absolutePos(POS.east()), Direction.EAST, PartTypes.INTERFACE_ITEM, new ItemStack(PartTypes.INTERFACE_ITEM.getItem()));
+
+        // Place chest for interface
+        helper.setBlock(POS.west(), Blocks.STONE);
+        helper.setBlock(POS.below().west(), Blocks.STONE); // So the item does not fall outside of the search area
+
+        // Place stone before player simulator
+        helper.setBlock(POS.east().east(), Blocks.CHEST);
+
+        // Insert some items into interface
+        ChestBlockEntity chestIn = helper.getBlockEntity(POS.east().east());
+        chestIn.setItem(0, new ItemStack(Items.DIAMOND_PICKAXE));
+
+        // Enable click any item aspect
+        PartPos posPlayerSimulator = PartPos.of(helper.getLevel(), helper.absolutePos(POS), Direction.WEST);
+        placeVariableInWriter(helper.getLevel(), posPlayerSimulator, TunnelAspects.Write.Player.CLICK_ITEM_BOOLEAN, createVariableForValue(helper.getLevel(), ValueTypes.BOOLEAN, ValueTypeBoolean.ValueBoolean.of(true)));
+
+        // Set aspect to left-click
+        PartHelpers.PartStateHolder partStateHolder = PartHelpers.getPart(posPlayerSimulator);
+        IAspectProperties properties = TunnelAspects.Write.Player.CLICK_ITEM_BOOLEAN.getProperties(partStateHolder.getPart(), PartTarget.fromCenter(posPlayerSimulator), partStateHolder.getState());
+        properties.setValue(TunnelAspectWriteBuilders.Player.PROP_RIGHT_CLICK, ValueTypeBoolean.ValueBoolean.of(false));
+        partStateHolder.getState().setAspectProperties(TunnelAspects.Write.Player.CLICK_ITEM_BOOLEAN, properties);
+
+        helper.succeedWhen(() -> {
+            // Check pickaxe still exists
+            helper.assertContainerContains(POS.east().east(), Items.DIAMOND_PICKAXE);
+
+            // Check cobblestone was dropped
+            helper.assertItemEntityPresent(Items.COBBLESTONE);
+            helper.assertBlockNotPresent(Blocks.STONE, POS.west());
+        });
+    }
+
+    @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
+    public void testPlayerSimulatorPlaceBlock(GameTestHelper helper) {
+        // Place cable
+        helper.setBlock(POS, RegistryEntries.BLOCK_CABLE.value());
+        helper.setBlock(POS.east(), RegistryEntries.BLOCK_CABLE.value());
+
+        // Place player simulator
+        PartHelpers.addPart(helper.getLevel(), helper.absolutePos(POS), Direction.WEST, PartTypes.PLAYER_SIMULATOR, new ItemStack(PartTypes.PLAYER_SIMULATOR.getItem()));
+
+        // Place item interface
+        PartHelpers.addPart(helper.getLevel(), helper.absolutePos(POS.east()), Direction.EAST, PartTypes.INTERFACE_ITEM, new ItemStack(PartTypes.INTERFACE_ITEM.getItem()));
+
+        // Place chest for interface
+        helper.setBlock(POS.east().east(), Blocks.CHEST);
+
+        // Place block a bit before player simulator to right-click bucket against
+        helper.setBlock(POS.west().west().west(), Blocks.STONE);
+
+        // Insert some items into interface
+        ChestBlockEntity chestIn = helper.getBlockEntity(POS.east().east());
+        chestIn.setItem(0, new ItemStack(Items.DIRT));
+
+        // Enable item click aspect
+        placeVariableInWriter(helper.getLevel(), PartPos.of(helper.getLevel(), helper.absolutePos(POS), Direction.WEST), TunnelAspects.Write.Player.CLICK_ITEM_BOOLEAN, new ItemStack(RegistryEntries.ITEM_VARIABLE));
+
+        helper.succeedWhen(() -> {
+            // Check inventory is empty
+            helper.assertContainerEmpty(POS.east().east());
+
+            // Check block is placed
+            helper.assertBlockPresent(Blocks.DIRT, POS.west().west());
         });
     }
 
