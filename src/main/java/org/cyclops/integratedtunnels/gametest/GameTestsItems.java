@@ -14,16 +14,14 @@ import net.minecraft.world.level.block.entity.ChestBlockEntity;
 import net.minecraft.world.level.block.entity.HopperBlockEntity;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import org.cyclops.cyclopscore.datastructure.DimPos;
 import org.cyclops.integrateddynamics.RegistryEntries;
 import org.cyclops.integrateddynamics.api.part.PartPos;
 import org.cyclops.integrateddynamics.api.part.PartTarget;
 import org.cyclops.integrateddynamics.api.part.aspect.property.IAspectProperties;
 import org.cyclops.integrateddynamics.api.part.write.IPartStateWriter;
 import org.cyclops.integrateddynamics.core.block.IgnoredBlockStatus;
-import org.cyclops.integrateddynamics.core.evaluate.variable.ValueObjectTypeItemStack;
-import org.cyclops.integrateddynamics.core.evaluate.variable.ValueTypeBoolean;
-import org.cyclops.integrateddynamics.core.evaluate.variable.ValueTypeInteger;
-import org.cyclops.integrateddynamics.core.evaluate.variable.ValueTypes;
+import org.cyclops.integrateddynamics.core.evaluate.variable.*;
 import org.cyclops.integrateddynamics.core.helper.PartHelpers;
 import org.cyclops.integratedtunnels.Reference;
 import org.cyclops.integratedtunnels.part.PartTypes;
@@ -476,6 +474,100 @@ public class GameTestsItems {
             helper.assertTrue(chest2.getItem(0).getCount() == 10, "chest 2 does not contain 10 white wool");
             helper.assertTrue(chest3.getItem(0).getItem() == Items.WHITE_WOOL, "chest 3 does not contain white wool");
             helper.assertTrue(chest3.getItem(0).getCount() == 10, "chest 3 does not contain 10 white wool");
+        });
+    }
+
+    @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
+    public void testItemsImporterToInterfaceItemList(GameTestHelper helper) {
+        // Place cable
+        helper.setBlock(POS, RegistryEntries.BLOCK_CABLE.value());
+        helper.setBlock(POS.east(), RegistryEntries.BLOCK_CABLE.value());
+
+        // Place item importer
+        PartHelpers.addPart(helper.getLevel(), helper.absolutePos(POS), Direction.WEST, PartTypes.IMPORTER_ITEM, new ItemStack(PartTypes.IMPORTER_ITEM.getItem()));
+
+        // Place item interface
+        PartHelpers.addPart(helper.getLevel(), helper.absolutePos(POS.east()), Direction.EAST, PartTypes.INTERFACE_ITEM, new ItemStack(PartTypes.INTERFACE_ITEM.getItem()));
+
+        // Place chests
+        helper.setBlock(POS.west(), Blocks.CHEST);
+        helper.setBlock(POS.east().east(), Blocks.CHEST);
+
+        // Insert items in importer chest
+        ChestBlockEntity chestIn = helper.getBlockEntity(POS.west());
+        chestIn.setItem(0, new ItemStack(Items.WHITE_WOOL));
+        chestIn.setItem(1, new ItemStack(Items.ACACIA_LEAVES));
+        chestIn.setItem(2, new ItemStack(Items.DIAMOND_PICKAXE));
+
+        // Place empty variable in importer
+        ItemStack variableAspect = createVariableForValue(helper.getLevel(), ValueTypes.LIST, ValueTypeList.ValueList.ofAll(
+                ValueObjectTypeItemStack.ValueItemStack.of(new ItemStack(Items.ACACIA_LEAVES)),
+                ValueObjectTypeItemStack.ValueItemStack.of(new ItemStack(Items.DIAMOND_PICKAXE))
+        ));
+        placeVariableInWriter(helper.getLevel(), PartPos.of(helper.getLevel(), helper.absolutePos(POS), Direction.WEST), TunnelAspects.Write.Item.LIST_IMPORT, variableAspect);
+
+        helper.succeedWhen(() -> {
+            // Check if items are moved
+            ChestBlockEntity chestOut = helper.getBlockEntity(POS.east().east());
+            helper.assertFalse(chestIn.getItem(0).isEmpty(), "Incorrect input item was moved");
+            helper.assertTrue(chestIn.getItem(1).isEmpty(), "Incorrect input item was moved");
+            helper.assertTrue(chestIn.getItem(2).isEmpty(), "Incorrect input item was moved");
+            helper.assertFalse(chestOut.getItem(0).isEmpty(), "Incorrect output item was moved");
+            helper.assertFalse(chestOut.getItem(1).isEmpty(), "Incorrect output item was moved");
+            helper.assertTrue(chestOut.getItem(2).isEmpty(), "Incorrect output item was moved");
+            helper.assertContainerContains(POS.west(), Items.WHITE_WOOL);
+            helper.assertContainerContains(POS.east().east(), Items.ACACIA_LEAVES);
+            helper.assertContainerContains(POS.east().east(), Items.DIAMOND_PICKAXE);
+        });
+    }
+
+    @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
+    public void testItemsImporterToInterfaceItemListBlacklist(GameTestHelper helper) {
+        // Place cable
+        helper.setBlock(POS, RegistryEntries.BLOCK_CABLE.value());
+        helper.setBlock(POS.east(), RegistryEntries.BLOCK_CABLE.value());
+
+        // Place item importer
+        PartHelpers.addPart(helper.getLevel(), helper.absolutePos(POS), Direction.WEST, PartTypes.IMPORTER_ITEM, new ItemStack(PartTypes.IMPORTER_ITEM.getItem()));
+
+        // Place item interface
+        PartHelpers.addPart(helper.getLevel(), helper.absolutePos(POS.east()), Direction.EAST, PartTypes.INTERFACE_ITEM, new ItemStack(PartTypes.INTERFACE_ITEM.getItem()));
+
+        // Place chests
+        helper.setBlock(POS.west(), Blocks.CHEST);
+        helper.setBlock(POS.east().east(), Blocks.CHEST);
+
+        // Insert items in importer chest
+        ChestBlockEntity chestIn = helper.getBlockEntity(POS.west());
+        chestIn.setItem(0, new ItemStack(Items.WHITE_WOOL));
+        chestIn.setItem(1, new ItemStack(Items.ACACIA_LEAVES));
+        chestIn.setItem(2, new ItemStack(Items.DIAMOND_PICKAXE));
+
+        // Place empty variable in importer
+        ItemStack variableAspect = createVariableForValue(helper.getLevel(), ValueTypes.LIST, ValueTypeList.ValueList.ofAll(
+                ValueObjectTypeItemStack.ValueItemStack.of(new ItemStack(Items.WHITE_WOOL))
+        ));
+        placeVariableInWriter(helper.getLevel(), PartPos.of(helper.getLevel(), helper.absolutePos(POS), Direction.WEST), TunnelAspects.Write.Item.LIST_IMPORT, variableAspect);
+
+        // Enable blacklist
+        PartPos posImporter = PartPos.of(DimPos.of(helper.getLevel(), helper.absolutePos(POS)), Direction.WEST);
+        PartHelpers.PartStateHolder partStateHolder = PartHelpers.getPart(posImporter);
+        IAspectProperties properties = TunnelAspects.Write.Item.LIST_IMPORT.getProperties(partStateHolder.getPart(), PartTarget.fromCenter(posImporter), partStateHolder.getState());
+        properties.setValue(TunnelAspectWriteBuilders.PROP_BLACKLIST, ValueTypeBoolean.ValueBoolean.of(true));
+        partStateHolder.getState().setAspectProperties(TunnelAspects.Write.Fluid.LIST_IMPORT, properties);
+
+        helper.succeedWhen(() -> {
+            // Check if items are moved
+            ChestBlockEntity chestOut = helper.getBlockEntity(POS.east().east());
+            helper.assertFalse(chestIn.getItem(0).isEmpty(), "Incorrect input item was moved");
+            helper.assertTrue(chestIn.getItem(1).isEmpty(), "Incorrect input item was moved");
+            helper.assertTrue(chestIn.getItem(2).isEmpty(), "Incorrect input item was moved");
+            helper.assertFalse(chestOut.getItem(0).isEmpty(), "Incorrect output item was moved");
+            helper.assertFalse(chestOut.getItem(1).isEmpty(), "Incorrect output item was moved");
+            helper.assertTrue(chestOut.getItem(2).isEmpty(), "Incorrect output item was moved");
+            helper.assertContainerContains(POS.west(), Items.WHITE_WOOL);
+            helper.assertContainerContains(POS.east().east(), Items.ACACIA_LEAVES);
+            helper.assertContainerContains(POS.east().east(), Items.DIAMOND_PICKAXE);
         });
     }
 
