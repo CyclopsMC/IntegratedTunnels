@@ -5,20 +5,27 @@ import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.material.Fluids;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import org.cyclops.cyclopscore.datastructure.DimPos;
 import org.cyclops.integrateddynamics.RegistryEntries;
 import org.cyclops.integrateddynamics.api.part.PartPos;
+import org.cyclops.integrateddynamics.api.part.PartTarget;
+import org.cyclops.integrateddynamics.api.part.aspect.property.IAspectProperties;
 import org.cyclops.integrateddynamics.api.part.write.IPartStateWriter;
 import org.cyclops.integrateddynamics.blockentity.BlockEntityDryingBasin;
 import org.cyclops.integrateddynamics.core.block.IgnoredBlockStatus;
 import org.cyclops.integrateddynamics.core.evaluate.variable.ValueObjectTypeFluidStack;
+import org.cyclops.integrateddynamics.core.evaluate.variable.ValueTypeBoolean;
+import org.cyclops.integrateddynamics.core.evaluate.variable.ValueTypeList;
 import org.cyclops.integrateddynamics.core.evaluate.variable.ValueTypes;
 import org.cyclops.integrateddynamics.core.helper.PartHelpers;
 import org.cyclops.integratedtunnels.Reference;
 import org.cyclops.integratedtunnels.part.PartTypes;
+import org.cyclops.integratedtunnels.part.aspect.TunnelAspectWriteBuilders;
 import org.cyclops.integratedtunnels.part.aspect.TunnelAspects;
 
 import static org.cyclops.integrateddynamics.gametest.GameTestHelpersIntegratedDynamics.createVariableForValue;
@@ -59,7 +66,7 @@ public class GameTestsFluids {
         helper.succeedWhen(() -> {
             // Check if fluid is moved
             BlockEntityDryingBasin basinOut = helper.getBlockEntity(POS.east().east());
-            helper.assertValueEqual(basinOut.getTank().getFluidAmount(), 1_000, "Basin out does not contain energy");
+            helper.assertValueEqual(basinOut.getTank().getFluidAmount(), 1_000, "Basin out does not contain fluids");
             helper.assertValueEqual(basinIn.getTank().getFluidAmount(), 0, "Basin in was not drained");
 
             // Check importer state
@@ -102,7 +109,7 @@ public class GameTestsFluids {
         helper.succeedWhen(() -> {
             // Check if fluid is moved
             BlockEntityDryingBasin basinOut = helper.getBlockEntity(POS.east().east());
-            helper.assertValueEqual(basinOut.getTank().getFluidAmount(), 1_000, "Basin out does not contain energy");
+            helper.assertValueEqual(basinOut.getTank().getFluidAmount(), 1_000, "Basin out does not contain fluids");
             helper.assertValueEqual(basinIn.getTank().getFluidAmount(), 0, "Basin in was not drained");
 
             // Check importer state
@@ -155,7 +162,7 @@ public class GameTestsFluids {
             BlockEntityDryingBasin basinInterface = helper.getBlockEntity(POS.east().east());
             BlockEntityDryingBasin basinOut = helper.getBlockEntity(POS.east().north());
             helper.assertValueEqual(basinInterface.getTank().getFluidAmount(), 0, "Basin interface was not drained");
-            helper.assertValueEqual(basinOut.getTank().getFluidAmount(), 1_000, "Basin out does not contain energy");
+            helper.assertValueEqual(basinOut.getTank().getFluidAmount(), 1_000, "Basin out does not contain fluids");
             helper.assertValueEqual(basinIn.getTank().getFluidAmount(), 0, "Basin in was not drained");
         });
     }
@@ -187,7 +194,7 @@ public class GameTestsFluids {
         helper.succeedWhen(() -> {
             // Check if fluid is moved
             BlockEntityDryingBasin basinOut = helper.getBlockEntity(POS.east().east());
-            helper.assertValueEqual(basinOut.getTank().getFluidAmount(), 1_000, "Basin out does not contain energy");
+            helper.assertValueEqual(basinOut.getTank().getFluidAmount(), 1_000, "Basin out does not contain fluids");
             helper.assertValueEqual(basinIn.getTank().getFluidAmount(), 0, "Basin in was not drained");
         });
     }
@@ -255,7 +262,7 @@ public class GameTestsFluids {
         helper.succeedWhen(() -> {
             // Check if fluid is moved
             BlockEntityDryingBasin basinOut = helper.getBlockEntity(POS.east().east());
-            helper.assertValueEqual(basinOut.getTank().getFluidAmount(), 1_000, "Basin out does not contain energy");
+            helper.assertValueEqual(basinOut.getTank().getFluidAmount(), 1_000, "Basin out does not contain fluids");
             helper.assertValueEqual(basinIn.getTank().getFluidAmount(), 0, "Basin in was not drained");
 
             // Check importer state
@@ -313,7 +320,7 @@ public class GameTestsFluids {
         helper.succeedWhen(() -> {
             // Check if fluid is moved
             BlockEntityDryingBasin basinOut = helper.getBlockEntity(POS.east().east());
-            helper.assertValueEqual(basinOut.getTank().getFluidAmount(), 1_000, "Basin out does not contain energy");
+            helper.assertValueEqual(basinOut.getTank().getFluidAmount(), 1_000, "Basin out does not contain fluids");
             helper.assertValueEqual(basinIn.getTank().getFluidAmount(), 0, "Basin in was not drained");
 
             // Check importer state
@@ -395,6 +402,269 @@ public class GameTestsFluids {
             );
             helper.assertValueEqual(partStateInterface.getActiveAspect(), TunnelAspects.Write.FluidFilter.FLUIDSTACK_SET_FILTER, "Active aspect filtering interface is incorrect");
             helper.assertTrue(partStateInterface.getErrors(TunnelAspects.Write.FluidFilter.FLUIDSTACK_SET_FILTER).isEmpty(), "Active aspect filtering interface has errors");
+        });
+    }
+
+    @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
+    public void testFluidsImporterToInterfaceFluidListCorrect(GameTestHelper helper) {
+        // Place cable
+        helper.setBlock(POS, RegistryEntries.BLOCK_CABLE.value());
+        helper.setBlock(POS.east(), RegistryEntries.BLOCK_CABLE.value());
+
+        // Place fluid importer
+        PartHelpers.addPart(helper.getLevel(), helper.absolutePos(POS), Direction.WEST, PartTypes.IMPORTER_FLUID, new ItemStack(PartTypes.IMPORTER_FLUID.getItem()));
+
+        // Place fluid interface
+        PartHelpers.addPart(helper.getLevel(), helper.absolutePos(POS.east()), Direction.EAST, PartTypes.INTERFACE_FLUID, new ItemStack(PartTypes.INTERFACE_FLUID.getItem()));
+
+        // Place drying basins
+        helper.setBlock(POS.west(), RegistryEntries.BLOCK_DRYING_BASIN.get());
+        helper.setBlock(POS.east().east(), RegistryEntries.BLOCK_DRYING_BASIN.get());
+
+        // Insert fluids in importer basin
+        BlockEntityDryingBasin basinIn = helper.getBlockEntity(POS.west());
+        basinIn.getTank().setFluid(new FluidStack(Fluids.WATER, 1_000));
+
+        // Place empty variable in importer
+        ItemStack variableAspect = createVariableForValue(helper.getLevel(), ValueTypes.LIST, ValueTypeList.ValueList.ofAll(
+                ValueObjectTypeFluidStack.ValueFluidStack.of(new FluidStack(Fluids.LAVA, 100)),
+                ValueObjectTypeFluidStack.ValueFluidStack.of(new FluidStack(Fluids.WATER, 100))
+        ));
+        placeVariableInWriter(helper.getLevel(), PartPos.of(helper.getLevel(), helper.absolutePos(POS), Direction.WEST), TunnelAspects.Write.Fluid.LIST_IMPORT, variableAspect);
+
+        helper.succeedWhen(() -> {
+            // Check if fluid is moved
+            BlockEntityDryingBasin basinOut = helper.getBlockEntity(POS.east().east());
+            helper.assertValueEqual(basinOut.getTank().getFluidAmount(), 1_000, "Basin out does not contain fluids");
+            helper.assertValueEqual(basinIn.getTank().getFluidAmount(), 0, "Basin in was not drained");
+        });
+    }
+
+    @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
+    public void testFluidsImporterToInterfaceFluidListIncorrect(GameTestHelper helper) {
+        // Place cable
+        helper.setBlock(POS, RegistryEntries.BLOCK_CABLE.value());
+        helper.setBlock(POS.east(), RegistryEntries.BLOCK_CABLE.value());
+
+        // Place fluid importer
+        PartHelpers.addPart(helper.getLevel(), helper.absolutePos(POS), Direction.WEST, PartTypes.IMPORTER_FLUID, new ItemStack(PartTypes.IMPORTER_FLUID.getItem()));
+
+        // Place fluid interface
+        PartHelpers.addPart(helper.getLevel(), helper.absolutePos(POS.east()), Direction.EAST, PartTypes.INTERFACE_FLUID, new ItemStack(PartTypes.INTERFACE_FLUID.getItem()));
+
+        // Place drying basins
+        helper.setBlock(POS.west(), RegistryEntries.BLOCK_DRYING_BASIN.get());
+        helper.setBlock(POS.east().east(), RegistryEntries.BLOCK_DRYING_BASIN.get());
+
+        // Insert fluids in importer basin
+        BlockEntityDryingBasin basinIn = helper.getBlockEntity(POS.west());
+        basinIn.getTank().setFluid(new FluidStack(Fluids.WATER, 1_000));
+
+        // Place empty variable in importer
+        ItemStack variableAspectImporter = createVariableForValue(helper.getLevel(), ValueTypes.LIST, ValueTypeList.ValueList.ofAll(
+                ValueObjectTypeFluidStack.ValueFluidStack.of(new FluidStack(Fluids.LAVA, 100)),
+                ValueObjectTypeFluidStack.ValueFluidStack.of(new FluidStack(Fluids.FLOWING_LAVA, 100))
+        ));
+        placeVariableInWriter(helper.getLevel(), PartPos.of(helper.getLevel(), helper.absolutePos(POS), Direction.WEST), TunnelAspects.Write.Fluid.LIST_IMPORT, variableAspectImporter);
+
+        helper.succeedWhen(() -> {
+            // Check if fluid is moved
+            BlockEntityDryingBasin basinOut = helper.getBlockEntity(POS.east().east());
+            helper.assertValueEqual(basinOut.getTank().getFluidAmount(), 0, "Basin out contains fluids");
+            helper.assertValueEqual(basinIn.getTank().getFluidAmount(), 1_000, "Basin in was drained");
+        });
+    }
+
+    @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
+    public void testFluidsImporterToInterfaceFluidListBlacklistCorrect(GameTestHelper helper) {
+        // Place cable
+        helper.setBlock(POS, RegistryEntries.BLOCK_CABLE.value());
+        helper.setBlock(POS.east(), RegistryEntries.BLOCK_CABLE.value());
+
+        // Place fluid importer
+        PartHelpers.addPart(helper.getLevel(), helper.absolutePos(POS), Direction.WEST, PartTypes.IMPORTER_FLUID, new ItemStack(PartTypes.IMPORTER_FLUID.getItem()));
+
+        // Place fluid interface
+        PartHelpers.addPart(helper.getLevel(), helper.absolutePos(POS.east()), Direction.EAST, PartTypes.INTERFACE_FLUID, new ItemStack(PartTypes.INTERFACE_FLUID.getItem()));
+
+        // Place drying basins
+        helper.setBlock(POS.west(), RegistryEntries.BLOCK_DRYING_BASIN.get());
+        helper.setBlock(POS.east().east(), RegistryEntries.BLOCK_DRYING_BASIN.get());
+
+        // Insert fluids in importer basin
+        BlockEntityDryingBasin basinIn = helper.getBlockEntity(POS.west());
+        basinIn.getTank().setFluid(new FluidStack(Fluids.WATER, 1_000));
+
+        // Place empty variable in importer
+        ItemStack variableAspect = createVariableForValue(helper.getLevel(), ValueTypes.LIST, ValueTypeList.ValueList.ofAll(
+                ValueObjectTypeFluidStack.ValueFluidStack.of(new FluidStack(Fluids.LAVA, 100)),
+                ValueObjectTypeFluidStack.ValueFluidStack.of(new FluidStack(Fluids.FLOWING_LAVA, 100))
+        ));
+        placeVariableInWriter(helper.getLevel(), PartPos.of(helper.getLevel(), helper.absolutePos(POS), Direction.WEST), TunnelAspects.Write.Fluid.LIST_IMPORT, variableAspect);
+
+        // Enable blacklist
+        PartPos posImporter = PartPos.of(DimPos.of(helper.getLevel(), helper.absolutePos(POS)), Direction.WEST);
+        PartHelpers.PartStateHolder partStateHolder = PartHelpers.getPart(posImporter);
+        IAspectProperties properties = TunnelAspects.Write.Fluid.LIST_IMPORT.getProperties(partStateHolder.getPart(), PartTarget.fromCenter(posImporter), partStateHolder.getState());
+        properties.setValue(TunnelAspectWriteBuilders.PROP_BLACKLIST, ValueTypeBoolean.ValueBoolean.of(true));
+        partStateHolder.getState().setAspectProperties(TunnelAspects.Write.Fluid.LIST_IMPORT, properties);
+
+        helper.succeedWhen(() -> {
+            // Check if fluid is moved
+            BlockEntityDryingBasin basinOut = helper.getBlockEntity(POS.east().east());
+            helper.assertValueEqual(basinOut.getTank().getFluidAmount(), 1_000, "Basin out does not contain fluids");
+            helper.assertValueEqual(basinIn.getTank().getFluidAmount(), 0, "Basin in was not drained");
+        });
+    }
+
+    @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
+    public void testFluidsImporterToInterfaceFluidListBlacklistIncorrect(GameTestHelper helper) {
+        // Place cable
+        helper.setBlock(POS, RegistryEntries.BLOCK_CABLE.value());
+        helper.setBlock(POS.east(), RegistryEntries.BLOCK_CABLE.value());
+
+        // Place fluid importer
+        PartHelpers.addPart(helper.getLevel(), helper.absolutePos(POS), Direction.WEST, PartTypes.IMPORTER_FLUID, new ItemStack(PartTypes.IMPORTER_FLUID.getItem()));
+
+        // Place fluid interface
+        PartHelpers.addPart(helper.getLevel(), helper.absolutePos(POS.east()), Direction.EAST, PartTypes.INTERFACE_FLUID, new ItemStack(PartTypes.INTERFACE_FLUID.getItem()));
+
+        // Place drying basins
+        helper.setBlock(POS.west(), RegistryEntries.BLOCK_DRYING_BASIN.get());
+        helper.setBlock(POS.east().east(), RegistryEntries.BLOCK_DRYING_BASIN.get());
+
+        // Insert fluids in importer basin
+        BlockEntityDryingBasin basinIn = helper.getBlockEntity(POS.west());
+        basinIn.getTank().setFluid(new FluidStack(Fluids.WATER, 1_000));
+
+        // Place empty variable in importer
+        ItemStack variableAspect = createVariableForValue(helper.getLevel(), ValueTypes.LIST, ValueTypeList.ValueList.ofAll(
+                ValueObjectTypeFluidStack.ValueFluidStack.of(new FluidStack(Fluids.WATER, 100)),
+                ValueObjectTypeFluidStack.ValueFluidStack.of(new FluidStack(Fluids.LAVA, 100))
+        ));
+        placeVariableInWriter(helper.getLevel(), PartPos.of(helper.getLevel(), helper.absolutePos(POS), Direction.WEST), TunnelAspects.Write.Fluid.LIST_IMPORT, variableAspect);
+
+        // Enable blacklist
+        PartPos posImporter = PartPos.of(DimPos.of(helper.getLevel(), helper.absolutePos(POS)), Direction.WEST);
+        PartHelpers.PartStateHolder partStateHolder = PartHelpers.getPart(posImporter);
+        IAspectProperties properties = TunnelAspects.Write.Fluid.LIST_IMPORT.getProperties(partStateHolder.getPart(), PartTarget.fromCenter(posImporter), partStateHolder.getState());
+        properties.setValue(TunnelAspectWriteBuilders.PROP_BLACKLIST, ValueTypeBoolean.ValueBoolean.of(true));
+        partStateHolder.getState().setAspectProperties(TunnelAspects.Write.Fluid.LIST_IMPORT, properties);
+
+        helper.succeedWhen(() -> {
+            // Check if fluid is moved
+            BlockEntityDryingBasin basinOut = helper.getBlockEntity(POS.east().east());
+            helper.assertValueEqual(basinOut.getTank().getFluidAmount(), 0, "Basin out contains fluids");
+            helper.assertValueEqual(basinIn.getTank().getFluidAmount(), 1_000, "Basin in was drained");
+        });
+    }
+
+    @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
+    public void testFluidInterfaceToWorldExporterListCorrect(GameTestHelper helper) {
+        // Place cable
+        helper.setBlock(POS, RegistryEntries.BLOCK_CABLE.value());
+        helper.setBlock(POS.east(), RegistryEntries.BLOCK_CABLE.value());
+
+        // Place fluid interface
+        PartHelpers.addPart(helper.getLevel(), helper.absolutePos(POS), Direction.WEST, PartTypes.INTERFACE_FLUID, new ItemStack(PartTypes.INTERFACE_FLUID.getItem()));
+
+        // Place fluid world exporter
+        PartHelpers.addPart(helper.getLevel(), helper.absolutePos(POS.east()), Direction.EAST, PartTypes.EXPORTER_WORLD_FLUID, new ItemStack(PartTypes.EXPORTER_FLUID.getItem()));
+
+        // Place drying basins
+        helper.setBlock(POS.west(), RegistryEntries.BLOCK_DRYING_BASIN.get());
+
+        // Insert fluid in tank
+        BlockEntityDryingBasin basinIn = helper.getBlockEntity(POS.west());
+        basinIn.getTank().setFluid(new FluidStack(Fluids.WATER, 1_000));
+
+        // Place variable in exporter
+        ItemStack variableAspect = createVariableForValue(helper.getLevel(), ValueTypes.LIST, ValueTypeList.ValueList.ofAll(
+                ValueObjectTypeFluidStack.ValueFluidStack.of(new FluidStack(Fluids.LAVA, 1000)),
+                ValueObjectTypeFluidStack.ValueFluidStack.of(new FluidStack(Fluids.WATER, 1000))
+        ));
+        placeVariableInWriter(helper.getLevel(), PartPos.of(helper.getLevel(), helper.absolutePos(POS.east()), Direction.EAST), TunnelAspects.Write.World.FLUID_LIST_EXPORT, variableAspect);
+
+        helper.succeedWhen(() -> {
+            // Check if fluid is moved
+            helper.assertValueEqual(basinIn.getTank().getFluidAmount(), 0, "Basin in was not drained");
+            helper.assertBlockPresent(Blocks.WATER, POS.east().east());
+        });
+    }
+
+    @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
+    public void testFluidInterfaceToWorldExporterListIncorrect(GameTestHelper helper) {
+        // Place cable
+        helper.setBlock(POS, RegistryEntries.BLOCK_CABLE.value());
+        helper.setBlock(POS.east(), RegistryEntries.BLOCK_CABLE.value());
+
+        // Place fluid interface
+        PartHelpers.addPart(helper.getLevel(), helper.absolutePos(POS), Direction.WEST, PartTypes.INTERFACE_FLUID, new ItemStack(PartTypes.INTERFACE_FLUID.getItem()));
+
+        // Place fluid world exporter
+        PartHelpers.addPart(helper.getLevel(), helper.absolutePos(POS.east()), Direction.EAST, PartTypes.EXPORTER_WORLD_FLUID, new ItemStack(PartTypes.EXPORTER_FLUID.getItem()));
+
+        // Place drying basins
+        helper.setBlock(POS.west(), RegistryEntries.BLOCK_DRYING_BASIN.get());
+
+        // Insert fluid in tank
+        BlockEntityDryingBasin basinIn = helper.getBlockEntity(POS.west());
+        basinIn.getTank().setFluid(new FluidStack(Fluids.WATER, 1_000));
+
+        // Place variable in exporter
+        ItemStack variableAspect = createVariableForValue(helper.getLevel(), ValueTypes.LIST, ValueTypeList.ValueList.ofAll(
+                ValueObjectTypeFluidStack.ValueFluidStack.of(new FluidStack(Fluids.LAVA, 1000)),
+                ValueObjectTypeFluidStack.ValueFluidStack.of(new FluidStack(Fluids.FLOWING_LAVA, 1000))
+        ));
+        placeVariableInWriter(helper.getLevel(), PartPos.of(helper.getLevel(), helper.absolutePos(POS.east()), Direction.EAST), TunnelAspects.Write.World.FLUID_LIST_EXPORT, variableAspect);
+
+        helper.succeedWhen(() -> {
+            // Check if fluid is not moved
+            helper.assertValueEqual(basinIn.getTank().getFluidAmount(), 1_000, "Basin in was drained");
+            helper.assertBlockNotPresent(Blocks.WATER, POS.east().east());
+        });
+    }
+
+    @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
+    public void testFluidInterfacesToWorldExporterListCorrect(GameTestHelper helper) {
+        // Place cable
+        helper.setBlock(POS, RegistryEntries.BLOCK_CABLE.value());
+        helper.setBlock(POS.east(), RegistryEntries.BLOCK_CABLE.value());
+
+        // Place fluid interfaces
+        PartHelpers.addPart(helper.getLevel(), helper.absolutePos(POS), Direction.WEST, PartTypes.INTERFACE_FLUID, new ItemStack(PartTypes.INTERFACE_FLUID.getItem()));
+        PartHelpers.addPart(helper.getLevel(), helper.absolutePos(POS), Direction.NORTH, PartTypes.INTERFACE_FLUID, new ItemStack(PartTypes.INTERFACE_FLUID.getItem()));
+        PartHelpers.addPart(helper.getLevel(), helper.absolutePos(POS), Direction.SOUTH, PartTypes.INTERFACE_FLUID, new ItemStack(PartTypes.INTERFACE_FLUID.getItem()));
+
+        // Place fluid world exporter
+        PartHelpers.addPart(helper.getLevel(), helper.absolutePos(POS.east()), Direction.EAST, PartTypes.EXPORTER_WORLD_FLUID, new ItemStack(PartTypes.EXPORTER_FLUID.getItem()));
+
+        // Place drying basins
+        helper.setBlock(POS.west(), RegistryEntries.BLOCK_DRYING_BASIN.get());
+        helper.setBlock(POS.north(), RegistryEntries.BLOCK_DRYING_BASIN.get());
+        helper.setBlock(POS.south(), RegistryEntries.BLOCK_DRYING_BASIN.get());
+
+        // Insert fluid in tank
+        BlockEntityDryingBasin basinIn1 = helper.getBlockEntity(POS.west());
+        BlockEntityDryingBasin basinIn2 = helper.getBlockEntity(POS.north());
+        BlockEntityDryingBasin basinIn3 = helper.getBlockEntity(POS.south());
+        basinIn1.getTank().setFluid(new FluidStack(RegistryEntries.FLUID_MENRIL_RESIN, 1_000));
+        basinIn2.getTank().setFluid(new FluidStack(Fluids.WATER, 1_000));
+        basinIn3.getTank().setFluid(new FluidStack(Fluids.LAVA, 1_000));
+
+        // Place variable in exporter
+        ItemStack variableAspect = createVariableForValue(helper.getLevel(), ValueTypes.LIST, ValueTypeList.ValueList.ofAll(
+                ValueObjectTypeFluidStack.ValueFluidStack.of(new FluidStack(Fluids.WATER, 1000)),
+                ValueObjectTypeFluidStack.ValueFluidStack.of(new FluidStack(Fluids.LAVA, 1000))
+        ));
+        placeVariableInWriter(helper.getLevel(), PartPos.of(helper.getLevel(), helper.absolutePos(POS.east()), Direction.EAST), TunnelAspects.Write.World.FLUID_LIST_EXPORT, variableAspect);
+
+        helper.succeedWhen(() -> {
+            // Check if fluid is moved
+            helper.assertValueEqual(basinIn1.getTank().getFluidAmount(), 1000, "Basin in 1 was drained");
+            helper.assertValueEqual(basinIn2.getTank().getFluidAmount(), 0, "Basin in 2 was not drained");
+            helper.assertValueEqual(basinIn3.getTank().getFluidAmount(), 1000, "Basin in 3 was drained");
+            helper.assertBlockPresent(Blocks.WATER, POS.east().east());
         });
     }
 

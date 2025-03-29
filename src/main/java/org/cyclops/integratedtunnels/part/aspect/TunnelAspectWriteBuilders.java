@@ -1723,7 +1723,7 @@ public class TunnelAspectWriteBuilders {
                 IAspectProperties properties = input.getMiddle();
                 boolean checkNbt = properties.getValue(TunnelAspectWriteBuilders.Fluid.PROP_CHECK_NBT).getRawValue();
                 boolean blacklist = properties.getValue(PROP_BLACKLIST).getRawValue();
-                IngredientPredicate<FluidStack, Integer> fluidStackPredicate = TunnelFluidHelpers.matchFluidStacks(list.getRawValue(), false, false, checkNbt, blacklist, IModHelpersNeoForge.get().getFluidHelpers().getBucketVolume(), true);
+                IngredientPredicate<FluidStack, Integer> fluidStackPredicate = TunnelFluidHelpers.matchFluidStacks(list.getRawValue(), true, false, checkNbt, blacklist, IModHelpersNeoForge.get().getFluidHelpers().getBucketVolume(), true);
                 return IFluidTarget.ofBlock(fluidStackPredicate, input.getLeft(), input.getMiddle(), fluidStackPredicate);
             };
             public static final IAspectValuePropagator<Triple<PartTarget, IAspectProperties, ValueTypeOperator.ValueOperator>, IFluidTarget>
