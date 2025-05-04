@@ -469,7 +469,7 @@
   "info_book.integratedtunnels.item.text1": "Move items over the network. Import items into the network using &lItem Importers&r into &lItem Interfaces&r. Export items from the network using &lItem Exporters&r from &lItem Interfaces&r. Dynamically filter what items can go through an interface using a &lFiltering Item Interfaces&r.",
 
   "info_book.integratedtunnels.fluid": "Fluids",
-  "info_book.integratedtunnels.fluid.text1": "Move fluids over the network. Import fluids into the network using &lFluid Importers&r into &lFluidInterfaces&r. Export fluids from the network using &lFluid Exporters&r from &lFluid Interfaces&r. Dynamically filter what fluids can go through an interface using a &lFiltering Fluid Interfaces&r.",
+  "info_book.integratedtunnels.fluid.text1": "Move fluids over the network. Import fluids into the network using &lFluid Importers&r into &lFluid Interfaces&r. Export fluids from the network using &lFluid Exporters&r from &lFluid Interfaces&r. Dynamically filter what fluids can go through an interface using a &lFiltering Fluid Interfaces&r.",
 
   "info_book.integratedtunnels.energy": "Energy",
   "info_book.integratedtunnels.energy.text1": "Move energy over the network. Import energy into the network using &lEnergy Importers&r into &lEnergy Interfaces&r. Export energy from the network using &lEnergy Exporters&r from &lEnergy Interfaces&r. Dynamically filter if energy can go through an interface using a &lFiltering Energy Interfaces&r.",
@@ -483,7 +483,7 @@
   "info_book.integratedtunnels.world.fluid.text1": "With &lFluid World Importers&r and &lFluid World Exporters&r, you can place fluid source blocks, pick them up and interact with entities that are a tank, such as dropped tank items. Various aspect properties exists to change things like whether or not a block update should be caused.",
 
   "info_book.integratedtunnels.world.energy": "Energy",
-  "info_book.integratedtunnels.world.energy.text1": "The &lEnergy World Importers&r and &lFluid World Exporters&r help you interact with entities that have an energy buffer, such as dropped batteries.",
+  "info_book.integratedtunnels.world.energy.text1": "The &lEnergy World Importers&r and &lEnergy World Exporters&r help you interact with entities that have an energy buffer, such as dropped batteries.",
 
   "info_book.integratedtunnels.world.block": "Block",
   "info_book.integratedtunnels.world.block.text1": "The &lBlock World Importers&r and &lBlock World Exporters&r allow you to place blocks and break them. Various aspect properties such as silk touching are available.",
