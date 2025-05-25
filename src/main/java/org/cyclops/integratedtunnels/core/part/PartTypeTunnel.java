@@ -56,6 +56,11 @@ public abstract class PartTypeTunnel<P extends IPartType<P, S>, S extends IPartS
                 return new ContainerInterfaceSettings(id, playerInventory, new SimpleContainer(0),
                         data.getRight(), Optional.of(data.getLeft()), data.getMiddle());
             }
+
+            @Override
+            public boolean shouldTriggerClientSideContainerClosingOnOpen() {
+                return false;
+            }
         });
     }
 
@@ -74,6 +79,11 @@ public abstract class PartTypeTunnel<P extends IPartType<P, S>, S extends IPartS
                 Triple<IPartContainer, PartTypeBase, PartTarget> data = PartHelpers.getContainerPartConstructionData(pos);
                 return new ContainerPartOffset(id, playerInventory, new SimpleContainer(0),
                         data.getRight(), Optional.of(data.getLeft()), data.getMiddle());
+            }
+
+            @Override
+            public boolean shouldTriggerClientSideContainerClosingOnOpen() {
+                return false;
             }
         });
     }
