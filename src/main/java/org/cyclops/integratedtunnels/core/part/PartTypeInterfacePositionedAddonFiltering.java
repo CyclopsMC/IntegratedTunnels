@@ -65,6 +65,11 @@ public abstract class PartTypeInterfacePositionedAddonFiltering<N extends IPosit
                 return new ContainerInterfaceSettings(id, playerInventory, new SimpleContainer(0),
                         data.getRight(), Optional.of(data.getLeft()), data.getMiddle());
             }
+
+            @Override
+            public boolean shouldTriggerClientSideContainerClosingOnOpen() {
+                return false;
+            }
         });
     }
 
