@@ -23,7 +23,7 @@ description="${description}"
     modId="integrateddynamics"
     type="required"
     versionRange="[${integrateddynamics_version_semver},)"
-    ordering="AFTER"
+    ordering="NONE"
     side="BOTH"
 [[dependencies.${mod_id}]]
     modId="commoncapabilities"

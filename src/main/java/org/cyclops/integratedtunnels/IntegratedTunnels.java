@@ -16,6 +16,7 @@ import org.cyclops.cyclopscore.init.ModBaseNeoForge;
 import org.cyclops.cyclopscore.proxy.IClientProxy;
 import org.cyclops.cyclopscore.proxy.ICommonProxy;
 import org.cyclops.integrateddynamics.IntegratedDynamics;
+import org.cyclops.integrateddynamics.core.event.IntegratedDynamicsSetupEvent;
 import org.cyclops.integrateddynamics.core.part.aspect.AspectRegistry;
 import org.cyclops.integrateddynamics.infobook.OnTheDynamicsOfIntegrationBook;
 import org.cyclops.integratedtunnels.api.world.IBlockBreakHandlerRegistry;
@@ -55,6 +56,7 @@ public class IntegratedTunnels extends ModBaseNeoForge<IntegratedTunnels> {
         getRegistryManager().addRegistry(IBlockPlaceHandlerRegistry.class, BlockBreakPlaceRegistry.getInstance());
 
         modEventBus.addListener(this::onRegistriesCreate);
+        modEventBus.addListener(this::onSetup);
         modEventBus.addListener(Capabilities::registerPartCapabilities);
         modEventBus.register(new TunnelNetworkCapabilityConstructors());
     }
@@ -70,19 +72,11 @@ public class IntegratedTunnels extends ModBaseNeoForge<IntegratedTunnels> {
     @Override
     protected void setup(FMLCommonSetupEvent event) {
         super.setup(event);
+    }
 
+    protected void onSetup(IntegratedDynamicsSetupEvent event) {
         // Register value list proxies
         TunnelValueTypeListProxyFactories.load();
-
-        // Initialize info book
-        IntegratedDynamics._instance.getRegistryManager().getRegistry(IInfoBookRegistry.class)
-                .registerSection(this,
-                        OnTheDynamicsOfIntegrationBook.getInstance(), "info_book.integrateddynamics.manual",
-                        "/data/" + Reference.MOD_ID + "/info/tunnels_info.xml");
-        IntegratedDynamics._instance.getRegistryManager().getRegistry(IInfoBookRegistry.class)
-                .registerSection(this,
-                        OnTheDynamicsOfIntegrationBook.getInstance(), "info_book.integrateddynamics.tutorials",
-                        "/data/" + Reference.MOD_ID + "/info/tunnels_tutorials.xml");
 
         // Inject aspects into ID parts
         AspectRegistry.getInstance().register(org.cyclops.integrateddynamics.core.part.PartTypes.NETWORK_READER, Lists.newArrayList(
@@ -98,6 +92,16 @@ public class IntegratedTunnels extends ModBaseNeoForge<IntegratedTunnels> {
                 TunnelAspects.Read.Fluid.OPERATOR_GETFLUIDCOUNT,
                 TunnelAspects.Read.Fluid.INTEGER_INTERFACES
         ));
+
+        // Initialize info book
+        IntegratedDynamics._instance.getRegistryManager().getRegistry(IInfoBookRegistry.class)
+                .registerSection(this,
+                        OnTheDynamicsOfIntegrationBook.getInstance(), "info_book.integrateddynamics.manual",
+                        "/data/" + Reference.MOD_ID + "/info/tunnels_info.xml");
+        IntegratedDynamics._instance.getRegistryManager().getRegistry(IInfoBookRegistry.class)
+                .registerSection(this,
+                        OnTheDynamicsOfIntegrationBook.getInstance(), "info_book.integrateddynamics.tutorials",
+                        "/data/" + Reference.MOD_ID + "/info/tunnels_tutorials.xml");
     }
 
     @Override
