@@ -59,7 +59,6 @@ public class IntegratedTunnels extends ModBaseVersionable<IntegratedTunnels> {
         getRegistryManager().addRegistry(IBlockPlaceHandlerRegistry.class, BlockBreakPlaceRegistry.getInstance());
 
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::onRegistriesCreate);
-        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::onSetup);
     }
 
     public void onRegistriesCreate(NewRegistryEvent event) {
@@ -78,9 +77,7 @@ public class IntegratedTunnels extends ModBaseVersionable<IntegratedTunnels> {
 
         // Register value list proxies
         TunnelValueTypeListProxyFactories.load();
-    }
 
-    protected void onSetup(IntegratedDynamicsSetupEvent event) {
         // Initialize info book
         IntegratedDynamics._instance.getRegistryManager().getRegistry(IInfoBookRegistry.class)
                 .registerSection(this,
