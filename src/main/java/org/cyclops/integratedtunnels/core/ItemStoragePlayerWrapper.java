@@ -234,8 +234,6 @@ public class ItemStoragePlayerWrapper implements IIngredientComponentStorage<Ite
                         }
                         returnPlayerInventory(player);
                         return ItemStack.EMPTY;
-                    } else {
-                        returnPlayerInventory(player);
                     }
                 }
             }
