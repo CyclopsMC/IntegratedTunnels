@@ -2,4 +2,5 @@ As always, don't forget to backup your world before updating!
 Requires CyclopsCore version 1.25.5 or higher.
 
 Fixes:
+* Fix Player Simulator duping placed items, regression due to #339 fix
 * Fix player simulator not consuming PASSed items, Closes #339
