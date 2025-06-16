@@ -235,8 +235,6 @@ public class ItemStoragePlayerWrapper implements IIngredientComponentStorage<Ite
                         returnPlayerInventory(player);
                         return ItemStack.EMPTY;
                     } else {
-                        // Modify the active stack, to pass forward to later steps.
-                        stack = actionresult.getObject();
                         returnPlayerInventory(player);
                     }
                 }
