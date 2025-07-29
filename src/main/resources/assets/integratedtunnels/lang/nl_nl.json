@@ -108,6 +108,8 @@
   "aspect.integratedtunnels.write.itemstack.player.click.info": "Klik met het gegeven voorwerp.",
   "aspect.integratedtunnels.write.list.player.click": "Klik voorwerpen",
   "aspect.integratedtunnels.write.list.player.click.info": "Klik met de gegeven voorwerpen.",
+  "aspect.integratedtunnels.write.operator.player.click": "Klik voorwerp-predicaat",
+  "aspect.integratedtunnels.write.operator.player.click.info": "Klik met de voorwerpen die overeenkomen met het gegeven predicaat.",
   "info_book.integratedtunnels.section.main": "Tunnels",
   "info_book.integratedtunnels.introduction": "Introductie",
   "info_book.integratedtunnels.introduction.text1": "&lIntegrated Tunnels&r is een uitbreiding op &lIntegrated Dynamics&r voor het overdragen van voorwerpen, vloeistoffen en energie over &lIntegrated Dynamics&r netwerken.",
