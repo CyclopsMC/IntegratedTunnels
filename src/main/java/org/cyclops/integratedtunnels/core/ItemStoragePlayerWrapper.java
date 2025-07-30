@@ -156,6 +156,7 @@ public class ItemStoragePlayerWrapper implements IIngredientComponentStorage<Ite
                 if (!stack.isEmpty()) {
                     UseOnContext itemUseContext = new UseOnContext(player, hand, blockRayTraceResult);
                     InteractionResult actionResult = stack.getItem().onItemUseFirst(stack, itemUseContext);
+                    stack = itemUseContext.getItemInHand();
                     if (actionResult == InteractionResult.FAIL) {
                         return stack;
                     } else if (actionResult.consumesAction()) {
@@ -257,6 +258,7 @@ public class ItemStoragePlayerWrapper implements IIngredientComponentStorage<Ite
                 UseOnContext itemUseContextReach = new UseOnContext(player, hand,
                         new BlockHitResult(new Vec3(offsetX, offsetY, offsetZ), side, targetPos, false));
                 InteractionResult actionResult = stack.useOn(itemUseContextReach);
+                stack = itemUseContextReach.getItemInHand();
                 if (actionResult == InteractionResult.FAIL) {
                     return stack;
                 } else if (actionResult.consumesAction()) {
