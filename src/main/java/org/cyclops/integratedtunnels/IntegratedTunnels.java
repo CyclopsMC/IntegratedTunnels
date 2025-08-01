@@ -3,8 +3,6 @@ package org.cyclops.integratedtunnels;
 import com.google.common.collect.Lists;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
@@ -28,6 +26,7 @@ import org.cyclops.integratedtunnels.core.world.BlockBreakHandlerRegistry;
 import org.cyclops.integratedtunnels.core.world.BlockBreakHandlers;
 import org.cyclops.integratedtunnels.core.world.BlockBreakPlaceRegistry;
 import org.cyclops.integratedtunnels.core.world.BlockPlaceHandlers;
+import org.cyclops.integratedtunnels.gametest.*;
 import org.cyclops.integratedtunnels.item.ItemDummyPickAxeConfig;
 import org.cyclops.integratedtunnels.part.PartTypes;
 import org.cyclops.integratedtunnels.part.aspect.TunnelAspects;
@@ -122,7 +121,6 @@ public class IntegratedTunnels extends ModBaseNeoForge<IntegratedTunnels> {
     }
 
     @Override
-    @OnlyIn(Dist.CLIENT)
     protected IClientProxy constructClientProxy() {
         return new ClientProxy();
     }
@@ -130,6 +128,19 @@ public class IntegratedTunnels extends ModBaseNeoForge<IntegratedTunnels> {
     @Override
     protected ICommonProxy constructCommonProxy() {
         return new CommonProxy();
+    }
+
+    @Override
+    public Class<?>[] getGameTestClasses() {
+        return new Class<?>[] {
+                GameTestsEnergy.class,
+                GameTestsFluids.class,
+                GameTestsItems.class,
+                GameTestsPlayerSimulator.class,
+                GameTestsWorldBlock.class,
+                GameTestsWorldFluid.class,
+                GameTestsWorldItem.class,
+        };
     }
 
     /**

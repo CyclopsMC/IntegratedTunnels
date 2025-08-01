@@ -2,14 +2,13 @@ package org.cyclops.integratedtunnels.gametest;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.material.Fluids;
 import net.neoforged.neoforge.fluids.FluidStack;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import org.cyclops.cyclopscore.gametest.GameTest;
 import org.cyclops.integrateddynamics.RegistryEntries;
 import org.cyclops.integrateddynamics.api.part.PartPos;
 import org.cyclops.integrateddynamics.blockentity.BlockEntityDryingBasin;
@@ -23,11 +22,9 @@ import org.cyclops.integratedtunnels.part.aspect.TunnelAspects;
 import static org.cyclops.integrateddynamics.gametest.GameTestHelpersIntegratedDynamics.createVariableForValue;
 import static org.cyclops.integrateddynamics.gametest.GameTestHelpersIntegratedDynamics.placeVariableInWriter;
 
-@GameTestHolder(Reference.MOD_ID)
-@PrefixGameTestTemplate(false)
 public class GameTestsWorldFluid {
 
-    public static final String TEMPLATE_EMPTY = "empty10";
+    public static final String TEMPLATE_EMPTY = Reference.MOD_ID + ":empty10";
     public static final int TIMEOUT = 2000;
     public static final BlockPos POS = BlockPos.ZERO.offset(2, 0, 2);
 
@@ -54,14 +51,14 @@ public class GameTestsWorldFluid {
 
         // Place empty variable in importer and exporter
         ItemStack variableAspect = new ItemStack(RegistryEntries.ITEM_VARIABLE);
-        placeVariableInWriter(helper.getLevel(), PartPos.of(helper.getLevel(), helper.absolutePos(POS), Direction.WEST), TunnelAspects.Write.World.FLUID_BOOLEAN_IMPORT, variableAspect);
-        placeVariableInWriter(helper.getLevel(), PartPos.of(helper.getLevel(), helper.absolutePos(POS.east()), Direction.NORTH), TunnelAspects.Write.World.FLUID_BOOLEAN_EXPORT, variableAspect);
+        placeVariableInWriter(helper, helper.getLevel(), PartPos.of(helper.getLevel(), helper.absolutePos(POS), Direction.WEST), TunnelAspects.Write.World.FLUID_BOOLEAN_IMPORT, variableAspect);
+        placeVariableInWriter(helper, helper.getLevel(), PartPos.of(helper.getLevel(), helper.absolutePos(POS.east()), Direction.NORTH), TunnelAspects.Write.World.FLUID_BOOLEAN_EXPORT, variableAspect);
 
         helper.succeedWhen(() -> {
             // Check if fluids are moved
             helper.assertBlockNotPresent(Blocks.WATER, POS.west());
-            BlockEntityDryingBasin basinOut = helper.getBlockEntity(POS.east().east());
-            helper.assertValueEqual(basinOut.getTank().getFluidAmount(), 0, "Basin contains fluid");
+            BlockEntityDryingBasin basinOut = helper.getBlockEntity(POS.east().east(), BlockEntityDryingBasin.class);
+            helper.assertValueEqual(basinOut.getTank().getFluidAmount(), 0, Component.literal("Basin contains fluid"));
             helper.assertBlockPresent(Blocks.WATER, POS.east().north());
         });
     }
@@ -88,14 +85,14 @@ public class GameTestsWorldFluid {
         helper.setBlock(POS.west(), Blocks.WATER);
 
         // Place empty variable in importer and exporter
-        placeVariableInWriter(helper.getLevel(), PartPos.of(helper.getLevel(), helper.absolutePos(POS), Direction.WEST), TunnelAspects.Write.World.FLUID_FLUIDSTACK_IMPORT, createVariableForValue(helper.getLevel(), ValueTypes.OBJECT_FLUIDSTACK, ValueObjectTypeFluidStack.ValueFluidStack.of(new FluidStack(Fluids.WATER, 10))));
-        placeVariableInWriter(helper.getLevel(), PartPos.of(helper.getLevel(), helper.absolutePos(POS.east()), Direction.NORTH), TunnelAspects.Write.World.FLUID_FLUIDSTACK_EXPORT, createVariableForValue(helper.getLevel(), ValueTypes.OBJECT_FLUIDSTACK, ValueObjectTypeFluidStack.ValueFluidStack.of(new FluidStack(Fluids.WATER, 10))));
+        placeVariableInWriter(helper, helper.getLevel(), PartPos.of(helper.getLevel(), helper.absolutePos(POS), Direction.WEST), TunnelAspects.Write.World.FLUID_FLUIDSTACK_IMPORT, createVariableForValue(helper.getLevel(), ValueTypes.OBJECT_FLUIDSTACK, ValueObjectTypeFluidStack.ValueFluidStack.of(new FluidStack(Fluids.WATER, 10))));
+        placeVariableInWriter(helper, helper.getLevel(), PartPos.of(helper.getLevel(), helper.absolutePos(POS.east()), Direction.NORTH), TunnelAspects.Write.World.FLUID_FLUIDSTACK_EXPORT, createVariableForValue(helper.getLevel(), ValueTypes.OBJECT_FLUIDSTACK, ValueObjectTypeFluidStack.ValueFluidStack.of(new FluidStack(Fluids.WATER, 10))));
 
         helper.succeedWhen(() -> {
             // Check if fluids are moved
             helper.assertBlockNotPresent(Blocks.WATER, POS.west());
-            BlockEntityDryingBasin basinOut = helper.getBlockEntity(POS.east().east());
-            helper.assertValueEqual(basinOut.getTank().getFluidAmount(), 0, "Basin contains fluid");
+            BlockEntityDryingBasin basinOut = helper.getBlockEntity(POS.east().east(), BlockEntityDryingBasin.class);
+            helper.assertValueEqual(basinOut.getTank().getFluidAmount(), 0, Component.literal("Basin contains fluid"));
             helper.assertBlockPresent(Blocks.WATER, POS.east().north());
         });
     }
@@ -122,14 +119,14 @@ public class GameTestsWorldFluid {
         helper.setBlock(POS.west(), Blocks.WATER);
 
         // Place empty variable in importer and exporter
-        placeVariableInWriter(helper.getLevel(), PartPos.of(helper.getLevel(), helper.absolutePos(POS), Direction.WEST), TunnelAspects.Write.World.FLUID_FLUIDSTACK_IMPORT, createVariableForValue(helper.getLevel(), ValueTypes.OBJECT_FLUIDSTACK, ValueObjectTypeFluidStack.ValueFluidStack.of(new FluidStack(Fluids.LAVA, 10))));
-        placeVariableInWriter(helper.getLevel(), PartPos.of(helper.getLevel(), helper.absolutePos(POS.east()), Direction.NORTH), TunnelAspects.Write.World.FLUID_FLUIDSTACK_EXPORT, createVariableForValue(helper.getLevel(), ValueTypes.OBJECT_FLUIDSTACK, ValueObjectTypeFluidStack.ValueFluidStack.of(new FluidStack(Fluids.LAVA, 10))));
+        placeVariableInWriter(helper, helper.getLevel(), PartPos.of(helper.getLevel(), helper.absolutePos(POS), Direction.WEST), TunnelAspects.Write.World.FLUID_FLUIDSTACK_IMPORT, createVariableForValue(helper.getLevel(), ValueTypes.OBJECT_FLUIDSTACK, ValueObjectTypeFluidStack.ValueFluidStack.of(new FluidStack(Fluids.LAVA, 10))));
+        placeVariableInWriter(helper, helper.getLevel(), PartPos.of(helper.getLevel(), helper.absolutePos(POS.east()), Direction.NORTH), TunnelAspects.Write.World.FLUID_FLUIDSTACK_EXPORT, createVariableForValue(helper.getLevel(), ValueTypes.OBJECT_FLUIDSTACK, ValueObjectTypeFluidStack.ValueFluidStack.of(new FluidStack(Fluids.LAVA, 10))));
 
         helper.succeedWhen(() -> {
             // Check if fluids are not moved
             helper.assertBlockPresent(Blocks.WATER, POS.west());
-            BlockEntityDryingBasin basinOut = helper.getBlockEntity(POS.east().east());
-            helper.assertValueEqual(basinOut.getTank().getFluidAmount(), 0, "Basin contains fluid");
+            BlockEntityDryingBasin basinOut = helper.getBlockEntity(POS.east().east(), BlockEntityDryingBasin.class);
+            helper.assertValueEqual(basinOut.getTank().getFluidAmount(), 0, Component.literal("Basin contains fluid"));
             helper.assertBlockNotPresent(Blocks.WATER, POS.east().north());
         });
     }

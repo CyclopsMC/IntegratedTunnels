@@ -10,6 +10,7 @@ import org.cyclops.integrateddynamics.part.aspect.Aspects;
 import org.cyclops.integratedtunnels.GeneralConfig;
 import org.cyclops.integratedtunnels.core.part.PartTypeTunnelAspectsWorld;
 import org.cyclops.integratedtunnels.part.aspect.TunnelAspects;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * A part that can simulate player interactions.
@@ -46,8 +47,8 @@ public class PartTypePlayerSimulator extends PartTypeTunnelAspectsWorld<PartType
     }
 
     @Override
-    public void updateActivation(PartTarget target, PartStatePlayerSimulator state, Player player) {
-        state.update(target);
-        super.updateActivation(target, state, player);
+    public void updateActivation(PartTarget target, PartStatePlayerSimulator partState, @Nullable Player player, boolean isNetworkInitializing) {
+        partState.update(target);
+        super.updateActivation(target, partState, player, isNetworkInitializing);
     }
 }

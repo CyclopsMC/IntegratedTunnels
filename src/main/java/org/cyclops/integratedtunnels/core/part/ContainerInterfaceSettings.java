@@ -34,7 +34,7 @@ public class ContainerInterfaceSettings extends ContainerPartSettings {
         lastChannelInterfaceValueId = getNextValueId();
 
         putButtonAction(ContainerMultipartAspects.BUTTON_OFFSETS, (s, containerExtended) -> {
-            if (!player.getCommandSenderWorld().isClientSide()) {
+            if (!player.level().isClientSide()) {
                 PartHelpers.openContainerPartOffsets((ServerPlayer) player, target.getCenter(), partType);
             }
         });

@@ -106,7 +106,7 @@ public class ContainerScreenInterfaceSettings extends ContainerScreenPartSetting
         super.renderLabels(guiGraphics, mouseX, mouseY);
 
         if (isHovering(-20, 0, 18, 18, mouseX, mouseY)) {
-            drawTooltip(Lists.newArrayList(Component.translatable("gui.integrateddynamics.part_offsets")), guiGraphics.pose(), mouseX - leftPos, mouseY - topPos);
+            drawTooltip(Lists.newArrayList(Component.translatable("gui.integrateddynamics.part_offsets")), guiGraphics, mouseX, mouseY);
         }
     }
 

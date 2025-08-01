@@ -1,6 +1,7 @@
 package org.cyclops.integratedtunnels.item;
 
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ToolMaterial;
 import org.cyclops.cyclopscore.config.extendedconfig.ItemConfigCommon;
 import org.cyclops.cyclopscore.init.IModBase;
 import org.cyclops.integratedtunnels.IntegratedTunnels;
@@ -18,7 +19,7 @@ public class ItemDummyPickAxeConfig extends ItemConfigCommon<IModBase> {
         super(
                 IntegratedTunnels._instance,
                 "dummy_pickaxe",
-                (eConfig, properties) -> new ItemDummyPickAxe(properties)
+                (eConfig, properties) -> new ItemDummyPickAxe(properties.pickaxe(ToolMaterial.DIAMOND, 1, 1))
         );
     }
 

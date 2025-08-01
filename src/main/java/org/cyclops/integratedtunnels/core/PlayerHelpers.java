@@ -4,6 +4,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.common.util.FakePlayer;
@@ -44,9 +45,9 @@ public class PlayerHelpers {
 
     public static void setHeldItemSilent(Player player, InteractionHand hand, ItemStack itemStack) {
         if (hand == InteractionHand.MAIN_HAND) {
-            player.getInventory().items.set(player.getInventory().selected, itemStack);
+            player.getInventory().setSelectedItem(itemStack);
         } else if (hand == InteractionHand.OFF_HAND) {
-            player.getInventory().offhand.set(0, itemStack);
+            player.getInventory().setItem(Inventory.SLOT_OFFHAND, itemStack);
         } else {
             // Could happen if some mod messes with the hand types.
             player.setItemInHand(hand, itemStack);

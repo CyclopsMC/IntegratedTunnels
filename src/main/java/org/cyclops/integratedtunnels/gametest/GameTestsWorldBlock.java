@@ -2,14 +2,13 @@ package org.cyclops.integratedtunnels.gametest;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.ShulkerBoxBlockEntity;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import org.cyclops.cyclopscore.gametest.GameTest;
 import org.cyclops.integrateddynamics.RegistryEntries;
 import org.cyclops.integrateddynamics.api.part.PartPos;
 import org.cyclops.integrateddynamics.api.part.write.IPartStateWriter;
@@ -24,11 +23,9 @@ import org.cyclops.integratedtunnels.part.aspect.TunnelAspects;
 import static org.cyclops.integrateddynamics.gametest.GameTestHelpersIntegratedDynamics.createVariableForValue;
 import static org.cyclops.integrateddynamics.gametest.GameTestHelpersIntegratedDynamics.placeVariableInWriter;
 
-@GameTestHolder(Reference.MOD_ID)
-@PrefixGameTestTemplate(false)
 public class GameTestsWorldBlock {
 
-    public static final String TEMPLATE_EMPTY = "empty10";
+    public static final String TEMPLATE_EMPTY = Reference.MOD_ID + ":empty10";
     public static final int TIMEOUT = 2000;
     public static final BlockPos POS = BlockPos.ZERO.offset(2, 0, 2);
 
@@ -55,36 +52,36 @@ public class GameTestsWorldBlock {
 
         // Place empty variable in importer and exporter
         ItemStack variableAspect = new ItemStack(RegistryEntries.ITEM_VARIABLE);
-        placeVariableInWriter(helper.getLevel(), PartPos.of(helper.getLevel(), helper.absolutePos(POS), Direction.WEST), TunnelAspects.Write.World.BLOCK_BOOLEAN_IMPORT, variableAspect);
-        placeVariableInWriter(helper.getLevel(), PartPos.of(helper.getLevel(), helper.absolutePos(POS.east()), Direction.NORTH), TunnelAspects.Write.World.BLOCK_BOOLEAN_EXPORT, variableAspect);
+        placeVariableInWriter(helper, helper.getLevel(), PartPos.of(helper.getLevel(), helper.absolutePos(POS), Direction.WEST), TunnelAspects.Write.World.BLOCK_BOOLEAN_IMPORT, variableAspect);
+        placeVariableInWriter(helper, helper.getLevel(), PartPos.of(helper.getLevel(), helper.absolutePos(POS.east()), Direction.NORTH), TunnelAspects.Write.World.BLOCK_BOOLEAN_EXPORT, variableAspect);
 
         helper.succeedWhen(() -> {
             // Check if items are moved
             helper.assertBlockNotPresent(Blocks.STONE, POS.west());
-            helper.assertContainerEmpty(POS.west());
+            helper.assertContainerEmpty(POS.east().east());
             helper.assertBlockPresent(Blocks.COBBLESTONE, POS.east().north());
 
             // Check importer state
             IPartStateWriter partStateWriter = (IPartStateWriter) PartHelpers.getPart(PartPos.of(helper.getLevel(), helper.absolutePos(POS), Direction.WEST)).getState();
-            helper.assertFalse(partStateWriter.isDeactivated(), "Importer is deactivated");
+            helper.assertFalse(partStateWriter.isDeactivated(), Component.literal("Importer is deactivated"));
             helper.assertValueEqual(
                     PartTypes.IMPORTER_WORLD_BLOCK.getBlockState(PartHelpers.getPartContainerChecked(PartPos.of(helper.getLevel(), helper.absolutePos(POS), Direction.WEST)), Direction.WEST).getValue(IgnoredBlockStatus.STATUS),
                     IgnoredBlockStatus.Status.ACTIVE,
-                    "Block status is incorrect"
+                    Component.literal("Block status is incorrect")
             );
-            helper.assertValueEqual(partStateWriter.getActiveAspect(), TunnelAspects.Write.World.BLOCK_BOOLEAN_IMPORT, "Active aspect is incorrect");
-            helper.assertTrue(partStateWriter.getErrors(TunnelAspects.Write.World.BLOCK_BOOLEAN_IMPORT).isEmpty(), "Active aspect has errors");
+            helper.assertValueEqual(partStateWriter.getActiveAspect(), TunnelAspects.Write.World.BLOCK_BOOLEAN_IMPORT, Component.literal("Active aspect is incorrect"));
+            helper.assertTrue(partStateWriter.getErrors(TunnelAspects.Write.World.BLOCK_BOOLEAN_IMPORT).isEmpty(), Component.literal("Active aspect has errors"));
 
             // Check exporter state
             IPartStateWriter partStateWriter2 = (IPartStateWriter) PartHelpers.getPart(PartPos.of(helper.getLevel(), helper.absolutePos(POS.east()), Direction.NORTH)).getState();
-            helper.assertFalse(partStateWriter2.isDeactivated(), "Importer is deactivated");
+            helper.assertFalse(partStateWriter2.isDeactivated(), Component.literal("Importer is deactivated"));
             helper.assertValueEqual(
                     PartTypes.EXPORTER_WORLD_BLOCK.getBlockState(PartHelpers.getPartContainerChecked(PartPos.of(helper.getLevel(), helper.absolutePos(POS.east()), Direction.NORTH)), Direction.NORTH).getValue(IgnoredBlockStatus.STATUS),
                     IgnoredBlockStatus.Status.ACTIVE,
-                    "Block status is incorrect"
+                    Component.literal("Block status is incorrect")
             );
-            helper.assertValueEqual(partStateWriter2.getActiveAspect(), TunnelAspects.Write.World.BLOCK_BOOLEAN_EXPORT, "Active aspect is incorrect");
-            helper.assertTrue(partStateWriter2.getErrors(TunnelAspects.Write.World.BLOCK_BOOLEAN_EXPORT).isEmpty(), "Active aspect has errors");
+            helper.assertValueEqual(partStateWriter2.getActiveAspect(), TunnelAspects.Write.World.BLOCK_BOOLEAN_EXPORT, Component.literal("Active aspect is incorrect"));
+            helper.assertTrue(partStateWriter2.getErrors(TunnelAspects.Write.World.BLOCK_BOOLEAN_EXPORT).isEmpty(), Component.literal("Active aspect has errors"));
         });
     }
 
@@ -110,13 +107,13 @@ public class GameTestsWorldBlock {
         helper.setBlock(POS.west(), Blocks.STONE);
 
         // Place empty variable in importer and exporter
-        placeVariableInWriter(helper.getLevel(), PartPos.of(helper.getLevel(), helper.absolutePos(POS), Direction.WEST), TunnelAspects.Write.World.BLOCK_ITEMSTACK_IMPORT, createVariableForValue(helper.getLevel(), ValueTypes.OBJECT_ITEMSTACK, ValueObjectTypeItemStack.ValueItemStack.of(new ItemStack(Blocks.COBBLESTONE))));
-        placeVariableInWriter(helper.getLevel(), PartPos.of(helper.getLevel(), helper.absolutePos(POS.east()), Direction.NORTH), TunnelAspects.Write.World.BLOCK_BOOLEAN_EXPORT, new ItemStack(RegistryEntries.ITEM_VARIABLE));
+        placeVariableInWriter(helper, helper.getLevel(), PartPos.of(helper.getLevel(), helper.absolutePos(POS), Direction.WEST), TunnelAspects.Write.World.BLOCK_ITEMSTACK_IMPORT, createVariableForValue(helper.getLevel(), ValueTypes.OBJECT_ITEMSTACK, ValueObjectTypeItemStack.ValueItemStack.of(new ItemStack(Blocks.COBBLESTONE))));
+        placeVariableInWriter(helper, helper.getLevel(), PartPos.of(helper.getLevel(), helper.absolutePos(POS.east()), Direction.NORTH), TunnelAspects.Write.World.BLOCK_BOOLEAN_EXPORT, new ItemStack(RegistryEntries.ITEM_VARIABLE));
 
         helper.succeedWhen(() -> {
             // Check if items are moved
             helper.assertBlockNotPresent(Blocks.STONE, POS.west());
-            helper.assertContainerEmpty(POS.west());
+            helper.assertContainerEmpty(POS.east().east());
             helper.assertBlockPresent(Blocks.COBBLESTONE, POS.east().north());
         });
     }
@@ -143,13 +140,13 @@ public class GameTestsWorldBlock {
         helper.setBlock(POS.west(), Blocks.STONE);
 
         // Place empty variable in importer and exporter
-        placeVariableInWriter(helper.getLevel(), PartPos.of(helper.getLevel(), helper.absolutePos(POS), Direction.WEST), TunnelAspects.Write.World.BLOCK_ITEMSTACK_IMPORT, createVariableForValue(helper.getLevel(), ValueTypes.OBJECT_ITEMSTACK, ValueObjectTypeItemStack.ValueItemStack.of(new ItemStack(Blocks.STONE))));
-        placeVariableInWriter(helper.getLevel(), PartPos.of(helper.getLevel(), helper.absolutePos(POS.east()), Direction.NORTH), TunnelAspects.Write.World.BLOCK_BOOLEAN_EXPORT, new ItemStack(RegistryEntries.ITEM_VARIABLE));
+        placeVariableInWriter(helper, helper.getLevel(), PartPos.of(helper.getLevel(), helper.absolutePos(POS), Direction.WEST), TunnelAspects.Write.World.BLOCK_ITEMSTACK_IMPORT, createVariableForValue(helper.getLevel(), ValueTypes.OBJECT_ITEMSTACK, ValueObjectTypeItemStack.ValueItemStack.of(new ItemStack(Blocks.STONE))));
+        placeVariableInWriter(helper, helper.getLevel(), PartPos.of(helper.getLevel(), helper.absolutePos(POS.east()), Direction.NORTH), TunnelAspects.Write.World.BLOCK_BOOLEAN_EXPORT, new ItemStack(RegistryEntries.ITEM_VARIABLE));
 
         helper.succeedWhen(() -> {
             // Check if items are not moved
             helper.assertBlockPresent(Blocks.STONE, POS.west());
-            helper.assertContainerEmpty(POS.west());
+            helper.assertContainerEmpty(POS.east().east());
             helper.assertBlockNotPresent(Blocks.COBBLESTONE, POS.east().north());
         });
     }
@@ -174,19 +171,19 @@ public class GameTestsWorldBlock {
 
         // Place shulker box before importer
         helper.setBlock(POS.west(), Blocks.SHULKER_BOX);
-        ShulkerBoxBlockEntity shulkerBoxStart = helper.getBlockEntity(POS.west());
+        ShulkerBoxBlockEntity shulkerBoxStart = helper.getBlockEntity(POS.west(), ShulkerBoxBlockEntity.class);
         shulkerBoxStart.setItem(0, new ItemStack(Items.APPLE));
         shulkerBoxStart.setItem(1, new ItemStack(Items.DIRT));
 
         // Place empty variable in importer and exporter
         ItemStack variableAspect = new ItemStack(RegistryEntries.ITEM_VARIABLE);
-        placeVariableInWriter(helper.getLevel(), PartPos.of(helper.getLevel(), helper.absolutePos(POS), Direction.WEST), TunnelAspects.Write.World.BLOCK_BOOLEAN_IMPORT, variableAspect);
-        placeVariableInWriter(helper.getLevel(), PartPos.of(helper.getLevel(), helper.absolutePos(POS.east()), Direction.NORTH), TunnelAspects.Write.World.BLOCK_BOOLEAN_EXPORT, variableAspect);
+        placeVariableInWriter(helper, helper.getLevel(), PartPos.of(helper.getLevel(), helper.absolutePos(POS), Direction.WEST), TunnelAspects.Write.World.BLOCK_BOOLEAN_IMPORT, variableAspect);
+        placeVariableInWriter(helper, helper.getLevel(), PartPos.of(helper.getLevel(), helper.absolutePos(POS.east()), Direction.NORTH), TunnelAspects.Write.World.BLOCK_BOOLEAN_EXPORT, variableAspect);
 
         helper.succeedWhen(() -> {
             // Check if items are moved
             helper.assertBlockNotPresent(Blocks.STONE, POS.west());
-            helper.assertContainerEmpty(POS.west());
+            helper.assertContainerEmpty(POS.east().east());
             helper.assertBlockPresent(Blocks.SHULKER_BOX, POS.east().north());
             helper.assertContainerContains(POS.east().north(), Items.APPLE);
             helper.assertContainerContains(POS.east().north(), Items.DIRT);

@@ -1,10 +1,10 @@
 package org.cyclops.integratedtunnels.core;
 
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import net.minecraft.network.Connection;
 import net.minecraft.network.PacketListener;
-import net.minecraft.network.PacketSendListener;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.PacketFlow;
@@ -55,7 +55,12 @@ public class FakeNetHandlerPlayServer extends ServerGamePacketListenerImpl {
             }
 
             @Override
-            public void send(Packet<?> p_243248_, @Nullable PacketSendListener p_243316_) {
+            public void send(Packet<?> packet, @Nullable ChannelFutureListener p_428399_) {
+
+            }
+
+            @Override
+            public void send(Packet<?> packet, @Nullable ChannelFutureListener p_428328_, boolean p_428543_) {
 
             }
 

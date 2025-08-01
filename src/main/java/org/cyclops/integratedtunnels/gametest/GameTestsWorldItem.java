@@ -2,12 +2,10 @@ package org.cyclops.integratedtunnels.gametest;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Blocks;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import org.cyclops.cyclopscore.gametest.GameTest;
 import org.cyclops.integrateddynamics.RegistryEntries;
 import org.cyclops.integrateddynamics.api.part.PartPos;
 import org.cyclops.integrateddynamics.core.evaluate.variable.ValueObjectTypeItemStack;
@@ -20,11 +18,9 @@ import org.cyclops.integratedtunnels.part.aspect.TunnelAspects;
 import static org.cyclops.integrateddynamics.gametest.GameTestHelpersIntegratedDynamics.createVariableForValue;
 import static org.cyclops.integrateddynamics.gametest.GameTestHelpersIntegratedDynamics.placeVariableInWriter;
 
-@GameTestHolder(Reference.MOD_ID)
-@PrefixGameTestTemplate(false)
 public class GameTestsWorldItem {
 
-    public static final String TEMPLATE_EMPTY = "empty10";
+    public static final String TEMPLATE_EMPTY = Reference.MOD_ID + ":empty10";
     public static final int TIMEOUT = 2000;
     public static final BlockPos POS = BlockPos.ZERO.offset(2, 0, 2);
 
@@ -51,13 +47,13 @@ public class GameTestsWorldItem {
 
         // Place empty variable in importer and exporter
         ItemStack variableAspect = new ItemStack(RegistryEntries.ITEM_VARIABLE);
-        placeVariableInWriter(helper.getLevel(), PartPos.of(helper.getLevel(), helper.absolutePos(POS), Direction.WEST), TunnelAspects.Write.World.ENTITYITEM_BOOLEAN_IMPORT, variableAspect);
-        placeVariableInWriter(helper.getLevel(), PartPos.of(helper.getLevel(), helper.absolutePos(POS.east()), Direction.NORTH), TunnelAspects.Write.World.ENTITYITEM_BOOLEAN_EXPORT, variableAspect);
+        placeVariableInWriter(helper, helper.getLevel(), PartPos.of(helper.getLevel(), helper.absolutePos(POS), Direction.WEST), TunnelAspects.Write.World.ENTITYITEM_BOOLEAN_IMPORT, variableAspect);
+        placeVariableInWriter(helper, helper.getLevel(), PartPos.of(helper.getLevel(), helper.absolutePos(POS.east()), Direction.NORTH), TunnelAspects.Write.World.ENTITYITEM_BOOLEAN_EXPORT, variableAspect);
 
         helper.succeedWhen(() -> {
             // Check if items are moved
             helper.assertItemEntityNotPresent(Blocks.STONE.asItem(), POS.west(), 0.25);
-            helper.assertContainerEmpty(POS.west());
+            helper.assertContainerEmpty(POS.east().east());
             helper.assertItemEntityPresent(Blocks.STONE.asItem(), POS.east().north(), 0.25);
         });
     }
@@ -84,13 +80,13 @@ public class GameTestsWorldItem {
         helper.spawnItem(Blocks.STONE.asItem(), POS.west());
 
         // Place empty variable in importer and exporter
-        placeVariableInWriter(helper.getLevel(), PartPos.of(helper.getLevel(), helper.absolutePos(POS), Direction.WEST), TunnelAspects.Write.World.ENTITYITEM_ITEMSTACK_IMPORT, createVariableForValue(helper.getLevel(), ValueTypes.OBJECT_ITEMSTACK, ValueObjectTypeItemStack.ValueItemStack.of(new ItemStack(Blocks.STONE))));
-        placeVariableInWriter(helper.getLevel(), PartPos.of(helper.getLevel(), helper.absolutePos(POS.east()), Direction.NORTH), TunnelAspects.Write.World.ENTITYITEM_BOOLEAN_EXPORT, new ItemStack(RegistryEntries.ITEM_VARIABLE));
+        placeVariableInWriter(helper, helper.getLevel(), PartPos.of(helper.getLevel(), helper.absolutePos(POS), Direction.WEST), TunnelAspects.Write.World.ENTITYITEM_ITEMSTACK_IMPORT, createVariableForValue(helper.getLevel(), ValueTypes.OBJECT_ITEMSTACK, ValueObjectTypeItemStack.ValueItemStack.of(new ItemStack(Blocks.STONE))));
+        placeVariableInWriter(helper, helper.getLevel(), PartPos.of(helper.getLevel(), helper.absolutePos(POS.east()), Direction.NORTH), TunnelAspects.Write.World.ENTITYITEM_BOOLEAN_EXPORT, new ItemStack(RegistryEntries.ITEM_VARIABLE));
 
         helper.succeedWhen(() -> {
             // Check if items are moved
             helper.assertItemEntityNotPresent(Blocks.STONE.asItem(), POS.west(), 0.25);
-            helper.assertContainerEmpty(POS.west());
+            helper.assertContainerEmpty(POS.east().east());
             helper.assertItemEntityPresent(Blocks.STONE.asItem(), POS.east().north(), 0.25);
         });
     }
@@ -117,13 +113,13 @@ public class GameTestsWorldItem {
         helper.spawnItem(Blocks.STONE.asItem(), POS.west());
 
         // Place empty variable in importer and exporter
-        placeVariableInWriter(helper.getLevel(), PartPos.of(helper.getLevel(), helper.absolutePos(POS), Direction.WEST), TunnelAspects.Write.World.ENTITYITEM_ITEMSTACK_IMPORT, createVariableForValue(helper.getLevel(), ValueTypes.OBJECT_ITEMSTACK, ValueObjectTypeItemStack.ValueItemStack.of(new ItemStack(Blocks.COBBLESTONE))));
-        placeVariableInWriter(helper.getLevel(), PartPos.of(helper.getLevel(), helper.absolutePos(POS.east()), Direction.NORTH), TunnelAspects.Write.World.ENTITYITEM_BOOLEAN_EXPORT, new ItemStack(RegistryEntries.ITEM_VARIABLE));
+        placeVariableInWriter(helper, helper.getLevel(), PartPos.of(helper.getLevel(), helper.absolutePos(POS), Direction.WEST), TunnelAspects.Write.World.ENTITYITEM_ITEMSTACK_IMPORT, createVariableForValue(helper.getLevel(), ValueTypes.OBJECT_ITEMSTACK, ValueObjectTypeItemStack.ValueItemStack.of(new ItemStack(Blocks.COBBLESTONE))));
+        placeVariableInWriter(helper, helper.getLevel(), PartPos.of(helper.getLevel(), helper.absolutePos(POS.east()), Direction.NORTH), TunnelAspects.Write.World.ENTITYITEM_BOOLEAN_EXPORT, new ItemStack(RegistryEntries.ITEM_VARIABLE));
 
         helper.succeedWhen(() -> {
             // Check if items are not moved
             helper.assertItemEntityPresent(Blocks.STONE.asItem(), POS.west(), 0.25);
-            helper.assertContainerEmpty(POS.west());
+            helper.assertContainerEmpty(POS.east().east());
             helper.assertItemEntityNotPresent(Blocks.STONE.asItem(), POS.east().north(), 0.25);
         });
     }

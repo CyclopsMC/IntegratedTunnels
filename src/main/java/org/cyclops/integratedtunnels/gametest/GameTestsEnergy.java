@@ -2,11 +2,10 @@ package org.cyclops.integratedtunnels.gametest;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import org.cyclops.cyclopscore.gametest.GameTest;
 import org.cyclops.integrateddynamics.RegistryEntries;
 import org.cyclops.integrateddynamics.api.part.PartPos;
 import org.cyclops.integrateddynamics.api.part.write.IPartStateWriter;
@@ -23,11 +22,9 @@ import org.cyclops.integratedtunnels.part.aspect.TunnelAspects;
 import static org.cyclops.integrateddynamics.gametest.GameTestHelpersIntegratedDynamics.createVariableForValue;
 import static org.cyclops.integrateddynamics.gametest.GameTestHelpersIntegratedDynamics.placeVariableInWriter;
 
-@GameTestHolder(Reference.MOD_ID)
-@PrefixGameTestTemplate(false)
 public class GameTestsEnergy {
 
-    public static final String TEMPLATE_EMPTY = "empty10";
+    public static final String TEMPLATE_EMPTY = Reference.MOD_ID + ":empty10";
     public static final int TIMEOUT = 2000;
     public static final BlockPos POS = BlockPos.ZERO.offset(2, 0, 2);
 
@@ -48,29 +45,29 @@ public class GameTestsEnergy {
         helper.setBlock(POS.east().east(), RegistryEntries.BLOCK_ENERGY_BATTERY.get());
 
         // Insert energy in interface battery
-        BlockEntityEnergyBattery batteryIn = helper.getBlockEntity(POS.west());
+        BlockEntityEnergyBattery batteryIn = helper.getBlockEntity(POS.west(), BlockEntityEnergyBattery.class);
         batteryIn.setEnergyStored(10_000);
 
         // Place empty variable in importer
         ItemStack variableAspect = new ItemStack(RegistryEntries.ITEM_VARIABLE);
-        placeVariableInWriter(helper.getLevel(), PartPos.of(helper.getLevel(), helper.absolutePos(POS), Direction.WEST), TunnelAspects.Write.Energy.BOOLEAN_IMPORT, variableAspect);
+        placeVariableInWriter(helper, helper.getLevel(), PartPos.of(helper.getLevel(), helper.absolutePos(POS), Direction.WEST), TunnelAspects.Write.Energy.BOOLEAN_IMPORT, variableAspect);
 
         helper.succeedWhen(() -> {
             // Check if energy is moved
-            BlockEntityEnergyBattery batteryOut = helper.getBlockEntity(POS.east().east());
-            helper.assertValueEqual(batteryOut.getEnergyStored(), 10_000, "Battery out does not contain energy");
-            helper.assertValueEqual(batteryIn.getEnergyStored(), 0, "Battery in was not drained");
+            BlockEntityEnergyBattery batteryOut = helper.getBlockEntity(POS.east().east(), BlockEntityEnergyBattery.class);
+            helper.assertValueEqual(batteryOut.getEnergyStored(), 10_000, Component.literal("Battery out does not contain energy"));
+            helper.assertValueEqual(batteryIn.getEnergyStored(), 0, Component.literal("Battery in was not drained"));
 
             // Check importer state
             IPartStateWriter partStateWriter = (IPartStateWriter) PartHelpers.getPart(PartPos.of(helper.getLevel(), helper.absolutePos(POS), Direction.WEST)).getState();
-            helper.assertFalse(partStateWriter.isDeactivated(), "Importer is deactivated");
+            helper.assertFalse(partStateWriter.isDeactivated(), Component.literal("Importer is deactivated"));
             helper.assertValueEqual(
                     PartTypes.IMPORTER_ENERGY.getBlockState(PartHelpers.getPartContainerChecked(PartPos.of(helper.getLevel(), helper.absolutePos(POS), Direction.WEST)), Direction.WEST).getValue(IgnoredBlockStatus.STATUS),
                     IgnoredBlockStatus.Status.ACTIVE,
-                    "Block status is incorrect"
+                    Component.literal("Block status is incorrect")
             );
-            helper.assertValueEqual(partStateWriter.getActiveAspect(), TunnelAspects.Write.Energy.BOOLEAN_IMPORT, "Active aspect is incorrect");
-            helper.assertTrue(partStateWriter.getErrors(TunnelAspects.Write.Energy.BOOLEAN_IMPORT).isEmpty(), "Active aspect has errors");
+            helper.assertValueEqual(partStateWriter.getActiveAspect(), TunnelAspects.Write.Energy.BOOLEAN_IMPORT, Component.literal("Active aspect is incorrect"));
+            helper.assertTrue(partStateWriter.getErrors(TunnelAspects.Write.Energy.BOOLEAN_IMPORT).isEmpty(), Component.literal("Active aspect has errors"));
         });
     }
 
@@ -91,29 +88,29 @@ public class GameTestsEnergy {
         helper.setBlock(POS.east().east(), RegistryEntries.BLOCK_ENERGY_BATTERY.get());
 
         // Insert energy in interface battery
-        BlockEntityEnergyBattery batteryIn = helper.getBlockEntity(POS.west());
+        BlockEntityEnergyBattery batteryIn = helper.getBlockEntity(POS.west(), BlockEntityEnergyBattery.class);
         batteryIn.setEnergyStored(10_000);
 
         // Place empty variable in exporter
         ItemStack variableAspect = new ItemStack(RegistryEntries.ITEM_VARIABLE);
-        placeVariableInWriter(helper.getLevel(), PartPos.of(helper.getLevel(), helper.absolutePos(POS.east()), Direction.EAST), TunnelAspects.Write.Energy.BOOLEAN_EXPORT, variableAspect);
+        placeVariableInWriter(helper, helper.getLevel(), PartPos.of(helper.getLevel(), helper.absolutePos(POS.east()), Direction.EAST), TunnelAspects.Write.Energy.BOOLEAN_EXPORT, variableAspect);
 
         helper.succeedWhen(() -> {
             // Check if energy is moved
-            BlockEntityEnergyBattery batteryOut = helper.getBlockEntity(POS.east().east());
-            helper.assertValueEqual(batteryOut.getEnergyStored(), 10_000, "Battery out does not contain energy");
-            helper.assertValueEqual(batteryIn.getEnergyStored(), 0, "Battery in was not drained");
+            BlockEntityEnergyBattery batteryOut = helper.getBlockEntity(POS.east().east(), BlockEntityEnergyBattery.class);
+            helper.assertValueEqual(batteryOut.getEnergyStored(), 10_000, Component.literal("Battery out does not contain energy"));
+            helper.assertValueEqual(batteryIn.getEnergyStored(), 0, Component.literal("Battery in was not drained"));
 
             // Check importer state
             IPartStateWriter partStateWriter = (IPartStateWriter) PartHelpers.getPart(PartPos.of(helper.getLevel(), helper.absolutePos(POS.east()), Direction.EAST)).getState();
-            helper.assertFalse(partStateWriter.isDeactivated(), "Exporter is deactivated");
+            helper.assertFalse(partStateWriter.isDeactivated(), Component.literal("Exporter is deactivated"));
             helper.assertValueEqual(
                     PartTypes.EXPORTER_ENERGY.getBlockState(PartHelpers.getPartContainerChecked(PartPos.of(helper.getLevel(), helper.absolutePos(POS.east()), Direction.EAST)), Direction.EAST).getValue(IgnoredBlockStatus.STATUS),
                     IgnoredBlockStatus.Status.ACTIVE,
-                    "Block status is incorrect"
+                    Component.literal("Block status is incorrect")
             );
-            helper.assertValueEqual(partStateWriter.getActiveAspect(), TunnelAspects.Write.Energy.BOOLEAN_EXPORT, "Active aspect is incorrect");
-            helper.assertTrue(partStateWriter.getErrors(TunnelAspects.Write.Energy.BOOLEAN_EXPORT).isEmpty(), "Active aspect has errors");
+            helper.assertValueEqual(partStateWriter.getActiveAspect(), TunnelAspects.Write.Energy.BOOLEAN_EXPORT, Component.literal("Active aspect is incorrect"));
+            helper.assertTrue(partStateWriter.getErrors(TunnelAspects.Write.Energy.BOOLEAN_EXPORT).isEmpty(), Component.literal("Active aspect has errors"));
         });
     }
 
@@ -138,24 +135,24 @@ public class GameTestsEnergy {
         helper.setBlock(POS.east().north(), RegistryEntries.BLOCK_ENERGY_BATTERY.get());
 
         // Insert energy in interface battery
-        BlockEntityEnergyBattery batteryIn = helper.getBlockEntity(POS.west());
+        BlockEntityEnergyBattery batteryIn = helper.getBlockEntity(POS.west(), BlockEntityEnergyBattery.class);
         batteryIn.setEnergyStored(10_000);
 
         // Place empty variable in importer
         ItemStack variableAspectImporter = new ItemStack(RegistryEntries.ITEM_VARIABLE);
-        placeVariableInWriter(helper.getLevel(), PartPos.of(helper.getLevel(), helper.absolutePos(POS), Direction.WEST), TunnelAspects.Write.Energy.BOOLEAN_IMPORT, variableAspectImporter);
+        placeVariableInWriter(helper, helper.getLevel(), PartPos.of(helper.getLevel(), helper.absolutePos(POS), Direction.WEST), TunnelAspects.Write.Energy.BOOLEAN_IMPORT, variableAspectImporter);
 
         // Place empty variable in exporter
         ItemStack variableAspectExporter = new ItemStack(RegistryEntries.ITEM_VARIABLE);
-        placeVariableInWriter(helper.getLevel(), PartPos.of(helper.getLevel(), helper.absolutePos(POS.east()), Direction.NORTH), TunnelAspects.Write.Energy.BOOLEAN_EXPORT, variableAspectExporter);
+        placeVariableInWriter(helper, helper.getLevel(), PartPos.of(helper.getLevel(), helper.absolutePos(POS.east()), Direction.NORTH), TunnelAspects.Write.Energy.BOOLEAN_EXPORT, variableAspectExporter);
 
         helper.succeedWhen(() -> {
             // Check if energy is moved
-            BlockEntityEnergyBattery batteryInterface = helper.getBlockEntity(POS.east().east());
-            BlockEntityEnergyBattery batteryOut = helper.getBlockEntity(POS.east().north());
-            helper.assertValueEqual(batteryInterface.getEnergyStored(), 0, "Battery interface was not drained");
-            helper.assertValueEqual(batteryOut.getEnergyStored(), 10_000, "Battery out does not contain energy");
-            helper.assertValueEqual(batteryIn.getEnergyStored(), 0, "Battery in was not drained");
+            BlockEntityEnergyBattery batteryInterface = helper.getBlockEntity(POS.east().east(), BlockEntityEnergyBattery.class);
+            BlockEntityEnergyBattery batteryOut = helper.getBlockEntity(POS.east().north(), BlockEntityEnergyBattery.class);
+            helper.assertValueEqual(batteryInterface.getEnergyStored(), 0, Component.literal("Battery interface was not drained"));
+            helper.assertValueEqual(batteryOut.getEnergyStored(), 10_000, Component.literal("Battery out does not contain energy"));
+            helper.assertValueEqual(batteryIn.getEnergyStored(), 0, Component.literal("Battery in was not drained"));
         });
     }
 
@@ -176,18 +173,18 @@ public class GameTestsEnergy {
         helper.setBlock(POS.east().east(), RegistryEntries.BLOCK_ENERGY_BATTERY.get());
 
         // Insert energy in importer battery
-        BlockEntityEnergyBattery batteryIn = helper.getBlockEntity(POS.west());
+        BlockEntityEnergyBattery batteryIn = helper.getBlockEntity(POS.west(), BlockEntityEnergyBattery.class);
         batteryIn.setEnergyStored(10_000);
 
         // Place empty variable in importer
         ItemStack variableAspect = createVariableForValue(helper.getLevel(), ValueTypes.LONG, ValueTypeLong.ValueLong.of(10));
-        placeVariableInWriter(helper.getLevel(), PartPos.of(helper.getLevel(), helper.absolutePos(POS), Direction.WEST), TunnelAspects.Write.Energy.LONG_IMPORT, variableAspect);
+        placeVariableInWriter(helper, helper.getLevel(), PartPos.of(helper.getLevel(), helper.absolutePos(POS), Direction.WEST), TunnelAspects.Write.Energy.LONG_IMPORT, variableAspect);
 
         helper.succeedWhen(() -> {
             // Check if energy is moved
-            BlockEntityEnergyBattery batteryOut = helper.getBlockEntity(POS.east().east());
-            helper.assertValueEqual(batteryOut.getEnergyStored(), 10_000, "Battery out does not contain energy");
-            helper.assertValueEqual(batteryIn.getEnergyStored(), 0, "Battery in was not drained");
+            BlockEntityEnergyBattery batteryOut = helper.getBlockEntity(POS.east().east(), BlockEntityEnergyBattery.class);
+            helper.assertValueEqual(batteryOut.getEnergyStored(), 10_000, Component.literal("Battery out does not contain energy"));
+            helper.assertValueEqual(batteryIn.getEnergyStored(), 0, Component.literal("Battery in was not drained"));
         });
     }
 
@@ -208,44 +205,44 @@ public class GameTestsEnergy {
         helper.setBlock(POS.east().east(), RegistryEntries.BLOCK_ENERGY_BATTERY.get());
 
         // Insert energy in interface battery
-        BlockEntityEnergyBattery batteryIn = helper.getBlockEntity(POS.west());
+        BlockEntityEnergyBattery batteryIn = helper.getBlockEntity(POS.west(), BlockEntityEnergyBattery.class);
         batteryIn.setEnergyStored(10_000);
 
         // Place empty variable in importer
         ItemStack variableAspectImporter = new ItemStack(RegistryEntries.ITEM_VARIABLE);
-        placeVariableInWriter(helper.getLevel(), PartPos.of(helper.getLevel(), helper.absolutePos(POS), Direction.WEST), TunnelAspects.Write.Energy.BOOLEAN_IMPORT, variableAspectImporter);
+        placeVariableInWriter(helper, helper.getLevel(), PartPos.of(helper.getLevel(), helper.absolutePos(POS), Direction.WEST), TunnelAspects.Write.Energy.BOOLEAN_IMPORT, variableAspectImporter);
 
         // Place empty variable in filtering interface
         ItemStack variableAspectInterface = new ItemStack(RegistryEntries.ITEM_VARIABLE);
-        placeVariableInWriter(helper.getLevel(), PartPos.of(helper.getLevel(), helper.absolutePos(POS.east()), Direction.EAST), TunnelAspects.Write.EnergyFilter.BOOLEAN_SET_FILTER, variableAspectInterface);
+        placeVariableInWriter(helper, helper.getLevel(), PartPos.of(helper.getLevel(), helper.absolutePos(POS.east()), Direction.EAST), TunnelAspects.Write.EnergyFilter.BOOLEAN_SET_FILTER, variableAspectInterface);
 
         helper.succeedWhen(() -> {
             // Check if energy is moved
-            BlockEntityEnergyBattery batteryOut = helper.getBlockEntity(POS.east().east());
-            helper.assertValueEqual(batteryOut.getEnergyStored(), 10_000, "Battery out does not contain energy");
-            helper.assertValueEqual(batteryIn.getEnergyStored(), 0, "Battery in was not drained");
+            BlockEntityEnergyBattery batteryOut = helper.getBlockEntity(POS.east().east(), BlockEntityEnergyBattery.class);
+            helper.assertValueEqual(batteryOut.getEnergyStored(), 10_000, Component.literal("Battery out does not contain energy"));
+            helper.assertValueEqual(batteryIn.getEnergyStored(), 0, Component.literal("Battery in was not drained"));
 
             // Check importer state
             IPartStateWriter partStateWriter = (IPartStateWriter) PartHelpers.getPart(PartPos.of(helper.getLevel(), helper.absolutePos(POS), Direction.WEST)).getState();
-            helper.assertFalse(partStateWriter.isDeactivated(), "Importer is deactivated");
+            helper.assertFalse(partStateWriter.isDeactivated(), Component.literal("Importer is deactivated"));
             helper.assertValueEqual(
                     PartTypes.IMPORTER_ENERGY.getBlockState(PartHelpers.getPartContainerChecked(PartPos.of(helper.getLevel(), helper.absolutePos(POS), Direction.WEST)), Direction.WEST).getValue(IgnoredBlockStatus.STATUS),
                     IgnoredBlockStatus.Status.ACTIVE,
-                    "Block status importer is incorrect"
+                    Component.literal("Block status importer is incorrect")
             );
-            helper.assertValueEqual(partStateWriter.getActiveAspect(), TunnelAspects.Write.Energy.BOOLEAN_IMPORT, "Active aspect importer is incorrect");
-            helper.assertTrue(partStateWriter.getErrors(TunnelAspects.Write.Energy.BOOLEAN_IMPORT).isEmpty(), "Active aspect importer has errors");
+            helper.assertValueEqual(partStateWriter.getActiveAspect(), TunnelAspects.Write.Energy.BOOLEAN_IMPORT, Component.literal("Active aspect importer is incorrect"));
+            helper.assertTrue(partStateWriter.getErrors(TunnelAspects.Write.Energy.BOOLEAN_IMPORT).isEmpty(), Component.literal("Active aspect importer has errors"));
 
             // Check filtering interface state
             IPartStateWriter partStateInterface = (IPartStateWriter) PartHelpers.getPart(PartPos.of(helper.getLevel(), helper.absolutePos(POS.east()), Direction.EAST)).getState();
-            helper.assertFalse(partStateInterface.isDeactivated(), "Filtering interface is deactivated");
+            helper.assertFalse(partStateInterface.isDeactivated(), Component.literal("Filtering interface is deactivated"));
             helper.assertValueEqual(
                     PartTypes.INTERFACE_FILTERING_ENERGY.getBlockState(PartHelpers.getPartContainerChecked(PartPos.of(helper.getLevel(), helper.absolutePos(POS.east()), Direction.EAST)), Direction.EAST).getValue(IgnoredBlockStatus.STATUS),
                     IgnoredBlockStatus.Status.ACTIVE,
-                    "Block status filtering interface is incorrect"
+                    Component.literal("Block status filtering interface is incorrect")
             );
-            helper.assertValueEqual(partStateInterface.getActiveAspect(), TunnelAspects.Write.EnergyFilter.BOOLEAN_SET_FILTER, "Active aspect filtering interface is incorrect");
-            helper.assertTrue(partStateInterface.getErrors(TunnelAspects.Write.EnergyFilter.BOOLEAN_SET_FILTER).isEmpty(), "Active aspect filtering interface has errors");
+            helper.assertValueEqual(partStateInterface.getActiveAspect(), TunnelAspects.Write.EnergyFilter.BOOLEAN_SET_FILTER, Component.literal("Active aspect filtering interface is incorrect"));
+            helper.assertTrue(partStateInterface.getErrors(TunnelAspects.Write.EnergyFilter.BOOLEAN_SET_FILTER).isEmpty(), Component.literal("Active aspect filtering interface has errors"));
         });
     }
 
@@ -266,44 +263,44 @@ public class GameTestsEnergy {
         helper.setBlock(POS.east().east(), RegistryEntries.BLOCK_ENERGY_BATTERY.get());
 
         // Insert energy in interface battery
-        BlockEntityEnergyBattery batteryIn = helper.getBlockEntity(POS.west());
+        BlockEntityEnergyBattery batteryIn = helper.getBlockEntity(POS.west(), BlockEntityEnergyBattery.class);
         batteryIn.setEnergyStored(10_000);
 
         // Place empty variable in importer
         ItemStack variableAspectImporter = new ItemStack(RegistryEntries.ITEM_VARIABLE);
-        placeVariableInWriter(helper.getLevel(), PartPos.of(helper.getLevel(), helper.absolutePos(POS), Direction.WEST), TunnelAspects.Write.Energy.BOOLEAN_IMPORT, variableAspectImporter);
+        placeVariableInWriter(helper, helper.getLevel(), PartPos.of(helper.getLevel(), helper.absolutePos(POS), Direction.WEST), TunnelAspects.Write.Energy.BOOLEAN_IMPORT, variableAspectImporter);
 
         // Place empty variable in filtering interface
         ItemStack variableAspectInterface = createVariableForValue(helper.getLevel(), ValueTypes.BOOLEAN, ValueTypeBoolean.ValueBoolean.of(false));
-        placeVariableInWriter(helper.getLevel(), PartPos.of(helper.getLevel(), helper.absolutePos(POS.east()), Direction.EAST), TunnelAspects.Write.EnergyFilter.BOOLEAN_SET_FILTER, variableAspectInterface);
+        placeVariableInWriter(helper, helper.getLevel(), PartPos.of(helper.getLevel(), helper.absolutePos(POS.east()), Direction.EAST), TunnelAspects.Write.EnergyFilter.BOOLEAN_SET_FILTER, variableAspectInterface);
 
         helper.succeedWhen(() -> {
             // Check if energy is not moved
-            BlockEntityEnergyBattery batteryOut = helper.getBlockEntity(POS.east().east());
-            helper.assertValueEqual(batteryOut.getEnergyStored(), 0, "Battery out contains energy");
-            helper.assertValueEqual(batteryIn.getEnergyStored(), 10_000, "Battery in was drained");
+            BlockEntityEnergyBattery batteryOut = helper.getBlockEntity(POS.east().east(), BlockEntityEnergyBattery.class);
+            helper.assertValueEqual(batteryOut.getEnergyStored(), 0, Component.literal("Battery out contains energy"));
+            helper.assertValueEqual(batteryIn.getEnergyStored(), 10_000, Component.literal("Battery in was drained"));
 
             // Check importer state
             IPartStateWriter partStateWriter = (IPartStateWriter) PartHelpers.getPart(PartPos.of(helper.getLevel(), helper.absolutePos(POS), Direction.WEST)).getState();
-            helper.assertFalse(partStateWriter.isDeactivated(), "Importer is deactivated");
+            helper.assertFalse(partStateWriter.isDeactivated(), Component.literal("Importer is deactivated"));
             helper.assertValueEqual(
                     PartTypes.IMPORTER_ENERGY.getBlockState(PartHelpers.getPartContainerChecked(PartPos.of(helper.getLevel(), helper.absolutePos(POS), Direction.WEST)), Direction.WEST).getValue(IgnoredBlockStatus.STATUS),
                     IgnoredBlockStatus.Status.ACTIVE,
-                    "Block status importer is incorrect"
+                    Component.literal("Block status importer is incorrect")
             );
-            helper.assertValueEqual(partStateWriter.getActiveAspect(), TunnelAspects.Write.Energy.BOOLEAN_IMPORT, "Active aspect importer is incorrect");
-            helper.assertTrue(partStateWriter.getErrors(TunnelAspects.Write.Energy.BOOLEAN_IMPORT).isEmpty(), "Active aspect importer has errors");
+            helper.assertValueEqual(partStateWriter.getActiveAspect(), TunnelAspects.Write.Energy.BOOLEAN_IMPORT, Component.literal("Active aspect importer is incorrect"));
+            helper.assertTrue(partStateWriter.getErrors(TunnelAspects.Write.Energy.BOOLEAN_IMPORT).isEmpty(), Component.literal("Active aspect importer has errors"));
 
             // Check filtering interface state
             IPartStateWriter partStateInterface = (IPartStateWriter) PartHelpers.getPart(PartPos.of(helper.getLevel(), helper.absolutePos(POS.east()), Direction.EAST)).getState();
-            helper.assertFalse(partStateInterface.isDeactivated(), "Filtering interface is deactivated");
+            helper.assertFalse(partStateInterface.isDeactivated(), Component.literal("Filtering interface is deactivated"));
             helper.assertValueEqual(
                     PartTypes.INTERFACE_FILTERING_ENERGY.getBlockState(PartHelpers.getPartContainerChecked(PartPos.of(helper.getLevel(), helper.absolutePos(POS.east()), Direction.EAST)), Direction.EAST).getValue(IgnoredBlockStatus.STATUS),
                     IgnoredBlockStatus.Status.ACTIVE,
-                    "Block status filtering interface is incorrect"
+                    Component.literal("Block status filtering interface is incorrect")
             );
-            helper.assertValueEqual(partStateInterface.getActiveAspect(), TunnelAspects.Write.EnergyFilter.BOOLEAN_SET_FILTER, "Active aspect filtering interface is incorrect");
-            helper.assertTrue(partStateInterface.getErrors(TunnelAspects.Write.EnergyFilter.BOOLEAN_SET_FILTER).isEmpty(), "Active aspect filtering interface has errors");
+            helper.assertValueEqual(partStateInterface.getActiveAspect(), TunnelAspects.Write.EnergyFilter.BOOLEAN_SET_FILTER, Component.literal("Active aspect filtering interface is incorrect"));
+            helper.assertTrue(partStateInterface.getErrors(TunnelAspects.Write.EnergyFilter.BOOLEAN_SET_FILTER).isEmpty(), Component.literal("Active aspect filtering interface has errors"));
         });
     }
 

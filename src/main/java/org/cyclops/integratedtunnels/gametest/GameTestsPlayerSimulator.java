@@ -2,16 +2,15 @@ package org.cyclops.integratedtunnels.gametest;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.LeverBlock;
 import net.minecraft.world.level.block.entity.ChestBlockEntity;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import org.cyclops.cyclopscore.gametest.GameTest;
 import org.cyclops.integrateddynamics.RegistryEntries;
 import org.cyclops.integrateddynamics.api.part.PartPos;
 import org.cyclops.integrateddynamics.api.part.PartTarget;
@@ -30,11 +29,9 @@ import org.cyclops.integratedtunnels.part.aspect.TunnelAspects;
 import static org.cyclops.integrateddynamics.gametest.GameTestHelpersIntegratedDynamics.createVariableForValue;
 import static org.cyclops.integrateddynamics.gametest.GameTestHelpersIntegratedDynamics.placeVariableInWriter;
 
-@GameTestHolder(Reference.MOD_ID)
-@PrefixGameTestTemplate(false)
 public class GameTestsPlayerSimulator {
 
-    public static final String TEMPLATE_EMPTY = "empty10";
+    public static final String TEMPLATE_EMPTY = Reference.MOD_ID + ":empty10";
     public static final int TIMEOUT = 2000;
     public static final BlockPos POS = BlockPos.ZERO.offset(2, 1, 2);
 
@@ -58,34 +55,34 @@ public class GameTestsPlayerSimulator {
         helper.setBlock(POS.west().below(), Blocks.STONE);
 
         // Insert some items into interface
-        ChestBlockEntity chestIn = helper.getBlockEntity(POS.east().east());
+        ChestBlockEntity chestIn = helper.getBlockEntity(POS.east().east(), ChestBlockEntity.class);
         chestIn.setItem(0, new ItemStack(Items.WHITE_WOOL));
         chestIn.setItem(1, new ItemStack(Items.BUCKET));
         chestIn.setItem(2, new ItemStack(Items.DIAMOND_PICKAXE));
 
         // Place bucket variable in click item
-        placeVariableInWriter(helper.getLevel(), PartPos.of(helper.getLevel(), helper.absolutePos(POS), Direction.WEST), TunnelAspects.Write.Player.CLICK_ITEM_ITEMSTACK, createVariableForValue(helper.getLevel(), ValueTypes.OBJECT_ITEMSTACK, ValueObjectTypeItemStack.ValueItemStack.of(new ItemStack(Items.BUCKET))));
+        placeVariableInWriter(helper, helper.getLevel(), PartPos.of(helper.getLevel(), helper.absolutePos(POS), Direction.WEST), TunnelAspects.Write.Player.CLICK_ITEM_ITEMSTACK, createVariableForValue(helper.getLevel(), ValueTypes.OBJECT_ITEMSTACK, ValueObjectTypeItemStack.ValueItemStack.of(new ItemStack(Items.BUCKET))));
 
         helper.succeedWhen(() -> {
             // Check bucket is filled
             helper.assertContainerContains(POS.east().east(), Items.WHITE_WOOL);
             helper.assertContainerContains(POS.east().east(), Items.MILK_BUCKET);
             helper.assertContainerContains(POS.east().east(), Items.DIAMOND_PICKAXE);
-            helper.assertTrue(chestIn.getItem(3).isEmpty(), "Chest contains too many items");
+            helper.assertTrue(chestIn.getItem(3).isEmpty(), Component.literal("Chest contains too many items"));
 
             // Check cow still exists
             helper.assertEntityPresent(EntityType.COW);
 
             // Check importer state
             IPartStateWriter partStateWriter = (IPartStateWriter) PartHelpers.getPart(PartPos.of(helper.getLevel(), helper.absolutePos(POS), Direction.WEST)).getState();
-            helper.assertFalse(partStateWriter.isDeactivated(), "Importer is deactivated");
+            helper.assertFalse(partStateWriter.isDeactivated(), Component.literal("Importer is deactivated"));
             helper.assertValueEqual(
                     PartTypes.PLAYER_SIMULATOR.getBlockState(PartHelpers.getPartContainerChecked(PartPos.of(helper.getLevel(), helper.absolutePos(POS), Direction.WEST)), Direction.WEST).getValue(IgnoredBlockStatus.STATUS),
                     IgnoredBlockStatus.Status.ACTIVE,
-                    "Block status is incorrect"
+                    Component.literal("Block status is incorrect")
             );
-            helper.assertValueEqual(partStateWriter.getActiveAspect(), TunnelAspects.Write.Player.CLICK_ITEM_ITEMSTACK, "Active aspect is incorrect");
-            helper.assertTrue(partStateWriter.getErrors(TunnelAspects.Write.Player.CLICK_ITEM_ITEMSTACK).isEmpty(), "Active aspect has errors");
+            helper.assertValueEqual(partStateWriter.getActiveAspect(), TunnelAspects.Write.Player.CLICK_ITEM_ITEMSTACK, Component.literal("Active aspect is incorrect"));
+            helper.assertTrue(partStateWriter.getErrors(TunnelAspects.Write.Player.CLICK_ITEM_ITEMSTACK).isEmpty(), Component.literal("Active aspect has errors"));
         });
     }
 
@@ -116,12 +113,12 @@ public class GameTestsPlayerSimulator {
         helper.setBlock(POS.west().west().south(), Blocks.ACACIA_FENCE);
 
         // Insert some items into interface
-        ChestBlockEntity chestIn = helper.getBlockEntity(POS.east().east());
+        ChestBlockEntity chestIn = helper.getBlockEntity(POS.east().east(), ChestBlockEntity.class);
         chestIn.setItem(0, new ItemStack(Items.DIAMOND_SWORD));
 
         // Enable click any item aspect
         PartPos posPlayerSimulator = PartPos.of(helper.getLevel(), helper.absolutePos(POS), Direction.WEST);
-        placeVariableInWriter(helper.getLevel(), posPlayerSimulator, TunnelAspects.Write.Player.CLICK_ITEM_BOOLEAN, createVariableForValue(helper.getLevel(), ValueTypes.BOOLEAN, ValueTypeBoolean.ValueBoolean.of(true)));
+        placeVariableInWriter(helper, helper.getLevel(), posPlayerSimulator, TunnelAspects.Write.Player.CLICK_ITEM_BOOLEAN, createVariableForValue(helper.getLevel(), ValueTypes.BOOLEAN, ValueTypeBoolean.ValueBoolean.of(true)));
 
         // Set aspect to left-click
         PartHelpers.PartStateHolder partStateHolder = PartHelpers.getPart(posPlayerSimulator);
@@ -157,7 +154,7 @@ public class GameTestsPlayerSimulator {
         helper.setBlock(POS.west(), Blocks.LEVER);
 
         // Enable empty click aspect
-        placeVariableInWriter(helper.getLevel(), PartPos.of(helper.getLevel(), helper.absolutePos(POS), Direction.WEST), TunnelAspects.Write.Player.CLICK_EMPTY_BOOLEAN, new ItemStack(RegistryEntries.ITEM_VARIABLE));
+        placeVariableInWriter(helper, helper.getLevel(), PartPos.of(helper.getLevel(), helper.absolutePos(POS), Direction.WEST), TunnelAspects.Write.Player.CLICK_EMPTY_BOOLEAN, new ItemStack(RegistryEntries.ITEM_VARIABLE));
 
         helper.succeedWhen(() -> {
             // Check lever is flipped
@@ -186,11 +183,11 @@ public class GameTestsPlayerSimulator {
         helper.setBlock(POS.west().south(), Blocks.STONE);
 
         // Insert some items into interface
-        ChestBlockEntity chestIn = helper.getBlockEntity(POS.east().east());
+        ChestBlockEntity chestIn = helper.getBlockEntity(POS.east().east(), ChestBlockEntity.class);
         chestIn.setItem(0, new ItemStack(Items.WATER_BUCKET));
 
         // Enable item click aspect
-        placeVariableInWriter(helper.getLevel(), PartPos.of(helper.getLevel(), helper.absolutePos(POS), Direction.WEST), TunnelAspects.Write.Player.CLICK_ITEM_BOOLEAN, new ItemStack(RegistryEntries.ITEM_VARIABLE));
+        placeVariableInWriter(helper, helper.getLevel(), PartPos.of(helper.getLevel(), helper.absolutePos(POS), Direction.WEST), TunnelAspects.Write.Player.CLICK_ITEM_BOOLEAN, new ItemStack(RegistryEntries.ITEM_VARIABLE));
 
         helper.succeedWhen(() -> {
             // Check bucket is drained
@@ -221,12 +218,12 @@ public class GameTestsPlayerSimulator {
         helper.setBlock(POS.east().east(), Blocks.CHEST);
 
         // Insert some items into interface
-        ChestBlockEntity chestIn = helper.getBlockEntity(POS.east().east());
+        ChestBlockEntity chestIn = helper.getBlockEntity(POS.east().east(), ChestBlockEntity.class);
         chestIn.setItem(0, new ItemStack(Items.DIAMOND_PICKAXE));
 
         // Enable click any item aspect
         PartPos posPlayerSimulator = PartPos.of(helper.getLevel(), helper.absolutePos(POS), Direction.WEST);
-        placeVariableInWriter(helper.getLevel(), posPlayerSimulator, TunnelAspects.Write.Player.CLICK_ITEM_BOOLEAN, createVariableForValue(helper.getLevel(), ValueTypes.BOOLEAN, ValueTypeBoolean.ValueBoolean.of(true)));
+        placeVariableInWriter(helper, helper.getLevel(), posPlayerSimulator, TunnelAspects.Write.Player.CLICK_ITEM_BOOLEAN, createVariableForValue(helper.getLevel(), ValueTypes.BOOLEAN, ValueTypeBoolean.ValueBoolean.of(true)));
 
         // Set aspect to left-click
         PartHelpers.PartStateHolder partStateHolder = PartHelpers.getPart(posPlayerSimulator);
@@ -263,11 +260,11 @@ public class GameTestsPlayerSimulator {
         helper.setBlock(POS.west().west().west(), Blocks.STONE);
 
         // Insert some items into interface
-        ChestBlockEntity chestIn = helper.getBlockEntity(POS.east().east());
+        ChestBlockEntity chestIn = helper.getBlockEntity(POS.east().east(), ChestBlockEntity.class);
         chestIn.setItem(0, new ItemStack(Items.DIRT));
 
         // Enable item click aspect
-        placeVariableInWriter(helper.getLevel(), PartPos.of(helper.getLevel(), helper.absolutePos(POS), Direction.WEST), TunnelAspects.Write.Player.CLICK_ITEM_BOOLEAN, new ItemStack(RegistryEntries.ITEM_VARIABLE));
+        placeVariableInWriter(helper, helper.getLevel(), PartPos.of(helper.getLevel(), helper.absolutePos(POS), Direction.WEST), TunnelAspects.Write.Player.CLICK_ITEM_BOOLEAN, new ItemStack(RegistryEntries.ITEM_VARIABLE));
 
         helper.succeedWhen(() -> {
             // Check inventory is empty

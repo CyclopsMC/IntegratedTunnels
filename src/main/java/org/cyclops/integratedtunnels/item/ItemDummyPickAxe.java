@@ -2,11 +2,8 @@ package org.cyclops.integratedtunnels.item;
 
 import com.google.common.collect.Maps;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.tags.BlockTags;
-import net.minecraft.world.item.DiggerItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.ToolMaterial;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.server.ServerLifecycleHooks;
@@ -19,12 +16,12 @@ import java.util.Objects;
  * A dummy pickaxe that can harvest everything.
  * @author rubensworks
  */
-public class ItemDummyPickAxe extends DiggerItem {
+public class ItemDummyPickAxe extends Item {
 
     private static final Map<EnchantmentData, ItemStack> ITEMSTACKS = Maps.newHashMap();
 
     public ItemDummyPickAxe(Item.Properties properties) {
-        super(ToolMaterial.DIAMOND, BlockTags.MINEABLE_WITH_PICKAXE, 1, 1, properties);
+        super(properties);
     }
 
     @Override

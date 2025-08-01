@@ -1,8 +1,6 @@
 package org.cyclops.integratedtunnels.core.part;
 
 import net.minecraft.core.Vec3i;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.Tag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
@@ -12,6 +10,8 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import org.apache.commons.lang3.tuple.Triple;
 import org.cyclops.cyclopscore.datastructure.DimPos;
 import org.cyclops.cyclopscore.network.PacketCodecs;
@@ -171,17 +171,15 @@ public abstract class PartTypeInterfacePositionedAddon<N extends IPositionedAddo
         private IPartNetwork partNetwork;
 
         @Override
-        public void readFromNBT(ValueDeseralizationContext valueDeseralizationContext, CompoundTag tag) {
-            super.readFromNBT(valueDeseralizationContext, tag);
-            if (tag.contains("channelInterface", Tag.TAG_INT)) {
-                this.channelInterface = tag.getInt("channelInterface");
-            }
+        public void serialize(ValueOutput valueOutput) {
+            super.serialize(valueOutput);
+            valueOutput.putInt("channelInterface", channelInterface);
         }
 
         @Override
-        public void writeToNBT(ValueDeseralizationContext valueDeseralizationContext, CompoundTag tag) {
-            super.writeToNBT(valueDeseralizationContext, tag);
-            tag.putInt("channelInterface", channelInterface);
+        public void deserialize(ValueInput valueInput) {
+            super.deserialize(valueInput);
+            this.channelInterface = valueInput.getInt("channelInterface").orElseThrow();
         }
 
         @Override

@@ -2,9 +2,9 @@ package org.cyclops.integratedtunnels.part.aspect.listproxy;
 
 import com.google.common.collect.Iterators;
 import net.minecraft.core.Direction;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import org.cyclops.cyclopscore.datastructure.DimPos;
 import org.cyclops.cyclopscore.ingredient.collection.IIngredientCollectionLike;
 import org.cyclops.cyclopscore.persist.nbt.INBTProvider;
@@ -36,15 +36,15 @@ public class ValueTypeListProxyPositionedItemNetwork extends ValueTypeListProxyP
     }
 
     @Override
-    public void writeGeneratedFieldsToNBT(CompoundTag tag, HolderLookup.Provider holderLookupProvider) {
-        super.writeGeneratedFieldsToNBT(tag, holderLookupProvider);
-        NBTClassType.writeNbt(Integer.class, "channel", this.channel, tag, holderLookupProvider);
+    public void writeGeneratedFieldsToNBT(ValueOutput output) {
+        super.writeGeneratedFieldsToNBT(output);
+        NBTClassType.writeNbt(Integer.class, "channel", this.channel, output);
     }
 
     @Override
-    public void readGeneratedFieldsFromNBT(CompoundTag tag, HolderLookup.Provider holderLookupProvider) {
-        super.readGeneratedFieldsFromNBT(tag, holderLookupProvider);
-        this.channel = NBTClassType.readNbt(Integer.class, "channel", tag, holderLookupProvider);
+    public void readGeneratedFieldsFromNBT(ValueInput input) {
+        super.readGeneratedFieldsFromNBT(input);
+        this.channel = NBTClassType.readNbt(Integer.class, "channel", input);
     }
 
     protected Optional<IIngredientPositionsIndex<ItemStack, Integer>> getChannelIndex() {
