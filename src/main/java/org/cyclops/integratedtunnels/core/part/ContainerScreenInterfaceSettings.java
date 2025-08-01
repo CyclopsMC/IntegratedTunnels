@@ -97,7 +97,7 @@ public class ContainerScreenInterfaceSettings extends ContainerScreenPartSetting
     protected void renderBg(GuiGraphics guiGraphics, float partialTicks, int mouseX, int mouseY) {
         super.renderBg(guiGraphics, partialTicks, mouseX, mouseY);
         guiGraphics.drawString(font, IModHelpers.get().getL10NHelpers().localize("gui.integratedtunnels.partsettings.channel.interface"),
-                leftPos + 8, topPos + 112, IModHelpers.get().getBaseHelpers().RGBToInt(0, 0, 0), false);
+                leftPos + 8, topPos + 112, IModHelpers.get().getBaseHelpers().RGBAToInt(0, 0, 0, 255), false);
         numberFieldChannelInterface.render(guiGraphics, mouseX, mouseY, partialTicks);
     }
 
