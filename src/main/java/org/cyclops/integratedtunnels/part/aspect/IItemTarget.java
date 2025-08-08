@@ -45,7 +45,7 @@ public interface IItemTarget extends IChanneledTarget<IItemNetwork, ItemStack> {
         INetwork network = IChanneledTarget.getNetworkChecked(center);
         BlockEntity tile = target.getPos().getLevel(true).getBlockEntity(target.getPos().getBlockPos());
         PartStateRoundRobin<?> partState = IChanneledTarget.getPartState(center);
-        return new ItemTargetCapabilityProvider(transfer, network, Block.class, tile == null ? null : ICapabilityGetter.forBlockEntity(tile), tile, target.getSide(),
+        return new ItemTargetCapabilityProvider(transfer, network, Block.class, tile == null ? ICapabilityGetter.forBlock(target.getPos().getLevel(true), target.getPos().getBlockPos(), null, null) : ICapabilityGetter.forBlockEntity(tile), tile, target.getSide(),
                 slot, itemStackMatcher, partTarget, properties, partState);
     }
 
