@@ -43,7 +43,7 @@ public interface IFluidTarget extends IChanneledTarget<IFluidNetwork, FluidStack
         INetwork network = IChanneledTarget.getNetworkChecked(center);
         BlockEntity tile = target.getPos().getLevel(true).getBlockEntity(target.getPos().getBlockPos());
         PartStateRoundRobin<?> partState = IChanneledTarget.getPartState(center);
-        return new FluidTargetCapabilityProvider(transfer, network, Block.class, tile == null ? null : ICapabilityGetter.forBlockEntity(tile), tile, target.getSide(),
+        return new FluidTargetCapabilityProvider(transfer, network, Block.class, tile == null ? ICapabilityGetter.forBlock(target.getPos().getLevel(true), target.getPos().getBlockPos(), null, null) : ICapabilityGetter.forBlockEntity(tile), tile, target.getSide(),
                 fluidStackMatcher, partTarget, properties, partState);
     }
 

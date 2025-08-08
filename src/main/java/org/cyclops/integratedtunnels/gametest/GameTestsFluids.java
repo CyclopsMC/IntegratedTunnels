@@ -6,6 +6,7 @@ import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.LayeredCauldronBlock;
 import net.minecraft.world.level.material.Fluids;
 import net.neoforged.neoforge.fluids.FluidStack;
 import org.cyclops.cyclopscore.datastructure.DimPos;
@@ -161,6 +162,43 @@ public class GameTestsFluids {
             helper.assertValueEqual(basinInterface.getTank().getFluidAmount(), 0, Component.literal("Basin interface was not drained"));
             helper.assertValueEqual(basinOut.getTank().getFluidAmount(), 1_000, Component.literal("Basin out does not contain fluids"));
             helper.assertValueEqual(basinIn.getTank().getFluidAmount(), 0, Component.literal("Basin in was not drained"));
+        });
+    }
+
+    @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
+    public void testFluidImporterToInterfaceToExporterBooleanCauldron(GameTestHelper helper) {
+        // Place cable
+        helper.setBlock(POS, RegistryEntries.BLOCK_CABLE.value());
+        helper.setBlock(POS.east(), RegistryEntries.BLOCK_CABLE.value());
+
+        // Place fluid importer
+        PartHelpers.addPart(helper.getLevel(), helper.absolutePos(POS), Direction.WEST, PartTypes.IMPORTER_FLUID, new ItemStack(PartTypes.IMPORTER_FLUID.getItem()));
+
+        // Place fluid interface
+        PartHelpers.addPart(helper.getLevel(), helper.absolutePos(POS.east()), Direction.EAST, PartTypes.INTERFACE_FLUID, new ItemStack(PartTypes.INTERFACE_FLUID.getItem()));
+
+        // Place fluid exporter
+        PartHelpers.addPart(helper.getLevel(), helper.absolutePos(POS.east()), Direction.NORTH, PartTypes.EXPORTER_FLUID, new ItemStack(PartTypes.EXPORTER_FLUID.getItem()));
+
+        // Place cauldrons
+        helper.setBlock(POS.west(), Blocks.WATER_CAULDRON.defaultBlockState().setValue(LayeredCauldronBlock.LEVEL, LayeredCauldronBlock.MAX_FILL_LEVEL));
+        helper.setBlock(POS.east().east(), Blocks.CAULDRON);
+        helper.setBlock(POS.east().north(), Blocks.CAULDRON);
+
+        // Place empty variable in importer
+        ItemStack variableAspectImporter = new ItemStack(RegistryEntries.ITEM_VARIABLE);
+        placeVariableInWriter(helper, helper.getLevel(), PartPos.of(helper.getLevel(), helper.absolutePos(POS), Direction.WEST), TunnelAspects.Write.Fluid.BOOLEAN_IMPORT, variableAspectImporter);
+
+        // Place empty variable in exporter
+        ItemStack variableAspectExporter = new ItemStack(RegistryEntries.ITEM_VARIABLE);
+        placeVariableInWriter(helper, helper.getLevel(), PartPos.of(helper.getLevel(), helper.absolutePos(POS.east()), Direction.NORTH), TunnelAspects.Write.Fluid.BOOLEAN_EXPORT, variableAspectExporter);
+
+        helper.succeedWhen(() -> {
+            // Check if fluid is moved
+            helper.assertBlockPresent(Blocks.CAULDRON, POS.west());
+            helper.assertBlockPresent(Blocks.CAULDRON, POS.east().east());
+            helper.assertBlockPresent(Blocks.WATER_CAULDRON, POS.east().north());
+            helper.assertBlockProperty(POS.east().north(), LayeredCauldronBlock.LEVEL, LayeredCauldronBlock.MAX_FILL_LEVEL);
         });
     }
 

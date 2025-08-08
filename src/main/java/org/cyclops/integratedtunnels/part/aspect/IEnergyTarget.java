@@ -33,7 +33,7 @@ public interface IEnergyTarget extends IChanneledTarget<IEnergyNetwork, Long> {
         INetwork network = IChanneledTarget.getNetworkChecked(center);
         BlockEntity tile = target.getPos().getLevel(true).getBlockEntity(target.getPos().getBlockPos());
         PartStateRoundRobin<?> partState = IChanneledTarget.getPartState(center);
-        return new EnergyTargetCapabilityProvider(Block.class, tile == null ? null : ICapabilityGetter.forBlockEntity(tile), target.getSide(), network, properties, amount, partState);
+        return new EnergyTargetCapabilityProvider(Block.class, tile == null ? null : tile == null ? ICapabilityGetter.forBlock(target.getPos().getLevel(true), target.getPos().getBlockPos(), null, null) : ICapabilityGetter.forBlockEntity(tile), target.getSide(), network, properties, amount, partState);
     }
 
     public static IEnergyTarget ofEntity(PartTarget partTarget, @Nullable Entity entity,

@@ -1,12 +1,6 @@
 {
-  "_comment": "General",
-  "itemGroup.integratedtunnels": "Integrated Tunnels",
   "general.integratedtunnels.description": "Transfira outras coisas através das redes do Integrated Dynamics.",
-
-  "_comment": "Gui",
   "gui.integratedtunnels.partsettings.channel.interface": "Canal da Interface",
-
-  "_comment": "Achievements",
   "advancement.integratedtunnels.interface_item": "Interface de Item",
   "advancement.integratedtunnels.interface_item.desc": "Crie uma Interface de Item",
   "advancement.integratedtunnels.interface_fluid": "Interface de Fluido",
@@ -49,8 +43,6 @@
   "advancement.integratedtunnels.player_simulator.desc": "Crie um Simulador de Jogador",
   "advancement.integratedtunnels.click_sword": "Clicar com uma Espada de Diamante",
   "advancement.integratedtunnels.click_sword.desc": "Clique com uma Espada de Diamante usando um Simulador de Jogador",
-
-  "_comment": "Part types",
   "parttype.integratedtunnels.interface_energy": "Interface de Energia",
   "parttype.integratedtunnels.interface_energy.info": "Conecta um armazenador de energia à rede",
   "parttype.integratedtunnels.interface_filter_energy": "Interface de Energia com Filtro",
@@ -93,8 +85,6 @@
   "parttype.integratedtunnels.exporter_world_block.info": "Coloca blocos no mundo",
   "parttype.integratedtunnels.player_simulator": "Simulador de Jogador",
   "parttype.integratedtunnels.player_simulator.info": "Simula ações do jogador",
-
-  "_comment": "Aspect property types",
   "aspect.aspecttypes.integratedtunnels.long.energy.rate": "Taxa de Transferência de Energia",
   "aspect.aspecttypes.integratedtunnels.integer.item.rate": "Taxa de Transferência de Item",
   "aspect.aspecttypes.integratedtunnels.integer.item.slot": "Slot do Item",
@@ -141,9 +131,7 @@
   "aspect.aspecttypes.integratedtunnels.boolean.world.delaybeforepickup": "Atraso de Coleta (ticks)",
   "aspect.aspecttypes.integratedtunnels.double.world.velocity": "Velocidade",
   "aspect.aspecttypes.integratedtunnels.double.world.velocity.info": "Velocidade da entidade, valor entre 0 e 25.",
-  "aspect.aspecttypes.integratedtunnels.double.world.yaw": "Yaw",
   "aspect.aspecttypes.integratedtunnels.double.world.yaw.info": "Rotação esquerda/direita entre -180 e 180 graus.",
-  "aspect.aspecttypes.integratedtunnels.double.world.pitch": "Pitch",
   "aspect.aspecttypes.integratedtunnels.double.world.pitch.info": "Rotação para cima/baixo entre -180 e 180 graus.",
   "aspect.aspecttypes.integratedtunnels.boolean.player.rightclick": "Clique Direito",
   "aspect.aspecttypes.integratedtunnels.integer.entityindex": "Índice da Entidade",
@@ -154,7 +142,6 @@
   "aspect.aspecttypes.integratedtunnels.boolean.blacklist.info": "Se tudo, exceto os itens na lista fornecida, deve ser manuseado.",
   "aspect.aspecttypes.integratedtunnels.boolean.player.sneak": "Agachar",
   "aspect.aspecttypes.integratedtunnels.boolean.player.sneak.info": "Se o agachamento do jogador (segurando shift) deve ser simulado.",
-  "aspect.aspecttypes.integratedtunnels.boolean.roundrobin": "Round-Robin",
   "aspect.aspecttypes.integratedtunnels.boolean.roundrobin.info": "Se as interfaces devem ser iteradas em ordem circular, ignorando prioridades.",
   "aspect.aspecttypes.integratedtunnels.boolean.exactamount": "Quantidade Exata",
   "aspect.aspecttypes.integratedtunnels.boolean.exactamount.info": "Se os ingredientes só podem ser movidos se o slot contiver exatamente a quantidade fornecida.",
@@ -170,10 +157,6 @@
   "aspect.aspecttypes.integratedtunnels.boolean.filter.applytoextract.info": "Se o filtro deve ser aplicado a extrações da rede (incluindo visualizações).",
   "aspect.aspecttypes.integratedtunnels.boolean.filter.allowallifnotapplied": "Permitir se não aplicado",
   "aspect.aspecttypes.integratedtunnels.boolean.filter.allowallifnotapplied.info": "Se todos os ingredientes devem passar se o filtro estiver desabilitado para ins/del.",
-
-  "_comment": "Aspects",
-
-  "_comment": "# Network aspects",
   "aspect.integratedtunnels.read.long.itemnetwork.count": "Contagem de Itens da Rede",
   "aspect.integratedtunnels.read.long.itemnetwork.count.info": "Obtém a quantidade total de itens na rede",
   "aspect.integratedtunnels.read.long.itemnetwork.countmax": "Contagem Máxima de Itens da Rede",
@@ -196,8 +179,6 @@
   "aspect.integratedtunnels.read.operator.fluidnetwork.countbyfluid.info": "Obtém a contagem total do fluido fornecido na rede",
   "aspect.integratedtunnels.read.integer.fluidnetwork.interfaces": "Interfaces de Fluido da Rede",
   "aspect.integratedtunnels.read.integer.fluidnetwork.interfaces.info": "Obtém o número de interfaces válidas para armazenamento de fluidos",
-
-  "_comment": "# Energy",
   "aspect.integratedtunnels.write.boolean.energy.export": "Exportar Energia",
   "aspect.integratedtunnels.write.boolean.energy.export.info": "Exporta energia se o booleano for verdadeiro",
   "aspect.integratedtunnels.write.long.energy.export": "Exportar Quantidade de Energia",
@@ -206,8 +187,6 @@
   "aspect.integratedtunnels.write.boolean.energy.import.info": "Importa energia se o booleano for verdadeiro",
   "aspect.integratedtunnels.write.long.energy.import": "Importar Quantidade de Energia",
   "aspect.integratedtunnels.write.long.energy.import.info": "Importa a quantidade de energia fornecida a cada tick.",
-
-  "_comment": "# Item",
   "aspect.integratedtunnels.write.boolean.item.export": "Exportar Todos os Itens",
   "aspect.integratedtunnels.write.boolean.item.export.info": "Exporta itens se o booleano for verdadeiro",
   "aspect.integratedtunnels.write.integer.item.export": "Exportar Quantidade de Itens",
@@ -236,8 +215,6 @@
   "aspect.integratedtunnels.write.operator.item.import.info": "Importa todos os itens que correspondem ao predicado fornecido.",
   "aspect.integratedtunnels.write.nbt.item.import": "Importar Itens por NBT",
   "aspect.integratedtunnels.write.nbt.item.import.info": "Importa todos os itens que correspondem à tag NBT fornecida.",
-
-  "_comment": "# Fluid",
   "aspect.integratedtunnels.write.boolean.fluid.export": "Exportar Todos os Fluidos",
   "aspect.integratedtunnels.write.boolean.fluid.export.info": "Exporta fluidos se o booleano for verdadeiro",
   "aspect.integratedtunnels.write.integer.fluid.export": "Exportar Quantidade de Fluido",
@@ -262,8 +239,6 @@
   "aspect.integratedtunnels.write.operator.fluid.import.info": "Importa todos os fluidos que correspondem ao predicado fornecido.",
   "aspect.integratedtunnels.write.nbt.fluid.import": "Importar Fluidos por NBT",
   "aspect.integratedtunnels.write.nbt.fluid.import.info": "Importa todos os fluidos que correspondem à tag NBT fornecida.",
-
-  "_comment": "# World",
   "aspect.integratedtunnels.write.boolean.world.fluid.export": "Colocar Todos os Fluidos",
   "aspect.integratedtunnels.write.boolean.world.fluid.export.info": "Coloca todos os fluidos no mundo.",
   "aspect.integratedtunnels.write.fluidstack.world.fluid.export": "Colocar Fluido",
@@ -332,7 +307,6 @@
   "aspect.integratedtunnels.write.operator.world.entity.fluid.export.info": "Exporta todos os fluidos que correspondem ao predicado fornecido para as entidades à frente.",
   "aspect.integratedtunnels.write.nbt.world.entity.fluid.export": "Exportar Fluidos por NBT para Entidades",
   "aspect.integratedtunnels.write.nbt.world.entity.fluid.export.info": "Exporta todos os fluidos que correspondem à tag NBT fornecida para as entidades à frente.",
-
   "aspect.integratedtunnels.write.boolean.world.fluid.import": "Coletar Todos os Fluidos",
   "aspect.integratedtunnels.write.boolean.world.fluid.import.info": "Coleta todos os fluidos no mundo.",
   "aspect.integratedtunnels.write.fluidstack.world.fluid.import": "Coletar Fluido",
@@ -401,8 +375,6 @@
   "aspect.integratedtunnels.write.operator.world.entity.fluid.import.info": "Importa todos os fluidos que correspondem ao predicado fornecido das entidades à frente.",
   "aspect.integratedtunnels.write.nbt.world.entity.fluid.import": "Importar Fluidos por NBT de Entidades",
   "aspect.integratedtunnels.write.nbt.world.entity.fluid.import.info": "Importa todos os fluidos que correspondem à tag NBT fornecida das entidades à frente.",
-
-  "_comment": "Player",
   "aspect.integratedtunnels.write.boolean.player.clickempty": "Clicar com Mão Vazia",
   "aspect.integratedtunnels.write.boolean.player.clickempty.info": "Clica com a mão vazia.",
   "aspect.integratedtunnels.write.boolean.player.click": "Clicar",
@@ -417,8 +389,6 @@
   "aspect.integratedtunnels.write.operator.player.click.info": "Clica com os itens que correspondem ao predicado fornecido.",
   "aspect.integratedtunnels.write.nbt.player.click": "Clicar Item por NBT",
   "aspect.integratedtunnels.write.nbt.player.click.info": "Clica com os itens que correspondem à tag NBT fornecida.",
-
-  "_comment": "# Item Filter",
   "aspect.integratedtunnels.write.boolean.item.filter": "Filtrar Todos os Itens",
   "aspect.integratedtunnels.write.boolean.item.filter.info": "Passa itens se o booleano for verdadeiro",
   "aspect.integratedtunnels.write.itemstack.item.filter": "Filtrar Item",
@@ -429,8 +399,6 @@
   "aspect.integratedtunnels.write.operator.item.filter.info": "Passa todos os itens que correspondem ao predicado fornecido.",
   "aspect.integratedtunnels.write.nbt.item.filter": "Filtrar Itens por NBT",
   "aspect.integratedtunnels.write.nbt.item.filter.info": "Passa todos os itens que correspondem à tag NBT fornecida.",
-
-  "_comment": "# Fluid Filter",
   "aspect.integratedtunnels.write.boolean.fluid.filter": "Filtrar Todos os Fluidos",
   "aspect.integratedtunnels.write.boolean.fluid.filter.info": "Passa fluidos se o booleano for verdadeiro",
   "aspect.integratedtunnels.write.fluidstack.fluid.filter": "Filtrar Fluido",
@@ -441,19 +409,12 @@
   "aspect.integratedtunnels.write.operator.fluid.filter.info": "Passa todos os fluidos que correspondem ao predicado fornecido.",
   "aspect.integratedtunnels.write.nbt.fluid.filter": "Filtrar Fluidos por NBT",
   "aspect.integratedtunnels.write.nbt.fluid.filter.info": "Passa todos os fluidos que correspondem à tag NBT fornecida.",
-
-  "_comment": "# Energy Filter",
   "aspect.integratedtunnels.write.boolean.energy.filter": "Filtrar Toda a Energia",
   "aspect.integratedtunnels.write.boolean.energy.filter.info": "Passa energia se o booleano for verdadeiro",
-
-  "_comment": "------ On the Dynamics of Integration contents ------",
-
   "info_book.integratedtunnels.section.main": "Túneis",
-
   "info_book.integratedtunnels.introduction": "Introdução",
   "info_book.integratedtunnels.introduction.text1": "&lIntegrated Tunnels&r é uma extensão para o &lIntegrated Dynamics&r para transferir itens, fluidos e energia através das redes do &lIntegrated Dynamics&r.",
   "info_book.integratedtunnels.introduction.text2": "Você pode usar a lógica do &lIntegrated Dynamics&r para configurar filtros, que podem ser tão complexos quanto desejar. &o\"Eu quero enviar 3 picaretas encantáveis com um valor de dano menor que 10 para este baú a cada tick\"&r ou &o\"Eu quero encher este tanque até ter 1000mB de óleo, mas apenas quando minha máquina estiver funcionando e se eu tiver menos de 10 lingotes de ferro neste baú\"&r Sem problemas! O &lIntegrated Tunnels&r pode fazer isso por você, e o fará de forma eficiente também!",
-
   "info_book.integratedtunnels.concepts": "Conceitos",
   "info_book.integratedtunnels.concepts.text1": "O &lIntegrated Tunnels&r adiciona 4 tipos de partes para os diferentes tipos de transporte, a saber, &oImportadores&r, &oExportadores&r e dois tipos de &oInterfaces&r.",
   "info_book.integratedtunnels.concepts.text2": "Importadores (azuis) sempre tentam puxar de um alvo para as Interfaces (brancas) na mesma rede.",
@@ -463,83 +424,56 @@
   "info_book.integratedtunnels.concepts.text6": "Além disso, você também pode adicionar múltiplos Importadores e Exportadores, novamente com prioridades relativas.",
   "info_book.integratedtunnels.concepts.text7": "Usando as variáveis do &lIntegrated Dynamics&r, você deve especificar quais itens devem ser movidos. Se você quiser manter as coisas simples e apenas mover tudo, simplesmente use um &lCartão de Variável&r em branco.",
   "info_book.integratedtunnels.concepts.text8": "Note que se você tiver um mod de autocrafting como o &lIntegrated Crafting&r instalado, então você poderá usar a configuração &oCriar&r nos exportadores. Isso fará com que, se um ingrediente não estiver disponível para exportação, ele seja autocriado primeiro.",
-
   "info_book.integratedtunnels.item": "Itens",
   "info_book.integratedtunnels.item.text1": "Mova itens pela rede. Importe itens para a rede usando &lImportadores de Item&r para &lInterfaces de Item&r. Exporte itens da rede usando &lExportadores de Item&r a partir de &lInterfaces de Item&r. Filtre dinamicamente quais itens podem passar por uma interface usando uma &lInterface de Item com Filtro&r.",
-
   "info_book.integratedtunnels.fluid": "Fluidos",
   "info_book.integratedtunnels.fluid.text1": "Mova fluidos pela rede. Importe fluidos para a rede usando &lImportadores de Fluido&r para &lInterfaces de Fluido&r. Exporte fluidos da rede usando &lExportadores de Fluido&r a partir de &lInterfaces de Fluido&r. Filtre dinamicamente quais fluidos podem passar por uma interface usando uma &lInterface de Fluido com Filtro&r.",
-
   "info_book.integratedtunnels.energy": "Energia",
   "info_book.integratedtunnels.energy.text1": "Mova energia pela rede. Importe energia para a rede usando &lImportadores de Energia&r para &lInterfaces de Energia&r. Exporte energia da rede usando &lExportadores de Energia&r a partir de &lInterfaces de Energia&r. Filtre dinamicamente se a energia pode passar por uma interface usando uma &lInterface de Energia com Filtro&r.",
-
   "info_book.integratedtunnels.world": "Interação com o Mundo",
-
   "info_book.integratedtunnels.world.item": "Itens",
   "info_book.integratedtunnels.world.item.text1": "&lImportadores de Item do Mundo&r e &lExportadores de Item do Mundo&r podem ser usados para colocar itens no mundo, coletá-los e interagir com entidades que possuem um inventário, como Caixas de Shulker dropadas e Burros. Existem várias propriedades de aspecto para alterar coisas como ejeção, velocidade de arremesso, atraso de coleta, pitch e yaw.",
-
   "info_book.integratedtunnels.world.fluid": "Fluidos",
   "info_book.integratedtunnels.world.fluid.text1": "Com &lImportadores de Fluido do Mundo&r e &lExportadores de Fluido do Mundo&r, você pode colocar blocos-fonte de fluido, coletá-los e interagir com entidades que são um tanque, como itens de tanque dropados. Existem várias propriedades de aspecto para alterar coisas como se uma atualização de bloco deve ou não ser causada.",
-
   "info_book.integratedtunnels.world.energy": "Energia",
   "info_book.integratedtunnels.world.energy.text1": "Os &lImportadores de Energia do Mundo&r e &lExportadores de Energia do Mundo&r ajudam você a interagir com entidades que possuem um buffer de energia, como baterias dropadas.",
-
   "info_book.integratedtunnels.world.block": "Bloco",
   "info_book.integratedtunnels.world.block.text1": "Os &lImportadores de Bloco do Mundo&r e &lExportadores de Bloco do Mundo&r permitem que você coloque e quebre blocos. Várias propriedades de aspecto, como toque de seda, estão disponíveis.",
-
   "info_book.integratedtunnels.player": "Simulação de Jogador",
   "info_book.integratedtunnels.player.text1": "Qualquer Minecrafter experiente sabe que quanto menos você tiver que clicar, melhor. Com o &lSimulador de Jogador&r, você pode automatizar uma grande parte desse clique tedioso. Ele permite que você automatize o clique com qualquer mão e item. Propriedades avançadas permitem que você altere coisas como posições de clique e assim por diante.",
-
   "info_book.integratedtunnels.section.tutorials": "Tutoriais de Túneis",
-
   "info_book.integratedtunnels.tutorials.introduction": "Introdução",
   "info_book.integratedtunnels.tutorials.introduction.text1": "Esta seção contém vários tutoriais que ajudam você a aprender o &lIntegrated Tunnels&r, o add-on do &lIntegrated Dynamics&r para transferência de itens, fluidos e energia.",
-
-  "info_book.integratedtunnels.tutorials.interfaces": "Interfaces",
   "info_book.integratedtunnels.tutorials.interfaces.text1": "&oInterfaces&r são partes que podem ser anexadas a &lCabos&r. Existe uma versão para item, fluido e energia, que se conectam respectivamente a inventários, tanques e máquinas de energia. As &oInterfaces&r tornam seu alvo acessível à rede.",
-
   "info_book.integratedtunnels.tutorials.importer_exporter": "Importador e Exportador",
   "info_book.integratedtunnels.tutorials.importer_exporter.text1": "&oImportadores de Item&r moverão itens de seu alvo para uma das &oInterfaces de Item&r. Os &oExportadores de Item&r fazem o oposto, eles moverão itens de qualquer uma das &oInterfaces de Item&r para seu alvo.",
-
   "info_book.integratedtunnels.tutorials.import_all_items": "Importar Todos os Itens",
   "info_book.integratedtunnels.tutorials.import_all_items.text1": "Coloque um &lCartão de Variável&r vazio dentro de um &lImportador de Item&r para importar todos os itens para a rede a partir de um inventário alvo.",
-
   "info_book.integratedtunnels.tutorials.export_items_limit": "Exportar Itens com Limite",
   "info_book.integratedtunnels.tutorials.export_items_limit.text1": "Leia o número de itens no inventário alvo usando um &lLeitor de Inventário&r e mova itens apenas até que o número total de itens seja maior que &610&0.",
-
   "info_book.integratedtunnels.tutorials.import_items_list": "Importar Lista de Itens",
   "info_book.integratedtunnels.tutorials.import_items_list.text1": "Importe todos os itens em uma determinada lista para o inventário alvo. Uma lista de itens pode ser criada lendo uma lista de qualquer &lLeitor de Inventário&r.",
-
   "info_book.integratedtunnels.tutorials.export_enchantable_items": "Exportar Itens Encantáveis",
   "info_book.integratedtunnels.tutorials.export_enchantable_items.text1": "Exporte todos os itens encantáveis para o inventário alvo. Isso pode ser feito usando um certo &lOperador&r.",
-
   "info_book.integratedtunnels.tutorials.filter_storage_day": "Filtrar Armazenamento de Itens se for Dia",
   "info_book.integratedtunnels.tutorials.filter_storage_day.text1": "Usando a &lInterface de Item com Filtro&r, conecte um &lBaú&r à sua rede e só disponibilize seu conteúdo para a rede se for dia (e não quando for noite).",
-
   "info_book.integratedtunnels.tutorials.filter_storage_mod": "Filtrar Armazenamento de Itens por Mod",
   "info_book.integratedtunnels.tutorials.filter_storage_mod.text1": "Usando a &lInterface de Item com Filtro&r, conecte um &lBaú&r à sua rede e configure um filtro baseado em predicado que só passa itens do mod &lIntegrated Dynamics&r. Para fazer isso, criaremos um novo operador que receberá um &8Item&0 como entrada e retornará um &9Booleano&0 como saída.",
   "info_book.integratedtunnels.tutorials.filter_storage_mod.text2": "Para fazer isso, primeiro crie um valor de &2Operador&0 contendo o operador &lIgualdade Relacional&r. Em seguida, crie uma &4String&0 contendo o valor &lIntegratedDynamics&r (sem espaço). E então, use o operador &lAplicar&r para aplicar parcialmente seu operador &lIgualdade Relacional&r ao seu valor de &4String&0.",
   "info_book.integratedtunnels.tutorials.filter_storage_mod.text3": "Como próximo passo, temos que criar outro valor de &2Operador&0, mas desta vez contendo o operador &lMod do Item&r. E agora, podemos usar o operador &lPipe&r para canalizar nosso operador &lMod do Item&r para nosso operador parcialmente aplicado do passo anterior.",
   "info_book.integratedtunnels.tutorials.filter_storage_mod.text4": "Este resultado do operador &lPipe&r pode ser colocado no aspecto baseado em predicado da sua &lInterface de Item com Filtro&r, e todas as variáveis das quais dependemos precisam ser colocadas em um &lArmazém de Variáveis&r. Se todos os passos forem seguidos corretamente, o filtro só passará itens do mod &lIntegrated Dynamics&r, o que pode ser personalizado alterando nossa constante de &4String&0.",
-
   "info_book.integratedtunnels.tutorials.world_item_importer_exporter": "Importador e Exportador de Item do Mundo",
   "info_book.integratedtunnels.tutorials.world_item_importer_exporter.text1": "Semelhante aos &oImportadores de Item&r e &oExportadores de Item&r, os &lImportadores de Item do Mundo&r e &lExportadores de Item do Mundo&r podem, respectivamente, coletar itens do mundo para a sua rede de itens e colocar itens no mundo a partir da sua rede de itens. Além disso, eles também podem ser usados para interagir com itens dropados que possuem inventários, como &oCaixas de Shulker&r.",
-
   "info_book.integratedtunnels.tutorials.drop_all_items": "Dropar Todos os Itens",
   "info_book.integratedtunnels.tutorials.drop_all_items.text1": "Coloque um &lCartão de Variável&r vazio dentro de um &lExportador de Item do Mundo&r para dropar todos os itens da rede no chão.",
-
   "info_book.integratedtunnels.tutorials.pickup_items_limit": "Coletar Itens com Limite",
   "info_book.integratedtunnels.tutorials.pickup_items_limit.text1": "Escreva um número constante &65&0 em um &lCartão de Variável&r e coloque-o dentro de um &lImportador de Item do Mundo&r para coletar 5 itens de cada vez do espaço alvo.",
-
   "info_book.integratedtunnels.tutorials.world_block_importer_exporter": "Importador e Exportador de Bloco do Mundo",
   "info_book.integratedtunnels.tutorials.world_block_importer_exporter.text1": "Em vez de dropar itens no mundo ou coletá-los, você também pode quebrar e colocar blocos usando o &lImportador de Bloco do Mundo&r e o &lExportador de Bloco do Mundo&r. Existem várias propriedades de aspecto para alterar coisas como se os blocos devem ou não ter toque de seda ao quebrar.",
-
   "info_book.integratedtunnels.tutorials.break_stone": "Quebrar Apenas Blocos de Pedra",
   "info_book.integratedtunnels.tutorials.break_stone.text1": "Faça um &lCartão de Variável&r contendo uma referência ao valor do item &8Pedra&0. Coloque-o dentro de um &lImportador de Bloco do Mundo&r para quebrar apenas blocos de Pedra. Dê uma olhada também nas várias propriedades de aspecto para ver se você consegue usar toque de seda na Pedra para evitar receber apenas Pedregulho.",
-
   "info_book.integratedtunnels.tutorials.place_logwood": "Colocar Itens por Tag",
   "info_book.integratedtunnels.tutorials.place_logwood.text1": "Tente criar um sistema usando o &lExportador de Bloco do Mundo&r que só coloca troncos de madeira. Faça isso usando o operador &lValores de Tag&r para obter uma lista de todos os itens na tag &ologs&r.",
-
   "info_book.integratedtunnels.tutorials.click_sword": "Clicar com Espada",
   "info_book.integratedtunnels.tutorials.click_sword.text1": "Todo esse clique e tal pode ser bem chato, por que não deixar um &lSimulador de Jogador&r fazer isso por você? Comece criando um e insira um &lCartão de Variável&r contendo uma &oEspada de Diamante&r para deixá-lo atacar autonomamente usando &oEspadas de Diamante&r da sua rede de itens."
 }
