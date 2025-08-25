@@ -53,7 +53,7 @@ public abstract class PositionedOperatorIngredientIndex<T, M> extends Positioned
         return this;
     }
 
-    protected Optional<IIngredientPositionsIndex<T, M>> getChannelIndex() {
+    public Optional<IIngredientPositionsIndex<T, M>> getChannelIndex() {
         return TunnelAspectReadBuilders.Network.getChannelIndex(getNetworkCapability(), getPos(), getSide(), channel);
     }
 
