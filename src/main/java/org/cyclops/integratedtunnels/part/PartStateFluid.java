@@ -91,7 +91,7 @@ public class PartStateFluid<P extends IPartTypeWriter> extends PartStatePosition
 
             // If we do an effective extraction, first simulate to check if it matches the filter
             if (action.execute()) {
-                FluidStack drainedSimulated = getFluidHandler().drain(Math.min(maxDrain, GeneralConfig.fluidRateLimit), FluidAction.EXECUTE);
+                FluidStack drainedSimulated = getFluidHandler().drain(Math.min(maxDrain, GeneralConfig.fluidRateLimit), FluidAction.SIMULATE);
                 if (!filter.testExtraction(drainedSimulated)) {
                     return FluidStack.EMPTY;
                 }
