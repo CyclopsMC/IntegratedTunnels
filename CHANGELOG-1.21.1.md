@@ -1,8 +1,21 @@
 # Changelog for Minecraft 1.21.1
 All notable changes to this project will be documented in this file.
 
+<a name="1.21.1-1.9.0"></a>
+## [1.21.1-1.9.0](https://github.com/CyclopsMC/IntegratedTunnels/compare/1.21.1-1.8.44...1.21.1-1.9.0) - 2025-10-07 07:49:11
+
+
+### Added
+* Add missing PASSIVE_IO property
+
+### Fixed
+* Fix passive fluid interaction consuming too much
+
+Internal changes: (required for Integrated Mekanism)
+* Make PositionedOperatorIngredientIndex better extensible
+
 <a name="1.21.1-1.8.44"></a>
-## [1.21.1-1.8.44](https://github.com/CyclopsMC/IntegratedTunnels/compare/1.21.1-1.8.43...1.21.1-1.8.44) - 2025-08-08 22:06:22
+## [1.21.1-1.8.44](https://github.com/CyclopsMC/IntegratedTunnels/compare/1.21.1-1.8.43...1.21.1-1.8.44) - 2025-08-08 22:06:22 +0200
 
 
 ### Fixed

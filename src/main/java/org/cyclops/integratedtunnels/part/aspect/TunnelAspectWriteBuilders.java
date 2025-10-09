@@ -880,6 +880,7 @@ public class TunnelAspectWriteBuilders {
         public static final IAspectProperties PROPERTIES = new AspectProperties(ImmutableList.<IAspectPropertyTypeInstance>of(
                 PROP_CHANNEL,
                 //PROP_EXACTAMOUNT
+                PROP_PASSIVE_IO,
                 PROP_CHECK_AMOUNT
         ));
         public static final IAspectProperties PROPERTIES_RATE = new AspectProperties(ImmutableList.<IAspectPropertyTypeInstance>of(
@@ -2304,6 +2305,7 @@ public class TunnelAspectWriteBuilders {
 
     }
 
+    // TODO: do these actually do anything? Because PartState's such as PartStateFluid always implement these caps, and have priority over these volatile caps. Add some tests, and remove if guaranteed to still work.
     public static <N extends IPositionedAddonsNetwork, T> IAspectWriteActivator
     createPositionedNetworkAddonActivator(final NetworkCapability<N> networkCapability, final PartCapability<T> targetCapability) {
         return new IAspectWriteActivator() {
