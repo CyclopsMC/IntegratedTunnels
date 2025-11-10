@@ -1537,7 +1537,7 @@ public class TunnelAspectWriteBuilders {
                         );
                         transfer = input.getRight().getTransfer();
                     }
-                    return IItemTarget.ofStorage(transfer, network, partTarget, properties, itemStackMatcher, itemStorage, -1);
+                    return IItemTarget.ofStorage(transfer, network, partTarget, properties, itemStackMatcher, itemStorage, input.getRight().getSlot());
                 };
             }
 
@@ -1558,7 +1558,7 @@ public class TunnelAspectWriteBuilders {
                         input.getRight().getTransfer(),
                         new TunnelTransferEntity(entity)
                 );
-                return IItemTarget.ofEntity(transfer, partTarget, entity, properties, itemStackMatcher,  -1);
+                return IItemTarget.ofEntity(transfer, partTarget, entity, properties, itemStackMatcher,  input.getRight().getSlot());
             };
 
         }
@@ -2309,7 +2309,7 @@ public class TunnelAspectWriteBuilders {
                     rightClick, sneak, continuousClick, entityIndex, network.getCapability(ItemNetworkConfig.CAPABILITY).orElse(null).getChannel(channel));
             ITunnelTransfer transfer = input.getRight().getTransfer();
             return IItemTarget.ofStorage(transfer, network, partTarget, properties,
-                    itemStackMatcher, storage, -1);
+                    itemStackMatcher, storage, input.getRight().getSlot());
         };
 
     }
