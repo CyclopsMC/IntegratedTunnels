@@ -1,6 +1,7 @@
 package org.cyclops.integratedtunnels.core;
 
 import com.google.common.collect.Iterators;
+import net.minecraft.world.entity.npc.Villager;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
@@ -182,6 +183,12 @@ public class ItemStoragePlayerWrapper implements IIngredientComponentStorage<Ite
             if (entities.size() > 0) {
                 Entity entity = getEntity(entities);
                 InteractionResult actionResult = player.interactOn(entity, hand);
+
+                // Remove simulated player again from villager, to avoid locked villagers.
+                if (entity instanceof Villager villager) {
+                    villager.setTradingPlayer(null);
+                }
+
                 if (actionResult == InteractionResult.FAIL) {
                     return stack;
                 } else if (actionResult.consumesAction()) {
