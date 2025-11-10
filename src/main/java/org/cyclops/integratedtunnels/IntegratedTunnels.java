@@ -25,6 +25,7 @@ import org.cyclops.integratedtunnels.capability.ingredient.TunnelIngredientCompo
 import org.cyclops.integratedtunnels.capability.network.FluidNetworkConfig;
 import org.cyclops.integratedtunnels.capability.network.ItemNetworkConfig;
 import org.cyclops.integratedtunnels.capability.network.TunnelNetworkCapabilityConstructors;
+import org.cyclops.integratedtunnels.core.ItemStoragePlayerWrapper;
 import org.cyclops.integratedtunnels.core.part.ContainerInterfaceSettingsConfig;
 import org.cyclops.integratedtunnels.core.world.BlockBreakHandlerRegistry;
 import org.cyclops.integratedtunnels.core.world.BlockBreakHandlers;
@@ -73,6 +74,7 @@ public class IntegratedTunnels extends ModBaseVersionable<IntegratedTunnels> {
         super.setup(event);
 
         MinecraftForge.EVENT_BUS.register(new TunnelNetworkCapabilityConstructors());
+        MinecraftForge.EVENT_BUS.register(ItemStoragePlayerWrapper.class);
 
         // Register value list proxies
         TunnelValueTypeListProxyFactories.load();
