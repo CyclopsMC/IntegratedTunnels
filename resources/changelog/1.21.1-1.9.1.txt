@@ -1,0 +1,9 @@
+As always, don't forget to backup your world before updating!
+Requires CyclopsCore version 1.26.0 or higher.
+
+Fixes:
+* Disallow taming from Player Simulator, Closes CyclopsMC/IntegratedDynamics#1562
+* Fix broken Player Simulator item-based aspects
+* Fix Player Simulator locking villager trades, Closes #1561
+* Fix slot option not working for entities in World Item Exporter/Importer
+  Closes CyclopsMC/IntegratedDynamics#1559

@@ -1,8 +1,19 @@
 # Changelog for Minecraft 1.21.1
 All notable changes to this project will be documented in this file.
 
+<a name="1.21.1-1.9.1"></a>
+## [1.21.1-1.9.1](https://github.com/CyclopsMC/IntegratedTunnels/compare/1.21.1-1.9.0...1.21.1-1.9.1) - 2025-11-11 14:44:12
+
+
+### Fixed
+* Disallow taming from Player Simulator, Closes CyclopsMC/IntegratedDynamics#1562
+* Fix broken Player Simulator item-based aspects
+* Fix Player Simulator locking villager trades, Closes #1561
+* Fix slot option not working for entities in World Item Exporter/Importer
+  Closes CyclopsMC/IntegratedDynamics#1559
+
 <a name="1.21.1-1.9.0"></a>
-## [1.21.1-1.9.0](https://github.com/CyclopsMC/IntegratedTunnels/compare/1.21.1-1.8.44...1.21.1-1.9.0) - 2025-10-07 07:49:11
+## [1.21.1-1.9.0](https://github.com/CyclopsMC/IntegratedTunnels/compare/1.21.1-1.8.44...1.21.1-1.9.0) - 2025-10-07 07:49:11 +0200
 
 
 ### Added
