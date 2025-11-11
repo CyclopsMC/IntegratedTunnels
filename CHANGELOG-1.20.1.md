@@ -1,8 +1,19 @@
 # Changelog for Minecraft 1.20.1
 All notable changes to this project will be documented in this file.
 
+<a name="1.20.1-1.9.1"></a>
+## [1.20.1-1.9.1](/compare/1.20.1-1.9.0...1.20.1-1.9.1) - 2025-11-11 14:34:23
+
+
+### Fixed
+* Disallow taming from Player Simulator, Closes CyclopsMC/IntegratedDynamics#1562
+* Fix broken Player Simulator item-based aspects
+* Fix Player Simulator locking villager trades, Closes #1561
+* Fix slot option not working for entities in World Item Exporter/Importer
+  Closes CyclopsMC/IntegratedDynamics#1559
+
 <a name="1.20.1-1.9.0"></a>
-## [1.20.1-1.9.0](/compare/1.20.1-1.8.42...1.20.1-1.9.0) - 2025-10-07 07:37:24
+## [1.20.1-1.9.0](/compare/1.20.1-1.8.42...1.20.1-1.9.0) - 2025-10-07 07:37:24 +0200
 
 
 ### Fixed

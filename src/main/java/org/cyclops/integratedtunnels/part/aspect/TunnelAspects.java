@@ -1,9 +1,9 @@
 package org.cyclops.integratedtunnels.part.aspect;
 
 import com.google.common.collect.Iterators;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.neoforge.fluids.FluidStack;
+import net.minecraft.world.item.ItemStack;
 import org.cyclops.commoncapabilities.api.capability.fluidhandler.FluidMatch;
 import org.cyclops.commoncapabilities.api.capability.itemhandler.ItemMatch;
 import org.cyclops.commoncapabilities.api.ingredient.storage.IIngredientComponentStorage;
@@ -815,6 +815,7 @@ public class TunnelAspects {
                 public static final IAspectWrite<ValueTypeBoolean.ValueBoolean, ValueTypeBoolean> CLICK_ITEM_BOOLEAN =
                         TunnelAspectWriteBuilders.Player.BUILDER_BOOLEAN
                                 .withProperties(TunnelAspectWriteBuilders.Player.PROPERTIES_CLICK_SIMPLE)
+                                .handle(TunnelAspectWriteBuilders.Player.clearSlotProperty())
                                 .handle(TunnelAspectWriteBuilders.Item.PROP_BOOLEAN_ITEMPREDICATE)
                                 .handle(TunnelAspectWriteBuilders.Player.PROP_ITEMTARGET_CLICK)
                                 .handle(TunnelAspectWriteBuilders.Item.PROP_EXPORT)
@@ -822,6 +823,7 @@ public class TunnelAspects {
                 public static final IAspectWrite<ValueTypeInteger.ValueInteger, ValueTypeInteger> CLICK_ITEM_INTEGER =
                         TunnelAspectWriteBuilders.Player.BUILDER_INTEGER
                                 .withProperties(TunnelAspectWriteBuilders.Player.PROPERTIES_CLICK_NORATE)
+                                .handle(TunnelAspectWriteBuilders.Player.clearSlotProperty())
                                 .handle(TunnelAspectWriteBuilders.Item.PROP_INTEGER_ITEMPREDICATE)
                                 .handle(TunnelAspectWriteBuilders.Player.PROP_ITEMTARGET_CLICK)
                                 .handle(TunnelAspectWriteBuilders.Item.PROP_EXPORT)
@@ -829,6 +831,7 @@ public class TunnelAspects {
                 public static final IAspectWrite<ValueObjectTypeItemStack.ValueItemStack, ValueObjectTypeItemStack> CLICK_ITEM_ITEMSTACK =
                         TunnelAspectWriteBuilders.Player.BUILDER_ITEMSTACK
                                 .withProperties(TunnelAspectWriteBuilders.Player.PROPERTIES_CLICKCRAFT)
+                                .handle(TunnelAspectWriteBuilders.Player.clearSlotProperty())
                                 .handle(TunnelAspectWriteBuilders.Item.PROP_ITEMSTACK_ITEMPREDICATE)
                                 .handle(TunnelAspectWriteBuilders.Player.PROP_ITEMTARGET_CLICK)
                                 .handle(TunnelAspectWriteBuilders.Item.PROP_EXPORT)
@@ -836,6 +839,7 @@ public class TunnelAspects {
                 public static final IAspectWrite<ValueTypeList.ValueList, ValueTypeList> CLICK_ITEM_LISTITEMSTACK =
                         TunnelAspectWriteBuilders.Player.BUILDER_LIST
                                 .withProperties(TunnelAspectWriteBuilders.Player.PROPERTIES_CLICKLIST)
+                                .handle(TunnelAspectWriteBuilders.Player.clearSlotProperty())
                                 .handle(TunnelAspectWriteBuilders.Item.PROP_ITEMSTACKLIST_ITEMPREDICATE)
                                 .handle(TunnelAspectWriteBuilders.Player.PROP_ITEMTARGET_CLICK)
                                 .handle(TunnelAspectWriteBuilders.Item.PROP_EXPORT)
@@ -843,6 +847,7 @@ public class TunnelAspects {
                 public static final IAspectWrite<ValueTypeOperator.ValueOperator, ValueTypeOperator> CLICK_ITEM_PREDICATEITEMSTACK =
                         TunnelAspectWriteBuilders.Player.BUILDER_OPERATOR
                                 .withProperties(TunnelAspectWriteBuilders.Player.PROPERTIES_CLICK_SIMPLE)
+                                .handle(TunnelAspectWriteBuilders.Player.clearSlotProperty())
                                 .handle(TunnelAspectWriteBuilders.Item.PROP_ITEMSTACKPREDICATE_ITEMPREDICATE)
                                 .handle(TunnelAspectWriteBuilders.Player.PROP_ITEMTARGET_CLICK)
                                 .handle(TunnelAspectWriteBuilders.Item.PROP_EXPORT)
@@ -850,6 +855,7 @@ public class TunnelAspects {
             public static final IAspectWrite<ValueTypeNbt.ValueNbt, ValueTypeNbt> CLICK_ITEM_NBT =
                     TunnelAspectWriteBuilders.Player.BUILDER_NBT
                             .withProperties(TunnelAspectWriteBuilders.Player.PROPERTIES_CLICK_NBT)
+                            .handle(TunnelAspectWriteBuilders.Player.clearSlotProperty())
                             .handle(TunnelAspectWriteBuilders.Item.PROP_NBT_ITEMPREDICATE)
                             .handle(TunnelAspectWriteBuilders.Player.PROP_ITEMTARGET_CLICK)
                             .handle(TunnelAspectWriteBuilders.Item.PROP_EXPORT)

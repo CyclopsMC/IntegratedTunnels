@@ -1557,7 +1557,7 @@ public class TunnelAspectWriteBuilders {
                         input.getRight().getTransfer(),
                         new TunnelTransferEntity(entity)
                 );
-                return IItemTarget.ofEntity(transfer, partTarget, entity, properties, itemStackMatcher,  -1);
+                return IItemTarget.ofEntity(transfer, partTarget, entity, properties, itemStackMatcher,  input.getRight().getSlot());
             };
 
         }
@@ -2308,8 +2308,15 @@ public class TunnelAspectWriteBuilders {
                     rightClick, sneak, continuousClick, entityIndex, network.getCapability(Capabilities.ItemNetwork.NETWORK).orElse(null).getChannel(channel));
             ITunnelTransfer transfer = input.getRight().getTransfer();
             return IItemTarget.ofStorage(transfer, network, partTarget, properties,
-                    itemStackMatcher, storage, -1);
+                    itemStackMatcher, storage, input.getRight().getSlot());
         };
+
+        public static <T> IAspectValuePropagator<Triple<PartTarget, IAspectProperties, T>, Triple<PartTarget, IAspectProperties, T>> clearSlotProperty() {
+            return e -> {
+                e.getMiddle().setValue(TunnelAspectWriteBuilders.Item.PROP_SLOT, ValueTypeInteger.ValueInteger.of(-1));
+                return e;
+            };
+        }
 
     }
 
