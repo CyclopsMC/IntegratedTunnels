@@ -1,8 +1,15 @@
 # Changelog for Minecraft 1.19.2
 All notable changes to this project will be documented in this file.
 
+<a name="1.19.2-1.8.42"></a>
+## [1.19.2-1.8.42](/compare/1.19.2-1.8.41...1.19.2-1.8.42) - 2025-11-11 14:43:00
+
+
+### Fixed
+* Fix broken item entity import/export
+
 <a name="1.19.2-1.8.41"></a>
-## [1.19.2-1.8.41](/compare/1.19.2-1.8.40...1.19.2-1.8.41) - 2025-11-11 14:32:50
+## [1.19.2-1.8.41](/compare/1.19.2-1.8.40...1.19.2-1.8.41) - 2025-11-11 14:32:50 +0100
 
 
 ### Fixed
