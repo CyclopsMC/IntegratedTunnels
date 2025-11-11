@@ -1530,7 +1530,7 @@ public class TunnelAspectWriteBuilders {
                         );
                         transfer = input.getRight().getTransfer();
                     }
-                    return IItemTarget.ofStorage(transfer, network, partTarget, properties, itemStackMatcher, itemStorage, input.getRight().getSlot());
+                    return IItemTarget.ofStorage(transfer, network, partTarget, properties, itemStackMatcher, itemStorage, -1);
                 };
             }
 
