@@ -16,6 +16,7 @@ import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.npc.Villager;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
@@ -25,6 +26,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.common.CommonHooks;
 import net.neoforged.neoforge.event.EventHooks;
+import net.neoforged.neoforge.event.entity.living.AnimalTameEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import org.cyclops.commoncapabilities.api.ingredient.IngredientComponent;
 import org.cyclops.commoncapabilities.api.ingredient.storage.IIngredientComponentStorage;
@@ -194,6 +196,12 @@ public class ItemStoragePlayerWrapper implements IIngredientComponentStorage<Ite
             if (entities.size() > 0) {
                 Entity entity = getEntity(entities);
                 InteractionResult actionResult = player.interactOn(entity, hand);
+
+                // Remove simulated player again from villager, to avoid locked villagers.
+                if (entity instanceof Villager villager) {
+                    villager.setTradingPlayer(null);
+                }
+
                 if (actionResult == InteractionResult.FAIL) {
                     return stack;
                 } else if (actionResult.consumesAction()) {
@@ -334,5 +342,12 @@ public class ItemStoragePlayerWrapper implements IIngredientComponentStorage<Ite
     @Override
     public ItemStack extract(long maxQuantity, boolean simulate) {
         return ItemStack.EMPTY;
+    }
+
+    // Disallow taming using the player simulator, as the animal is otherwise locked to the simulator.
+    public static void onTameAnimal(AnimalTameEvent event) {
+        if (event.getTamer() instanceof ExtendedFakePlayer) {
+            event.setCanceled(true);
+        }
     }
 }

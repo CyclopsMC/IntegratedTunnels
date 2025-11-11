@@ -6,6 +6,7 @@ import net.minecraft.world.item.ItemStack;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.registries.NewRegistryEvent;
 import org.apache.logging.log4j.Level;
 import org.cyclops.cyclopscore.config.ConfigHandlerCommon;
@@ -21,6 +22,7 @@ import org.cyclops.integratedtunnels.api.world.IBlockBreakHandlerRegistry;
 import org.cyclops.integratedtunnels.api.world.IBlockPlaceHandlerRegistry;
 import org.cyclops.integratedtunnels.capability.ingredient.TunnelIngredientComponentCapabilities;
 import org.cyclops.integratedtunnels.capability.network.TunnelNetworkCapabilityConstructors;
+import org.cyclops.integratedtunnels.core.ItemStoragePlayerWrapper;
 import org.cyclops.integratedtunnels.core.part.ContainerInterfaceSettingsConfig;
 import org.cyclops.integratedtunnels.core.world.BlockBreakHandlerRegistry;
 import org.cyclops.integratedtunnels.core.world.BlockBreakHandlers;
@@ -58,6 +60,7 @@ public class IntegratedTunnels extends ModBaseNeoForge<IntegratedTunnels> {
         modEventBus.addListener(this::onSetup);
         modEventBus.addListener(Capabilities::registerPartCapabilities);
         modEventBus.register(new TunnelNetworkCapabilityConstructors());
+        NeoForge.EVENT_BUS.addListener(ItemStoragePlayerWrapper::onTameAnimal);
     }
 
     public void onRegistriesCreate(NewRegistryEvent event) {
