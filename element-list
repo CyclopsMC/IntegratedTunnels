@@ -8,7 +8,6 @@ org.cyclops.integratedtunnels.core.network
 org.cyclops.integratedtunnels.core.part
 org.cyclops.integratedtunnels.core.predicate
 org.cyclops.integratedtunnels.core.world
-org.cyclops.integratedtunnels.gametest
 org.cyclops.integratedtunnels.item
 org.cyclops.integratedtunnels.part
 org.cyclops.integratedtunnels.part.aspect
