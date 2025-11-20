@@ -782,7 +782,7 @@ public class TunnelAspectWriteBuilders {
                 // For predicate-based matchers, make sure we can iterate over the contents in a slotted manner,
                 // as the predicate must apply to each slotted ingredient.
                 // Only do this for exporting, not for importing, as this would otherwise break round-robin imports.
-                IIngredientComponentStorage<ItemStack, Integer> source = input.getItemStackMatcher().hasMatchFlags() ? input.getItemChannel() : input.getItemChannelSlotted();
+                IIngredientComponentStorage<ItemStack, Integer> source = input.getItemStackMatcher().hasMatchFlags() ? input.getItemChannel() : input.getItemChannelUncollapsed(); // TODO: go back to slotbased, but only use it if aspect property for slot-based is enabled (only add for predicates)!
                 TunnelHelpers.moveSingleStateOptimized(
                         input.getNetwork(),
                         input.getChanneledNetwork(),

@@ -2,7 +2,6 @@ package org.cyclops.integratedtunnels.part.aspect;
 
 import net.minecraft.world.item.ItemStack;
 import org.cyclops.commoncapabilities.api.ingredient.storage.IIngredientComponentStorage;
-import org.cyclops.commoncapabilities.api.ingredient.storage.IIngredientComponentStorageSlotted;
 import org.cyclops.integrateddynamics.api.network.INetwork;
 import org.cyclops.integrateddynamics.api.part.PartTarget;
 import org.cyclops.integrateddynamics.api.part.aspect.property.IAspectProperties;
@@ -48,8 +47,8 @@ public class ItemTargetStorage extends ChanneledTarget<IItemNetwork, ItemStack> 
     }
 
     @Override
-    public IIngredientComponentStorageSlotted<ItemStack, Integer> getItemChannelSlotted() {
-        return getChanneledNetwork().getChannelSlotted(getChannel());
+    public IIngredientComponentStorage<ItemStack, Integer> getItemChannelUncollapsed() {
+        return getChanneledNetwork().getChannelUncollapsed(getChannel());
     }
 
     @Override
