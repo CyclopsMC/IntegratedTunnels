@@ -1,8 +1,28 @@
 # Changelog for Minecraft 1.21.1
 All notable changes to this project will be documented in this file.
 
+<a name="1.21.1-1.9.2"></a>
+## [1.21.1-1.9.2](https://github.com/CyclopsMC/IntegratedTunnels/compare/1.21.1-1.9.1...1.21.1-1.9.2) - 2025-11-21 15:53:26
+
+
+### Added
+* * Add translations through Crowdin (#350)
+
+### Changed
+* Optimize predicate-based transfer using slotless index
+
+By default, predicate-based aspects used the slot-based index to be able
+to handle cases such as #271. Since slot-based transfer can be a lot
+slower than slotless transfer, this is not great.
+Since the use case of #271 is quite exotic, the slot-based behaviour
+has been hidden behind an aspect property, while the predicate-based
+aspects will now always use the more performant slotless index by
+default.
+
+Closes CyclopsMC/ColossalChests#192
+
 <a name="1.21.1-1.9.1"></a>
-## [1.21.1-1.9.1](https://github.com/CyclopsMC/IntegratedTunnels/compare/1.21.1-1.9.0...1.21.1-1.9.1) - 2025-11-11 14:44:12
+## [1.21.1-1.9.1](https://github.com/CyclopsMC/IntegratedTunnels/compare/1.21.1-1.9.0...1.21.1-1.9.1) - 2025-11-11 14:44:12 +0100
 
 
 ### Fixed
