@@ -401,6 +401,8 @@ public class TunnelAspectWriteBuilders {
                 new AspectPropertyTypeInstance<>(ValueTypes.BOOLEAN, "aspect.aspecttypes.integratedtunnels.boolean.item.nbtrequire");
         public static final IAspectPropertyTypeInstance<ValueTypeBoolean, ValueTypeBoolean.ValueBoolean> PROP_NBT_RECURSIVE =
                 new AspectPropertyTypeInstance<>(ValueTypes.BOOLEAN, "aspect.aspecttypes.integratedtunnels.boolean.item.nbtrecursive");
+        public static final IAspectPropertyTypeInstance<ValueTypeBoolean, ValueTypeBoolean.ValueBoolean> PROP_PREDICATE_SLOTBASED =
+                new AspectPropertyTypeInstance<>(ValueTypes.BOOLEAN, "aspect.aspecttypes.integratedtunnels.boolean.item.predicateslotbased");
         public static final IAspectProperties PROPERTIES_RATESLOT = new AspectProperties(ImmutableList.<IAspectPropertyTypeInstance>of(
                 PROP_CHANNEL,
                 PROP_ROUNDROBIN,
@@ -409,6 +411,16 @@ public class TunnelAspectWriteBuilders {
                 PROP_SLOT,
                 PROP_PASSIVE_IO,
                 PROP_CHECK_STACKSIZE
+        ));
+        public static final IAspectProperties PROPERTIES_RATESLOTPREDICATE = new AspectProperties(ImmutableList.<IAspectPropertyTypeInstance>of(
+                PROP_CHANNEL,
+                PROP_ROUNDROBIN,
+                PROP_RATE,
+                //PROP_EXACTAMOUNT,
+                PROP_SLOT,
+                PROP_PASSIVE_IO,
+                PROP_CHECK_STACKSIZE,
+                PROP_PREDICATE_SLOTBASED
         ));
         public static final IAspectProperties PROPERTIES_SLOT = new AspectProperties(ImmutableList.<IAspectPropertyTypeInstance>of(
                 PROP_CHANNEL,
@@ -508,6 +520,15 @@ public class TunnelAspectWriteBuilders {
             PROPERTIES_RATESLOT.setValue(PROP_SLOT, ValueTypeInteger.ValueInteger.of(-1));
             PROPERTIES_RATESLOT.setValue(PROP_PASSIVE_IO, ValueTypeBoolean.ValueBoolean.of(false));
             PROPERTIES_RATESLOT.setValue(PROP_CHECK_STACKSIZE, ValueTypeBoolean.ValueBoolean.of(false));
+
+            PROPERTIES_RATESLOTPREDICATE.setValue(PROP_CHANNEL, ValueTypeInteger.ValueInteger.of(IPositionedAddonsNetworkIngredients.DEFAULT_CHANNEL));
+            PROPERTIES_RATESLOTPREDICATE.setValue(PROP_ROUNDROBIN, ValueTypeBoolean.ValueBoolean.of(false));
+            PROPERTIES_RATESLOTPREDICATE.setValue(PROP_RATE, ValueTypeInteger.ValueInteger.of(64));
+            //PROPERTIES_RATESLOTPREDICATE.setValue(PROP_EXACTAMOUNT, ValueTypeBoolean.ValueBoolean.of(false));
+            PROPERTIES_RATESLOTPREDICATE.setValue(PROP_SLOT, ValueTypeInteger.ValueInteger.of(-1));
+            PROPERTIES_RATESLOTPREDICATE.setValue(PROP_PASSIVE_IO, ValueTypeBoolean.ValueBoolean.of(true));
+            PROPERTIES_RATESLOTPREDICATE.setValue(PROP_CHECK_STACKSIZE, ValueTypeBoolean.ValueBoolean.of(false));
+            PROPERTIES_RATESLOTPREDICATE.setValue(PROP_PREDICATE_SLOTBASED, ValueTypeBoolean.ValueBoolean.of(false));
 
             PROPERTIES_SLOT.setValue(PROP_CHANNEL, ValueTypeInteger.ValueInteger.of(IPositionedAddonsNetworkIngredients.DEFAULT_CHANNEL));
             PROPERTIES_SLOT.setValue(PROP_ROUNDROBIN, ValueTypeBoolean.ValueBoolean.of(false));
@@ -778,7 +799,7 @@ public class TunnelAspectWriteBuilders {
                 // For predicate-based matchers, make sure we can iterate over the contents in a slotted manner,
                 // as the predicate must apply to each slotted ingredient.
                 // Only do this for exporting, not for importing, as this would otherwise break round-robin imports.
-                IIngredientComponentStorage<ItemStack, Integer> source = input.getItemStackMatcher().hasMatchFlags() ? input.getItemChannel() : input.getItemChannelSlotted();
+                IIngredientComponentStorage<ItemStack, Integer> source = input.getItemStackMatcher().hasMatchFlags() || !input.getProperties().getValue(TunnelAspectWriteBuilders.Item.PROP_PREDICATE_SLOTBASED).getRawValue() ? input.getItemChannel() : input.getItemChannelSlotted();
                 TunnelHelpers.moveSingleStateOptimized(
                         input.getNetwork(),
                         input.getChanneledNetwork(),
@@ -876,6 +897,8 @@ public class TunnelAspectWriteBuilders {
                 new AspectPropertyTypeInstance<>(ValueTypes.BOOLEAN, "aspect.aspecttypes.integratedtunnels.boolean.fluid.nbtrequire");
         public static final IAspectPropertyTypeInstance<ValueTypeBoolean, ValueTypeBoolean.ValueBoolean> PROP_NBT_RECURSIVE=
                 new AspectPropertyTypeInstance<>(ValueTypes.BOOLEAN, "aspect.aspecttypes.integratedtunnels.boolean.fluid.nbtrecursive");
+        public static final IAspectPropertyTypeInstance<ValueTypeBoolean, ValueTypeBoolean.ValueBoolean> PROP_PREDICATE_SLOTBASED =
+                new AspectPropertyTypeInstance<>(ValueTypes.BOOLEAN, "aspect.aspecttypes.integratedtunnels.boolean.fluid.predicateslotbased");
 
         public static final IAspectProperties PROPERTIES = new AspectProperties(ImmutableList.<IAspectPropertyTypeInstance>of(
                 PROP_CHANNEL,
@@ -890,6 +913,15 @@ public class TunnelAspectWriteBuilders {
                 //PROP_EXACTAMOUNT
                 PROP_PASSIVE_IO,
                 PROP_CHECK_AMOUNT
+        ));
+        public static final IAspectProperties PROPERTIES_RATEPREDICATE = new AspectProperties(ImmutableList.<IAspectPropertyTypeInstance>of(
+                PROP_CHANNEL,
+                PROP_ROUNDROBIN,
+                PROP_RATE,
+                //PROP_EXACTAMOUNT
+                PROP_PASSIVE_IO,
+                PROP_CHECK_AMOUNT,
+                PROP_PREDICATE_SLOTBASED
         ));
         public static final IAspectProperties PROPERTIES_RATECHECKS = new AspectProperties(ImmutableList.<IAspectPropertyTypeInstance>of(
                 PROP_CHANNEL,
@@ -969,6 +1001,14 @@ public class TunnelAspectWriteBuilders {
             //PROPERTIES_RATE.setValue(PROP_EXACTAMOUNT, ValueTypeBoolean.ValueBoolean.of(false));
             PROPERTIES_RATE.setValue(PROP_PASSIVE_IO, ValueTypeBoolean.ValueBoolean.of(false));
             PROPERTIES_RATE.setValue(PROP_CHECK_AMOUNT, ValueTypeBoolean.ValueBoolean.of(false));
+
+            PROPERTIES_RATEPREDICATE.setValue(PROP_CHANNEL, ValueTypeInteger.ValueInteger.of(IPositionedAddonsNetworkIngredients.DEFAULT_CHANNEL));
+            PROPERTIES_RATEPREDICATE.setValue(PROP_ROUNDROBIN, ValueTypeBoolean.ValueBoolean.of(false));
+            PROPERTIES_RATEPREDICATE.setValue(PROP_RATE, ValueTypeInteger.ValueInteger.of(1000));
+            //PROPERTIES_RATEPREDICATE.setValue(PROP_EXACTAMOUNT, ValueTypeBoolean.ValueBoolean.of(false));
+            PROPERTIES_RATEPREDICATE.setValue(PROP_PASSIVE_IO, ValueTypeBoolean.ValueBoolean.of(true));
+            PROPERTIES_RATEPREDICATE.setValue(PROP_CHECK_AMOUNT, ValueTypeBoolean.ValueBoolean.of(false));
+            PROPERTIES_RATEPREDICATE.setValue(PROP_PREDICATE_SLOTBASED, ValueTypeBoolean.ValueBoolean.of(false));
 
             PROPERTIES_RATECHECKS.setValue(PROP_CHANNEL, ValueTypeInteger.ValueInteger.of(IPositionedAddonsNetworkIngredients.DEFAULT_CHANNEL));
             PROPERTIES_RATECHECKS.setValue(PROP_ROUNDROBIN, ValueTypeBoolean.ValueBoolean.of(false));
@@ -1362,6 +1402,7 @@ public class TunnelAspectWriteBuilders {
             public static final IAspectProperties PROPERTIES_ENTITYITEM_PICK_UP = PROPERTIES_ENTITYITEM_PICK_UP_NORATE.clone();
             public static final IAspectProperties PROPERTIES_ENTITYITEM_PLACE_NORATE = PROPERTIES_ENTITYITEM_PLACE_NORATE_NOCHECKS.clone();
             public static final IAspectProperties PROPERTIES_ENTITYITEM_PLACE_NOCHECKS = PROPERTIES_ENTITYITEM_PLACE_NORATE_NOCHECKS.clone();
+            public static final IAspectProperties PROPERTIES_ENTITYITEM_PLACE_NOCHECKSPREDICATE = PROPERTIES_ENTITYITEM_PLACE_NORATE_NOCHECKS.clone();
             public static final IAspectProperties PROPERTIES_ENTITYITEM_PLACE_NBT = PROPERTIES_ENTITYITEM_PLACE_NORATE_NOCHECKS.clone();
             public static final IAspectProperties PROPERTIES_ENTITYITEMCRAFT_PLACE = PROPERTIES_ENTITYITEM_PLACE_NORATE_NOCHECKS.clone();
             public static final IAspectProperties PROPERTIES_ENTITYITEM_PICK_UP_NOCHECKS = new AspectProperties(ImmutableList.<IAspectPropertyTypeInstance>of(
@@ -1370,6 +1411,14 @@ public class TunnelAspectWriteBuilders {
                     //PROP_EXACTAMOUNT,
                     PROP_IGNORE_PICK_UP_DELAY,
                     TunnelAspectWriteBuilders.Item.PROP_RATE
+            ));
+            public static final IAspectProperties PROPERTIES_ENTITYITEM_PICK_UP_NOCHECKSPREDICATE = new AspectProperties(ImmutableList.<IAspectPropertyTypeInstance>of(
+                    PROP_CHANNEL,
+                    PROP_ROUNDROBIN,
+                    //PROP_EXACTAMOUNT,
+                    PROP_IGNORE_PICK_UP_DELAY,
+                    TunnelAspectWriteBuilders.Item.PROP_RATE,
+                    TunnelAspectWriteBuilders.Item.PROP_PREDICATE_SLOTBASED
             ));
             public static final IAspectProperties PROPERTIES_ENTITYITEM_PICK_UP_NORATE_NOCHECKS = new AspectProperties(ImmutableList.<IAspectPropertyTypeInstance>of(
                     PROP_CHANNEL,
@@ -1396,6 +1445,13 @@ public class TunnelAspectWriteBuilders {
                 //PROPERTIES_ENTITYITEM_PICK_UP_NOCHECKS.setValue(PROP_EXACTAMOUNT, ValueTypeBoolean.ValueBoolean.of(false));
                 PROPERTIES_ENTITYITEM_PICK_UP_NOCHECKS.setValue(PROP_IGNORE_PICK_UP_DELAY, ValueTypeBoolean.ValueBoolean.of(true));
                 PROPERTIES_ENTITYITEM_PICK_UP_NOCHECKS.setValue(TunnelAspectWriteBuilders.Item.PROP_RATE, ValueTypeInteger.ValueInteger.of(64));
+
+                PROPERTIES_ENTITYITEM_PICK_UP_NOCHECKSPREDICATE.setValue(PROP_CHANNEL, ValueTypeInteger.ValueInteger.of(IPositionedAddonsNetworkIngredients.DEFAULT_CHANNEL));
+                PROPERTIES_ENTITYITEM_PICK_UP_NOCHECKSPREDICATE.setValue(PROP_ROUNDROBIN, ValueTypeBoolean.ValueBoolean.of(false));
+                //PROPERTIES_ENTITYITEM_PICK_UP_NOCHECKSPREDICATE.setValue(PROP_EXACTAMOUNT, ValueTypeBoolean.ValueBoolean.of(false));
+                PROPERTIES_ENTITYITEM_PICK_UP_NOCHECKSPREDICATE.setValue(PROP_IGNORE_PICK_UP_DELAY, ValueTypeBoolean.ValueBoolean.of(true));
+                PROPERTIES_ENTITYITEM_PICK_UP_NOCHECKSPREDICATE.setValue(TunnelAspectWriteBuilders.Item.PROP_RATE, ValueTypeInteger.ValueInteger.of(64));
+                PROPERTIES_ENTITYITEM_PICK_UP_NOCHECKSPREDICATE.setValue(TunnelAspectWriteBuilders.Item.PROP_PREDICATE_SLOTBASED, ValueTypeBoolean.ValueBoolean.of(false));
 
                 PROPERTIES_ENTITYITEM_PICK_UP_NORATE_NOCHECKS.setValue(PROP_CHANNEL, ValueTypeInteger.ValueInteger.of(IPositionedAddonsNetworkIngredients.DEFAULT_CHANNEL));
                 PROPERTIES_ENTITYITEM_PICK_UP_NORATE_NOCHECKS.setValue(PROP_ROUNDROBIN, ValueTypeBoolean.ValueBoolean.of(false));
@@ -1425,6 +1481,9 @@ public class TunnelAspectWriteBuilders {
 
                 PROPERTIES_ENTITYITEM_PLACE_NOCHECKS.setValue(TunnelAspectWriteBuilders.Item.PROP_RATE, ValueTypeInteger.ValueInteger.of(64));
 
+                PROPERTIES_ENTITYITEM_PLACE_NOCHECKSPREDICATE.setValue(TunnelAspectWriteBuilders.Item.PROP_RATE, ValueTypeInteger.ValueInteger.of(64));
+                PROPERTIES_ENTITYITEM_PLACE_NOCHECKSPREDICATE.setValue(TunnelAspectWriteBuilders.Item.PROP_PREDICATE_SLOTBASED, ValueTypeBoolean.ValueBoolean.of(false));
+
                 PROPERTIES_ENTITYITEM_PLACE_NBT.setValue(TunnelAspectWriteBuilders.Item.PROP_RATE, ValueTypeInteger.ValueInteger.of(64));
                 PROPERTIES_ENTITYITEM_PLACE_NBT.setValue(PROP_ROUNDROBIN, ValueTypeBoolean.ValueBoolean.of(false));
                 PROPERTIES_ENTITYITEM_PLACE_NBT.setValue(PROP_BLACKLIST, ValueTypeBoolean.ValueBoolean.of(false));
@@ -1441,13 +1500,19 @@ public class TunnelAspectWriteBuilders {
                 PROPERTIES_ENTITYITEM_PLACELIST.setValue(PROP_BLACKLIST, ValueTypeBoolean.ValueBoolean.of(false));
             }
             public static final IAspectProperties PROPERTIES_RATESLOT = TunnelAspectWriteBuilders.Item.PROPERTIES_RATESLOT.clone();
+            public static final IAspectProperties PROPERTIES_RATESLOTPREDICATE = TunnelAspectWriteBuilders.Item.PROPERTIES_RATESLOTPREDICATE.clone();
             public static final IAspectProperties PROPERTIES_SLOT = TunnelAspectWriteBuilders.Item.PROPERTIES_SLOT.clone();
             public static final IAspectProperties PROPERTIES_RATESLOTCHECKS = TunnelAspectWriteBuilders.Item.PROPERTIES_RATESLOTCHECKS.clone();
+            public static final IAspectProperties PROPERTIES_RATESLOTCHECKSPREDICATE = TunnelAspectWriteBuilders.Item.PROPERTIES_RATESLOTCHECKS.clone();
             public static final IAspectProperties PROPERTIES_RATESLOTCHECKSCRAFT = TunnelAspectWriteBuilders.Item.PROPERTIES_RATESLOTCHECKSCRAFT.clone();
             public static final IAspectProperties PROPERTIES_NBT = TunnelAspectWriteBuilders.Item.PROPERTIES_NBT.clone();
             static {
                 PROPERTIES_RATESLOT.setValue(World.PROPERTY_ENTITYINDEX, ValueTypeInteger.ValueInteger.of(0));
                 PROPERTIES_RATESLOT.removeValue(PROP_PASSIVE_IO);
+
+                PROPERTIES_RATESLOTPREDICATE.setValue(World.PROPERTY_ENTITYINDEX, ValueTypeInteger.ValueInteger.of(0));
+                PROPERTIES_RATESLOTPREDICATE.removeValue(PROP_PASSIVE_IO);
+                PROPERTIES_RATESLOTPREDICATE.setValue(TunnelAspectWriteBuilders.Item.PROP_PREDICATE_SLOTBASED, ValueTypeBoolean.ValueBoolean.of(false));
 
                 PROPERTIES_SLOT.setValue(World.PROPERTY_ENTITYINDEX, ValueTypeInteger.ValueInteger.of(0));
                 PROPERTIES_SLOT.removeValue(PROP_PASSIVE_IO);
@@ -1456,6 +1521,12 @@ public class TunnelAspectWriteBuilders {
                 PROPERTIES_RATESLOTCHECKS.setValue(PROP_BLACKLIST, ValueTypeBoolean.ValueBoolean.of(false));
                 PROPERTIES_RATESLOTCHECKS.setValue(PROP_EMPTYISANY, ValueTypeBoolean.ValueBoolean.of(false));
                 PROPERTIES_RATESLOTCHECKS.removeValue(PROP_PASSIVE_IO);
+
+                PROPERTIES_RATESLOTCHECKSPREDICATE.setValue(World.PROPERTY_ENTITYINDEX, ValueTypeInteger.ValueInteger.of(0));
+                PROPERTIES_RATESLOTCHECKSPREDICATE.setValue(PROP_BLACKLIST, ValueTypeBoolean.ValueBoolean.of(false));
+                PROPERTIES_RATESLOTCHECKSPREDICATE.setValue(PROP_EMPTYISANY, ValueTypeBoolean.ValueBoolean.of(false));
+                PROPERTIES_RATESLOTCHECKSPREDICATE.removeValue(PROP_PASSIVE_IO);
+                PROPERTIES_RATESLOTCHECKSPREDICATE.setValue(TunnelAspectWriteBuilders.Item.PROP_PREDICATE_SLOTBASED, ValueTypeBoolean.ValueBoolean.of(false));
 
                 PROPERTIES_RATESLOTCHECKSCRAFT.setValue(World.PROPERTY_ENTITYINDEX, ValueTypeInteger.ValueInteger.of(0));
                 PROPERTIES_RATESLOTCHECKSCRAFT.setValue(PROP_BLACKLIST, ValueTypeBoolean.ValueBoolean.of(false));
@@ -1556,11 +1627,23 @@ public class TunnelAspectWriteBuilders {
 
         public static final class Fluid {
 
+            public static final IAspectProperties PROPERTIES_CHANNELPREDICATE = new AspectProperties(ImmutableList.<IAspectPropertyTypeInstance>of(
+                    PROP_CHANNEL,
+                    PROP_ROUNDROBIN,
+                    TunnelAspectWriteBuilders.Fluid.PROP_PREDICATE_SLOTBASED
+            ));
             public static final IAspectProperties PROPERTIES_UPDATE = new AspectProperties(ImmutableList.<IAspectPropertyTypeInstance>of(
                     PROP_CHANNEL,
                     PROP_ROUNDROBIN,
                     PROP_BLOCK_UPDATE,
                     PROP_IGNORE_REPLACABLE
+            ));
+            public static final IAspectProperties PROPERTIES_UPDATEPREDICATE = new AspectProperties(ImmutableList.<IAspectPropertyTypeInstance>of(
+                    PROP_CHANNEL,
+                    PROP_ROUNDROBIN,
+                    PROP_BLOCK_UPDATE,
+                    PROP_IGNORE_REPLACABLE,
+                    TunnelAspectWriteBuilders.Fluid.PROP_PREDICATE_SLOTBASED
             ));
             public static final IAspectProperties PROPERTIES_FLUIDCRAFT_UPDATE = new AspectProperties(ImmutableList.<IAspectPropertyTypeInstance>of(
                     PROP_CHANNEL,
@@ -1609,16 +1692,28 @@ public class TunnelAspectWriteBuilders {
                     TunnelAspectWriteBuilders.Fluid.PROP_NBT_RECURSIVE
             ));
             public static final IAspectProperties PROPERTIES_RATE = TunnelAspectWriteBuilders.Fluid.PROPERTIES_RATE.clone();
+            public static final IAspectProperties PROPERTIES_RATEPREDICATE = TunnelAspectWriteBuilders.Fluid.PROPERTIES_RATE.clone();
             public static final IAspectProperties PROPERTIES_RATECHECKS = TunnelAspectWriteBuilders.Fluid.PROPERTIES_RATECHECKS.clone();
             public static final IAspectProperties PROPERTIES_RATECHECKSCRAFT = TunnelAspectWriteBuilders.Fluid.PROPERTIES_RATECHECKSCRAFT.clone();
             public static final IAspectProperties PROPERTIES_RATECHECKSLIST = TunnelAspectWriteBuilders.Fluid.PROPERTIES_RATECHECKSLIST.clone();
 
             static {
+                PROPERTIES_CHANNEL.setValue(PROP_CHANNEL, ValueTypeInteger.ValueInteger.of(IPositionedAddonsNetworkIngredients.DEFAULT_CHANNEL));
+                PROPERTIES_CHANNEL.setValue(PROP_ROUNDROBIN, ValueTypeBoolean.ValueBoolean.of(false));
+                PROPERTIES_CHANNELPREDICATE.setValue(TunnelAspectWriteBuilders.Fluid.PROP_PREDICATE_SLOTBASED, ValueTypeBoolean.ValueBoolean.of(false));
+
                 PROPERTIES_UPDATE.setValue(PROP_CHANNEL, ValueTypeInteger.ValueInteger.of(IPositionedAddonsNetworkIngredients.DEFAULT_CHANNEL));
                 PROPERTIES_UPDATE.setValue(PROP_ROUNDROBIN, ValueTypeBoolean.ValueBoolean.of(false));
                 PROPERTIES_UPDATE.setValue(PROP_BLOCK_UPDATE, ValueTypeBoolean.ValueBoolean.of(false));
                 PROPERTIES_UPDATE.setValue(PROP_IGNORE_REPLACABLE, ValueTypeBoolean.ValueBoolean.of(false));
                 PROPERTIES_UPDATE.removeValue(PROP_PASSIVE_IO);
+
+                PROPERTIES_UPDATEPREDICATE.setValue(PROP_CHANNEL, ValueTypeInteger.ValueInteger.of(IPositionedAddonsNetworkIngredients.DEFAULT_CHANNEL));
+                PROPERTIES_UPDATEPREDICATE.setValue(PROP_ROUNDROBIN, ValueTypeBoolean.ValueBoolean.of(false));
+                PROPERTIES_UPDATEPREDICATE.setValue(PROP_BLOCK_UPDATE, ValueTypeBoolean.ValueBoolean.of(false));
+                PROPERTIES_UPDATEPREDICATE.setValue(PROP_IGNORE_REPLACABLE, ValueTypeBoolean.ValueBoolean.of(false));
+                PROPERTIES_UPDATEPREDICATE.removeValue(PROP_PASSIVE_IO);
+                PROPERTIES_UPDATEPREDICATE.setValue(TunnelAspectWriteBuilders.Fluid.PROP_PREDICATE_SLOTBASED, ValueTypeBoolean.ValueBoolean.of(false));
 
                 PROPERTIES_FLUIDCRAFT_UPDATE.setValue(PROP_CHANNEL, ValueTypeInteger.ValueInteger.of(IPositionedAddonsNetworkIngredients.DEFAULT_CHANNEL));
                 PROPERTIES_FLUIDCRAFT_UPDATE.setValue(PROP_ROUNDROBIN, ValueTypeBoolean.ValueBoolean.of(false));
@@ -1653,6 +1748,10 @@ public class TunnelAspectWriteBuilders {
 
                 PROPERTIES_RATE.setValue(World.PROPERTY_ENTITYINDEX, ValueTypeInteger.ValueInteger.of(0));
                 PROPERTIES_RATE.removeValue(PROP_PASSIVE_IO);
+
+                PROPERTIES_RATEPREDICATE.setValue(World.PROPERTY_ENTITYINDEX, ValueTypeInteger.ValueInteger.of(0));
+                PROPERTIES_RATEPREDICATE.removeValue(PROP_PASSIVE_IO);
+                PROPERTIES_RATEPREDICATE.setValue(TunnelAspectWriteBuilders.Fluid.PROP_PREDICATE_SLOTBASED, ValueTypeBoolean.ValueBoolean.of(false));
 
                 PROPERTIES_RATECHECKS.setValue(World.PROPERTY_ENTITYINDEX, ValueTypeInteger.ValueInteger.of(0));
                 PROPERTIES_RATECHECKS.setValue(PROP_BLACKLIST, ValueTypeBoolean.ValueBoolean.of(false));

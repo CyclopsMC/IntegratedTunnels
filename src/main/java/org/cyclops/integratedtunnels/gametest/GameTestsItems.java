@@ -20,6 +20,8 @@ import org.cyclops.integrateddynamics.api.part.PartTarget;
 import org.cyclops.integrateddynamics.api.part.aspect.property.IAspectProperties;
 import org.cyclops.integrateddynamics.api.part.write.IPartStateWriter;
 import org.cyclops.integrateddynamics.core.block.IgnoredBlockStatus;
+import org.cyclops.integrateddynamics.core.evaluate.operator.CurriedOperator;
+import org.cyclops.integrateddynamics.core.evaluate.operator.Operators;
 import org.cyclops.integrateddynamics.core.evaluate.variable.*;
 import org.cyclops.integrateddynamics.core.helper.PartHelpers;
 import org.cyclops.integratedtunnels.Reference;
@@ -565,6 +567,204 @@ public class GameTestsItems {
             helper.assertContainerContains(POS.west(), Items.WHITE_WOOL);
             helper.assertContainerContains(POS.east().east(), Items.ACACIA_LEAVES);
             helper.assertContainerContains(POS.east().east(), Items.DIAMOND_PICKAXE);
+        });
+    }
+
+    @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
+    public void testItemsInterfaceToExporterPredicateValidSingle(GameTestHelper helper) {
+        // Place cable
+        helper.setBlock(POS, RegistryEntries.BLOCK_CABLE.value());
+        helper.setBlock(POS.east(), RegistryEntries.BLOCK_CABLE.value());
+
+        // Place item interface
+        PartHelpers.addPart(helper.getLevel(), helper.absolutePos(POS), Direction.WEST, PartTypes.INTERFACE_ITEM, new ItemStack(PartTypes.INTERFACE_ITEM.getItem()));
+
+        // Place item exporter
+        PartHelpers.addPart(helper.getLevel(), helper.absolutePos(POS.east()), Direction.EAST, PartTypes.EXPORTER_ITEM, new ItemStack(PartTypes.EXPORTER_ITEM.getItem()));
+
+        // Place chests
+        helper.setBlock(POS.west(), Blocks.CHEST);
+        helper.setBlock(POS.east().east(), Blocks.CHEST);
+
+        // Insert items in interface chest
+        ChestBlockEntity chestIn = helper.getBlockEntity(POS.west(), ChestBlockEntity.class);
+        chestIn.setItem(0, new ItemStack(Items.WHITE_WOOL));
+        chestIn.setItem(1, new ItemStack(Items.ACACIA_LEAVES));
+        chestIn.setItem(2, new ItemStack(Items.DIAMOND_PICKAXE));
+
+        // Place empty variable in exporter
+        ItemStack variableAspect = createVariableForValue(helper.getLevel(), ValueTypes.OPERATOR, ValueTypeOperator.ValueOperator.of(new CurriedOperator(
+                Operators.RELATIONAL_EQUALS,
+                new Variable<>(ValueObjectTypeItemStack.ValueItemStack.of(new ItemStack(Items.WHITE_WOOL)))
+        )));
+        placeVariableInWriter(helper, helper.getLevel(), PartPos.of(helper.getLevel(), helper.absolutePos(POS.east()), Direction.EAST), TunnelAspects.Write.Item.PREDICATE_EXPORT, variableAspect);
+
+        helper.succeedWhen(() -> {
+            // Check if items are moved
+            ChestBlockEntity chestOut = helper.getBlockEntity(POS.east().east(), ChestBlockEntity.class);
+            helper.assertTrue(chestIn.getItem(0).isEmpty(), Component.literal("Incorrect input item was moved"));
+            helper.assertFalse(chestIn.getItem(1).isEmpty(), Component.literal("Incorrect input item was moved"));
+            helper.assertFalse(chestIn.getItem(2).isEmpty(), Component.literal("Incorrect input item was moved"));
+            helper.assertFalse(chestOut.getItem(0).isEmpty(), Component.literal("Incorrect output item was moved"));
+            helper.assertTrue(chestOut.getItem(1).isEmpty(), Component.literal("Incorrect output item was moved"));
+            helper.assertTrue(chestOut.getItem(2).isEmpty(), Component.literal("Incorrect output item was moved"));
+            helper.assertContainerContains(POS.east().east(), Items.WHITE_WOOL);
+            helper.assertContainerContains(POS.west(), Items.ACACIA_LEAVES);
+            helper.assertContainerContains(POS.west(), Items.DIAMOND_PICKAXE);
+        });
+    }
+
+    @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
+    public void testItemsInterfaceToExporterPredicateInvalidMultiple(GameTestHelper helper) {
+        // Place cable
+        helper.setBlock(POS, RegistryEntries.BLOCK_CABLE.value());
+        helper.setBlock(POS.east(), RegistryEntries.BLOCK_CABLE.value());
+
+        // Place item interface
+        PartHelpers.addPart(helper.getLevel(), helper.absolutePos(POS), Direction.WEST, PartTypes.INTERFACE_ITEM, new ItemStack(PartTypes.INTERFACE_ITEM.getItem()));
+
+        // Place item exporter
+        PartHelpers.addPart(helper.getLevel(), helper.absolutePos(POS.east()), Direction.EAST, PartTypes.EXPORTER_ITEM, new ItemStack(PartTypes.EXPORTER_ITEM.getItem()));
+
+        // Place chests
+        helper.setBlock(POS.west(), Blocks.CHEST);
+        helper.setBlock(POS.east().east(), Blocks.CHEST);
+
+        // Insert items in interface chest
+        ChestBlockEntity chestIn = helper.getBlockEntity(POS.west(), ChestBlockEntity.class);
+        chestIn.setItem(0, new ItemStack(Items.WHITE_WOOL));
+        chestIn.setItem(1, new ItemStack(Items.ACACIA_LEAVES));
+        chestIn.setItem(2, new ItemStack(Items.DIAMOND_PICKAXE));
+        chestIn.setItem(3, new ItemStack(Items.WHITE_WOOL));
+
+        // Place empty variable in exporter
+        ItemStack variableAspect = createVariableForValue(helper.getLevel(), ValueTypes.OPERATOR, ValueTypeOperator.ValueOperator.of(new CurriedOperator(
+                Operators.RELATIONAL_EQUALS,
+                new Variable<>(ValueObjectTypeItemStack.ValueItemStack.of(new ItemStack(Items.WHITE_WOOL)))
+        )));
+        placeVariableInWriter(helper, helper.getLevel(), PartPos.of(helper.getLevel(), helper.absolutePos(POS.east()), Direction.EAST), TunnelAspects.Write.Item.PREDICATE_EXPORT, variableAspect);
+
+        helper.succeedWhen(() -> {
+            // Check if items are moved
+            ChestBlockEntity chestOut = helper.getBlockEntity(POS.east().east(), ChestBlockEntity.class);
+            helper.assertFalse(chestIn.getItem(0).isEmpty(), Component.literal("Incorrect input item was moved"));
+            helper.assertFalse(chestIn.getItem(1).isEmpty(), Component.literal("Incorrect input item was moved"));
+            helper.assertFalse(chestIn.getItem(2).isEmpty(), Component.literal("Incorrect input item was moved"));
+            helper.assertFalse(chestIn.getItem(3).isEmpty(), Component.literal("Incorrect input item was moved"));
+            helper.assertTrue(chestOut.getItem(0).isEmpty(), Component.literal("Incorrect output item was moved"));
+            helper.assertTrue(chestOut.getItem(1).isEmpty(), Component.literal("Incorrect output item was moved"));
+            helper.assertTrue(chestOut.getItem(2).isEmpty(), Component.literal("Incorrect output item was moved"));
+            helper.assertTrue(chestOut.getItem(3).isEmpty(), Component.literal("Incorrect output item was moved"));
+            helper.assertTrue(chestIn.getItem(0).getItem() == Items.WHITE_WOOL, Component.literal("Incorrect output item type was moved"));
+            helper.assertContainerContains(POS.west(), Items.ACACIA_LEAVES);
+            helper.assertContainerContains(POS.west(), Items.DIAMOND_PICKAXE);
+            helper.assertTrue(chestIn.getItem(3).getItem() == Items.WHITE_WOOL, Component.literal("Incorrect output item type was moved"));
+        });
+    }
+
+    @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
+    public void testItemsInterfaceToExporterPredicateSlotBasedValid(GameTestHelper helper) {
+        // Place cable
+        helper.setBlock(POS, RegistryEntries.BLOCK_CABLE.value());
+        helper.setBlock(POS.east(), RegistryEntries.BLOCK_CABLE.value());
+
+        // Place item interface
+        PartHelpers.addPart(helper.getLevel(), helper.absolutePos(POS), Direction.WEST, PartTypes.INTERFACE_ITEM, new ItemStack(PartTypes.INTERFACE_ITEM.getItem()));
+
+        // Place item exporter
+        PartHelpers.addPart(helper.getLevel(), helper.absolutePos(POS.east()), Direction.EAST, PartTypes.EXPORTER_ITEM, new ItemStack(PartTypes.EXPORTER_ITEM.getItem()));
+
+        // Place chests
+        helper.setBlock(POS.west(), Blocks.CHEST);
+        helper.setBlock(POS.east().east(), Blocks.CHEST);
+
+        // Insert items in interface chest
+        ChestBlockEntity chestIn = helper.getBlockEntity(POS.west(), ChestBlockEntity.class);
+        chestIn.setItem(0, new ItemStack(Items.WHITE_WOOL));
+        chestIn.setItem(1, new ItemStack(Items.ACACIA_LEAVES));
+        chestIn.setItem(2, new ItemStack(Items.DIAMOND_PICKAXE));
+        chestIn.setItem(3, new ItemStack(Items.WHITE_WOOL));
+
+        // Place empty variable in exporter
+        ItemStack variableAspect = createVariableForValue(helper.getLevel(), ValueTypes.OPERATOR, ValueTypeOperator.ValueOperator.of(new CurriedOperator(
+                Operators.RELATIONAL_EQUALS,
+                new Variable<>(ValueObjectTypeItemStack.ValueItemStack.of(new ItemStack(Items.WHITE_WOOL)))
+        )));
+        placeVariableInWriter(helper, helper.getLevel(), PartPos.of(helper.getLevel(), helper.absolutePos(POS.east()), Direction.EAST), TunnelAspects.Write.Item.PREDICATE_EXPORT, variableAspect);
+
+        // Enable slot-based
+        PartPos posExporter = PartPos.of(DimPos.of(helper.getLevel(), helper.absolutePos(POS.east())), Direction.EAST);
+        PartHelpers.PartStateHolder partStateHolder = PartHelpers.getPart(posExporter);
+        IAspectProperties properties = TunnelAspects.Write.Item.PREDICATE_EXPORT.getProperties(partStateHolder.getPart(), PartTarget.fromCenter(posExporter), partStateHolder.getState());
+        properties.setValue(TunnelAspectWriteBuilders.Item.PROP_PREDICATE_SLOTBASED, ValueTypeBoolean.ValueBoolean.of(true));
+        partStateHolder.getState().setAspectProperties(TunnelAspects.Write.Item.PREDICATE_EXPORT, properties);
+
+        helper.succeedWhen(() -> {
+            // Check if items are moved
+            ChestBlockEntity chestOut = helper.getBlockEntity(POS.east().east(), ChestBlockEntity.class);
+            helper.assertTrue(chestIn.getItem(0).isEmpty(), Component.literal("Incorrect input item was moved"));
+            helper.assertFalse(chestIn.getItem(1).isEmpty(), Component.literal("Incorrect input item was moved"));
+            helper.assertFalse(chestIn.getItem(2).isEmpty(), Component.literal("Incorrect input item was moved"));
+            helper.assertTrue(chestIn.getItem(3).isEmpty(), Component.literal("Incorrect input item was moved"));
+            helper.assertFalse(chestOut.getItem(0).isEmpty(), Component.literal("Incorrect output item was moved"));
+            helper.assertTrue(chestOut.getItem(1).isEmpty(), Component.literal("Incorrect output item was moved"));
+            helper.assertTrue(chestOut.getItem(2).isEmpty(), Component.literal("Incorrect output item was moved"));
+            helper.assertTrue(chestOut.getItem(0).getItem() == Items.WHITE_WOOL, Component.literal("Incorrect output item type was moved"));
+            helper.assertTrue(chestOut.getItem(0).getCount() == 2, Component.literal("Incorrect output item size was moved"));
+            helper.assertContainerContains(POS.west(), Items.ACACIA_LEAVES);
+            helper.assertContainerContains(POS.west(), Items.DIAMOND_PICKAXE);
+        });
+    }
+
+    @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
+    public void testItemsInterfaceToExporterPredicateSlotBasedInvalid(GameTestHelper helper) {
+        // Place cable
+        helper.setBlock(POS, RegistryEntries.BLOCK_CABLE.value());
+        helper.setBlock(POS.east(), RegistryEntries.BLOCK_CABLE.value());
+
+        // Place item interface
+        PartHelpers.addPart(helper.getLevel(), helper.absolutePos(POS), Direction.WEST, PartTypes.INTERFACE_ITEM, new ItemStack(PartTypes.INTERFACE_ITEM.getItem()));
+
+        // Place item exporter
+        PartHelpers.addPart(helper.getLevel(), helper.absolutePos(POS.east()), Direction.EAST, PartTypes.EXPORTER_ITEM, new ItemStack(PartTypes.EXPORTER_ITEM.getItem()));
+
+        // Place chests
+        helper.setBlock(POS.west(), Blocks.CHEST);
+        helper.setBlock(POS.east().east(), Blocks.CHEST);
+
+        // Insert items in interface chest
+        ChestBlockEntity chestIn = helper.getBlockEntity(POS.west(), ChestBlockEntity.class);
+        chestIn.setItem(0, new ItemStack(Items.WHITE_WOOL, 2));
+        chestIn.setItem(1, new ItemStack(Items.ACACIA_LEAVES));
+        chestIn.setItem(2, new ItemStack(Items.DIAMOND_PICKAXE));
+
+        // Place empty variable in exporter
+        ItemStack variableAspect = createVariableForValue(helper.getLevel(), ValueTypes.OPERATOR, ValueTypeOperator.ValueOperator.of(new CurriedOperator(
+                Operators.RELATIONAL_EQUALS,
+                new Variable<>(ValueObjectTypeItemStack.ValueItemStack.of(new ItemStack(Items.WHITE_WOOL)))
+        )));
+        placeVariableInWriter(helper, helper.getLevel(), PartPos.of(helper.getLevel(), helper.absolutePos(POS.east()), Direction.EAST), TunnelAspects.Write.Item.PREDICATE_EXPORT, variableAspect);
+
+        // Enable slot-based
+        PartPos posExporter = PartPos.of(DimPos.of(helper.getLevel(), helper.absolutePos(POS.east())), Direction.EAST);
+        PartHelpers.PartStateHolder partStateHolder = PartHelpers.getPart(posExporter);
+        IAspectProperties properties = TunnelAspects.Write.Item.PREDICATE_EXPORT.getProperties(partStateHolder.getPart(), PartTarget.fromCenter(posExporter), partStateHolder.getState());
+        properties.setValue(TunnelAspectWriteBuilders.Item.PROP_PREDICATE_SLOTBASED, ValueTypeBoolean.ValueBoolean.of(true));
+        partStateHolder.getState().setAspectProperties(TunnelAspects.Write.Item.PREDICATE_EXPORT, properties);
+
+        helper.succeedWhen(() -> {
+            // Check if items are moved
+            ChestBlockEntity chestOut = helper.getBlockEntity(POS.east().east(), ChestBlockEntity.class);
+            helper.assertFalse(chestIn.getItem(0).isEmpty(), Component.literal("Incorrect input item was moved"));
+            helper.assertFalse(chestIn.getItem(1).isEmpty(), Component.literal("Incorrect input item was moved"));
+            helper.assertFalse(chestIn.getItem(2).isEmpty(), Component.literal("Incorrect input item was moved"));
+            helper.assertTrue(chestOut.getItem(0).isEmpty(), Component.literal("Incorrect output item was moved"));
+            helper.assertTrue(chestOut.getItem(1).isEmpty(), Component.literal("Incorrect output item was moved"));
+            helper.assertTrue(chestOut.getItem(2).isEmpty(), Component.literal("Incorrect output item was moved"));
+            helper.assertTrue(chestIn.getItem(0).getItem() == Items.WHITE_WOOL, Component.literal("Incorrect output item type was moved"));
+            helper.assertTrue(chestIn.getItem(0).getCount() == 2, Component.literal("Incorrect output item size was moved"));
+            helper.assertContainerContains(POS.west(), Items.ACACIA_LEAVES);
+            helper.assertContainerContains(POS.west(), Items.DIAMOND_PICKAXE);
         });
     }
 

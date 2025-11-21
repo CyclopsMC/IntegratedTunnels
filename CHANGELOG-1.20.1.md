@@ -1,8 +1,25 @@
 # Changelog for Minecraft 1.20.1
 All notable changes to this project will be documented in this file.
 
+<a name="1.20.1-1.9.3"></a>
+## [1.20.1-1.9.3](/compare/1.20.1-1.9.2...1.20.1-1.9.3) - 2025-11-21 15:24:42
+
+
+### Changed
+* Optimize predicate-based transfer using slotless index
+
+By default, predicate-based aspects used the slot-based index to be able
+to handle cases such as #271. Since slot-based transfer can be a lot
+slower than slotless transfer, this is not great.
+Since the use case of #271 is quite exotic, the slot-based behaviour
+has been hidden behind an aspect property, while the predicate-based
+aspects will now always use the more performant slotless index by
+default.
+
+Closes CyclopsMC/ColossalChests#192
+
 <a name="1.20.1-1.9.2"></a>
-## [1.20.1-1.9.2](/compare/1.20.1-1.9.1...1.20.1-1.9.2) - 2025-11-11 14:43:21
+## [1.20.1-1.9.2](/compare/1.20.1-1.9.1...1.20.1-1.9.2) - 2025-11-11 14:43:21 +0100
 
 
 ### Fixed

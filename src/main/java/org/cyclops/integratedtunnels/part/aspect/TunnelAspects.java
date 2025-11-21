@@ -178,7 +178,7 @@ public class TunnelAspects {
                             .appendKind("export").buildWrite();
             public static final IAspectWrite<ValueTypeOperator.ValueOperator, ValueTypeOperator> PREDICATE_EXPORT =
                     TunnelAspectWriteBuilders.Item.BUILDER_OPERATOR
-                            .withProperties(TunnelAspectWriteBuilders.Item.PROPERTIES_RATESLOT)
+                            .withProperties(TunnelAspectWriteBuilders.Item.PROPERTIES_RATESLOTPREDICATE)
                             .handle(TunnelAspectWriteBuilders.Item.PROP_ITEMSTACKPREDICATE_ITEMPREDICATE)
                             .handle(TunnelAspectWriteBuilders.Item.PROP_ITEMTARGET)
                             .handle(TunnelAspectWriteBuilders.Item.PROP_EXPORT)
@@ -228,7 +228,7 @@ public class TunnelAspects {
                             .appendKind("import").buildWrite();
             public static final IAspectWrite<ValueTypeOperator.ValueOperator, ValueTypeOperator> PREDICATE_IMPORT =
                     TunnelAspectWriteBuilders.Item.BUILDER_OPERATOR
-                            .withProperties(TunnelAspectWriteBuilders.Item.PROPERTIES_RATESLOT)
+                            .withProperties(TunnelAspectWriteBuilders.Item.PROPERTIES_RATESLOTPREDICATE)
                             .handle(TunnelAspectWriteBuilders.Item.PROP_ITEMSTACKPREDICATE_ITEMPREDICATE)
                             .handle(TunnelAspectWriteBuilders.Item.PROP_ITEMTARGET)
                             .handle(TunnelAspectWriteBuilders.Item.PROP_IMPORT)
@@ -276,7 +276,7 @@ public class TunnelAspects {
                             .appendKind("export").buildWrite();
             public static final IAspectWrite<ValueTypeOperator.ValueOperator, ValueTypeOperator> PREDICATE_EXPORT =
                     TunnelAspectWriteBuilders.Fluid.BUILDER_OPERATOR
-                            .withProperties(TunnelAspectWriteBuilders.Fluid.PROPERTIES_RATE)
+                            .withProperties(TunnelAspectWriteBuilders.Fluid.PROPERTIES_RATEPREDICATE)
                             .handle(TunnelAspectWriteBuilders.Fluid.PROP_FLUIDSTACKPREDICATE_FLUIDPREDICATE)
                             .handle(TunnelAspectWriteBuilders.Fluid.PROP_FLUIDTARGET)
                             .handle(TunnelAspectWriteBuilders.Fluid.PROP_EXPORT)
@@ -320,7 +320,7 @@ public class TunnelAspects {
                             .appendKind("import").buildWrite();
             public static final IAspectWrite<ValueTypeOperator.ValueOperator, ValueTypeOperator> PREDICATE_IMPORT =
                     TunnelAspectWriteBuilders.Fluid.BUILDER_OPERATOR
-                            .withProperties(TunnelAspectWriteBuilders.Fluid.PROPERTIES_RATE)
+                            .withProperties(TunnelAspectWriteBuilders.Fluid.PROPERTIES_RATEPREDICATE)
                             .handle(TunnelAspectWriteBuilders.Fluid.PROP_FLUIDSTACKPREDICATE_FLUIDPREDICATE)
                             .handle(TunnelAspectWriteBuilders.Fluid.PROP_FLUIDTARGET)
                             .handle(TunnelAspectWriteBuilders.Fluid.PROP_IMPORT)
@@ -357,7 +357,7 @@ public class TunnelAspects {
                                 .appendKind("fluid").appendKind("export").buildWrite();
                 public static final IAspectWrite<ValueTypeOperator.ValueOperator, ValueTypeOperator> FLUID_PREDICATE_EXPORT =
                         TunnelAspectWriteBuilders.World.BUILDER_OPERATOR
-                                .withProperties(TunnelAspectWriteBuilders.World.Fluid.PROPERTIES_UPDATE)
+                                .withProperties(TunnelAspectWriteBuilders.World.Fluid.PROPERTIES_UPDATEPREDICATE)
                                 .handle(TunnelAspectWriteBuilders.World.Fluid.PROP_FLUIDSTACKPREDICATE_FLUIDTARGET)
                                 .handle(TunnelAspectWriteBuilders.World.Fluid.PROP_FLUIDSTACK_EXPORT)
                                 .appendKind("fluid").appendKind("export").buildWrite();
@@ -387,6 +387,7 @@ public class TunnelAspects {
                                 .appendKind("fluid").appendKind("import").buildWrite();
                 public static final IAspectWrite<ValueTypeOperator.ValueOperator, ValueTypeOperator> FLUID_PREDICATE_IMPORT =
                         TunnelAspectWriteBuilders.World.BUILDER_OPERATOR
+                                .withProperties(TunnelAspectWriteBuilders.World.Fluid.PROPERTIES_CHANNELPREDICATE)
                                 .handle(TunnelAspectWriteBuilders.World.Fluid.PROP_FLUIDSTACKPREDICATE_FLUIDTARGET)
                                 .handle(TunnelAspectWriteBuilders.World.Fluid.PROP_FLUIDSTACK_IMPORT)
                                 .appendKind("fluid").appendKind("import").buildWrite();
@@ -547,7 +548,7 @@ public class TunnelAspects {
                                 .appendKind("entityitem").appendKind("import").buildWrite();
                 public static final IAspectWrite<ValueTypeOperator.ValueOperator, ValueTypeOperator> ENTITYITEM_PREDICATEITEMSTACK_IMPORT =
                         TunnelAspectWriteBuilders.World.BUILDER_OPERATOR
-                                .withProperties(TunnelAspectWriteBuilders.World.Item.PROPERTIES_ENTITYITEM_PICK_UP_NOCHECKS)
+                                .withProperties(TunnelAspectWriteBuilders.World.Item.PROPERTIES_ENTITYITEM_PICK_UP_NOCHECKSPREDICATE)
                                 .handle(TunnelAspectWriteBuilders.Item.PROP_ITEMSTACKPREDICATE_ITEMPREDICATE)
                                 .handle(TunnelAspectWriteBuilders.World.Item.PROP_ENTITYITEM_ITEMTARGET_IMPORT)
                                 .handle(TunnelAspectWriteBuilders.Item.PROP_IMPORT)
@@ -590,7 +591,7 @@ public class TunnelAspects {
                                 .appendKind("entityitem").appendKind("export").buildWrite();
                 public static final IAspectWrite<ValueTypeOperator.ValueOperator, ValueTypeOperator> ENTITYITEM_PREDICATEITEMSTACK_EXPORT =
                         TunnelAspectWriteBuilders.World.BUILDER_OPERATOR
-                                .withProperties(TunnelAspectWriteBuilders.World.Item.PROPERTIES_ENTITYITEM_PLACE_NOCHECKS)
+                                .withProperties(TunnelAspectWriteBuilders.World.Item.PROPERTIES_ENTITYITEM_PLACE_NOCHECKSPREDICATE)
                                 .handle(TunnelAspectWriteBuilders.Item.PROP_ITEMSTACKPREDICATE_ITEMPREDICATE)
                                 .handle(TunnelAspectWriteBuilders.World.Item.PROP_ENTITYITEM_ITEMTARGET_EXPORT)
                                 .handle(TunnelAspectWriteBuilders.Item.PROP_EXPORT)
@@ -633,7 +634,7 @@ public class TunnelAspects {
                                 .appendKind("entity").appendKind("item").appendKind("import").buildWrite();
                 public static final IAspectWrite<ValueTypeOperator.ValueOperator, ValueTypeOperator> ENTITY_ITEM_PREDICATEITEMSTACK_IMPORT =
                         TunnelAspectWriteBuilders.World.BUILDER_OPERATOR
-                                .withProperties(TunnelAspectWriteBuilders.World.Item.PROPERTIES_RATESLOTCHECKS)
+                                .withProperties(TunnelAspectWriteBuilders.World.Item.PROPERTIES_RATESLOTCHECKSPREDICATE)
                                 .handle(TunnelAspectWriteBuilders.Item.PROP_ITEMSTACKPREDICATE_ITEMPREDICATE)
                                 .handle(TunnelAspectWriteBuilders.World.Item.PROP_ENTITY_ITEMTARGET)
                                 .handle(TunnelAspectWriteBuilders.Item.PROP_IMPORT)
@@ -676,7 +677,7 @@ public class TunnelAspects {
                                 .appendKind("entity").appendKind("item").appendKind("export").buildWrite();
                 public static final IAspectWrite<ValueTypeOperator.ValueOperator, ValueTypeOperator> ENTITY_ITEM_PREDICATEITEMSTACK_EXPORT =
                         TunnelAspectWriteBuilders.World.BUILDER_OPERATOR
-                                .withProperties(TunnelAspectWriteBuilders.World.Item.PROPERTIES_RATESLOT)
+                                .withProperties(TunnelAspectWriteBuilders.World.Item.PROPERTIES_RATESLOTPREDICATE)
                                 .handle(TunnelAspectWriteBuilders.Item.PROP_ITEMSTACKPREDICATE_ITEMPREDICATE)
                                 .handle(TunnelAspectWriteBuilders.World.Item.PROP_ENTITY_ITEMTARGET)
                                 .handle(TunnelAspectWriteBuilders.Item.PROP_EXPORT)
@@ -719,7 +720,7 @@ public class TunnelAspects {
                                 .appendKind("entity").appendKind("fluid").appendKind("import").buildWrite();
                 public static final IAspectWrite<ValueTypeOperator.ValueOperator, ValueTypeOperator> ENTITY_FLUID_PREDICATEFLUIDSTACK_IMPORT =
                         TunnelAspectWriteBuilders.World.BUILDER_OPERATOR
-                                .withProperties(TunnelAspectWriteBuilders.World.Fluid.PROPERTIES_RATE)
+                                .withProperties(TunnelAspectWriteBuilders.World.Fluid.PROPERTIES_RATEPREDICATE)
                                 .handle(TunnelAspectWriteBuilders.Fluid.PROP_FLUIDSTACKPREDICATE_FLUIDPREDICATE)
                                 .handle(TunnelAspectWriteBuilders.World.Fluid.PROP_ENTITY_FLUIDTARGET)
                                 .handle(TunnelAspectWriteBuilders.Fluid.PROP_IMPORT)
@@ -762,7 +763,7 @@ public class TunnelAspects {
                                 .appendKind("entity").appendKind("fluid").appendKind("export").buildWrite();
                 public static final IAspectWrite<ValueTypeOperator.ValueOperator, ValueTypeOperator> ENTITY_FLUID_PREDICATEFLUIDSTACK_EXPORT =
                         TunnelAspectWriteBuilders.World.BUILDER_OPERATOR
-                                .withProperties(TunnelAspectWriteBuilders.World.Fluid.PROPERTIES_RATE)
+                                .withProperties(TunnelAspectWriteBuilders.World.Fluid.PROPERTIES_RATEPREDICATE)
                                 .handle(TunnelAspectWriteBuilders.Fluid.PROP_FLUIDSTACKPREDICATE_FLUIDPREDICATE)
                                 .handle(TunnelAspectWriteBuilders.World.Fluid.PROP_ENTITY_FLUIDTARGET)
                                 .handle(TunnelAspectWriteBuilders.Fluid.PROP_EXPORT)
