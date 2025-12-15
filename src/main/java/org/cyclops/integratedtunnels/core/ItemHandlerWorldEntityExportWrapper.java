@@ -17,12 +17,15 @@ import net.minecraft.world.level.block.DispenserBlock;
 import net.minecraft.world.level.block.entity.DispenserBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
+import net.neoforged.neoforge.transfer.transaction.SnapshotJournal;
+import net.neoforged.neoforge.transfer.transaction.TransactionContext;
 import org.cyclops.commoncapabilities.api.ingredient.IngredientComponent;
 import org.cyclops.commoncapabilities.api.ingredient.storage.IIngredientComponentStorage;
 import org.cyclops.cyclopscore.datastructure.Wrapper;
 import org.cyclops.integratedtunnels.GeneralConfig;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.Iterator;
 import java.util.function.Supplier;
 
@@ -44,10 +47,14 @@ public class ItemHandlerWorldEntityExportWrapper implements IIngredientComponent
     private final float yawOffset;
     private final float pitchOffset;
     private final boolean dispense;
+    private final ItemHandlerWorldEntityExportWrapper.Journal journal;
 
     private final IIngredientComponentStorage<ItemStack, Integer> dispenseResultHandler;
 
     private static final DefaultDispenseItemBehavior DISPENSE_ITEM_DIRECTLY = new DefaultDispenseItemBehavior();
+
+    @Nullable
+    private ItemStack simulatedStack;
 
     public ItemHandlerWorldEntityExportWrapper(ServerLevel world, BlockPos pos,
                                                double offsetX, double offsetY, double offsetZ,
@@ -68,6 +75,7 @@ public class ItemHandlerWorldEntityExportWrapper implements IIngredientComponent
         this.pitchOffset = (float) pitchOffset;
         this.dispense = dispense;
         this.dispenseResultHandler = dispenseResultHandler;
+        this.journal = new ItemHandlerWorldEntityExportWrapper.Journal();
     }
 
     protected void setThrowableHeading(ItemEntity entity, double x, double y, double z, double velocity) {
@@ -131,50 +139,50 @@ public class ItemHandlerWorldEntityExportWrapper implements IIngredientComponent
     }
 
     @Override
-    public ItemStack insert(@Nonnull ItemStack stack, boolean simulate) {
-        if (!simulate) {
-            if (this.dispense) {
-                DispenseItemBehavior behaviorDispenseItem = DispenserBlock.DISPENSER_REGISTRY.get(stack.getItem());
-                if (behaviorDispenseItem.getClass() != DefaultDispenseItemBehavior.class) {
-                    BlockSource blockSource = getBlockSource();
-                    ItemStack result = behaviorDispenseItem.dispense(blockSource, stack.copy());
-                    if (!result.isEmpty()) {
-                        handleDispenseResult(this.dispenseResultHandler, blockSource, result);
-                    }
-                    return ItemStack.EMPTY;
+    public ItemStack insert(@Nonnull ItemStack stack, TransactionContext transaction) {
+        stack = stack.copy();
+        this.simulatedStack = stack.split(1);
+        this.journal.updateSnapshots(transaction);
+        return stack;
+    }
+
+    protected void insertActual(ItemStack stack) {
+        if (this.dispense) {
+            DispenseItemBehavior behaviorDispenseItem = DispenserBlock.DISPENSER_REGISTRY.get(stack.getItem());
+            if (behaviorDispenseItem.getClass() != DefaultDispenseItemBehavior.class) {
+                BlockSource blockSource = getBlockSource();
+                ItemStack result = behaviorDispenseItem.dispense(blockSource, stack.copy());
+                if (!result.isEmpty()) {
+                    handleDispenseResult(this.dispenseResultHandler, blockSource, result);
                 }
+                return;
             }
-            ItemEntity entity = new ItemEntity(world, pos.getX() + offsetX, pos.getY() + offsetY, pos.getZ() + offsetZ, stack.copy());
-            entity.lifespan = lifespan <= 0 ? stack.getItem().getEntityLifespan(stack, world) : lifespan;
-            float yaw = facing.toYRot() + yawOffset;
-            float pitch = (facing == Direction.UP ? -90F : (facing == Direction.DOWN ? 90F : 0)) - pitchOffset;
-            this.setThrowableHeading(entity,
-                    -Mth.sin(yaw * 0.017453292F) * Mth.cos(pitch * 0.017453292F),
-                    -Mth.sin((pitch) * 0.017453292F),
-                    Mth.cos(yaw * 0.017453292F) * Mth.cos(pitch * 0.017453292F),
-                    this.velocity);
-            entity.setPickUpDelay(delayBeforePickup);
-            world.addFreshEntity(entity);
-
-            if (GeneralConfig.worldInteractionEvents) {
-                world.levelEvent(1000, pos, 0); // Sound
-                world.levelEvent(2000, pos.relative(facing.getOpposite()), facing.get3DDataValue()); // Particles
-            }
-        } else if (this.dispense) {
-            stack = stack.copy();
-            stack.split(1);
-            return stack;
         }
+        ItemEntity entity = new ItemEntity(world, pos.getX() + offsetX, pos.getY() + offsetY, pos.getZ() + offsetZ, stack.copy());
+        entity.lifespan = lifespan <= 0 ? stack.getItem().getEntityLifespan(stack, world) : lifespan;
+        float yaw = facing.toYRot() + yawOffset;
+        float pitch = (facing == Direction.UP ? -90F : (facing == Direction.DOWN ? 90F : 0)) - pitchOffset;
+        this.setThrowableHeading(entity,
+                -Mth.sin(yaw * 0.017453292F) * Mth.cos(pitch * 0.017453292F),
+                -Mth.sin((pitch) * 0.017453292F),
+                Mth.cos(yaw * 0.017453292F) * Mth.cos(pitch * 0.017453292F),
+                this.velocity);
+        entity.setPickUpDelay(delayBeforePickup);
+        world.addFreshEntity(entity);
+
+        if (GeneralConfig.worldInteractionEvents) {
+            world.levelEvent(1000, pos, 0); // Sound
+            world.levelEvent(2000, pos.relative(facing.getOpposite()), facing.get3DDataValue()); // Particles
+        }
+    }
+
+    @Override
+    public ItemStack extract(@Nonnull ItemStack prototype, Integer matchCondition, TransactionContext transaction) {
         return ItemStack.EMPTY;
     }
 
     @Override
-    public ItemStack extract(@Nonnull ItemStack prototype, Integer matchCondition, boolean simulate) {
-        return ItemStack.EMPTY;
-    }
-
-    @Override
-    public ItemStack extract(long maxQuantity, boolean simulate) {
+    public ItemStack extract(long maxQuantity, TransactionContext transaction) {
         return ItemStack.EMPTY;
     }
 
@@ -213,6 +221,26 @@ public class ItemHandlerWorldEntityExportWrapper implements IIngredientComponent
         @Override
         protected NonNullList<ItemStack> getItems() {
             return NonNullList.create();
+        }
+    }
+
+    private class Journal extends SnapshotJournal<ItemStack> {
+        @Override
+        protected ItemStack createSnapshot() {
+            return simulatedStack.copy();
+        }
+
+        @Override
+        protected void revertToSnapshot(ItemStack unused) {
+
+        }
+
+        @Override
+        protected void onRootCommit(ItemStack itemStack) {
+            super.onRootCommit(itemStack);
+            if (itemStack != null) {
+                insertActual(itemStack);
+            }
         }
     }
 }

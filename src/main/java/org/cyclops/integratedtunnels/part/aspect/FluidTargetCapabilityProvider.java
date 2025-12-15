@@ -2,7 +2,8 @@ package org.cyclops.integratedtunnels.part.aspect;
 
 import net.minecraft.core.Direction;
 import net.neoforged.neoforge.fluids.FluidStack;
-import net.neoforged.neoforge.fluids.capability.IFluidHandler;
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.fluid.FluidResource;
 import org.cyclops.commoncapabilities.api.ingredient.IngredientComponent;
 import org.cyclops.commoncapabilities.api.ingredient.capability.ICapabilityGetter;
 import org.cyclops.commoncapabilities.api.ingredient.storage.IIngredientComponentStorage;
@@ -20,7 +21,7 @@ import javax.annotation.Nullable;
 /**
  * @author rubensworks
  */
-public class FluidTargetCapabilityProvider extends ChanneledTargetCapabilityProvider<IFluidHandler, IFluidNetwork, FluidStack, Integer>
+public class FluidTargetCapabilityProvider extends ChanneledTargetCapabilityProvider<ResourceHandler<FluidResource>, IFluidNetwork, FluidStack, Integer>
         implements IFluidTarget {
 
     private final ITunnelConnection connection;

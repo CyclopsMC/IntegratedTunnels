@@ -23,6 +23,8 @@ import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.level.BlockEvent;
+import net.neoforged.neoforge.transfer.transaction.SnapshotJournal;
+import net.neoforged.neoforge.transfer.transaction.TransactionContext;
 import org.cyclops.commoncapabilities.api.ingredient.IIngredientMatcher;
 import org.cyclops.commoncapabilities.api.ingredient.IngredientComponent;
 import org.cyclops.commoncapabilities.api.ingredient.storage.IIngredientComponentStorage;
@@ -38,6 +40,7 @@ import org.cyclops.integratedtunnels.item.ItemDummyPickAxe;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
@@ -58,10 +61,13 @@ public class ItemStorageBlockWrapper implements IIngredientComponentStorage<Item
     private final boolean silkTouch;
     private final boolean ignoreReplacable;
     private final boolean breakOnNoDrops;
+    private final ItemStorageBlockWrapper.JournalExtract journalExtract;
+    private final ItemStorageBlockWrapper.JournalInsert journalInsert;
 
     private IBlockBreakHandler blockBreakHandler = null;
     private List<ItemStack> cachedDrops = null;
     private boolean extracted = false;
+    private ItemStack insertedItem;
 
     public ItemStorageBlockWrapper(boolean writeOnly, ServerLevel world, BlockPos pos, Direction side, InteractionHand hand,
                                    boolean blockUpdate, int fortune, boolean silkTouch, boolean ignoreReplacable,
@@ -76,6 +82,8 @@ public class ItemStorageBlockWrapper implements IIngredientComponentStorage<Item
         this.silkTouch = silkTouch;
         this.ignoreReplacable = ignoreReplacable;
         this.breakOnNoDrops = breakOnNoDrops;
+        this.journalExtract = new ItemStorageBlockWrapper.JournalExtract();
+        this.journalInsert = new ItemStorageBlockWrapper.JournalInsert();
     }
 
     protected void sendBlockUpdate() {
@@ -92,7 +100,7 @@ public class ItemStorageBlockWrapper implements IIngredientComponentStorage<Item
             blockBreakHandler.breakBlock(blockState, world, pos, player);
         } else {
             FluidState fluidState = world.getFluidState(pos);
-            boolean removed = blockState.onDestroyedByPlayer(this.world, pos, player, false, fluidState);
+            boolean removed = blockState.onDestroyedByPlayer(this.world, pos, player, player.getItemInHand(player.getUsedItemHand()), false, fluidState);
             if (removed) {
                 blockState.getBlock().destroy(this.world, pos, blockState);
             }
@@ -125,6 +133,9 @@ public class ItemStorageBlockWrapper implements IIngredientComponentStorage<Item
     }
 
     protected List<ItemStack> getItemStacks() {
+        if (this.insertedItem != null) {
+            return Collections.emptyList();
+        }
         if (writeOnly) {
             if (!world.isEmptyBlock(pos)) {
                 boolean isDestReplaceable = world.getBlockState(pos).canBeReplaced(TunnelHelpers.createBlockItemUseContext(world, null, pos, side, hand));
@@ -175,7 +186,7 @@ public class ItemStorageBlockWrapper implements IIngredientComponentStorage<Item
                 .getHandler(itemStack, world, pos, side, hitX, hitY, hitZ, player);
     }
 
-    protected ItemStack setItemStack(ItemStack itemStack, boolean simulate) {
+    protected ItemStack setItemStack(ItemStack itemStack, TransactionContext transactionContext) {
         if (!itemStack.isEmpty() && itemStack.getCount() == 1) {
             Item item = itemStack.getItem();
             if (item instanceof BlockItem) {
@@ -187,23 +198,13 @@ public class ItemStorageBlockWrapper implements IIngredientComponentStorage<Item
                 IBlockPlaceHandler blockPlaceHandler = getBlockPlaceHandler(itemStack, world, pos, side.getOpposite(),
                         0, 0, 0, player);
                 if (blockPlaceHandler != null) {
-                    blockPlaceHandler.placeBlock(itemStack, world, pos, side.getOpposite(), 0, 0, 0, player);
+                    blockPlaceHandler.placeBlock(itemStack, world, pos, side.getOpposite(), 0, 0, 0, player, transactionContext);
                 } else {
                     BlockPlaceContext blockItemUseContext = TunnelHelpers.createBlockItemUseContext(world, player, pos, side.getOpposite(), hand, itemStack);
                     BlockState blockState = itemBlock.getBlock().getStateForPlacement(blockItemUseContext);
-                    if (blockState != null && (simulate || itemBlock.placeBlock(blockItemUseContext, blockState))) {
-                        if (!simulate) {
-                            itemBlock.updateCustomBlockEntityTag(pos, world, blockItemUseContext.getPlayer(), itemStack, blockState);
-                            updateBlockEntityComponents(world, pos, itemStack);
-                            itemBlock.getBlock().setPlacedBy(world, pos, blockState, player, itemStack);
-                            if (GeneralConfig.worldInteractionEvents) {
-                                SoundType soundtype = world.getBlockState(pos).getBlock().getSoundType(world.getBlockState(pos), world, pos, player);
-                                world.playSound(player, pos, soundtype.getPlaceSound(), SoundSource.BLOCKS, (soundtype.getVolume() + 1.0F) / 2.0F, soundtype.getPitch() * 0.8F); // Sound
-                            }
-                            if (blockUpdate) {
-                                sendBlockUpdate();
-                            }
-                        }
+                    if (blockState != null) {
+                        this.insertedItem = itemStack;
+                        this.journalInsert.updateSnapshots(transactionContext);
                         return ItemStack.EMPTY;
                     }
                 }
@@ -242,7 +243,7 @@ public class ItemStorageBlockWrapper implements IIngredientComponentStorage<Item
     }
 
     @Override
-    public ItemStack insert(@Nonnull ItemStack stack, boolean simulate) {
+    public ItemStack insert(@Nonnull ItemStack stack, TransactionContext transaction) {
         List<ItemStack> itemStacks = getItemStacks();
         if (itemStacks.size() > 0) {
             ItemStack itemStack = itemStacks.get(0);
@@ -256,7 +257,7 @@ public class ItemStorageBlockWrapper implements IIngredientComponentStorage<Item
         }
 
         ItemStack remaining = stack.copy();
-        if (!setItemStack(remaining.split(1), simulate).isEmpty()) {
+        if (!setItemStack(remaining.split(1), transaction).isEmpty()) {
             return stack;
         }
 
@@ -280,7 +281,7 @@ public class ItemStorageBlockWrapper implements IIngredientComponentStorage<Item
     }
 
     @Override
-    public ItemStack extract(@Nonnull ItemStack prototype, Integer matchCondition, boolean simulate) {
+    public ItemStack extract(@Nonnull ItemStack prototype, Integer matchCondition, TransactionContext transaction) {
         IIngredientMatcher<ItemStack, Integer> matcher = getComponent().getMatcher();
         Integer quantityFlag = getComponent().getPrimaryQuantifier().getMatchCondition();
         Integer subMatchCondition = matcher.withoutCondition(matchCondition, quantityFlag);
@@ -289,6 +290,7 @@ public class ItemStorageBlockWrapper implements IIngredientComponentStorage<Item
             return ItemStack.EMPTY;
         }
 
+        this.journalExtract.updateSnapshots(transaction);
         ListIterator<ItemStack> it = itemStacks.listIterator();
         while (it.hasNext()) {
             ItemStack itemStack = it.next();
@@ -296,20 +298,11 @@ public class ItemStorageBlockWrapper implements IIngredientComponentStorage<Item
                     && (!matcher.hasCondition(matchCondition, quantityFlag) || itemStack.getCount() >= prototype.getCount())) {
                 itemStack = itemStack.copy();
                 ItemStack ret = itemStack.split(IModHelpers.get().getBaseHelpers().castSafe(prototype.getCount()));
-                if (!simulate) {
-                    if (itemStack.isEmpty()) {
-                        it.remove();
-                    } else {
-                        it.set(itemStack);
-                    }
+                if (itemStack.isEmpty()) {
+                    it.remove();
+                } else {
+                    it.set(itemStack);
                 }
-
-                // Check if all items have been extracted, if so, remove block
-                if (!simulate) {
-                    this.extracted = true;
-                    postExtract();
-                }
-
                 return ret;
             }
         }
@@ -318,28 +311,79 @@ public class ItemStorageBlockWrapper implements IIngredientComponentStorage<Item
     }
 
     @Override
-    public ItemStack extract(long maxQuantity, boolean simulate) {
+    public ItemStack extract(long maxQuantity, TransactionContext transaction) {
         List<ItemStack> itemStacks = getItemStacks();
         if (itemStacks.isEmpty()) {
             return ItemStack.EMPTY;
         }
+        this.journalExtract.updateSnapshots(transaction);
         ItemStack itemStack = itemStacks.get(0);
         itemStack = itemStack.copy();
         ItemStack ret = itemStack.split(IModHelpers.get().getBaseHelpers().castSafe(maxQuantity));
-        if (!simulate) {
-            if (itemStack.isEmpty()) {
-                itemStacks.remove(0);
-            } else {
-                itemStacks.set(0, itemStack);
-            }
+        if (itemStack.isEmpty()) {
+            itemStacks.remove(0);
+        } else {
+            itemStacks.set(0, itemStack);
+        }
+        return ret;
+    }
+
+    private class JournalExtract extends SnapshotJournal<List<ItemStack>> {
+
+        @Override
+        protected List<ItemStack> createSnapshot() {
+            return Lists.newArrayList(getItemStacks());
         }
 
-        // Check if all items have been extracted, if so, remove block
-        if (!simulate) {
-            this.extracted = true;
+        @Override
+        protected void revertToSnapshot(List<ItemStack> itemStacks) {
+            cachedDrops = itemStacks;
+        }
+
+        @Override
+        protected void onRootCommit(List<ItemStack> originalState) {
+            super.onRootCommit(originalState);
+
+            // Check if all items have been extracted, if so, remove block
+            extracted = true;
             postExtract();
         }
+    }
 
-        return ret;
+    private class JournalInsert extends SnapshotJournal<ItemStack> {
+        @Override
+        protected ItemStack createSnapshot() {
+            return insertedItem.copy();
+        }
+
+        @Override
+        protected void revertToSnapshot(ItemStack unused) {
+
+        }
+
+        @Override
+        protected void onRootCommit(ItemStack itemStack) {
+            super.onRootCommit(itemStack);
+
+            Player player = PlayerHelpers.getFakePlayer(world);
+            PlayerHelpers.setPlayerState(player, hand, pos, 0, 0, 0, side, false);
+            BlockItem itemBlock = (BlockItem) itemStack.getItem();
+            BlockPlaceContext blockItemUseContext = TunnelHelpers.createBlockItemUseContext(world, player, pos, side.getOpposite(), hand, itemStack);
+            BlockState blockState = itemBlock.getBlock().getStateForPlacement(blockItemUseContext);
+
+            // Finalize placement of the item
+            if (itemBlock.placeBlock(blockItemUseContext, blockState)) {
+                itemBlock.updateCustomBlockEntityTag(pos, world, blockItemUseContext.getPlayer(), itemStack, blockState);
+                updateBlockEntityComponents(world, pos, itemStack);
+                itemBlock.getBlock().setPlacedBy(world, pos, blockState, player, itemStack);
+                if (GeneralConfig.worldInteractionEvents) {
+                    SoundType soundtype = world.getBlockState(pos).getBlock().getSoundType(world.getBlockState(pos), world, pos, player);
+                    world.playSound(player, pos, soundtype.getPlaceSound(), SoundSource.BLOCKS, (soundtype.getVolume() + 1.0F) / 2.0F, soundtype.getPitch() * 0.8F); // Sound
+                }
+                if (blockUpdate) {
+                    sendBlockUpdate();
+                }
+            }
+        }
     }
 }

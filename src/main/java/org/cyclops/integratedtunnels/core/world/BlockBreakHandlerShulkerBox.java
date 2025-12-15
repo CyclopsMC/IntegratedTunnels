@@ -49,6 +49,6 @@ public class BlockBreakHandlerShulkerBox implements IBlockBreakHandler {
     public void breakBlock(BlockState blockState, Level world, BlockPos pos, Player player) {
         IModHelpers.get().getBlockEntityHelpers().get(world, pos, ShulkerBoxBlockEntity.class)
                 .ifPresent(RandomizableContainerBlockEntity::clearContent);
-        blockState.getBlock().onDestroyedByPlayer(blockState, world, pos, player, false, world.getFluidState(pos));
+        blockState.getBlock().onDestroyedByPlayer(blockState, world, pos, player, player.getItemInHand(player.getUsedItemHand()), false, world.getFluidState(pos));
     }
 }

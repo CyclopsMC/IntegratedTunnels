@@ -21,7 +21,7 @@ import org.cyclops.integrateddynamics.core.part.aspect.build.AspectBuilder;
 import org.cyclops.integrateddynamics.core.part.aspect.build.IAspectValuePropagator;
 import org.cyclops.integrateddynamics.part.aspect.read.AspectReadBuilders;
 import org.cyclops.integratedtunnels.Capabilities;
-import org.cyclops.integratedtunnels.IntegratedTunnels;
+import org.cyclops.integratedtunnels.Reference;
 import org.cyclops.integratedtunnels.part.aspect.listproxy.ValueTypeListProxyPositionedFluidNetwork;
 import org.cyclops.integratedtunnels.part.aspect.listproxy.ValueTypeListProxyPositionedItemNetwork;
 
@@ -58,19 +58,19 @@ public class TunnelAspectReadBuilders {
 
         public static final class Item {
             public static final AspectBuilder<ValueTypeList.ValueList, ValueTypeList, Pair<PartTarget, IAspectProperties>>
-                    BUILDER_LIST = AspectReadBuilders.BUILDER_LIST.byMod(IntegratedTunnels._instance)
+                    BUILDER_LIST = AspectReadBuilders.BUILDER_LIST.byMod(Reference.MOD_ID)
                     .withProperties(AspectReadBuilders.Network.PROPERTIES)
                     .appendKind("itemnetwork");
             public static final AspectBuilder<ValueTypeInteger.ValueInteger, ValueTypeInteger, Pair<PartTarget, IAspectProperties>>
-                    BUILDER_INTEGER = AspectReadBuilders.BUILDER_INTEGER.byMod(IntegratedTunnels._instance)
+                    BUILDER_INTEGER = AspectReadBuilders.BUILDER_INTEGER.byMod(Reference.MOD_ID)
                     .withProperties(AspectReadBuilders.Network.PROPERTIES)
                     .appendKind("itemnetwork");
             public static final AspectBuilder<ValueTypeLong.ValueLong, ValueTypeLong, Pair<PartTarget, IAspectProperties>>
-                    BUILDER_LONG = AspectReadBuilders.BUILDER_LONG.byMod(IntegratedTunnels._instance)
+                    BUILDER_LONG = AspectReadBuilders.BUILDER_LONG.byMod(Reference.MOD_ID)
                     .withProperties(AspectReadBuilders.Network.PROPERTIES)
                     .appendKind("itemnetwork");
             public static final AspectBuilder<ValueTypeOperator.ValueOperator, ValueTypeOperator, Pair<PartTarget, IAspectProperties>>
-                    BUILDER_OPERATOR = AspectReadBuilders.BUILDER_OPERATOR.byMod(IntegratedTunnels._instance)
+                    BUILDER_OPERATOR = AspectReadBuilders.BUILDER_OPERATOR.byMod(Reference.MOD_ID)
                     .withProperties(AspectReadBuilders.Network.PROPERTIES)
                     .appendKind("itemnetwork");
 
@@ -92,19 +92,19 @@ public class TunnelAspectReadBuilders {
 
         public static final class Fluid {
             public static final AspectBuilder<ValueTypeList.ValueList, ValueTypeList, Pair<PartTarget, IAspectProperties>>
-                    BUILDER_LIST = AspectReadBuilders.BUILDER_LIST.byMod(IntegratedTunnels._instance)
+                    BUILDER_LIST = AspectReadBuilders.BUILDER_LIST.byMod(Reference.MOD_ID)
                     .withProperties(AspectReadBuilders.Network.PROPERTIES)
                     .appendKind("fluidnetwork");
             public static final AspectBuilder<ValueTypeInteger.ValueInteger, ValueTypeInteger, Pair<PartTarget, IAspectProperties>>
-                    BUILDER_INTEGER = AspectReadBuilders.BUILDER_INTEGER.byMod(IntegratedTunnels._instance)
+                    BUILDER_INTEGER = AspectReadBuilders.BUILDER_INTEGER.byMod(Reference.MOD_ID)
                     .withProperties(AspectReadBuilders.Network.PROPERTIES)
                     .appendKind("fluidnetwork");
             public static final AspectBuilder<ValueTypeLong.ValueLong, ValueTypeLong, Pair<PartTarget, IAspectProperties>>
-                    BUILDER_LONG = AspectReadBuilders.BUILDER_LONG.byMod(IntegratedTunnels._instance)
+                    BUILDER_LONG = AspectReadBuilders.BUILDER_LONG.byMod(Reference.MOD_ID)
                     .withProperties(AspectReadBuilders.Network.PROPERTIES)
                     .appendKind("fluidnetwork");
             public static final AspectBuilder<ValueTypeOperator.ValueOperator, ValueTypeOperator, Pair<PartTarget, IAspectProperties>>
-                    BUILDER_OPERATOR = AspectReadBuilders.BUILDER_OPERATOR.byMod(IntegratedTunnels._instance)
+                    BUILDER_OPERATOR = AspectReadBuilders.BUILDER_OPERATOR.byMod(Reference.MOD_ID)
                     .withProperties(AspectReadBuilders.Network.PROPERTIES)
                     .appendKind("fluidnetwork");
 

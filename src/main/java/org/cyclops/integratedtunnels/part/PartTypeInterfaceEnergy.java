@@ -2,7 +2,8 @@ package org.cyclops.integratedtunnels.part;
 
 import net.minecraft.core.Direction;
 import net.neoforged.neoforge.capabilities.BlockCapability;
-import net.neoforged.neoforge.energy.IEnergyStorage;
+import net.neoforged.neoforge.transfer.energy.EnergyHandler;
+import net.neoforged.neoforge.transfer.transaction.TransactionContext;
 import org.cyclops.integrateddynamics.api.network.IEnergyNetwork;
 import org.cyclops.integrateddynamics.api.network.NetworkCapability;
 import org.cyclops.integrateddynamics.api.part.PartCapability;
@@ -19,7 +20,7 @@ import java.util.Optional;
  * Interface for energy storages.
  * @author rubensworks
  */
-public class PartTypeInterfaceEnergy extends PartTypeInterfacePositionedAddon<IEnergyNetwork, IEnergyStorage, PartTypeInterfaceEnergy, PartTypeInterfaceEnergy.State> {
+public class PartTypeInterfaceEnergy extends PartTypeInterfacePositionedAddon<IEnergyNetwork, EnergyHandler, PartTypeInterfaceEnergy, PartTypeInterfaceEnergy.State> {
     public PartTypeInterfaceEnergy(String name) {
         super(name);
     }
@@ -30,17 +31,17 @@ public class PartTypeInterfaceEnergy extends PartTypeInterfacePositionedAddon<IE
     }
 
     @Override
-    public PartCapability<IEnergyStorage> getPartCapability() {
-        return Capabilities.EnergyStorage.PART;
+    public PartCapability<EnergyHandler> getPartCapability() {
+        return Capabilities.Energy.PART;
     }
 
     @Override
-    public BlockCapability<IEnergyStorage, Direction> getBlockCapability() {
-        return net.neoforged.neoforge.capabilities.Capabilities.EnergyStorage.BLOCK;
+    public BlockCapability<EnergyHandler, Direction> getBlockCapability() {
+        return net.neoforged.neoforge.capabilities.Capabilities.Energy.BLOCK;
     }
 
     @Override
-    public Optional<IEnergyStorage> getTargetCapabilityInstance(PartPos pos) {
+    public Optional<EnergyHandler> getTargetCapabilityInstance(PartPos pos) {
         return EnergyHelpers.getEnergyStorage(pos);
     }
 
@@ -54,92 +55,70 @@ public class PartTypeInterfaceEnergy extends PartTypeInterfacePositionedAddon<IE
         return GeneralConfig.interfaceEnergyBaseConsumption;
     }
 
-    public static class State extends PartTypeInterfacePositionedAddon.State<IEnergyNetwork, IEnergyStorage, PartTypeInterfaceEnergy, PartTypeInterfaceEnergy.State> {
+    public static class State extends PartTypeInterfacePositionedAddon.State<IEnergyNetwork, EnergyHandler, PartTypeInterfaceEnergy, PartTypeInterfaceEnergy.State> {
 
         @Override
-        public PartCapability<IEnergyStorage> getTargetCapability() {
-            return Capabilities.EnergyStorage.PART;
+        public PartCapability<EnergyHandler> getTargetCapability() {
+            return Capabilities.Energy.PART;
         }
 
         @Override
-        public IEnergyStorage getCapabilityInstance() {
+        public EnergyHandler getCapabilityInstance() {
             return new PartTypeInterfaceEnergy.EnergyStorage(this);
         }
     }
 
-    public static class EnergyStorage implements IEnergyStorage {
-        private final IPartTypeInterfacePositionedAddon.IState<IEnergyNetwork, IEnergyStorage, ?, ?> state;
+    public static class EnergyStorage implements EnergyHandler {
+        private final IPartTypeInterfacePositionedAddon.IState<IEnergyNetwork, EnergyHandler, ?, ?> state;
 
-        public EnergyStorage(IState<IEnergyNetwork, IEnergyStorage, ?, ?> state) {
+        public EnergyStorage(IState<IEnergyNetwork, EnergyHandler, ?, ?> state) {
             this.state = state;
         }
 
-        protected IEnergyStorage getEnergyStorage() {
-            return state.getPositionedAddonsNetwork().getChannelExternal(net.neoforged.neoforge.capabilities.Capabilities.EnergyStorage.BLOCK, state.getChannel());
+        protected EnergyHandler getEnergyStorage() {
+            return state.getPositionedAddonsNetwork().getChannelExternal(net.neoforged.neoforge.capabilities.Capabilities.Energy.BLOCK, state.getChannel());
         }
 
         @Override
-        public int receiveEnergy(int maxReceive, boolean simulate) {
+        public int insert(int amount, TransactionContext transaction) {
             if (!state.isNetworkAndPositionValid()) {
                 return 0;
             }
             state.disablePosition();
-            int ret = getEnergyStorage().receiveEnergy(maxReceive, simulate);
+            int ret = getEnergyStorage().insert(amount, transaction);
             state.enablePosition();
             return ret;
         }
 
         @Override
-        public int extractEnergy(int maxExtract, boolean simulate) {
+        public int extract(int amount, TransactionContext transaction) {
             if (!state.isNetworkAndPositionValid()) {
                 return 0;
             }
             state.disablePosition();
-            int ret = getEnergyStorage().extractEnergy(maxExtract, simulate);
+            int ret = getEnergyStorage().extract(amount, transaction);
             state.enablePosition();
             return ret;
         }
 
         @Override
-        public int getEnergyStored() {
+        public long getAmountAsLong() {
             if (!state.isNetworkAndPositionValid()) {
                 return 0;
             }
             state.disablePosition();
-            int ret = getEnergyStorage().getEnergyStored();
+            long ret = getEnergyStorage().getAmountAsLong();
             state.enablePosition();
             return ret;
         }
 
         @Override
-        public int getMaxEnergyStored() {
+        public long getCapacityAsLong() {
             if (!state.isNetworkAndPositionValid()) {
                 return 0;
             }
             state.disablePosition();
-            int ret = getEnergyStorage().getMaxEnergyStored();
-            state.enablePosition();
-            return ret;
-        }
-
-        @Override
-        public boolean canExtract() {
-            if (!state.isNetworkAndPositionValid()) {
-                return false;
-            }
-            state.disablePosition();
-            boolean ret = getEnergyStorage().canExtract();
-            state.enablePosition();
-            return ret;
-        }
-
-        @Override
-        public boolean canReceive() {
-            if (!state.isNetworkAndPositionValid()) {
-                return false;
-            }
-            state.disablePosition();
-            boolean ret = getEnergyStorage().canReceive();
+            long ret = getEnergyStorage().getCapacityAsLong();
             state.enablePosition();
             return ret;
         }

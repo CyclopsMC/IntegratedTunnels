@@ -9,7 +9,10 @@ import net.minecraft.world.level.block.Blocks;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.common.SoundActions;
 import net.neoforged.neoforge.fluids.FluidStack;
-import net.neoforged.neoforge.fluids.capability.IFluidHandler;
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.fluid.FluidResource;
+import net.neoforged.neoforge.transfer.transaction.SnapshotJournal;
+import net.neoforged.neoforge.transfer.transaction.TransactionContext;
 import org.cyclops.commoncapabilities.api.ingredient.IngredientComponent;
 import org.cyclops.commoncapabilities.api.ingredient.storage.IIngredientComponentStorage;
 import org.cyclops.cyclopscore.helper.IModHelpersNeoForge;
@@ -28,18 +31,23 @@ public class FluidStorageBlockWrapper implements IIngredientComponentStorage<Flu
     private final BlockPos pos;
     private final Direction side;
     private final boolean blockUpdate;
+    private final FluidStorageBlockWrapper.Journal journal;
 
     private final IIngredientComponentStorage<FluidStack, Integer> targetStorage;
+
+    private FluidStack inserted;
+    private FluidStack extracted;
 
     public FluidStorageBlockWrapper(ServerLevel world, BlockPos pos, Direction side, boolean blockUpdate) {
         this.world = world;
         this.pos = pos;
         this.side = side;
         this.blockUpdate = blockUpdate;
+        this.journal = new FluidStorageBlockWrapper.Journal();
 
-        IFluidHandler fluidHandler = new FluidHandlerBlock(world.getBlockState(pos), world, pos);
+        ResourceHandler<FluidResource> fluidHandler = new FluidHandlerBlock(world.getBlockState(pos), world, pos);
         this.targetStorage = getComponent()
-                .getStorageWrapperHandler(Capabilities.FluidHandler.BLOCK)
+                .getStorageWrapperHandler(Capabilities.Fluid.BLOCK)
                 .wrapComponentStorage(fluidHandler);
     }
 
@@ -89,35 +97,60 @@ public class FluidStorageBlockWrapper implements IIngredientComponentStorage<Flu
     }
 
     @Override
-    public FluidStack insert(@Nonnull FluidStack stack, boolean simulate) {
+    public FluidStack insert(@Nonnull FluidStack stack, TransactionContext transaction) {
         if (world.dimensionType().ultraWarm()
                 && stack.getFluid().getFluidType().isVaporizedOnPlacement(world, pos, stack)) {
             return FluidStack.EMPTY;
         }
 
-        FluidStack remaining = this.targetStorage.insert(stack, simulate);
-        if (!simulate && stack.getAmount() != remaining.getAmount()) {
-            postInsert(stack);
+        this.journal.updateSnapshots(transaction);
+        FluidStack remaining = this.targetStorage.insert(stack, transaction);
+        if (stack.getAmount() != remaining.getAmount()) {
+            this.inserted = stack;
         }
         return remaining;
     }
 
     @Override
-    public FluidStack extract(@Nonnull FluidStack prototype, Integer matchCondition, boolean simulate) {
-        FluidStack extracted = targetStorage.extract(prototype, matchCondition, simulate);
-        if (!simulate) {
-            postExtract(extracted);
-        }
+    public FluidStack extract(@Nonnull FluidStack prototype, Integer matchCondition, TransactionContext transaction) {
+        this.journal.updateSnapshots(transaction);
+        FluidStack extracted = targetStorage.extract(prototype, matchCondition, transaction);
+        this.extracted = extracted;
         return extracted;
     }
 
     @Override
-    public FluidStack extract(long maxQuantity, boolean simulate) {
-        FluidStack extracted = targetStorage.extract(maxQuantity, simulate);
-        if (!simulate) {
-            postExtract(extracted);
-        }
+    public FluidStack extract(long maxQuantity, TransactionContext transaction) {
+        this.journal.updateSnapshots(transaction);
+        FluidStack extracted = targetStorage.extract(maxQuantity, transaction);
+        this.extracted = extracted;
         return extracted;
+    }
+
+    private class Journal extends SnapshotJournal<Void> {
+
+        @Override
+        protected Void createSnapshot() {
+            return null;
+        }
+
+        @Override
+        protected void revertToSnapshot(Void unused) {
+
+        }
+
+        @Override
+        protected void onRootCommit(Void originalState) {
+            super.onRootCommit(originalState);
+            if (inserted != null) {
+                postInsert(inserted);
+            }
+            if (extracted != null) {
+                postExtract(extracted);
+            }
+            inserted = null;
+            extracted = null;
+        }
     }
 
 }

@@ -2,6 +2,9 @@ package org.cyclops.integratedtunnels.core.part;
 
 import com.google.common.collect.Lists;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.input.CharacterEvent;
+import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -68,29 +71,29 @@ public class ContainerScreenInterfaceSettings extends ContainerScreenPartSetting
     }
 
     @Override
-    public boolean charTyped(char typedChar, int keyCode) {
-        if (!this.numberFieldChannelInterface.charTyped(typedChar, keyCode)) {
-            return super.charTyped(typedChar, keyCode);
+    public boolean charTyped(CharacterEvent evt) {
+        if (!this.numberFieldChannelInterface.charTyped(evt)) {
+            return super.charTyped(evt);
         }
         return true;
     }
 
     @Override
-    public boolean keyPressed(int typedChar, int keyCode, int modifiers) {
-        if (typedChar != GLFW.GLFW_KEY_ESCAPE) {
-            if (this.numberFieldChannelInterface.keyPressed(typedChar, keyCode, modifiers)) {
+    public boolean keyPressed(KeyEvent evt) {
+        if (evt.key() != GLFW.GLFW_KEY_ESCAPE) {
+            if (this.numberFieldChannelInterface.keyPressed(evt)) {
                 return true;
             }
         }
-        return super.keyPressed(typedChar, keyCode, modifiers);
+        return super.keyPressed(evt);
     }
 
     @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int mouseButton) {
-        if (this.numberFieldChannelInterface.mouseClicked(mouseX, mouseY, mouseButton)) {
+    public boolean mouseClicked(MouseButtonEvent evt, boolean isDoubleClick) {
+        if (this.numberFieldChannelInterface.mouseClicked(evt, isDoubleClick)) {
             return true;
         }
-        return super.mouseClicked(mouseX, mouseY, mouseButton);
+        return super.mouseClicked(evt, isDoubleClick);
     }
 
     @Override

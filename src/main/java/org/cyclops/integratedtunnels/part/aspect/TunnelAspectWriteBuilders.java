@@ -46,7 +46,7 @@ import org.cyclops.integrateddynamics.part.aspect.read.AspectReadBuilders;
 import org.cyclops.integrateddynamics.part.aspect.write.AspectWriteBuilders;
 import org.cyclops.integratedtunnels.Capabilities;
 import org.cyclops.integratedtunnels.GeneralConfig;
-import org.cyclops.integratedtunnels.IntegratedTunnels;
+import org.cyclops.integratedtunnels.Reference;
 import org.cyclops.integratedtunnels.api.network.IItemNetwork;
 import org.cyclops.integratedtunnels.core.*;
 import org.cyclops.integratedtunnels.core.part.IPartTypeInterfacePositionedAddon;
@@ -198,17 +198,17 @@ public class TunnelAspectWriteBuilders {
 
         public static final IAspectWriteActivator ACTIVATOR = createPositionedNetworkAddonActivator(
                 org.cyclops.integrateddynamics.Capabilities.EnergyNetwork.NETWORK,
-                Capabilities.EnergyStorage.PART);
+                Capabilities.Energy.PART);
         public static final IAspectWriteDeactivator DEACTIVATOR = createPositionedNetworkAddonDeactivator(
                 org.cyclops.integrateddynamics.Capabilities.EnergyNetwork.NETWORK,
-                Capabilities.EnergyStorage.PART);
+                Capabilities.Energy.PART);
 
         public static final AspectBuilder<ValueTypeBoolean.ValueBoolean, ValueTypeBoolean, Triple<PartTarget, IAspectProperties, Boolean>>
-                BUILDER_BOOLEAN = AspectWriteBuilders.BUILDER_BOOLEAN.byMod(IntegratedTunnels._instance)
+                BUILDER_BOOLEAN = AspectWriteBuilders.BUILDER_BOOLEAN.byMod(Reference.MOD_ID)
                 .appendActivator(ACTIVATOR).appendDeactivator(DEACTIVATOR)
                 .appendKind("energy").handle(AspectWriteBuilders.PROP_GET_BOOLEAN).withProperties(PROPERTIES_CHANNEL);
         public static final AspectBuilder<ValueTypeLong.ValueLong, ValueTypeLong, Triple<PartTarget, IAspectProperties, Long>>
-                BUILDER_LONG = TunnelAspectWriteBuilders.BUILDER_LONG.byMod(IntegratedTunnels._instance)
+                BUILDER_LONG = TunnelAspectWriteBuilders.BUILDER_LONG.byMod(Reference.MOD_ID)
                 .appendActivator(ACTIVATOR).appendDeactivator(DEACTIVATOR)
                 .appendKind("energy").handle(AspectWriteBuilders.PROP_GET_LONG).withProperties(PROPERTIES_CHANNEL);
 
@@ -354,33 +354,33 @@ public class TunnelAspectWriteBuilders {
 
         public static final IAspectWriteActivator ACTIVATOR = createPositionedNetworkAddonActivator(
                 Capabilities.ItemNetwork.NETWORK,
-                Capabilities.ItemHandler.PART);
+                Capabilities.Item.PART);
         public static final IAspectWriteDeactivator DEACTIVATOR = createPositionedNetworkAddonDeactivator(
                 Capabilities.ItemNetwork.NETWORK,
-                Capabilities.ItemHandler.PART);
+                Capabilities.Item.PART);
 
         public static final AspectBuilder<ValueTypeBoolean.ValueBoolean, ValueTypeBoolean, Triple<PartTarget, IAspectProperties, Boolean>>
-                BUILDER_BOOLEAN = AspectWriteBuilders.BUILDER_BOOLEAN.byMod(IntegratedTunnels._instance)
+                BUILDER_BOOLEAN = AspectWriteBuilders.BUILDER_BOOLEAN.byMod(Reference.MOD_ID)
                 .appendActivator(ACTIVATOR).appendDeactivator(DEACTIVATOR)
                 .appendKind("item").handle(AspectWriteBuilders.PROP_GET_BOOLEAN).withProperties(PROPERTIES_CHANNEL);
         public static final AspectBuilder<ValueTypeInteger.ValueInteger, ValueTypeInteger, Triple<PartTarget, IAspectProperties, Integer>>
-                BUILDER_INTEGER = AspectWriteBuilders.BUILDER_INTEGER.byMod(IntegratedTunnels._instance)
+                BUILDER_INTEGER = AspectWriteBuilders.BUILDER_INTEGER.byMod(Reference.MOD_ID)
                 .appendActivator(ACTIVATOR).appendDeactivator(DEACTIVATOR)
                 .appendKind("item").handle(AspectWriteBuilders.PROP_GET_INTEGER).withProperties(PROPERTIES_CHANNEL);
         public static final AspectBuilder<ValueObjectTypeItemStack.ValueItemStack, ValueObjectTypeItemStack, Triple<PartTarget, IAspectProperties, ItemStack>>
-                BUILDER_ITEMSTACK = AspectWriteBuilders.BUILDER_ITEMSTACK.byMod(IntegratedTunnels._instance)
+                BUILDER_ITEMSTACK = AspectWriteBuilders.BUILDER_ITEMSTACK.byMod(Reference.MOD_ID)
                 .appendActivator(ACTIVATOR).appendDeactivator(DEACTIVATOR)
                 .appendKind("item").handle(AspectWriteBuilders.PROP_GET_ITEMSTACK).withProperties(PROPERTIES_CHANNEL);
         public static final AspectBuilder<ValueTypeList.ValueList, ValueTypeList, Triple<PartTarget, IAspectProperties, ValueTypeList.ValueList>>
-                BUILDER_LIST = AspectWriteBuilders.BUILDER_LIST.byMod(IntegratedTunnels._instance)
+                BUILDER_LIST = AspectWriteBuilders.BUILDER_LIST.byMod(Reference.MOD_ID)
                 .appendActivator(ACTIVATOR).appendDeactivator(DEACTIVATOR)
                 .appendKind("item").withProperties(PROPERTIES_CHANNEL);
         public static final AspectBuilder<ValueTypeOperator.ValueOperator, ValueTypeOperator, Triple<PartTarget, IAspectProperties, ValueTypeOperator.ValueOperator>>
-                BUILDER_OPERATOR = AspectWriteBuilders.BUILDER_OPERATOR.byMod(IntegratedTunnels._instance)
+                BUILDER_OPERATOR = AspectWriteBuilders.BUILDER_OPERATOR.byMod(Reference.MOD_ID)
                 .appendActivator(ACTIVATOR).appendDeactivator(DEACTIVATOR)
                 .appendKind("item").withProperties(PROPERTIES_CHANNEL);
         public static final AspectBuilder<ValueTypeNbt.ValueNbt, ValueTypeNbt, Triple<PartTarget, IAspectProperties, Optional<Tag>>>
-                BUILDER_NBT = AspectWriteBuilders.BUILDER_NBT.byMod(IntegratedTunnels._instance)
+                BUILDER_NBT = AspectWriteBuilders.BUILDER_NBT.byMod(Reference.MOD_ID)
                 .appendActivator(ACTIVATOR).appendDeactivator(DEACTIVATOR)
                 .appendKind("item").handle(AspectWriteBuilders.PROP_GET_NBT).withProperties(PROPERTIES_CHANNEL);
 
@@ -849,33 +849,33 @@ public class TunnelAspectWriteBuilders {
 
         public static final IAspectWriteActivator ACTIVATOR = createPositionedNetworkAddonActivator(
                 Capabilities.FluidNetwork.NETWORK,
-                Capabilities.FluidHandler.PART);
+                Capabilities.Fluid.PART);
         public static final IAspectWriteDeactivator DEACTIVATOR = createPositionedNetworkAddonDeactivator(
                 Capabilities.FluidNetwork.NETWORK,
-                Capabilities.FluidHandler.PART);
+                Capabilities.Fluid.PART);
 
         public static final AspectBuilder<ValueTypeBoolean.ValueBoolean, ValueTypeBoolean, Triple<PartTarget, IAspectProperties, Boolean>>
-                BUILDER_BOOLEAN = AspectWriteBuilders.BUILDER_BOOLEAN.byMod(IntegratedTunnels._instance)
+                BUILDER_BOOLEAN = AspectWriteBuilders.BUILDER_BOOLEAN.byMod(Reference.MOD_ID)
                 .appendActivator(ACTIVATOR).appendDeactivator(DEACTIVATOR)
                 .appendKind("fluid").handle(AspectWriteBuilders.PROP_GET_BOOLEAN).withProperties(PROPERTIES_CHANNEL);
         public static final AspectBuilder<ValueTypeInteger.ValueInteger, ValueTypeInteger, Triple<PartTarget, IAspectProperties, Integer>>
-                BUILDER_INTEGER = AspectWriteBuilders.BUILDER_INTEGER.byMod(IntegratedTunnels._instance)
+                BUILDER_INTEGER = AspectWriteBuilders.BUILDER_INTEGER.byMod(Reference.MOD_ID)
                 .appendActivator(ACTIVATOR).appendDeactivator(DEACTIVATOR)
                 .appendKind("fluid").handle(AspectWriteBuilders.PROP_GET_INTEGER).withProperties(PROPERTIES_CHANNEL);
         public static final AspectBuilder<ValueObjectTypeFluidStack.ValueFluidStack, ValueObjectTypeFluidStack, Triple<PartTarget, IAspectProperties, FluidStack>>
-                BUILDER_FLUIDSTACK = AspectWriteBuilders.BUILDER_FLUIDSTACK.byMod(IntegratedTunnels._instance)
+                BUILDER_FLUIDSTACK = AspectWriteBuilders.BUILDER_FLUIDSTACK.byMod(Reference.MOD_ID)
                 .appendActivator(ACTIVATOR).appendDeactivator(DEACTIVATOR)
                 .appendKind("fluid").handle(AspectWriteBuilders.PROP_GET_FLUIDSTACK).withProperties(PROPERTIES_CHANNEL);
         public static final AspectBuilder<ValueTypeList.ValueList, ValueTypeList, Triple<PartTarget, IAspectProperties, ValueTypeList.ValueList>>
-                BUILDER_LIST = AspectWriteBuilders.BUILDER_LIST.byMod(IntegratedTunnels._instance)
+                BUILDER_LIST = AspectWriteBuilders.BUILDER_LIST.byMod(Reference.MOD_ID)
                 .appendActivator(ACTIVATOR).appendDeactivator(DEACTIVATOR)
                 .appendKind("fluid").withProperties(PROPERTIES_CHANNEL);
         public static final AspectBuilder<ValueTypeOperator.ValueOperator, ValueTypeOperator, Triple<PartTarget, IAspectProperties, ValueTypeOperator.ValueOperator>>
-                BUILDER_OPERATOR = AspectWriteBuilders.BUILDER_OPERATOR.byMod(IntegratedTunnels._instance)
+                BUILDER_OPERATOR = AspectWriteBuilders.BUILDER_OPERATOR.byMod(Reference.MOD_ID)
                 .appendActivator(ACTIVATOR).appendDeactivator(DEACTIVATOR)
                 .appendKind("fluid").withProperties(PROPERTIES_CHANNEL);
         public static final AspectBuilder<ValueTypeNbt.ValueNbt, ValueTypeNbt, Triple<PartTarget, IAspectProperties, Optional<Tag>>>
-                BUILDER_NBT = AspectWriteBuilders.BUILDER_NBT.byMod(IntegratedTunnels._instance)
+                BUILDER_NBT = AspectWriteBuilders.BUILDER_NBT.byMod(Reference.MOD_ID)
                 .appendActivator(ACTIVATOR).appendDeactivator(DEACTIVATOR)
                 .appendKind("fluid").handle(AspectWriteBuilders.PROP_GET_NBT).withProperties(PROPERTIES_CHANNEL);
 
@@ -1247,31 +1247,31 @@ public class TunnelAspectWriteBuilders {
                 BUILDER_BLOCK_BASE = AspectWriteBuilders.getValue(AspectBuilder.forWriteType(ValueTypes.OBJECT_BLOCK)).withProperties(PROPERTIES_CHANNEL);
 
         public static final AspectBuilder<ValueTypeBoolean.ValueBoolean, ValueTypeBoolean, Triple<PartTarget, IAspectProperties, Boolean>>
-                BUILDER_BOOLEAN = AspectWriteBuilders.BUILDER_BOOLEAN.byMod(IntegratedTunnels._instance)
+                BUILDER_BOOLEAN = AspectWriteBuilders.BUILDER_BOOLEAN.byMod(Reference.MOD_ID)
                 .appendKind("world").handle(AspectWriteBuilders.PROP_GET_BOOLEAN).withProperties(PROPERTIES_CHANNEL);
         public static final AspectBuilder<ValueTypeInteger.ValueInteger, ValueTypeInteger, Triple<PartTarget, IAspectProperties, Integer>>
-                BUILDER_INTEGER = AspectWriteBuilders.BUILDER_INTEGER.byMod(IntegratedTunnels._instance)
+                BUILDER_INTEGER = AspectWriteBuilders.BUILDER_INTEGER.byMod(Reference.MOD_ID)
                 .appendKind("world").handle(AspectWriteBuilders.PROP_GET_INTEGER).withProperties(PROPERTIES_CHANNEL);
         public static final AspectBuilder<ValueTypeLong.ValueLong, ValueTypeLong, Triple<PartTarget, IAspectProperties, Long>>
-                BUILDER_LONG = TunnelAspectWriteBuilders.BUILDER_LONG.byMod(IntegratedTunnels._instance)
+                BUILDER_LONG = TunnelAspectWriteBuilders.BUILDER_LONG.byMod(Reference.MOD_ID)
                 .appendKind("world").handle(AspectWriteBuilders.PROP_GET_LONG).withProperties(PROPERTIES_CHANNEL);
         public static final AspectBuilder<ValueObjectTypeItemStack.ValueItemStack, ValueObjectTypeItemStack, Triple<PartTarget, IAspectProperties, ItemStack>>
-                BUILDER_ITEMSTACK = AspectWriteBuilders.BUILDER_ITEMSTACK.byMod(IntegratedTunnels._instance)
+                BUILDER_ITEMSTACK = AspectWriteBuilders.BUILDER_ITEMSTACK.byMod(Reference.MOD_ID)
                 .appendKind("world").handle(AspectWriteBuilders.PROP_GET_ITEMSTACK).withProperties(PROPERTIES_CHANNEL);
         public static final AspectBuilder<ValueObjectTypeBlock.ValueBlock, ValueObjectTypeBlock, Triple<PartTarget, IAspectProperties, BlockState>>
-                BUILDER_BLOCK = BUILDER_BLOCK_BASE.byMod(IntegratedTunnels._instance)
+                BUILDER_BLOCK = BUILDER_BLOCK_BASE.byMod(Reference.MOD_ID)
                 .appendKind("world").handle(AspectWriteBuilders.PROP_GET_BLOCK).withProperties(PROPERTIES_CHANNEL);
         public static final AspectBuilder<ValueObjectTypeFluidStack.ValueFluidStack, ValueObjectTypeFluidStack, Triple<PartTarget, IAspectProperties, FluidStack>>
-                BUILDER_FLUIDSTACK = AspectWriteBuilders.BUILDER_FLUIDSTACK.byMod(IntegratedTunnels._instance)
+                BUILDER_FLUIDSTACK = AspectWriteBuilders.BUILDER_FLUIDSTACK.byMod(Reference.MOD_ID)
                 .appendKind("world").handle(AspectWriteBuilders.PROP_GET_FLUIDSTACK).withProperties(PROPERTIES_CHANNEL);
         public static final AspectBuilder<ValueTypeList.ValueList, ValueTypeList, Triple<PartTarget, IAspectProperties, ValueTypeList.ValueList>>
-                BUILDER_LIST = AspectWriteBuilders.BUILDER_LIST.byMod(IntegratedTunnels._instance)
+                BUILDER_LIST = AspectWriteBuilders.BUILDER_LIST.byMod(Reference.MOD_ID)
                 .appendKind("world").withProperties(PROPERTIES_CHANNEL);
         public static final AspectBuilder<ValueTypeOperator.ValueOperator, ValueTypeOperator, Triple<PartTarget, IAspectProperties, ValueTypeOperator.ValueOperator>>
-                BUILDER_OPERATOR = AspectWriteBuilders.BUILDER_OPERATOR.byMod(IntegratedTunnels._instance)
+                BUILDER_OPERATOR = AspectWriteBuilders.BUILDER_OPERATOR.byMod(Reference.MOD_ID)
                 .appendKind("world").withProperties(PROPERTIES_CHANNEL);
         public static final AspectBuilder<ValueTypeNbt.ValueNbt, ValueTypeNbt, Triple<PartTarget, IAspectProperties, Optional<Tag>>>
-                BUILDER_NBT = AspectWriteBuilders.BUILDER_NBT.byMod(IntegratedTunnels._instance)
+                BUILDER_NBT = AspectWriteBuilders.BUILDER_NBT.byMod(Reference.MOD_ID)
                 .appendKind("world").handle(AspectWriteBuilders.PROP_GET_NBT).withProperties(PROPERTIES_CHANNEL);
 
         public static final Predicate<ValueTypeDouble.ValueDouble> VALIDATOR_DOUBLE_ANGLE =
@@ -2167,25 +2167,25 @@ public class TunnelAspectWriteBuilders {
     public static final class Player {
 
         public static final AspectBuilder<ValueTypeBoolean.ValueBoolean, ValueTypeBoolean, Triple<PartTarget, IAspectProperties, Boolean>>
-                BUILDER_BOOLEAN = AspectWriteBuilders.BUILDER_BOOLEAN.byMod(IntegratedTunnels._instance)
+                BUILDER_BOOLEAN = AspectWriteBuilders.BUILDER_BOOLEAN.byMod(Reference.MOD_ID)
                 .appendKind("player").handle(AspectWriteBuilders.PROP_GET_BOOLEAN).withProperties(PROPERTIES_CHANNEL);
         public static final AspectBuilder<ValueTypeInteger.ValueInteger, ValueTypeInteger, Triple<PartTarget, IAspectProperties, Integer>>
-                BUILDER_INTEGER = AspectWriteBuilders.BUILDER_INTEGER.byMod(IntegratedTunnels._instance)
+                BUILDER_INTEGER = AspectWriteBuilders.BUILDER_INTEGER.byMod(Reference.MOD_ID)
                 .appendKind("player").handle(AspectWriteBuilders.PROP_GET_INTEGER).withProperties(PROPERTIES_CHANNEL);
         public static final AspectBuilder<ValueObjectTypeItemStack.ValueItemStack, ValueObjectTypeItemStack, Triple<PartTarget, IAspectProperties, ItemStack>>
-                BUILDER_ITEMSTACK = AspectWriteBuilders.BUILDER_ITEMSTACK.byMod(IntegratedTunnels._instance)
+                BUILDER_ITEMSTACK = AspectWriteBuilders.BUILDER_ITEMSTACK.byMod(Reference.MOD_ID)
                 .appendKind("player").handle(AspectWriteBuilders.PROP_GET_ITEMSTACK).withProperties(PROPERTIES_CHANNEL);
         public static final AspectBuilder<ValueObjectTypeFluidStack.ValueFluidStack, ValueObjectTypeFluidStack, Triple<PartTarget, IAspectProperties, FluidStack>>
-                BUILDER_FLUIDSTACK = AspectWriteBuilders.BUILDER_FLUIDSTACK.byMod(IntegratedTunnels._instance)
+                BUILDER_FLUIDSTACK = AspectWriteBuilders.BUILDER_FLUIDSTACK.byMod(Reference.MOD_ID)
                 .appendKind("player").handle(AspectWriteBuilders.PROP_GET_FLUIDSTACK).withProperties(PROPERTIES_CHANNEL);
         public static final AspectBuilder<ValueTypeList.ValueList, ValueTypeList, Triple<PartTarget, IAspectProperties, ValueTypeList.ValueList>>
-                BUILDER_LIST = AspectWriteBuilders.BUILDER_LIST.byMod(IntegratedTunnels._instance)
+                BUILDER_LIST = AspectWriteBuilders.BUILDER_LIST.byMod(Reference.MOD_ID)
                 .appendKind("player").withProperties(PROPERTIES_CHANNEL);
         public static final AspectBuilder<ValueTypeOperator.ValueOperator, ValueTypeOperator, Triple<PartTarget, IAspectProperties, ValueTypeOperator.ValueOperator>>
-                BUILDER_OPERATOR = AspectWriteBuilders.BUILDER_OPERATOR.byMod(IntegratedTunnels._instance)
+                BUILDER_OPERATOR = AspectWriteBuilders.BUILDER_OPERATOR.byMod(Reference.MOD_ID)
                 .appendKind("player").withProperties(PROPERTIES_CHANNEL);
         public static final AspectBuilder<ValueTypeNbt.ValueNbt, ValueTypeNbt, Triple<PartTarget, IAspectProperties, Optional<Tag>>>
-                BUILDER_NBT = AspectWriteBuilders.BUILDER_NBT.byMod(IntegratedTunnels._instance)
+                BUILDER_NBT = AspectWriteBuilders.BUILDER_NBT.byMod(Reference.MOD_ID)
                 .appendKind("player").handle(AspectWriteBuilders.PROP_GET_NBT).withProperties(PROPERTIES_CHANNEL);
 
         public static final IAspectPropertyTypeInstance<ValueTypeBoolean, ValueTypeBoolean.ValueBoolean> PROP_RIGHT_CLICK =

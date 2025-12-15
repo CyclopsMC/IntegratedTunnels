@@ -2,7 +2,8 @@ package org.cyclops.integratedtunnels.part.aspect;
 
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.items.IItemHandler;
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.item.ItemResource;
 import org.cyclops.commoncapabilities.api.ingredient.IngredientComponent;
 import org.cyclops.commoncapabilities.api.ingredient.capability.ICapabilityGetter;
 import org.cyclops.commoncapabilities.api.ingredient.storage.IIngredientComponentStorage;
@@ -20,7 +21,7 @@ import javax.annotation.Nullable;
 /**
  * @author rubensworks
  */
-public class ItemTargetCapabilityProvider extends ChanneledTargetCapabilityProvider<IItemHandler, IItemNetwork, ItemStack, Integer>
+public class ItemTargetCapabilityProvider extends ChanneledTargetCapabilityProvider<ResourceHandler<ItemResource>, IItemNetwork, ItemStack, Integer>
         implements IItemTarget {
 
     private final ITunnelConnection connection;

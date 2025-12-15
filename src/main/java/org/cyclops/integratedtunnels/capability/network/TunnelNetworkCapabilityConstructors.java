@@ -1,8 +1,10 @@
 package org.cyclops.integratedtunnels.capability.network;
 
 import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.neoforge.fluids.capability.IFluidHandler;
-import net.neoforged.neoforge.items.IItemHandler;
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.fluid.FluidResource;
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.item.ItemResource;
 import org.cyclops.commoncapabilities.api.ingredient.IngredientComponent;
 import org.cyclops.cyclopscore.modcompat.capabilities.DefaultCapabilityProvider;
 import org.cyclops.integrateddynamics.api.network.AttachCapabilitiesEventNetwork;
@@ -20,17 +22,17 @@ public class TunnelNetworkCapabilityConstructors {
     @SubscribeEvent
     public void onNetworkLoad(AttachCapabilitiesEventNetwork event) {
         ItemNetwork itemNetwork = new ItemNetwork(IngredientComponent.ITEMSTACK);
-        IItemHandler itemHandler = itemNetwork.getChannelExternal(net.neoforged.neoforge.capabilities.Capabilities.ItemHandler.BLOCK,
+        ResourceHandler<ItemResource> itemHandler = itemNetwork.getChannelExternal(net.neoforged.neoforge.capabilities.Capabilities.Item.BLOCK,
                 IPositionedAddonsNetworkIngredients.DEFAULT_CHANNEL);
         event.register(Capabilities.ItemNetwork.NETWORK, new DefaultCapabilityProvider<>(itemNetwork));
-        event.register(Capabilities.ItemHandler.NETWORK, new DefaultCapabilityProvider<>(itemHandler));
+        event.register(Capabilities.Item.NETWORK, new DefaultCapabilityProvider<>(itemHandler));
         event.addFullNetworkListener(itemNetwork);
 
         FluidNetwork fluidNetwork = new FluidNetwork(IngredientComponent.FLUIDSTACK);
-        IFluidHandler fluidChannel = fluidNetwork.getChannelExternal(net.neoforged.neoforge.capabilities.Capabilities.FluidHandler.BLOCK,
+        ResourceHandler<FluidResource> fluidChannel = fluidNetwork.getChannelExternal(net.neoforged.neoforge.capabilities.Capabilities.Fluid.BLOCK,
                 IPositionedAddonsNetworkIngredients.DEFAULT_CHANNEL);
         event.register(Capabilities.FluidNetwork.NETWORK, new DefaultCapabilityProvider<>(fluidNetwork));
-        event.register(Capabilities.FluidHandler.NETWORK, new DefaultCapabilityProvider<>(fluidChannel));
+        event.register(Capabilities.Fluid.NETWORK, new DefaultCapabilityProvider<>(fluidChannel));
         event.addFullNetworkListener(fluidNetwork);
     }
 

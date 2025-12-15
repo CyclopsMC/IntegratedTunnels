@@ -3,7 +3,7 @@ package org.cyclops.integratedtunnels.part;
 import com.google.common.collect.Lists;
 import net.minecraft.core.Direction;
 import net.neoforged.neoforge.capabilities.BlockCapability;
-import net.neoforged.neoforge.energy.IEnergyStorage;
+import net.neoforged.neoforge.transfer.energy.EnergyHandler;
 import org.cyclops.integrateddynamics.api.network.IEnergyNetwork;
 import org.cyclops.integrateddynamics.api.network.NetworkCapability;
 import org.cyclops.integrateddynamics.api.part.PartCapability;
@@ -23,7 +23,7 @@ import java.util.Optional;
  * Interface for filtering energy storages.
  * @author rubensworks
  */
-public class PartTypeInterfaceFilteringEnergy extends PartTypeInterfacePositionedAddonFiltering<IEnergyNetwork, IEnergyStorage, PartTypeInterfaceFilteringEnergy, PartTypeInterfaceFilteringEnergy.State> {
+public class PartTypeInterfaceFilteringEnergy extends PartTypeInterfacePositionedAddonFiltering<IEnergyNetwork, EnergyHandler, PartTypeInterfaceFilteringEnergy, PartTypeInterfaceFilteringEnergy.State> {
     public PartTypeInterfaceFilteringEnergy(String name) {
         super(name);
         AspectRegistry.getInstance().register(this, Lists.<IAspect>newArrayList(
@@ -37,17 +37,17 @@ public class PartTypeInterfaceFilteringEnergy extends PartTypeInterfacePositione
     }
 
     @Override
-    public PartCapability<IEnergyStorage> getPartCapability() {
-        return Capabilities.EnergyStorage.PART;
+    public PartCapability<EnergyHandler> getPartCapability() {
+        return Capabilities.Energy.PART;
     }
 
     @Override
-    public BlockCapability<IEnergyStorage, Direction> getBlockCapability() {
-        return net.neoforged.neoforge.capabilities.Capabilities.EnergyStorage.BLOCK;
+    public BlockCapability<EnergyHandler, Direction> getBlockCapability() {
+        return net.neoforged.neoforge.capabilities.Capabilities.Energy.BLOCK;
     }
 
     @Override
-    public Optional<IEnergyStorage> getTargetCapabilityInstance(PartPos pos) {
+    public Optional<EnergyHandler> getTargetCapabilityInstance(PartPos pos) {
         return EnergyHelpers.getEnergyStorage(pos);
     }
 
@@ -61,19 +61,19 @@ public class PartTypeInterfaceFilteringEnergy extends PartTypeInterfacePositione
         return GeneralConfig.interfaceEnergyBaseConsumption;
     }
 
-    public static class State extends PartTypeInterfacePositionedAddonFiltering.State<IEnergyNetwork, IEnergyStorage, PartTypeInterfaceFilteringEnergy, PartTypeInterfaceFilteringEnergy.State> {
+    public static class State extends PartTypeInterfacePositionedAddonFiltering.State<IEnergyNetwork, EnergyHandler, PartTypeInterfaceFilteringEnergy, PartTypeInterfaceFilteringEnergy.State> {
 
         public State(int inventorySize) {
             super(inventorySize);
         }
 
         @Override
-        public PartCapability<IEnergyStorage> getTargetCapability() {
-            return Capabilities.EnergyStorage.PART;
+        public PartCapability<EnergyHandler> getTargetCapability() {
+            return Capabilities.Energy.PART;
         }
 
         @Override
-        public IEnergyStorage getCapabilityInstance() {
+        public EnergyHandler getCapabilityInstance() {
             return new PartTypeInterfaceEnergy.EnergyStorage(this);
         }
     }

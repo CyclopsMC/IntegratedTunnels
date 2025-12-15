@@ -3,7 +3,8 @@ package org.cyclops.integratedtunnels.part;
 import com.google.common.collect.Lists;
 import net.minecraft.core.Direction;
 import net.neoforged.neoforge.capabilities.BlockCapability;
-import net.neoforged.neoforge.items.IItemHandler;
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.item.ItemResource;
 import org.cyclops.integrateddynamics.api.network.INetwork;
 import org.cyclops.integrateddynamics.api.network.IPartNetwork;
 import org.cyclops.integrateddynamics.api.network.NetworkCapability;
@@ -24,7 +25,7 @@ import java.util.Optional;
  * Interface for filtering item handlers.
  * @author rubensworks
  */
-public class PartTypeInterfaceFilteringItem extends PartTypeInterfacePositionedAddonFiltering<IItemNetwork, IItemHandler, PartTypeInterfaceFilteringItem, PartTypeInterfaceFilteringItem.State> {
+public class PartTypeInterfaceFilteringItem extends PartTypeInterfacePositionedAddonFiltering<IItemNetwork, ResourceHandler<ItemResource>, PartTypeInterfaceFilteringItem, PartTypeInterfaceFilteringItem.State> {
     public PartTypeInterfaceFilteringItem(String name) {
         super(name);
         AspectRegistry.getInstance().register(this, Lists.<IAspect>newArrayList(
@@ -42,13 +43,13 @@ public class PartTypeInterfaceFilteringItem extends PartTypeInterfacePositionedA
     }
 
     @Override
-    public PartCapability<IItemHandler> getPartCapability() {
-        return Capabilities.ItemHandler.PART;
+    public PartCapability<ResourceHandler<ItemResource>> getPartCapability() {
+        return Capabilities.Item.PART;
     }
 
     @Override
-    public BlockCapability<IItemHandler, Direction> getBlockCapability() {
-        return net.neoforged.neoforge.capabilities.Capabilities.ItemHandler.BLOCK;
+    public BlockCapability<ResourceHandler<ItemResource>, Direction> getBlockCapability() {
+        return net.neoforged.neoforge.capabilities.Capabilities.Item.BLOCK;
     }
 
     @Override
@@ -61,25 +62,25 @@ public class PartTypeInterfaceFilteringItem extends PartTypeInterfacePositionedA
         return GeneralConfig.interfaceItemBaseConsumption;
     }
 
-    public static class State extends PartTypeInterfacePositionedAddonFiltering.State<IItemNetwork, IItemHandler, PartTypeInterfaceFilteringItem, PartTypeInterfaceFilteringItem.State> {
+    public static class State extends PartTypeInterfacePositionedAddonFiltering.State<IItemNetwork, ResourceHandler<ItemResource>, PartTypeInterfaceFilteringItem, PartTypeInterfaceFilteringItem.State> {
 
         public State(int inventorySize) {
             super(inventorySize);
         }
 
         @Override
-        public PartCapability<IItemHandler> getTargetCapability() {
-            return Capabilities.ItemHandler.PART;
+        public PartCapability<ResourceHandler<ItemResource>> getTargetCapability() {
+            return Capabilities.Item.PART;
         }
 
         @Override
-        public IItemHandler getCapabilityInstance() {
+        public ResourceHandler<ItemResource> getCapabilityInstance() {
             return new PartTypeInterfaceItem.ItemHandler(this);
         }
 
         @Override
         public <T> Optional<T> getCapability(PartTypeInterfaceFilteringItem partType, PartCapability<T> capability, INetwork network, IPartNetwork partNetwork, PartTarget target) {
-            if (isNetworkAndPositionValid() && capability == Capabilities.ItemHandler.PART) {
+            if (isNetworkAndPositionValid() && capability == Capabilities.Item.PART) {
                 return Optional.of((T) this.getCapabilityInstance());
             }
             return super.getCapability(partType, capability, network, partNetwork, target);

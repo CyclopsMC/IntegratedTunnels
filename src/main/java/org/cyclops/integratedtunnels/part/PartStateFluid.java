@@ -1,10 +1,11 @@
 package org.cyclops.integratedtunnels.part;
 
 import net.neoforged.neoforge.fluids.FluidStack;
-import net.neoforged.neoforge.fluids.capability.IFluidHandler;
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.fluid.FluidResource;
+import net.neoforged.neoforge.transfer.transaction.TransactionContext;
 import org.cyclops.integrateddynamics.api.network.INetwork;
 import org.cyclops.integrateddynamics.api.network.IPartNetwork;
-import org.cyclops.integrateddynamics.api.network.PositionedAddonsNetworkIngredientsFilter;
 import org.cyclops.integrateddynamics.api.part.PartCapability;
 import org.cyclops.integrateddynamics.api.part.PartTarget;
 import org.cyclops.integrateddynamics.api.part.write.IPartTypeWriter;
@@ -22,7 +23,7 @@ import java.util.Optional;
  * It also acts as an fluid capability that can be added to itself.
  * @author rubensworks
  */
-public class PartStateFluid<P extends IPartTypeWriter> extends PartStatePositionedAddon<P, IFluidNetwork, FluidStack> implements IFluidHandler {
+public class PartStateFluid<P extends IPartTypeWriter> extends PartStatePositionedAddon<P, IFluidNetwork, FluidStack> implements ResourceHandler<FluidResource> {
 
     public PartStateFluid(int inventorySize, boolean canReceive, boolean canExtract) {
         super(inventorySize, canReceive, canExtract);
@@ -30,82 +31,80 @@ public class PartStateFluid<P extends IPartTypeWriter> extends PartStatePosition
 
     @Override
     public <T> Optional<T> getCapability(P partType, PartCapability<T> capability, INetwork network, IPartNetwork partNetwork, PartTarget target) {
-        if (capability == Capabilities.FluidHandler.PART) {
+        if (capability == Capabilities.Fluid.PART) {
             return Optional.of((T) this);
         }
         return super.getCapability(partType, capability, network, partNetwork, target);
     }
 
-    protected IFluidHandler getFluidHandler() {
-        return getPositionedAddonsNetwork().getChannelExternal(net.neoforged.neoforge.capabilities.Capabilities.FluidHandler.BLOCK, TunnelHelpers.getPassiveInteractionChannel(this));
+    protected ResourceHandler<FluidResource> getFluidHandler() {
+        return getPositionedAddonsNetwork().getChannelExternal(net.neoforged.neoforge.capabilities.Capabilities.Fluid.BLOCK, TunnelHelpers.getPassiveInteractionChannel(this));
     }
 
     @Override
-    public int getTanks() {
-        return getPositionedAddonsNetwork() != null && getStorageFilter() != null ? getFluidHandler().getTanks() : 0;
+    public int size() {
+        return getPositionedAddonsNetwork() != null && getStorageFilter() != null ? getFluidHandler().size() : 0;
     }
 
     @Nonnull
     @Override
-    public FluidStack getFluidInTank(int tank) {
+    public FluidResource getResource(int tank) {
         if (getPositionedAddonsNetwork() != null && getStorageFilter() != null) {
-            FluidStack fluidStack = getFluidHandler().getFluidInTank(tank);
+            ResourceHandler<FluidResource> fh = getFluidHandler();
+            FluidResource resource = fh.getResource(tank);
+            FluidStack fluidStack = resource.toStack(fh.getAmountAsInt(tank));
             if (getStorageFilter().testView(fluidStack)) {
-                return fluidStack;
+                return resource;
             }
         }
-        return FluidStack.EMPTY;
+        return FluidResource.EMPTY;
     }
 
     @Override
-    public int getTankCapacity(int tank) {
-        return getPositionedAddonsNetwork() != null && getStorageFilter() != null ? getFluidHandler().getTankCapacity(tank) : 0;
-    }
-
-    @Override
-    public boolean isFluidValid(int tank, @Nonnull FluidStack stack) {
-        return getPositionedAddonsNetwork() != null && getStorageFilter() != null && getStorageFilter().testInsertion(stack) && getFluidHandler().isFluidValid(tank, stack);
-    }
-
-    protected FluidStack rateLimitFluid(FluidStack fluidStack) {
-        if (fluidStack != null && fluidStack.getAmount() > GeneralConfig.fluidRateLimit) {
-            return new FluidStack(fluidStack.getFluidHolder(), GeneralConfig.fluidRateLimit, fluidStack.getComponentsPatch());
-        }
-        return fluidStack;
-    }
-
-    @Override
-    public int fill(FluidStack resource, FluidAction action) {
-        return canReceive() && getPositionedAddonsNetwork() != null && getStorageFilter() != null && getStorageFilter().testInsertion(resource) ? getFluidHandler().fill(rateLimitFluid(resource), action) : 0;
-    }
-
-    @Override
-    public FluidStack drain(FluidStack resource, FluidAction action) {
-        return canExtract() && getPositionedAddonsNetwork() != null && getStorageFilter() != null && getStorageFilter().testExtraction(resource) ? getFluidHandler().drain(rateLimitFluid(resource), action) : FluidStack.EMPTY;
-    }
-
-    @Override
-    public FluidStack drain(int maxDrain, FluidAction action) {
-        if (canExtract() && getPositionedAddonsNetwork() != null && getStorageFilter() != null) {
-            PositionedAddonsNetworkIngredientsFilter<FluidStack> filter = getStorageFilter();
-
-            // If we do an effective extraction, first simulate to check if it matches the filter
-            if (action.execute()) {
-                FluidStack drainedSimulated = getFluidHandler().drain(Math.min(maxDrain, GeneralConfig.fluidRateLimit), FluidAction.SIMULATE);
-                if (!filter.testExtraction(drainedSimulated)) {
-                    return FluidStack.EMPTY;
-                }
+    public long getAmountAsLong(int tank) {
+        if (getPositionedAddonsNetwork() != null && getStorageFilter() != null) {
+            ResourceHandler<FluidResource> fh = getFluidHandler();
+            FluidResource resource = fh.getResource(tank);
+            long amount = fh.getAmountAsLong(tank);
+            FluidStack fluidStack = resource.toStack((int) amount);
+            if (getStorageFilter().testView(fluidStack)) {
+                return amount;
             }
-
-            FluidStack drained = getFluidHandler().drain(Math.min(maxDrain, GeneralConfig.fluidRateLimit), action);
-
-            // If simulating, just check the output
-            if (action.simulate() && !filter.testExtraction(drained)) {
-                return FluidStack.EMPTY;
-            }
-
-            return drained;
         }
-        return FluidStack.EMPTY;
+        return 0;
+    }
+
+    @Override
+    public long getCapacityAsLong(int tank, FluidResource fluidResource) {
+        return getPositionedAddonsNetwork() != null && getStorageFilter() != null ? getFluidHandler().getCapacityAsLong(tank, fluidResource) : 0;
+    }
+
+    @Override
+    public boolean isValid(int tank, FluidResource fluidResource) {
+        return getPositionedAddonsNetwork() != null && getStorageFilter() != null && getStorageFilter().testInsertion(fluidResource.toStack(1)) && getFluidHandler().isValid(tank, fluidResource);
+    }
+
+    protected int rateLimit(int amount) {
+        return Math.min(amount, GeneralConfig.fluidRateLimit);
+    }
+
+    @Override
+    public int insert(int tank, FluidResource resource, int amount, TransactionContext transaction) {
+        return canReceive() && getPositionedAddonsNetwork() != null && getStorageFilter() != null && getStorageFilter().testInsertion(resource.toStack(amount)) ? getFluidHandler().insert(tank, resource, rateLimit(amount), transaction) : 0;
+    }
+
+    @Override
+    public int insert(FluidResource resource, int amount, TransactionContext transaction) {
+        return canReceive() && getPositionedAddonsNetwork() != null && getStorageFilter() != null && getStorageFilter().testInsertion(resource.toStack(amount)) ? getFluidHandler().insert(resource, rateLimit(amount), transaction) : 0;
+    }
+
+    @Override
+    public int extract(int tank, FluidResource resource, int amount, TransactionContext transaction) {
+        return canExtract() && getPositionedAddonsNetwork() != null && getStorageFilter() != null && getStorageFilter().testExtraction(resource.toStack(amount)) ? getFluidHandler().extract(tank, resource, rateLimit(amount), transaction) : 0;
+    }
+
+    @Override
+    public int extract(FluidResource resource, int amount, TransactionContext transaction) {
+        return canExtract() && getPositionedAddonsNetwork() != null && getStorageFilter() != null && getStorageFilter().testExtraction(resource.toStack(amount)) ? getFluidHandler().extract(resource, rateLimit(amount), transaction) : 0;
     }
 }

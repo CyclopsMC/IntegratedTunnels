@@ -1,5 +1,6 @@
 package org.cyclops.integratedtunnels.core.part;
 
+import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.SimpleContainer;
@@ -113,8 +114,8 @@ public abstract class PartTypeInterfacePositionedAddonFiltering<N extends IPosit
     }
 
     @Override
-    public void onBlockNeighborChange(INetwork network, IPartNetwork partNetwork, PartTarget target, S state, BlockGetter world) {
-        super.onBlockNeighborChange(network, partNetwork, target, state, world);
+    public void onBlockNeighborChange(INetwork network, IPartNetwork partNetwork, PartTarget target, S state, BlockGetter world, @Nullable Direction side) {
+        super.onBlockNeighborChange(network, partNetwork, target, state, world, side);
         if (network != null) {
             updateTargetInNetwork(network, target.getTarget(), state.getPriority(), state.getChannelInterface(), state);
         }

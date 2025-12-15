@@ -2,8 +2,9 @@ package org.cyclops.integratedtunnels.part;
 
 import net.minecraft.core.Direction;
 import net.neoforged.neoforge.capabilities.BlockCapability;
-import net.neoforged.neoforge.fluids.FluidStack;
-import net.neoforged.neoforge.fluids.capability.IFluidHandler;
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.fluid.FluidResource;
+import net.neoforged.neoforge.transfer.transaction.TransactionContext;
 import org.cyclops.integrateddynamics.api.network.NetworkCapability;
 import org.cyclops.integrateddynamics.api.part.PartCapability;
 import org.cyclops.integratedtunnels.Capabilities;
@@ -18,7 +19,7 @@ import javax.annotation.Nonnull;
  * Interface for fluid handlers.
  * @author rubensworks
  */
-public class PartTypeInterfaceFluid extends PartTypeInterfacePositionedAddon<IFluidNetwork, IFluidHandler, PartTypeInterfaceFluid, PartTypeInterfaceFluid.State> {
+public class PartTypeInterfaceFluid extends PartTypeInterfacePositionedAddon<IFluidNetwork, ResourceHandler<FluidResource>, PartTypeInterfaceFluid, PartTypeInterfaceFluid.State> {
     public PartTypeInterfaceFluid(String name) {
         super(name);
     }
@@ -29,13 +30,13 @@ public class PartTypeInterfaceFluid extends PartTypeInterfacePositionedAddon<IFl
     }
 
     @Override
-    public PartCapability<IFluidHandler> getPartCapability() {
-        return Capabilities.FluidHandler.PART;
+    public PartCapability<ResourceHandler<FluidResource>> getPartCapability() {
+        return Capabilities.Fluid.PART;
     }
 
     @Override
-    public BlockCapability<IFluidHandler, Direction> getBlockCapability() {
-        return net.neoforged.neoforge.capabilities.Capabilities.FluidHandler.BLOCK;
+    public BlockCapability<ResourceHandler<FluidResource>, Direction> getBlockCapability() {
+        return net.neoforged.neoforge.capabilities.Capabilities.Fluid.BLOCK;
     }
 
     @Override
@@ -48,104 +49,126 @@ public class PartTypeInterfaceFluid extends PartTypeInterfacePositionedAddon<IFl
         return GeneralConfig.interfaceFluidBaseConsumption;
     }
 
-    public static class State extends PartTypeInterfacePositionedAddon.State<IFluidNetwork, IFluidHandler, PartTypeInterfaceFluid, PartTypeInterfaceFluid.State> {
+    public static class State extends PartTypeInterfacePositionedAddon.State<IFluidNetwork, ResourceHandler<FluidResource>, PartTypeInterfaceFluid, PartTypeInterfaceFluid.State> {
 
         @Override
-        public PartCapability<IFluidHandler> getTargetCapability() {
-            return Capabilities.FluidHandler.PART;
+        public PartCapability<ResourceHandler<FluidResource>> getTargetCapability() {
+            return Capabilities.Fluid.PART;
         }
 
         @Override
-        public IFluidHandler getCapabilityInstance() {
+        public ResourceHandler<FluidResource> getCapabilityInstance() {
             return new PartTypeInterfaceFluid.FluidHandler(this);
         }
     }
 
-    public static class FluidHandler implements IFluidHandler {
-        private final IPartTypeInterfacePositionedAddon.IState<IFluidNetwork, IFluidHandler, ?, ?> state;
+    public static class FluidHandler implements ResourceHandler<FluidResource> {
+        private final IPartTypeInterfacePositionedAddon.IState<IFluidNetwork, ResourceHandler<FluidResource>, ?, ?> state;
 
-        public FluidHandler(IState<IFluidNetwork, IFluidHandler, ?, ?> state) {
+        public FluidHandler(IState<IFluidNetwork, ResourceHandler<FluidResource>, ?, ?> state) {
             this.state = state;
         }
 
-        protected IFluidHandler getFluidHandler() {
-            return state.getPositionedAddonsNetwork().getChannelExternal(net.neoforged.neoforge.capabilities.Capabilities.FluidHandler.BLOCK, state.getChannel());
+        protected ResourceHandler<FluidResource> getFluidHandler() {
+            return state.getPositionedAddonsNetwork().getChannelExternal(net.neoforged.neoforge.capabilities.Capabilities.Fluid.BLOCK, state.getChannel());
         }
 
         @Override
-        public int getTanks() {
+        public int size() {
             if (!state.isNetworkAndPositionValid()) {
                 return 0;
             }
             state.disablePosition();
-            int ret = getFluidHandler().getTanks();
+            int ret = getFluidHandler().size();
             state.enablePosition();
             return ret;
         }
 
         @Nonnull
         @Override
-        public FluidStack getFluidInTank(int tank) {
+        public FluidResource getResource(int tank) {
             if (!state.isNetworkAndPositionValid()) {
-                return FluidStack.EMPTY;
+                return FluidResource.EMPTY;
             }
             state.disablePosition();
-            FluidStack ret = getFluidHandler().getFluidInTank(tank);
+            FluidResource ret = getFluidHandler().getResource(tank);
             state.enablePosition();
             return ret;
         }
 
         @Override
-        public int getTankCapacity(int tank) {
+        public long getAmountAsLong(int tank) {
             if (!state.isNetworkAndPositionValid()) {
                 return 0;
             }
             state.disablePosition();
-            int ret = getFluidHandler().getTankCapacity(tank);
+            long ret = getFluidHandler().getAmountAsLong(tank);
             state.enablePosition();
             return ret;
         }
 
         @Override
-        public boolean isFluidValid(int tank, @Nonnull FluidStack stack) {
+        public long getCapacityAsLong(int tank, FluidResource fluidResource) {
+            if (!state.isNetworkAndPositionValid()) {
+                return 0;
+            }
+            state.disablePosition();
+            long ret = getFluidHandler().getCapacityAsLong(tank, fluidResource);
+            state.enablePosition();
+            return ret;
+        }
+
+        @Override
+        public boolean isValid(int tank, FluidResource fluidResource) {
             if (!state.isNetworkAndPositionValid()) {
                 return false;
             }
             state.disablePosition();
-            boolean ret = getFluidHandler().isFluidValid(tank, stack);
+            boolean ret = getFluidHandler().isValid(tank, fluidResource);
             state.enablePosition();
             return ret;
         }
 
         @Override
-        public int fill(FluidStack resource, FluidAction action) {
+        public int insert(int tank, FluidResource resource, int amount, TransactionContext transaction) {
             if (!state.isNetworkAndPositionValid()) {
                 return 0;
             }
             state.disablePosition();
-            int ret = getFluidHandler().fill(resource, action);
+            int ret = getFluidHandler().insert(tank, resource, amount, transaction);
             state.enablePosition();
             return ret;
         }
 
         @Override
-        public FluidStack drain(FluidStack resource, FluidAction action) {
+        public int insert(FluidResource resource, int amount, TransactionContext transaction) {
             if (!state.isNetworkAndPositionValid()) {
-                return FluidStack.EMPTY;
+                return 0;
             }
             state.disablePosition();
-            FluidStack ret = getFluidHandler().drain(resource, action);
+            int ret = getFluidHandler().insert(resource, amount, transaction);
             state.enablePosition();
             return ret;
         }
 
         @Override
-        public FluidStack drain(int maxDrain, FluidAction action) {
+        public int extract(int tank, FluidResource resource, int amount, TransactionContext transaction) {
             if (!state.isNetworkAndPositionValid()) {
-                return FluidStack.EMPTY;
+                return 0;
             }
             state.disablePosition();
-            FluidStack ret = getFluidHandler().drain(maxDrain, action);
+            int ret = getFluidHandler().extract(tank, resource, amount, transaction);
+            state.enablePosition();
+            return ret;
+        }
+
+        @Override
+        public int extract(FluidResource resource, int amount, TransactionContext transaction) {
+            if (!state.isNetworkAndPositionValid()) {
+                return 0;
+            }
+            state.disablePosition();
+            int ret = getFluidHandler().extract(resource, amount, transaction);
             state.enablePosition();
             return ret;
         }

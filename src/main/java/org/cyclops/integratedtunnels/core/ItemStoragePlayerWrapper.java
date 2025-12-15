@@ -28,6 +28,8 @@ import net.neoforged.neoforge.common.CommonHooks;
 import net.neoforged.neoforge.event.EventHooks;
 import net.neoforged.neoforge.event.entity.living.AnimalTameEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
+import net.neoforged.neoforge.transfer.transaction.SnapshotJournal;
+import net.neoforged.neoforge.transfer.transaction.TransactionContext;
 import org.cyclops.commoncapabilities.api.ingredient.IngredientComponent;
 import org.cyclops.commoncapabilities.api.ingredient.storage.IIngredientComponentStorage;
 import org.cyclops.cyclopscore.helper.IModHelpers;
@@ -60,6 +62,9 @@ public class ItemStoragePlayerWrapper implements IIngredientComponentStorage<Ite
     private final boolean continuousClick;
     private final int entityIndex;
     private final IIngredientComponentStorage<ItemStack, Integer> playerReturnHandler;
+    private final ItemStoragePlayerWrapper.Journal journal;
+    @Nullable
+    private ItemStack simulatedStack;
 
     public ItemStoragePlayerWrapper(@Nullable ExtendedFakePlayer player, ServerLevel world, BlockPos pos,
                                     double offsetX, double offsetY, double offsetZ, Direction side, InteractionHand hand,
@@ -78,6 +83,7 @@ public class ItemStoragePlayerWrapper implements IIngredientComponentStorage<Ite
         this.rightClick = rightClick;
         this.sneaking = sneaking;
         this.playerReturnHandler = playerReturnHandler;
+        this.journal = new ItemStoragePlayerWrapper.Journal();
     }
 
     public static void cancelDestroyingBlock(ServerPlayer player) {
@@ -125,15 +131,17 @@ public class ItemStoragePlayerWrapper implements IIngredientComponentStorage<Ite
     }
 
     @Override
-    public ItemStack insert(@Nonnull ItemStack stack, boolean simulate) {
-        if (simulate) {
-            // We can ALWAYS click with items, so consume the whole item when simulating.
-            return ItemStack.EMPTY;
-        }
+    public ItemStack insert(@Nonnull ItemStack stack, TransactionContext transaction) {
         if (player == null) {
             return stack;
         }
+        this.journal.updateSnapshots(transaction);
+        this.simulatedStack = stack;
+        // We can ALWAYS click with items, so consume the whole item when simulating.
+        return ItemStack.EMPTY;
+    }
 
+    protected ItemStack insertActual(ItemStack stack) {
         PlayerHelpers.setPlayerState(player, hand, pos, offsetX, offsetY, offsetZ, side, sneaking);
         PlayerHelpers.setHeldItemSilent(player, hand, stack.copy());
 
@@ -335,12 +343,12 @@ public class ItemStoragePlayerWrapper implements IIngredientComponentStorage<Ite
     }
 
     @Override
-    public ItemStack extract(@Nonnull ItemStack prototype, Integer matchCondition, boolean simulate) {
+    public ItemStack extract(@Nonnull ItemStack prototype, Integer matchCondition, TransactionContext transaction) {
         return ItemStack.EMPTY;
     }
 
     @Override
-    public ItemStack extract(long maxQuantity, boolean simulate) {
+    public ItemStack extract(long maxQuantity, TransactionContext transaction) {
         return ItemStack.EMPTY;
     }
 
@@ -348,6 +356,27 @@ public class ItemStoragePlayerWrapper implements IIngredientComponentStorage<Ite
     public static void onTameAnimal(AnimalTameEvent event) {
         if (event.getTamer() instanceof ExtendedFakePlayer) {
             event.setCanceled(true);
+        }
+    }
+
+    private class Journal extends SnapshotJournal<Void> {
+        @Override
+        protected Void createSnapshot() {
+            return null;
+        }
+
+        @Override
+        protected void revertToSnapshot(Void unused) {
+
+        }
+
+        @Override
+        protected void onRootCommit(Void originalState) {
+            super.onRootCommit(originalState);
+            if (simulatedStack != null) {
+                insertActual(simulatedStack);
+                simulatedStack = null;
+            }
         }
     }
 }

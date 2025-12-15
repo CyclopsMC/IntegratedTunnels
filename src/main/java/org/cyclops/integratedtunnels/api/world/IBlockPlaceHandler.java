@@ -5,6 +5,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.core.Direction;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
+import net.neoforged.neoforge.transfer.transaction.TransactionContext;
 
 /**
  * An interface for custom block placing actions.
@@ -36,7 +37,8 @@ public interface IBlockPlaceHandler {
      * @param hitY The Y position that is being targeted.
      * @param hitZ The Z position that is being targeted.
      * @param player The placing player.
+     * @param transactionContext The transaction.
      */
-    public void placeBlock(ItemStack itemStack, Level world, BlockPos pos, Direction side, float hitX, float hitY, float hitZ, Player player);
+    public void placeBlock(ItemStack itemStack, Level world, BlockPos pos, Direction side, float hitX, float hitY, float hitZ, Player player, TransactionContext transactionContext);
 
 }

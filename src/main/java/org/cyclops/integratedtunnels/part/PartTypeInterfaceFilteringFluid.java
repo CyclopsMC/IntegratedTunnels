@@ -3,7 +3,8 @@ package org.cyclops.integratedtunnels.part;
 import com.google.common.collect.Lists;
 import net.minecraft.core.Direction;
 import net.neoforged.neoforge.capabilities.BlockCapability;
-import net.neoforged.neoforge.fluids.capability.IFluidHandler;
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.fluid.FluidResource;
 import org.cyclops.integrateddynamics.api.network.NetworkCapability;
 import org.cyclops.integrateddynamics.api.part.PartCapability;
 import org.cyclops.integrateddynamics.api.part.aspect.IAspect;
@@ -19,7 +20,7 @@ import org.cyclops.integratedtunnels.part.aspect.TunnelAspects;
  * Interface for filtering fluid handlers.
  * @author rubensworks
  */
-public class PartTypeInterfaceFilteringFluid extends PartTypeInterfacePositionedAddonFiltering<IFluidNetwork, IFluidHandler, PartTypeInterfaceFilteringFluid, PartTypeInterfaceFilteringFluid.State> {
+public class PartTypeInterfaceFilteringFluid extends PartTypeInterfacePositionedAddonFiltering<IFluidNetwork, ResourceHandler<FluidResource>, PartTypeInterfaceFilteringFluid, PartTypeInterfaceFilteringFluid.State> {
     public PartTypeInterfaceFilteringFluid(String name) {
         super(name);
         AspectRegistry.getInstance().register(this, Lists.<IAspect>newArrayList(
@@ -37,13 +38,13 @@ public class PartTypeInterfaceFilteringFluid extends PartTypeInterfacePositioned
     }
 
     @Override
-    public PartCapability<IFluidHandler> getPartCapability() {
-        return Capabilities.FluidHandler.PART;
+    public PartCapability<ResourceHandler<FluidResource>> getPartCapability() {
+        return Capabilities.Fluid.PART;
     }
 
     @Override
-    public BlockCapability<IFluidHandler, Direction> getBlockCapability() {
-        return net.neoforged.neoforge.capabilities.Capabilities.FluidHandler.BLOCK;
+    public BlockCapability<ResourceHandler<FluidResource>, Direction> getBlockCapability() {
+        return net.neoforged.neoforge.capabilities.Capabilities.Fluid.BLOCK;
     }
 
     @Override
@@ -56,19 +57,19 @@ public class PartTypeInterfaceFilteringFluid extends PartTypeInterfacePositioned
         return GeneralConfig.interfaceFluidBaseConsumption;
     }
 
-    public static class State extends PartTypeInterfacePositionedAddonFiltering.State<IFluidNetwork, IFluidHandler, PartTypeInterfaceFilteringFluid, PartTypeInterfaceFilteringFluid.State> {
+    public static class State extends PartTypeInterfacePositionedAddonFiltering.State<IFluidNetwork, ResourceHandler<FluidResource>, PartTypeInterfaceFilteringFluid, PartTypeInterfaceFilteringFluid.State> {
 
         public State(int inventorySize) {
             super(inventorySize);
         }
 
         @Override
-        public PartCapability<IFluidHandler> getTargetCapability() {
-            return Capabilities.FluidHandler.PART;
+        public PartCapability<ResourceHandler<FluidResource>> getTargetCapability() {
+            return Capabilities.Fluid.PART;
         }
 
         @Override
-        public IFluidHandler getCapabilityInstance() {
+        public ResourceHandler<FluidResource> getCapabilityInstance() {
             return new PartTypeInterfaceFluid.FluidHandler(this);
         }
     }

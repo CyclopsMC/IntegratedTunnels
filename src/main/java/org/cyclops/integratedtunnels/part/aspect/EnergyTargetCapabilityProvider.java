@@ -1,7 +1,7 @@
 package org.cyclops.integratedtunnels.part.aspect;
 
 import net.minecraft.core.Direction;
-import net.neoforged.neoforge.energy.IEnergyStorage;
+import net.neoforged.neoforge.transfer.energy.EnergyHandler;
 import org.cyclops.commoncapabilities.api.ingredient.IngredientComponent;
 import org.cyclops.commoncapabilities.api.ingredient.capability.ICapabilityGetter;
 import org.cyclops.commoncapabilities.api.ingredient.storage.IIngredientComponentStorage;
@@ -16,7 +16,7 @@ import javax.annotation.Nullable;
 /**
  * @author rubensworks
  */
-public class EnergyTargetCapabilityProvider extends ChanneledTargetCapabilityProvider<IEnergyStorage, IEnergyNetwork, Long, Boolean>
+public class EnergyTargetCapabilityProvider extends ChanneledTargetCapabilityProvider<EnergyHandler, IEnergyNetwork, Long, Boolean>
         implements IEnergyTarget {
 
     private final long amount;
