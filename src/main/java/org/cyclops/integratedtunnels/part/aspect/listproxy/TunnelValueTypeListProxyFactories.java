@@ -1,6 +1,6 @@
 package org.cyclops.integratedtunnels.part.aspect.listproxy;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.cyclops.integrateddynamics.core.evaluate.variable.ValueObjectTypeFluidStack;
 import org.cyclops.integrateddynamics.core.evaluate.variable.ValueObjectTypeItemStack;
 import org.cyclops.integrateddynamics.core.evaluate.variable.ValueTypeListProxyFactories;
@@ -18,10 +18,10 @@ public class TunnelValueTypeListProxyFactories {
     public static void load() {
         if (POSITIONED_ITEM_NETWORK == null) {
             POSITIONED_ITEM_NETWORK = ValueTypeListProxyFactories.REGISTRY.register(new ValueTypeListProxyNBTFactory<>(
-                    ResourceLocation.fromNamespaceAndPath(Reference.MOD_ID, "positioned_item_network"),
+                    Identifier.fromNamespaceAndPath(Reference.MOD_ID, "positioned_item_network"),
                     ValueTypeListProxyPositionedItemNetwork.class));
             POSITIONED_FLUID_NETWORK = ValueTypeListProxyFactories.REGISTRY.register(new ValueTypeListProxyNBTFactory<>(
-                    ResourceLocation.fromNamespaceAndPath(Reference.MOD_ID, "positioned_fluid_network"),
+                    Identifier.fromNamespaceAndPath(Reference.MOD_ID, "positioned_fluid_network"),
                     ValueTypeListProxyPositionedFluidNetwork.class));
         }
     }

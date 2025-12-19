@@ -1,7 +1,7 @@
 package org.cyclops.integratedtunnels.part.aspect;
 
 import com.google.common.collect.Iterators;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.minecraft.world.item.ItemStack;
 import org.cyclops.commoncapabilities.api.capability.fluidhandler.FluidMatch;
@@ -61,7 +61,7 @@ public class TunnelAspects {
                     .buildRead();
             static {
                 Operators.REGISTRY.registerSerializer(new PositionedOperator.Serializer(
-                        PositionedOperatorIngredientIndexItem.class, ResourceLocation.fromNamespaceAndPath(Reference.MOD_ID, "positioned_ingredient_index_item")));
+                        PositionedOperatorIngredientIndexItem.class, Identifier.fromNamespaceAndPath(Reference.MOD_ID, "positioned_ingredient_index_item")));
             }
         }
 
@@ -99,7 +99,7 @@ public class TunnelAspects {
                     .buildRead();
             static {
                 Operators.REGISTRY.registerSerializer(new PositionedOperator.Serializer(
-                        PositionedOperatorIngredientIndexFluid.class, ResourceLocation.fromNamespaceAndPath(Reference.MOD_ID, "positioned_ingredient_index_fluid")));
+                        PositionedOperatorIngredientIndexFluid.class, Identifier.fromNamespaceAndPath(Reference.MOD_ID, "positioned_ingredient_index_fluid")));
             }
         }
 

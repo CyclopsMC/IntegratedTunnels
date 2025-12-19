@@ -5,6 +5,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.attribute.EnvironmentAttributes;
 import net.minecraft.world.level.block.Blocks;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.common.SoundActions;
@@ -98,7 +99,7 @@ public class FluidStorageBlockWrapper implements IIngredientComponentStorage<Flu
 
     @Override
     public FluidStack insert(@Nonnull FluidStack stack, TransactionContext transaction) {
-        if (world.dimensionType().ultraWarm()
+        if (world.environmentAttributes().getValue(EnvironmentAttributes.WATER_EVAPORATES, pos)
                 && stack.getFluid().getFluidType().isVaporizedOnPlacement(world, pos, stack)) {
             return FluidStack.EMPTY;
         }
