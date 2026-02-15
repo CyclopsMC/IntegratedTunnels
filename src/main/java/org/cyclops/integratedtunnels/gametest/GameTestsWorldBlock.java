@@ -194,13 +194,12 @@ public class GameTestsWorldBlock {
     }
 
     @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
-    public void testWorldBlockImporterBlacklistBedrock(GameTestHelper helper) {
-        // Test that bedrock (blacklisted by default) cannot be imported
+    public void testWorldBlockImporterBlacklistOakLog(GameTestHelper helper) {
+        // Test that oak logs (blacklisted) cannot be imported
 
         // Temporarily modify config for this test
         java.util.List<String> originalBlacklist = org.cyclops.integratedtunnels.GeneralConfig.blockImporterBlacklist;
-        org.cyclops.integratedtunnels.GeneralConfig.blockImporterBlacklist = java.util.List.of("minecraft:bedrock");
-        org.cyclops.integratedtunnels.core.ItemStorageBlockWrapper.invalidatePatternCache();
+        org.cyclops.integratedtunnels.GeneralConfig.blockImporterBlacklist = java.util.List.of("minecraft:oak_log");
 
         try {
             // Place cable
@@ -216,16 +215,16 @@ public class GameTestsWorldBlock {
             // Place chest for interface
             helper.setBlock(POS.east().east(), Blocks.CHEST);
 
-            // Place bedrock before importer (should be blacklisted)
-            helper.setBlock(POS.west(), Blocks.BEDROCK);
+            // Place oak log before importer (should be blacklisted)
+            helper.setBlock(POS.west(), Blocks.OAK_LOG);
 
             // Place empty variable in importer
             ItemStack variableAspect = new ItemStack(RegistryEntries.ITEM_VARIABLE);
             placeVariableInWriter(helper.getLevel(), PartPos.of(helper.getLevel(), helper.absolutePos(POS), Direction.WEST), TunnelAspects.Write.World.BLOCK_BOOLEAN_IMPORT, variableAspect);
 
             helper.runAfterDelay(100, () -> {
-                // Check that bedrock is still present (was not imported)
-                helper.assertBlockPresent(Blocks.BEDROCK, POS.west());
+                // Check that oak log is still present (was not imported)
+                helper.assertBlockPresent(Blocks.OAK_LOG, POS.west());
                 // Check that chest is empty (no items imported)
                 helper.assertContainerEmpty(POS.east().east());
                 helper.succeed();
@@ -233,7 +232,6 @@ public class GameTestsWorldBlock {
         } finally {
             // Restore original config
             org.cyclops.integratedtunnels.GeneralConfig.blockImporterBlacklist = originalBlacklist;
-            org.cyclops.integratedtunnels.core.ItemStorageBlockWrapper.invalidatePatternCache();
         }
     }
 
@@ -241,10 +239,9 @@ public class GameTestsWorldBlock {
     public void testWorldBlockImporterBlacklistRegex(GameTestHelper helper) {
         // Test that regex patterns work for blacklisting
 
-        // Temporarily modify config for this test - blacklist all portal-related blocks
+        // Temporarily modify config for this test - blacklist all blocks with "oak" in them
         java.util.List<String> originalBlacklist = org.cyclops.integratedtunnels.GeneralConfig.blockImporterBlacklist;
-        org.cyclops.integratedtunnels.GeneralConfig.blockImporterBlacklist = java.util.List.of("minecraft:.*_portal.*");
-        org.cyclops.integratedtunnels.core.ItemStorageBlockWrapper.invalidatePatternCache();
+        org.cyclops.integratedtunnels.GeneralConfig.blockImporterBlacklist = java.util.List.of("minecraft:.*oak.*");
 
         try {
             // Place cable
@@ -260,16 +257,16 @@ public class GameTestsWorldBlock {
             // Place chest for interface
             helper.setBlock(POS.east().east(), Blocks.CHEST);
 
-            // Place end portal frame before importer (should match regex pattern)
-            helper.setBlock(POS.west(), Blocks.END_PORTAL_FRAME);
+            // Place oak planks before importer (should match regex pattern)
+            helper.setBlock(POS.west(), Blocks.OAK_PLANKS);
 
             // Place empty variable in importer
             ItemStack variableAspect = new ItemStack(RegistryEntries.ITEM_VARIABLE);
             placeVariableInWriter(helper.getLevel(), PartPos.of(helper.getLevel(), helper.absolutePos(POS), Direction.WEST), TunnelAspects.Write.World.BLOCK_BOOLEAN_IMPORT, variableAspect);
 
             helper.runAfterDelay(100, () -> {
-                // Check that end portal frame is still present (was not imported)
-                helper.assertBlockPresent(Blocks.END_PORTAL_FRAME, POS.west());
+                // Check that oak planks is still present (was not imported)
+                helper.assertBlockPresent(Blocks.OAK_PLANKS, POS.west());
                 // Check that chest is empty (no items imported)
                 helper.assertContainerEmpty(POS.east().east());
                 helper.succeed();
@@ -277,7 +274,6 @@ public class GameTestsWorldBlock {
         } finally {
             // Restore original config
             org.cyclops.integratedtunnels.GeneralConfig.blockImporterBlacklist = originalBlacklist;
-            org.cyclops.integratedtunnels.core.ItemStorageBlockWrapper.invalidatePatternCache();
         }
     }
 
@@ -285,10 +281,9 @@ public class GameTestsWorldBlock {
     public void testWorldBlockImporterNonBlacklistedBlock(GameTestHelper helper) {
         // Test that non-blacklisted blocks can still be imported normally
 
-        // Temporarily modify config for this test - only blacklist bedrock
+        // Temporarily modify config for this test - only blacklist oak log
         java.util.List<String> originalBlacklist = org.cyclops.integratedtunnels.GeneralConfig.blockImporterBlacklist;
-        org.cyclops.integratedtunnels.GeneralConfig.blockImporterBlacklist = java.util.List.of("minecraft:bedrock");
-        org.cyclops.integratedtunnels.core.ItemStorageBlockWrapper.invalidatePatternCache();
+        org.cyclops.integratedtunnels.GeneralConfig.blockImporterBlacklist = java.util.List.of("minecraft:oak_log");
 
         try {
             // Place cable
@@ -320,7 +315,6 @@ public class GameTestsWorldBlock {
         } finally {
             // Restore original config
             org.cyclops.integratedtunnels.GeneralConfig.blockImporterBlacklist = originalBlacklist;
-            org.cyclops.integratedtunnels.core.ItemStorageBlockWrapper.invalidatePatternCache();
         }
     }
 

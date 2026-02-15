@@ -93,13 +93,8 @@ public class GeneralConfig extends DummyConfig {
     @ConfigurableProperty(category = "general", comment = "The base energy usage for the player simulator when it does not have a variable.", minimalValue = 0, configLocation = ModConfig.Type.SERVER)
     public static int playerSimulatorBaseConsumptionDisabled = 1;
 
-    @ConfigurableProperty(category = "core", comment = "A list of regex patterns for block ResourceLocations that should not be importable by world block importers. Example patterns: 'minecraft:bedrock', 'minecraft:.*_portal.*', '.*:end_.*'", configLocation = ModConfig.Type.SERVER)
-    public static List<String> blockImporterBlacklist = List.of(
-            "minecraft:bedrock",
-            "minecraft:end_portal",
-            "minecraft:end_portal_frame",
-            "minecraft:end_gateway"
-    );
+    @ConfigurableProperty(category = "core", comment = "A list of regex patterns for block id's that should not be importable by world block importers. Example patterns: 'minecraft:bedrock', 'minecraft:.*_portal.*', '.*:end_.*'", configLocation = ModConfig.Type.SERVER)
+    public static List<String> blockImporterBlacklist = List.of();
 
     public GeneralConfig() {
         super(IntegratedTunnels._instance, "general");

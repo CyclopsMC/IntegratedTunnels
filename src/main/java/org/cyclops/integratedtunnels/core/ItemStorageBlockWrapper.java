@@ -41,7 +41,6 @@ import org.cyclops.integratedtunnels.item.ItemDummyPickAxe;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
@@ -53,10 +52,6 @@ import java.util.regex.PatternSyntaxException;
  * @author rubensworks
  */
 public class ItemStorageBlockWrapper implements IIngredientComponentStorage<ItemStack, Integer> {
-
-    // Cache for compiled regex patterns to avoid recompilation
-    private static volatile List<String> cachedPatternStrings = null;
-    private static volatile List<Pattern> cachedPatterns = null;
 
     private final boolean writeOnly;
     private final ServerLevel world;
@@ -93,59 +88,6 @@ public class ItemStorageBlockWrapper implements IIngredientComponentStorage<Item
     }
 
     /**
-     * Invalidate the pattern cache. Used primarily for testing purposes.
-     */
-    public static synchronized void invalidatePatternCache() {
-        cachedPatternStrings = null;
-        cachedPatterns = null;
-    }
-
-    /**
-     * Get compiled patterns from the config, using a cache to avoid recompilation.
-     * Uses double-checked locking for better concurrent read performance.
-     * @return List of compiled patterns.
-     */
-    private static List<Pattern> getCompiledPatterns() {
-        List<String> currentPatterns = GeneralConfig.blockImporterBlacklist;
-
-        // First check without synchronization (fast path)
-        List<Pattern> patterns = cachedPatterns;
-        List<String> patternStrings = cachedPatternStrings;
-
-        if (patterns != null && patternStrings != null && patternStrings.equals(currentPatterns)) {
-            return patterns;
-        }
-
-        // Slow path with synchronization
-        synchronized (ItemStorageBlockWrapper.class) {
-            // Double-check after acquiring lock
-            if (cachedPatterns != null && cachedPatternStrings != null && cachedPatternStrings.equals(currentPatterns)) {
-                return cachedPatterns;
-            }
-
-            // Recompile patterns
-            List<String> newPatternStrings = new ArrayList<>(currentPatterns);
-            List<Pattern> newPatterns = new ArrayList<>();
-
-            for (String patternString : currentPatterns) {
-                try {
-                    newPatterns.add(Pattern.compile(patternString));
-                } catch (PatternSyntaxException e) {
-                    // If the pattern is invalid, log and skip it
-                    IntegratedTunnels.clog(org.apache.logging.log4j.Level.WARN,
-                            "Invalid block importer blacklist pattern: " + patternString + " - " + e.getMessage());
-                }
-            }
-
-            // Update cache atomically by writing to volatile fields
-            cachedPatternStrings = newPatternStrings;
-            cachedPatterns = newPatterns;
-
-            return newPatterns;
-        }
-    }
-
-    /**
      * Check if a block is blacklisted from being imported.
      * @param blockState The block state to check.
      * @return True if the block is blacklisted, false otherwise.
@@ -154,9 +96,15 @@ public class ItemStorageBlockWrapper implements IIngredientComponentStorage<Item
         ResourceLocation blockId = BuiltInRegistries.BLOCK.getKey(blockState.getBlock());
         String blockIdString = blockId.toString();
 
-        for (Pattern pattern : getCompiledPatterns()) {
-            if (pattern.matcher(blockIdString).matches()) {
-                return true;
+        for (String patternString : GeneralConfig.blockImporterBlacklist) {
+            try {
+                if (Pattern.matches(patternString, blockIdString)) {
+                    return true;
+                }
+            } catch (PatternSyntaxException e) {
+                // If the pattern is invalid, log and skip it
+                IntegratedTunnels.clog(org.apache.logging.log4j.Level.WARN,
+                        "Invalid block importer blacklist pattern: " + patternString + " - " + e.getMessage());
             }
         }
         return false;
