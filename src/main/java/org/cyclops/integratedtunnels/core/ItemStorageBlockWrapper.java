@@ -170,7 +170,7 @@ public class ItemStorageBlockWrapper implements IIngredientComponentStorage<Item
 
                 // Check if the block is blacklisted
                 if (isBlockBlacklisted(blockState)) {
-                    return Lists.newArrayList(ItemStack.EMPTY);
+                    return cachedDrops = Lists.newArrayList();
                 }
 
                 Player player = PlayerHelpers.getFakePlayer(world);
