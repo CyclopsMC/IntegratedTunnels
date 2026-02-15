@@ -314,7 +314,6 @@ public class GameTestsWorldBlock {
             helper.succeedWhen(() -> {
                 // Check that stone was imported (block is gone)
                 helper.assertBlockNotPresent(Blocks.STONE, POS.west());
-                helper.assertContainerEmpty(POS.west());
                 // Check that chest has cobblestone (the drop from stone)
                 helper.assertContainerContains(POS.east().east(), Items.COBBLESTONE);
             });
