@@ -6,6 +6,8 @@ import org.cyclops.cyclopscore.config.extendedconfig.DummyConfig;
 import org.cyclops.cyclopscore.tracking.Analytics;
 import org.cyclops.cyclopscore.tracking.Versions;
 
+import java.util.List;
+
 /**
  * A config with general options for this mod.
  * @author rubensworks
@@ -90,6 +92,9 @@ public class GeneralConfig extends DummyConfig {
     public static int playerSimulatorBaseConsumptionEnabled = 64;
     @ConfigurableProperty(category = "general", comment = "The base energy usage for the player simulator when it does not have a variable.", minimalValue = 0, configLocation = ModConfig.Type.SERVER)
     public static int playerSimulatorBaseConsumptionDisabled = 1;
+
+    @ConfigurableProperty(category = "core", comment = "A list of regex patterns for block id's that should not be importable by world block importers. Example patterns: 'minecraft:bedrock', 'minecraft:.*_portal.*', '.*:end_.*'", configLocation = ModConfig.Type.SERVER)
+    public static List<String> blockImporterBlacklist = List.of();
 
     public GeneralConfig() {
         super(IntegratedTunnels._instance, "general");

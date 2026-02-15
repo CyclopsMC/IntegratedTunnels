@@ -3,6 +3,8 @@ package org.cyclops.integratedtunnels.core;
 import com.google.common.collect.Lists;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
@@ -42,6 +44,8 @@ import javax.annotation.Nullable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 /**
  * An item storage for world block placement.
@@ -81,6 +85,29 @@ public class ItemStorageBlockWrapper implements IIngredientComponentStorage<Item
 
     protected void sendBlockUpdate() {
         world.neighborChanged(pos, Blocks.AIR, pos);
+    }
+
+    /**
+     * Check if a block is blacklisted from being imported.
+     * @param blockState The block state to check.
+     * @return True if the block is blacklisted, false otherwise.
+     */
+    protected boolean isBlockBlacklisted(BlockState blockState) {
+        ResourceLocation blockId = BuiltInRegistries.BLOCK.getKey(blockState.getBlock());
+        String blockIdString = blockId.toString();
+
+        for (String patternString : GeneralConfig.blockImporterBlacklist) {
+            try {
+                if (Pattern.matches(patternString, blockIdString)) {
+                    return true;
+                }
+            } catch (PatternSyntaxException e) {
+                // If the pattern is invalid, log and skip it
+                IntegratedTunnels.clog(org.apache.logging.log4j.Level.WARN,
+                        "Invalid block importer blacklist pattern: " + patternString + " - " + e.getMessage());
+            }
+        }
+        return false;
     }
 
     protected IBlockBreakHandler getBlockBreakHandler(BlockState blockState, Level world, BlockPos pos, Player player) {
@@ -140,6 +167,11 @@ public class ItemStorageBlockWrapper implements IIngredientComponentStorage<Item
             }
             if (!world.isEmptyBlock(pos)) {
                 BlockState blockState = world.getBlockState(pos);
+
+                // Check if the block is blacklisted
+                if (isBlockBlacklisted(blockState)) {
+                    return cachedDrops = Lists.newArrayList();
+                }
 
                 Player player = PlayerHelpers.getFakePlayer(world);
                 PlayerHelpers.setPlayerState(player, hand, pos, 0, 0, 0, side, false);
