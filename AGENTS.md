@@ -153,6 +153,8 @@ Common Gradle tasks for development:
 | `./gradlew spotlessApply` | Format code according to project standards |
 | `./gradlew publishToMavenLocal` | Publish to local Maven for testing in other projects |
 
+If for any reason gradle fails due to internet connection issues, try running offline instead by running the gradle command with the `--offline` flag.
+
 ## CI/CD
 
 GitHub Actions automatically:
