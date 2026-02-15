@@ -55,8 +55,8 @@ import java.util.regex.PatternSyntaxException;
 public class ItemStorageBlockWrapper implements IIngredientComponentStorage<ItemStack, Integer> {
 
     // Cache for compiled regex patterns to avoid recompilation
-    private static List<String> cachedPatternStrings = null;
-    private static List<Pattern> cachedPatterns = null;
+    private static volatile List<String> cachedPatternStrings = null;
+    private static volatile List<Pattern> cachedPatterns = null;
 
     private final boolean writeOnly;
     private final ServerLevel world;
@@ -93,32 +93,56 @@ public class ItemStorageBlockWrapper implements IIngredientComponentStorage<Item
     }
 
     /**
+     * Invalidate the pattern cache. Used primarily for testing purposes.
+     */
+    public static synchronized void invalidatePatternCache() {
+        cachedPatternStrings = null;
+        cachedPatterns = null;
+    }
+
+    /**
      * Get compiled patterns from the config, using a cache to avoid recompilation.
+     * Uses double-checked locking for better concurrent read performance.
      * @return List of compiled patterns.
      */
-    private static synchronized List<Pattern> getCompiledPatterns() {
+    private static List<Pattern> getCompiledPatterns() {
         List<String> currentPatterns = GeneralConfig.blockImporterBlacklist;
         
-        // Check if cache is valid
-        if (cachedPatternStrings != null && cachedPatternStrings.equals(currentPatterns)) {
-            return cachedPatterns;
+        // First check without synchronization (fast path)
+        List<Pattern> patterns = cachedPatterns;
+        List<String> patternStrings = cachedPatternStrings;
+        
+        if (patterns != null && patternStrings != null && patternStrings.equals(currentPatterns)) {
+            return patterns;
         }
         
-        // Recompile patterns
-        cachedPatternStrings = new ArrayList<>(currentPatterns);
-        cachedPatterns = new ArrayList<>();
-        
-        for (String patternString : currentPatterns) {
-            try {
-                cachedPatterns.add(Pattern.compile(patternString));
-            } catch (PatternSyntaxException e) {
-                // If the pattern is invalid, log and skip it
-                IntegratedTunnels.clog(org.apache.logging.log4j.Level.WARN,
-                        "Invalid block importer blacklist pattern: " + patternString + " - " + e.getMessage());
+        // Slow path with synchronization
+        synchronized (ItemStorageBlockWrapper.class) {
+            // Double-check after acquiring lock
+            if (cachedPatterns != null && cachedPatternStrings != null && cachedPatternStrings.equals(currentPatterns)) {
+                return cachedPatterns;
             }
+            
+            // Recompile patterns
+            List<String> newPatternStrings = new ArrayList<>(currentPatterns);
+            List<Pattern> newPatterns = new ArrayList<>();
+            
+            for (String patternString : currentPatterns) {
+                try {
+                    newPatterns.add(Pattern.compile(patternString));
+                } catch (PatternSyntaxException e) {
+                    // If the pattern is invalid, log and skip it
+                    IntegratedTunnels.clog(org.apache.logging.log4j.Level.WARN,
+                            "Invalid block importer blacklist pattern: " + patternString + " - " + e.getMessage());
+                }
+            }
+            
+            // Update cache atomically by writing to volatile fields
+            cachedPatternStrings = newPatternStrings;
+            cachedPatterns = newPatterns;
+            
+            return newPatterns;
         }
-        
-        return cachedPatterns;
     }
 
     /**

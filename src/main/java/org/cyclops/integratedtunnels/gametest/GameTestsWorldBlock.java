@@ -200,6 +200,7 @@ public class GameTestsWorldBlock {
         // Temporarily modify config for this test
         java.util.List<String> originalBlacklist = org.cyclops.integratedtunnels.GeneralConfig.blockImporterBlacklist;
         org.cyclops.integratedtunnels.GeneralConfig.blockImporterBlacklist = java.util.List.of("minecraft:bedrock");
+        org.cyclops.integratedtunnels.core.ItemStorageBlockWrapper.invalidatePatternCache();
 
         try {
             // Place cable
@@ -232,6 +233,7 @@ public class GameTestsWorldBlock {
         } finally {
             // Restore original config
             org.cyclops.integratedtunnels.GeneralConfig.blockImporterBlacklist = originalBlacklist;
+            org.cyclops.integratedtunnels.core.ItemStorageBlockWrapper.invalidatePatternCache();
         }
     }
 
@@ -242,6 +244,7 @@ public class GameTestsWorldBlock {
         // Temporarily modify config for this test - blacklist all portal-related blocks
         java.util.List<String> originalBlacklist = org.cyclops.integratedtunnels.GeneralConfig.blockImporterBlacklist;
         org.cyclops.integratedtunnels.GeneralConfig.blockImporterBlacklist = java.util.List.of("minecraft:.*_portal.*");
+        org.cyclops.integratedtunnels.core.ItemStorageBlockWrapper.invalidatePatternCache();
 
         try {
             // Place cable
@@ -274,6 +277,7 @@ public class GameTestsWorldBlock {
         } finally {
             // Restore original config
             org.cyclops.integratedtunnels.GeneralConfig.blockImporterBlacklist = originalBlacklist;
+            org.cyclops.integratedtunnels.core.ItemStorageBlockWrapper.invalidatePatternCache();
         }
     }
 
@@ -284,6 +288,7 @@ public class GameTestsWorldBlock {
         // Temporarily modify config for this test - only blacklist bedrock
         java.util.List<String> originalBlacklist = org.cyclops.integratedtunnels.GeneralConfig.blockImporterBlacklist;
         org.cyclops.integratedtunnels.GeneralConfig.blockImporterBlacklist = java.util.List.of("minecraft:bedrock");
+        org.cyclops.integratedtunnels.core.ItemStorageBlockWrapper.invalidatePatternCache();
 
         try {
             // Place cable
@@ -316,6 +321,7 @@ public class GameTestsWorldBlock {
         } finally {
             // Restore original config
             org.cyclops.integratedtunnels.GeneralConfig.blockImporterBlacklist = originalBlacklist;
+            org.cyclops.integratedtunnels.core.ItemStorageBlockWrapper.invalidatePatternCache();
         }
     }
 
