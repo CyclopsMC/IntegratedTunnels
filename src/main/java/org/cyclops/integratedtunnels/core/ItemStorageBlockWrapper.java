@@ -107,26 +107,26 @@ public class ItemStorageBlockWrapper implements IIngredientComponentStorage<Item
      */
     private static List<Pattern> getCompiledPatterns() {
         List<String> currentPatterns = GeneralConfig.blockImporterBlacklist;
-        
+
         // First check without synchronization (fast path)
         List<Pattern> patterns = cachedPatterns;
         List<String> patternStrings = cachedPatternStrings;
-        
+
         if (patterns != null && patternStrings != null && patternStrings.equals(currentPatterns)) {
             return patterns;
         }
-        
+
         // Slow path with synchronization
         synchronized (ItemStorageBlockWrapper.class) {
             // Double-check after acquiring lock
             if (cachedPatterns != null && cachedPatternStrings != null && cachedPatternStrings.equals(currentPatterns)) {
                 return cachedPatterns;
             }
-            
+
             // Recompile patterns
             List<String> newPatternStrings = new ArrayList<>(currentPatterns);
             List<Pattern> newPatterns = new ArrayList<>();
-            
+
             for (String patternString : currentPatterns) {
                 try {
                     newPatterns.add(Pattern.compile(patternString));
@@ -136,11 +136,11 @@ public class ItemStorageBlockWrapper implements IIngredientComponentStorage<Item
                             "Invalid block importer blacklist pattern: " + patternString + " - " + e.getMessage());
                 }
             }
-            
+
             // Update cache atomically by writing to volatile fields
             cachedPatternStrings = newPatternStrings;
             cachedPatterns = newPatterns;
-            
+
             return newPatterns;
         }
     }
@@ -153,7 +153,7 @@ public class ItemStorageBlockWrapper implements IIngredientComponentStorage<Item
     protected boolean isBlockBlacklisted(BlockState blockState) {
         ResourceLocation blockId = BuiltInRegistries.BLOCK.getKey(blockState.getBlock());
         String blockIdString = blockId.toString();
-        
+
         for (Pattern pattern : getCompiledPatterns()) {
             if (pattern.matcher(blockIdString).matches()) {
                 return true;
