@@ -193,4 +193,130 @@ public class GameTestsWorldBlock {
         });
     }
 
+    @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
+    public void testWorldBlockImporterBlacklistBedrock(GameTestHelper helper) {
+        // Test that bedrock (blacklisted by default) cannot be imported
+
+        // Temporarily modify config for this test
+        java.util.List<String> originalBlacklist = org.cyclops.integratedtunnels.GeneralConfig.blockImporterBlacklist;
+        org.cyclops.integratedtunnels.GeneralConfig.blockImporterBlacklist = java.util.List.of("minecraft:bedrock");
+
+        try {
+            // Place cable
+            helper.setBlock(POS, RegistryEntries.BLOCK_CABLE.value());
+            helper.setBlock(POS.east(), RegistryEntries.BLOCK_CABLE.value());
+
+            // Place world block importer
+            PartHelpers.addPart(helper.getLevel(), helper.absolutePos(POS), Direction.WEST, PartTypes.IMPORTER_WORLD_BLOCK, new ItemStack(PartTypes.IMPORTER_WORLD_BLOCK.getItem()));
+
+            // Place item interface
+            PartHelpers.addPart(helper.getLevel(), helper.absolutePos(POS.east()), Direction.EAST, PartTypes.INTERFACE_ITEM, new ItemStack(PartTypes.INTERFACE_ITEM.getItem()));
+
+            // Place chest for interface
+            helper.setBlock(POS.east().east(), Blocks.CHEST);
+
+            // Place bedrock before importer (should be blacklisted)
+            helper.setBlock(POS.west(), Blocks.BEDROCK);
+
+            // Place empty variable in importer
+            ItemStack variableAspect = new ItemStack(RegistryEntries.ITEM_VARIABLE);
+            placeVariableInWriter(helper.getLevel(), PartPos.of(helper.getLevel(), helper.absolutePos(POS), Direction.WEST), TunnelAspects.Write.World.BLOCK_BOOLEAN_IMPORT, variableAspect);
+
+            helper.runAfterDelay(100, () -> {
+                // Check that bedrock is still present (was not imported)
+                helper.assertBlockPresent(Blocks.BEDROCK, POS.west());
+                // Check that chest is empty (no items imported)
+                helper.assertContainerEmpty(POS.east().east());
+                helper.succeed();
+            });
+        } finally {
+            // Restore original config
+            org.cyclops.integratedtunnels.GeneralConfig.blockImporterBlacklist = originalBlacklist;
+        }
+    }
+
+    @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
+    public void testWorldBlockImporterBlacklistRegex(GameTestHelper helper) {
+        // Test that regex patterns work for blacklisting
+
+        // Temporarily modify config for this test - blacklist all portal-related blocks
+        java.util.List<String> originalBlacklist = org.cyclops.integratedtunnels.GeneralConfig.blockImporterBlacklist;
+        org.cyclops.integratedtunnels.GeneralConfig.blockImporterBlacklist = java.util.List.of("minecraft:.*_portal.*");
+
+        try {
+            // Place cable
+            helper.setBlock(POS, RegistryEntries.BLOCK_CABLE.value());
+            helper.setBlock(POS.east(), RegistryEntries.BLOCK_CABLE.value());
+
+            // Place world block importer
+            PartHelpers.addPart(helper.getLevel(), helper.absolutePos(POS), Direction.WEST, PartTypes.IMPORTER_WORLD_BLOCK, new ItemStack(PartTypes.IMPORTER_WORLD_BLOCK.getItem()));
+
+            // Place item interface
+            PartHelpers.addPart(helper.getLevel(), helper.absolutePos(POS.east()), Direction.EAST, PartTypes.INTERFACE_ITEM, new ItemStack(PartTypes.INTERFACE_ITEM.getItem()));
+
+            // Place chest for interface
+            helper.setBlock(POS.east().east(), Blocks.CHEST);
+
+            // Place end portal frame before importer (should match regex pattern)
+            helper.setBlock(POS.west(), Blocks.END_PORTAL_FRAME);
+
+            // Place empty variable in importer
+            ItemStack variableAspect = new ItemStack(RegistryEntries.ITEM_VARIABLE);
+            placeVariableInWriter(helper.getLevel(), PartPos.of(helper.getLevel(), helper.absolutePos(POS), Direction.WEST), TunnelAspects.Write.World.BLOCK_BOOLEAN_IMPORT, variableAspect);
+
+            helper.runAfterDelay(100, () -> {
+                // Check that end portal frame is still present (was not imported)
+                helper.assertBlockPresent(Blocks.END_PORTAL_FRAME, POS.west());
+                // Check that chest is empty (no items imported)
+                helper.assertContainerEmpty(POS.east().east());
+                helper.succeed();
+            });
+        } finally {
+            // Restore original config
+            org.cyclops.integratedtunnels.GeneralConfig.blockImporterBlacklist = originalBlacklist;
+        }
+    }
+
+    @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
+    public void testWorldBlockImporterNonBlacklistedBlock(GameTestHelper helper) {
+        // Test that non-blacklisted blocks can still be imported normally
+
+        // Temporarily modify config for this test - only blacklist bedrock
+        java.util.List<String> originalBlacklist = org.cyclops.integratedtunnels.GeneralConfig.blockImporterBlacklist;
+        org.cyclops.integratedtunnels.GeneralConfig.blockImporterBlacklist = java.util.List.of("minecraft:bedrock");
+
+        try {
+            // Place cable
+            helper.setBlock(POS, RegistryEntries.BLOCK_CABLE.value());
+            helper.setBlock(POS.east(), RegistryEntries.BLOCK_CABLE.value());
+
+            // Place world block importer
+            PartHelpers.addPart(helper.getLevel(), helper.absolutePos(POS), Direction.WEST, PartTypes.IMPORTER_WORLD_BLOCK, new ItemStack(PartTypes.IMPORTER_WORLD_BLOCK.getItem()));
+
+            // Place item interface
+            PartHelpers.addPart(helper.getLevel(), helper.absolutePos(POS.east()), Direction.EAST, PartTypes.INTERFACE_ITEM, new ItemStack(PartTypes.INTERFACE_ITEM.getItem()));
+
+            // Place chest for interface
+            helper.setBlock(POS.east().east(), Blocks.CHEST);
+
+            // Place stone before importer (should NOT be blacklisted)
+            helper.setBlock(POS.west(), Blocks.STONE);
+
+            // Place empty variable in importer
+            ItemStack variableAspect = new ItemStack(RegistryEntries.ITEM_VARIABLE);
+            placeVariableInWriter(helper.getLevel(), PartPos.of(helper.getLevel(), helper.absolutePos(POS), Direction.WEST), TunnelAspects.Write.World.BLOCK_BOOLEAN_IMPORT, variableAspect);
+
+            helper.succeedWhen(() -> {
+                // Check that stone was imported (block is gone)
+                helper.assertBlockNotPresent(Blocks.STONE, POS.west());
+                helper.assertContainerEmpty(POS.west());
+                // Check that chest has cobblestone (the drop from stone)
+                helper.assertContainerContains(POS.east().east(), Items.COBBLESTONE);
+            });
+        } finally {
+            // Restore original config
+            org.cyclops.integratedtunnels.GeneralConfig.blockImporterBlacklist = originalBlacklist;
+        }
+    }
+
 }
