@@ -41,16 +41,22 @@ import org.cyclops.integratedtunnels.item.ItemDummyPickAxe;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 /**
  * An item storage for world block placement.
  * @author rubensworks
  */
 public class ItemStorageBlockWrapper implements IIngredientComponentStorage<ItemStack, Integer> {
+
+    // Cache for compiled regex patterns to avoid recompilation
+    private static List<String> cachedPatternStrings = null;
+    private static List<Pattern> cachedPatterns = null;
 
     private final boolean writeOnly;
     private final ServerLevel world;
@@ -87,6 +93,35 @@ public class ItemStorageBlockWrapper implements IIngredientComponentStorage<Item
     }
 
     /**
+     * Get compiled patterns from the config, using a cache to avoid recompilation.
+     * @return List of compiled patterns.
+     */
+    private static synchronized List<Pattern> getCompiledPatterns() {
+        List<String> currentPatterns = GeneralConfig.blockImporterBlacklist;
+        
+        // Check if cache is valid
+        if (cachedPatternStrings != null && cachedPatternStrings.equals(currentPatterns)) {
+            return cachedPatterns;
+        }
+        
+        // Recompile patterns
+        cachedPatternStrings = new ArrayList<>(currentPatterns);
+        cachedPatterns = new ArrayList<>();
+        
+        for (String patternString : currentPatterns) {
+            try {
+                cachedPatterns.add(Pattern.compile(patternString));
+            } catch (PatternSyntaxException e) {
+                // If the pattern is invalid, log and skip it
+                IntegratedTunnels.clog(org.apache.logging.log4j.Level.WARN,
+                        "Invalid block importer blacklist pattern: " + patternString + " - " + e.getMessage());
+            }
+        }
+        
+        return cachedPatterns;
+    }
+
+    /**
      * Check if a block is blacklisted from being imported.
      * @param blockState The block state to check.
      * @return True if the block is blacklisted, false otherwise.
@@ -95,15 +130,9 @@ public class ItemStorageBlockWrapper implements IIngredientComponentStorage<Item
         ResourceLocation blockId = BuiltInRegistries.BLOCK.getKey(blockState.getBlock());
         String blockIdString = blockId.toString();
         
-        for (String pattern : GeneralConfig.blockImporterBlacklist) {
-            try {
-                if (Pattern.matches(pattern, blockIdString)) {
-                    return true;
-                }
-            } catch (Exception e) {
-                // If the pattern is invalid, log and skip it
-                IntegratedTunnels.clog(org.apache.logging.log4j.Level.WARN,
-                        "Invalid block importer blacklist pattern: " + pattern);
+        for (Pattern pattern : getCompiledPatterns()) {
+            if (pattern.matcher(blockIdString).matches()) {
+                return true;
             }
         }
         return false;
