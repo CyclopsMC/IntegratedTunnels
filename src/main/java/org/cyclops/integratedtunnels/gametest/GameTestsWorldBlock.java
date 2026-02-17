@@ -191,7 +191,7 @@ public class GameTestsWorldBlock {
         });
     }
 
-    @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
+    @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT, environment = "integratedtunnels:blacklist_oak_log")
     public void testWorldBlockImporterBlacklistOakLog(GameTestHelper helper) {
         // Test that oak logs (blacklisted) cannot be imported
 
@@ -233,7 +233,7 @@ public class GameTestsWorldBlock {
         });
     }
 
-    @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
+    @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT, environment = "integratedtunnels:blacklist_regex")
     public void testWorldBlockImporterBlacklistRegex(GameTestHelper helper) {
         // Test that regex patterns work for blacklisting
 
@@ -275,7 +275,7 @@ public class GameTestsWorldBlock {
         });
     }
 
-    @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
+    @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT, environment = "integratedtunnels:non_blacklisted")
     public void testWorldBlockImporterNonBlacklistedBlock(GameTestHelper helper) {
         // Test that non-blacklisted blocks can still be imported normally
 
