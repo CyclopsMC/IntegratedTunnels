@@ -30,6 +30,9 @@ public class GameTestsWorldBlock {
     public static final int TIMEOUT = 2000;
     public static final BlockPos POS = BlockPos.ZERO.offset(2, 0, 2);
 
+    // Flag to ensure config-modifying tests run sequentially
+    private static volatile boolean configTestInProgress = false;
+
     @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
     public void testWorldBlockImporterToInterfaceToExporterBoolean(GameTestHelper helper) {
         // Place cable
@@ -195,6 +198,13 @@ public class GameTestsWorldBlock {
     public void testWorldBlockImporterBlacklistOakLog(GameTestHelper helper) {
         // Test that oak logs (blacklisted) cannot be imported
 
+        // Wait for any other config test to complete
+        if (configTestInProgress) {
+            helper.fail(Component.literal("Another config test is already in progress"));
+            return;
+        }
+        configTestInProgress = true;
+
         // Temporarily modify config for this test
         java.util.List<String> originalBlacklist = org.cyclops.integratedtunnels.GeneralConfig.blockImporterBlacklist;
         org.cyclops.integratedtunnels.GeneralConfig.blockImporterBlacklist = Lists.newArrayList("minecraft:oak_log");
@@ -220,20 +230,30 @@ public class GameTestsWorldBlock {
         placeVariableInWriter(helper, helper.getLevel(), PartPos.of(helper.getLevel(), helper.absolutePos(POS), Direction.WEST), TunnelAspects.Write.World.BLOCK_BOOLEAN_IMPORT, variableAspect);
 
         helper.runAfterDelay(200, () -> {
-            // Check that oak log is still present (was not imported)
-            helper.assertBlockPresent(Blocks.OAK_LOG, POS.west());
-            // Check that chest is empty (no items imported)
-            helper.assertContainerEmpty(POS.east().east());
-
-            // Restore original config
-            org.cyclops.integratedtunnels.GeneralConfig.blockImporterBlacklist = originalBlacklist;
-            helper.succeed();
+            try {
+                // Check that oak log is still present (was not imported)
+                helper.assertBlockPresent(Blocks.OAK_LOG, POS.west());
+                // Check that chest is empty (no items imported)
+                helper.assertContainerEmpty(POS.east().east());
+                helper.succeed();
+            } finally {
+                // Restore original config and release lock
+                org.cyclops.integratedtunnels.GeneralConfig.blockImporterBlacklist = originalBlacklist;
+                configTestInProgress = false;
+            }
         });
     }
 
     @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
     public void testWorldBlockImporterBlacklistRegex(GameTestHelper helper) {
         // Test that regex patterns work for blacklisting
+
+        // Wait for any other config test to complete
+        if (configTestInProgress) {
+            helper.fail(Component.literal("Another config test is already in progress"));
+            return;
+        }
+        configTestInProgress = true;
 
         // Temporarily modify config for this test - blacklist all blocks with "oak" in them
         java.util.List<String> originalBlacklist = org.cyclops.integratedtunnels.GeneralConfig.blockImporterBlacklist;
@@ -260,20 +280,30 @@ public class GameTestsWorldBlock {
         placeVariableInWriter(helper, helper.getLevel(), PartPos.of(helper.getLevel(), helper.absolutePos(POS), Direction.WEST), TunnelAspects.Write.World.BLOCK_BOOLEAN_IMPORT, variableAspect);
 
         helper.runAfterDelay(200, () -> {
-            // Check that oak planks is still present (was not imported)
-            helper.assertBlockPresent(Blocks.OAK_PLANKS, POS.west());
-            // Check that chest is empty (no items imported)
-            helper.assertContainerEmpty(POS.east().east());
-
-            // Restore original config
-            org.cyclops.integratedtunnels.GeneralConfig.blockImporterBlacklist = originalBlacklist;
-            helper.succeed();
+            try {
+                // Check that oak planks is still present (was not imported)
+                helper.assertBlockPresent(Blocks.OAK_PLANKS, POS.west());
+                // Check that chest is empty (no items imported)
+                helper.assertContainerEmpty(POS.east().east());
+                helper.succeed();
+            } finally {
+                // Restore original config and release lock
+                org.cyclops.integratedtunnels.GeneralConfig.blockImporterBlacklist = originalBlacklist;
+                configTestInProgress = false;
+            }
         });
     }
 
     @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
     public void testWorldBlockImporterNonBlacklistedBlock(GameTestHelper helper) {
         // Test that non-blacklisted blocks can still be imported normally
+
+        // Wait for any other config test to complete
+        if (configTestInProgress) {
+            helper.fail(Component.literal("Another config test is already in progress"));
+            return;
+        }
+        configTestInProgress = true;
 
         // Temporarily modify config for this test - only blacklist oak log
         java.util.List<String> originalBlacklist = org.cyclops.integratedtunnels.GeneralConfig.blockImporterBlacklist;
@@ -299,14 +329,18 @@ public class GameTestsWorldBlock {
         ItemStack variableAspect = new ItemStack(RegistryEntries.ITEM_VARIABLE);
         placeVariableInWriter(helper, helper.getLevel(), PartPos.of(helper.getLevel(), helper.absolutePos(POS), Direction.WEST), TunnelAspects.Write.World.BLOCK_BOOLEAN_IMPORT, variableAspect);
 
-        helper.succeedWhen(() -> {
-            // Check that stone was imported (block is gone)
-            helper.assertBlockNotPresent(Blocks.STONE, POS.west());
-            // Check that chest has cobblestone (the drop from stone)
-            helper.assertContainerContains(POS.east().east(), Items.COBBLESTONE);
-
-            // Restore original config
-            org.cyclops.integratedtunnels.GeneralConfig.blockImporterBlacklist = originalBlacklist;
+        helper.runAfterDelay(200, () -> {
+            try {
+                // Check that stone was imported (block is gone)
+                helper.assertBlockNotPresent(Blocks.STONE, POS.west());
+                // Check that chest has cobblestone (the drop from stone)
+                helper.assertContainerContains(POS.east().east(), Items.COBBLESTONE);
+                helper.succeed();
+            } finally {
+                // Restore original config and release lock
+                org.cyclops.integratedtunnels.GeneralConfig.blockImporterBlacklist = originalBlacklist;
+                configTestInProgress = false;
+            }
         });
     }
 
