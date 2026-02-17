@@ -1,9 +1,12 @@
 package org.cyclops.integratedtunnels;
 
+import com.google.common.collect.Lists;
 import org.cyclops.cyclopscore.config.ConfigurablePropertyCommon;
 import org.cyclops.cyclopscore.config.ModConfigLocation;
 import org.cyclops.cyclopscore.config.extendedconfig.DummyConfigCommon;
 import org.cyclops.cyclopscore.init.IModBase;
+
+import java.util.List;
 
 /**
  * A config with general options for this mod.
@@ -83,6 +86,9 @@ public class GeneralConfig extends DummyConfigCommon<IModBase> {
     public static int playerSimulatorBaseConsumptionEnabled = 64;
     @ConfigurablePropertyCommon(category = "general", comment = "The base energy usage for the player simulator when it does not have a variable.", minimalValue = 0, configLocation = ModConfigLocation.SERVER)
     public static int playerSimulatorBaseConsumptionDisabled = 1;
+
+    @ConfigurablePropertyCommon(category = "core", comment = "A list of regex patterns for block id's that should not be importable by world block importers. Example patterns: 'minecraft:bedrock', 'minecraft:.*_portal.*', '.*:end_.*'", configLocation = ModConfigLocation.SERVER)
+    public static List<String> blockImporterBlacklist = Lists.newArrayList();
 
     public GeneralConfig() {
         super(IntegratedTunnels._instance, "general");

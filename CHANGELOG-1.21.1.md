@@ -1,8 +1,16 @@
 # Changelog for Minecraft 1.21.1
 All notable changes to this project will be documented in this file.
 
+<a name="1.21.1-1.9.3"></a>
+## [1.21.1-1.9.3](https://github.com/CyclopsMC/IntegratedTunnels/compare/1.21.1-1.9.2...1.21.1-1.9.3) - 2026-02-17 11:04:39
+
+
+### Added
+* Add block importer blacklist config option, Closes #189
+* Add translations through Crowdin (#351)
+
 <a name="1.21.1-1.9.2"></a>
-## [1.21.1-1.9.2](https://github.com/CyclopsMC/IntegratedTunnels/compare/1.21.1-1.9.1...1.21.1-1.9.2) - 2025-11-21 15:53:26
+## [1.21.1-1.9.2](https://github.com/CyclopsMC/IntegratedTunnels/compare/1.21.1-1.9.1...1.21.1-1.9.2) - 2025-11-21 15:53:26 +0100
 
 
 ### Added
