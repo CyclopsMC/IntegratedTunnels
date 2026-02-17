@@ -1,0 +1,3 @@
+{
+  "description": "Isolated environment for tests that modify global config to prevent race conditions"
+}

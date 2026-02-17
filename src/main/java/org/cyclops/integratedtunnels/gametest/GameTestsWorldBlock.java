@@ -21,8 +21,6 @@ import org.cyclops.integratedtunnels.Reference;
 import org.cyclops.integratedtunnels.part.PartTypes;
 import org.cyclops.integratedtunnels.part.aspect.TunnelAspects;
 
-import java.util.concurrent.atomic.AtomicBoolean;
-
 import static org.cyclops.integrateddynamics.gametest.GameTestHelpersIntegratedDynamics.createVariableForValue;
 import static org.cyclops.integrateddynamics.gametest.GameTestHelpersIntegratedDynamics.placeVariableInWriter;
 
@@ -31,9 +29,6 @@ public class GameTestsWorldBlock {
     public static final String TEMPLATE_EMPTY = Reference.MOD_ID + ":empty10";
     public static final int TIMEOUT = 2000;
     public static final BlockPos POS = BlockPos.ZERO.offset(2, 0, 2);
-
-    // Flag to ensure config-modifying tests run sequentially
-    private static final AtomicBoolean configTestInProgress = new AtomicBoolean(false);
 
     @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
     public void testWorldBlockImporterToInterfaceToExporterBoolean(GameTestHelper helper) {
@@ -196,16 +191,9 @@ public class GameTestsWorldBlock {
         });
     }
 
-    @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
+    @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT, environment = "integratedtunnels:config_isolated")
     public void testWorldBlockImporterBlacklistOakLog(GameTestHelper helper) {
         // Test that oak logs (blacklisted) cannot be imported
-
-        // Atomically check and set the flag to ensure only one config test runs at a time
-        if (!configTestInProgress.compareAndSet(false, true)) {
-            // Another test is in progress, skip this one and retry later
-            helper.runAfterDelay(10, () -> testWorldBlockImporterBlacklistOakLog(helper));
-            return;
-        }
 
         // Temporarily modify config for this test
         java.util.List<String> originalBlacklist = org.cyclops.integratedtunnels.GeneralConfig.blockImporterBlacklist;
@@ -239,23 +227,15 @@ public class GameTestsWorldBlock {
                 helper.assertContainerEmpty(POS.east().east());
                 helper.succeed();
             } finally {
-                // Restore original config and release lock
+                // Restore original config
                 org.cyclops.integratedtunnels.GeneralConfig.blockImporterBlacklist = originalBlacklist;
-                configTestInProgress.set(false);
             }
         });
     }
 
-    @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
+    @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT, environment = "integratedtunnels:config_isolated")
     public void testWorldBlockImporterBlacklistRegex(GameTestHelper helper) {
         // Test that regex patterns work for blacklisting
-
-        // Atomically check and set the flag to ensure only one config test runs at a time
-        if (!configTestInProgress.compareAndSet(false, true)) {
-            // Another test is in progress, skip this one and retry later
-            helper.runAfterDelay(10, () -> testWorldBlockImporterBlacklistRegex(helper));
-            return;
-        }
 
         // Temporarily modify config for this test - blacklist all blocks with "oak" in them
         java.util.List<String> originalBlacklist = org.cyclops.integratedtunnels.GeneralConfig.blockImporterBlacklist;
@@ -289,23 +269,15 @@ public class GameTestsWorldBlock {
                 helper.assertContainerEmpty(POS.east().east());
                 helper.succeed();
             } finally {
-                // Restore original config and release lock
+                // Restore original config
                 org.cyclops.integratedtunnels.GeneralConfig.blockImporterBlacklist = originalBlacklist;
-                configTestInProgress.set(false);
             }
         });
     }
 
-    @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
+    @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT, environment = "integratedtunnels:config_isolated")
     public void testWorldBlockImporterNonBlacklistedBlock(GameTestHelper helper) {
         // Test that non-blacklisted blocks can still be imported normally
-
-        // Atomically check and set the flag to ensure only one config test runs at a time
-        if (!configTestInProgress.compareAndSet(false, true)) {
-            // Another test is in progress, skip this one and retry later
-            helper.runAfterDelay(10, () -> testWorldBlockImporterNonBlacklistedBlock(helper));
-            return;
-        }
 
         // Temporarily modify config for this test - only blacklist oak log
         java.util.List<String> originalBlacklist = org.cyclops.integratedtunnels.GeneralConfig.blockImporterBlacklist;
@@ -339,9 +311,8 @@ public class GameTestsWorldBlock {
                 helper.assertContainerContains(POS.east().east(), Items.COBBLESTONE);
                 helper.succeed();
             } finally {
-                // Restore original config and release lock
+                // Restore original config
                 org.cyclops.integratedtunnels.GeneralConfig.blockImporterBlacklist = originalBlacklist;
-                configTestInProgress.set(false);
             }
         });
     }
