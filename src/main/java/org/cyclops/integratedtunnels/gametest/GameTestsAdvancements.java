@@ -140,6 +140,19 @@ public class GameTestsAdvancements {
         helper.succeed();
     }
 
+    @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
+    public void testAdvancementRootNegative(GameTestHelper helper) {
+        ServerPlayer player = createMockPlayer(helper);
+
+        // Use a non-variable item (dirt) - should NOT trigger the advancement
+        ItemStack dirt = new ItemStack(Items.DIRT);
+        player.getInventory().setItem(0, dirt);
+        CriteriaTriggers.INVENTORY_CHANGED.trigger(player, player.getInventory(), dirt);
+
+        assertAdvancementNotDone(helper, player, Reference.MOD_ID, "root");
+        helper.succeed();
+    }
+
     // ===== cyclopscore:item_crafted advancements =====
 
     @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
@@ -148,6 +161,16 @@ public class GameTestsAdvancements {
         ItemStack crafted = new ItemStack(org.cyclops.integratedtunnels.part.PartTypes.INTERFACE_ITEM.getItem());
         EventHooks.firePlayerCraftingEvent(player, crafted, new SimpleContainer(0));
         assertAdvancement(helper, player, Reference.MOD_ID, "interfaces/interface_item");
+        helper.succeed();
+    }
+
+    @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
+    public void testAdvancementInterfaceItemNegative(GameTestHelper helper) {
+        ServerPlayer player = createMockPlayer(helper);
+        // Craft interface_fluid instead of interface_item - should NOT trigger the advancement
+        ItemStack crafted = new ItemStack(org.cyclops.integratedtunnels.part.PartTypes.INTERFACE_FLUID.getItem());
+        EventHooks.firePlayerCraftingEvent(player, crafted, new SimpleContainer(0));
+        assertAdvancementNotDone(helper, player, Reference.MOD_ID, "interfaces/interface_item");
         helper.succeed();
     }
 
@@ -161,11 +184,31 @@ public class GameTestsAdvancements {
     }
 
     @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
+    public void testAdvancementInterfaceFluidNegative(GameTestHelper helper) {
+        ServerPlayer player = createMockPlayer(helper);
+        // Craft interface_item instead of interface_fluid - should NOT trigger the advancement
+        ItemStack crafted = new ItemStack(org.cyclops.integratedtunnels.part.PartTypes.INTERFACE_ITEM.getItem());
+        EventHooks.firePlayerCraftingEvent(player, crafted, new SimpleContainer(0));
+        assertAdvancementNotDone(helper, player, Reference.MOD_ID, "interfaces/interface_fluid");
+        helper.succeed();
+    }
+
+    @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
     public void testAdvancementInterfaceEnergy(GameTestHelper helper) {
         ServerPlayer player = createMockPlayer(helper);
         ItemStack crafted = new ItemStack(org.cyclops.integratedtunnels.part.PartTypes.INTERFACE_ENERGY.getItem());
         EventHooks.firePlayerCraftingEvent(player, crafted, new SimpleContainer(0));
         assertAdvancement(helper, player, Reference.MOD_ID, "interfaces/interface_energy");
+        helper.succeed();
+    }
+
+    @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
+    public void testAdvancementInterfaceEnergyNegative(GameTestHelper helper) {
+        ServerPlayer player = createMockPlayer(helper);
+        // Craft interface_item instead of interface_energy - should NOT trigger the advancement
+        ItemStack crafted = new ItemStack(org.cyclops.integratedtunnels.part.PartTypes.INTERFACE_ITEM.getItem());
+        EventHooks.firePlayerCraftingEvent(player, crafted, new SimpleContainer(0));
+        assertAdvancementNotDone(helper, player, Reference.MOD_ID, "interfaces/interface_energy");
         helper.succeed();
     }
 
@@ -179,11 +222,31 @@ public class GameTestsAdvancements {
     }
 
     @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
+    public void testAdvancementImporterItemNegative(GameTestHelper helper) {
+        ServerPlayer player = createMockPlayer(helper);
+        // Craft exporter_item instead of importer_item - should NOT trigger the advancement
+        ItemStack crafted = new ItemStack(org.cyclops.integratedtunnels.part.PartTypes.EXPORTER_ITEM.getItem());
+        EventHooks.firePlayerCraftingEvent(player, crafted, new SimpleContainer(0));
+        assertAdvancementNotDone(helper, player, Reference.MOD_ID, "importer_exporter/importer_item");
+        helper.succeed();
+    }
+
+    @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
     public void testAdvancementExporterItem(GameTestHelper helper) {
         ServerPlayer player = createMockPlayer(helper);
         ItemStack crafted = new ItemStack(org.cyclops.integratedtunnels.part.PartTypes.EXPORTER_ITEM.getItem());
         EventHooks.firePlayerCraftingEvent(player, crafted, new SimpleContainer(0));
         assertAdvancement(helper, player, Reference.MOD_ID, "importer_exporter/exporter_item");
+        helper.succeed();
+    }
+
+    @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
+    public void testAdvancementExporterItemNegative(GameTestHelper helper) {
+        ServerPlayer player = createMockPlayer(helper);
+        // Craft importer_item instead of exporter_item - should NOT trigger the advancement
+        ItemStack crafted = new ItemStack(org.cyclops.integratedtunnels.part.PartTypes.IMPORTER_ITEM.getItem());
+        EventHooks.firePlayerCraftingEvent(player, crafted, new SimpleContainer(0));
+        assertAdvancementNotDone(helper, player, Reference.MOD_ID, "importer_exporter/exporter_item");
         helper.succeed();
     }
 
@@ -197,11 +260,31 @@ public class GameTestsAdvancements {
     }
 
     @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
+    public void testAdvancementPlayerSimulatorNegative(GameTestHelper helper) {
+        ServerPlayer player = createMockPlayer(helper);
+        // Craft importer_item instead of player_simulator - should NOT trigger the advancement
+        ItemStack crafted = new ItemStack(org.cyclops.integratedtunnels.part.PartTypes.IMPORTER_ITEM.getItem());
+        EventHooks.firePlayerCraftingEvent(player, crafted, new SimpleContainer(0));
+        assertAdvancementNotDone(helper, player, Reference.MOD_ID, "click_sword/player_simulator");
+        helper.succeed();
+    }
+
+    @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
     public void testAdvancementWorldImporterBlock(GameTestHelper helper) {
         ServerPlayer player = createMockPlayer(helper);
         ItemStack crafted = new ItemStack(org.cyclops.integratedtunnels.part.PartTypes.IMPORTER_WORLD_BLOCK.getItem());
         EventHooks.firePlayerCraftingEvent(player, crafted, new SimpleContainer(0));
         assertAdvancement(helper, player, Reference.MOD_ID, "world_importer_exporter/importer_block");
+        helper.succeed();
+    }
+
+    @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
+    public void testAdvancementWorldImporterBlockNegative(GameTestHelper helper) {
+        ServerPlayer player = createMockPlayer(helper);
+        // Craft importer_world_item instead of importer_world_block - should NOT trigger the advancement
+        ItemStack crafted = new ItemStack(org.cyclops.integratedtunnels.part.PartTypes.IMPORTER_WORLD_ITEM.getItem());
+        EventHooks.firePlayerCraftingEvent(player, crafted, new SimpleContainer(0));
+        assertAdvancementNotDone(helper, player, Reference.MOD_ID, "world_importer_exporter/importer_block");
         helper.succeed();
     }
 
@@ -215,6 +298,16 @@ public class GameTestsAdvancements {
     }
 
     @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
+    public void testAdvancementWorldImporterItemNegative(GameTestHelper helper) {
+        ServerPlayer player = createMockPlayer(helper);
+        // Craft importer_world_block instead of importer_world_item - should NOT trigger the advancement
+        ItemStack crafted = new ItemStack(org.cyclops.integratedtunnels.part.PartTypes.IMPORTER_WORLD_BLOCK.getItem());
+        EventHooks.firePlayerCraftingEvent(player, crafted, new SimpleContainer(0));
+        assertAdvancementNotDone(helper, player, Reference.MOD_ID, "world_importer_exporter/importer_item");
+        helper.succeed();
+    }
+
+    @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
     public void testAdvancementWorldExporterBlock(GameTestHelper helper) {
         ServerPlayer player = createMockPlayer(helper);
         ItemStack crafted = new ItemStack(org.cyclops.integratedtunnels.part.PartTypes.EXPORTER_WORLD_BLOCK.getItem());
@@ -224,11 +317,31 @@ public class GameTestsAdvancements {
     }
 
     @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
+    public void testAdvancementWorldExporterBlockNegative(GameTestHelper helper) {
+        ServerPlayer player = createMockPlayer(helper);
+        // Craft exporter_world_item instead of exporter_world_block - should NOT trigger the advancement
+        ItemStack crafted = new ItemStack(org.cyclops.integratedtunnels.part.PartTypes.EXPORTER_WORLD_ITEM.getItem());
+        EventHooks.firePlayerCraftingEvent(player, crafted, new SimpleContainer(0));
+        assertAdvancementNotDone(helper, player, Reference.MOD_ID, "world_importer_exporter/exporter_block");
+        helper.succeed();
+    }
+
+    @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
     public void testAdvancementWorldExporterItem(GameTestHelper helper) {
         ServerPlayer player = createMockPlayer(helper);
         ItemStack crafted = new ItemStack(org.cyclops.integratedtunnels.part.PartTypes.EXPORTER_WORLD_ITEM.getItem());
         EventHooks.firePlayerCraftingEvent(player, crafted, new SimpleContainer(0));
         assertAdvancement(helper, player, Reference.MOD_ID, "world_importer_exporter/exporter_item");
+        helper.succeed();
+    }
+
+    @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
+    public void testAdvancementWorldExporterItemNegative(GameTestHelper helper) {
+        ServerPlayer player = createMockPlayer(helper);
+        // Craft exporter_world_block instead of exporter_world_item - should NOT trigger the advancement
+        ItemStack crafted = new ItemStack(org.cyclops.integratedtunnels.part.PartTypes.EXPORTER_WORLD_BLOCK.getItem());
+        EventHooks.firePlayerCraftingEvent(player, crafted, new SimpleContainer(0));
+        assertAdvancementNotDone(helper, player, Reference.MOD_ID, "world_importer_exporter/exporter_item");
         helper.succeed();
     }
 
@@ -249,6 +362,25 @@ public class GameTestsAdvancements {
         placeVariableWithPlayer(level, partPos, TunnelAspects.Write.World.BLOCK_BLOCK_IMPORT, variable, player);
 
         assertAdvancement(helper, player, Reference.MOD_ID, "break_stone/break_stone");
+        helper.succeed();
+    }
+
+    @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
+    public void testAdvancementBreakStoneNegative(GameTestHelper helper) {
+        Level level = helper.getLevel();
+        helper.setBlock(POS, RegistryEntries.BLOCK_CABLE.value());
+        PartHelpers.addPart(level, helper.absolutePos(POS), Direction.WEST,
+                org.cyclops.integratedtunnels.part.PartTypes.IMPORTER_WORLD_BLOCK,
+                new ItemStack(org.cyclops.integratedtunnels.part.PartTypes.IMPORTER_WORLD_BLOCK.getItem()));
+
+        ServerPlayer player = createMockPlayer(helper);
+        PartPos partPos = PartPos.of(level, helper.absolutePos(POS), Direction.WEST);
+        // Use dirt block instead of stone - should NOT trigger the advancement
+        ItemStack variable = createVariableForValue(level, ValueTypes.OBJECT_BLOCK,
+                ValueObjectTypeBlock.ValueBlock.of(Blocks.DIRT.defaultBlockState()));
+        placeVariableWithPlayer(level, partPos, TunnelAspects.Write.World.BLOCK_BLOCK_IMPORT, variable, player);
+
+        assertAdvancementNotDone(helper, player, Reference.MOD_ID, "break_stone/break_stone");
         helper.succeed();
     }
 
@@ -308,6 +440,25 @@ public class GameTestsAdvancements {
     }
 
     @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
+    public void testAdvancementDropAllItemsNegative(GameTestHelper helper) {
+        Level level = helper.getLevel();
+        helper.setBlock(POS, RegistryEntries.BLOCK_CABLE.value());
+        PartHelpers.addPart(level, helper.absolutePos(POS), Direction.WEST,
+                org.cyclops.integratedtunnels.part.PartTypes.EXPORTER_WORLD_ITEM,
+                new ItemStack(org.cyclops.integratedtunnels.part.PartTypes.EXPORTER_WORLD_ITEM.getItem()));
+
+        ServerPlayer player = createMockPlayer(helper);
+        PartPos partPos = PartPos.of(level, helper.absolutePos(POS), Direction.WEST);
+        // Use false instead of true - should NOT trigger the advancement
+        ItemStack variable = createVariableForValue(level, ValueTypes.BOOLEAN,
+                ValueTypeBoolean.ValueBoolean.of(false));
+        placeVariableWithPlayer(level, partPos, TunnelAspects.Write.World.ENTITYITEM_BOOLEAN_EXPORT, variable, player);
+
+        assertAdvancementNotDone(helper, player, Reference.MOD_ID, "drop_all_items/drop_all_items");
+        helper.succeed();
+    }
+
+    @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
     public void testAdvancementExportEnchantableItems(GameTestHelper helper) {
         Level level = helper.getLevel();
         helper.setBlock(POS, RegistryEntries.BLOCK_CABLE.value());
@@ -327,6 +478,25 @@ public class GameTestsAdvancements {
     }
 
     @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
+    public void testAdvancementExportEnchantableItemsNegative(GameTestHelper helper) {
+        Level level = helper.getLevel();
+        helper.setBlock(POS, RegistryEntries.BLOCK_CABLE.value());
+        PartHelpers.addPart(level, helper.absolutePos(POS), Direction.WEST,
+                org.cyclops.integratedtunnels.part.PartTypes.EXPORTER_ITEM,
+                new ItemStack(org.cyclops.integratedtunnels.part.PartTypes.EXPORTER_ITEM.getItem()));
+
+        ServerPlayer player = createMockPlayer(helper);
+        PartPos partPos = PartPos.of(level, helper.absolutePos(POS), Direction.WEST);
+        // Use a different operator - not itemstack_enchantable - should NOT trigger the advancement
+        ItemStack variable = createVariableForValue(level, ValueTypes.OPERATOR,
+                ValueTypeOperator.ValueOperator.of(Operators.OBJECT_ITEMSTACK_ISENCHANTED));
+        placeVariableWithPlayer(level, partPos, TunnelAspects.Write.Item.PREDICATE_EXPORT, variable, player);
+
+        assertAdvancementNotDone(helper, player, Reference.MOD_ID, "export_enchantable_items/export_enchantable_items");
+        helper.succeed();
+    }
+
+    @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
     public void testAdvancementExportItemsLimit(GameTestHelper helper) {
         Level level = helper.getLevel();
         helper.setBlock(POS, RegistryEntries.BLOCK_CABLE.value());
@@ -341,6 +511,24 @@ public class GameTestsAdvancements {
         placeVariableWithPlayer(level, partPos, TunnelAspects.Write.Item.BOOLEAN_EXPORT, variable, player);
 
         assertAdvancement(helper, player, Reference.MOD_ID, "export_items_limit/export_items_limit");
+        helper.succeed();
+    }
+
+    @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
+    public void testAdvancementExportItemsLimitNegative(GameTestHelper helper) {
+        Level level = helper.getLevel();
+        helper.setBlock(POS, RegistryEntries.BLOCK_CABLE.value());
+        PartHelpers.addPart(level, helper.absolutePos(POS), Direction.WEST,
+                org.cyclops.integratedtunnels.part.PartTypes.EXPORTER_ITEM,
+                new ItemStack(org.cyclops.integratedtunnels.part.PartTypes.EXPORTER_ITEM.getItem()));
+
+        ServerPlayer player = createMockPlayer(helper);
+        PartPos partPos = PartPos.of(level, helper.absolutePos(POS), Direction.WEST);
+        // Use relational_gt instead of relational_lt - should NOT trigger the advancement
+        ItemStack variable = createVariableForOperator(level, Operators.RELATIONAL_GT, new int[0]);
+        placeVariableWithPlayer(level, partPos, TunnelAspects.Write.Item.BOOLEAN_EXPORT, variable, player);
+
+        assertAdvancementNotDone(helper, player, Reference.MOD_ID, "export_items_limit/export_items_limit");
         helper.succeed();
     }
 
@@ -375,6 +563,25 @@ public class GameTestsAdvancements {
     }
 
     @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
+    public void testAdvancementFilterStorageDayNegative(GameTestHelper helper) {
+        Level level = helper.getLevel();
+        helper.setBlock(POS, RegistryEntries.BLOCK_CABLE.value());
+        PartHelpers.addPart(level, helper.absolutePos(POS), Direction.WEST,
+                org.cyclops.integratedtunnels.part.PartTypes.INTERFACE_FILTERING_ITEM,
+                new ItemStack(org.cyclops.integratedtunnels.part.PartTypes.INTERFACE_FILTERING_ITEM.getItem()));
+
+        ServerPlayer player = createMockPlayer(helper);
+        PartPos partPos = PartPos.of(level, helper.absolutePos(POS), Direction.WEST);
+        // Use a plain value_type boolean variable instead of an aspect reader - should NOT trigger the advancement
+        ItemStack variable = createVariableForValue(level, ValueTypes.BOOLEAN,
+                ValueTypeBoolean.ValueBoolean.of(true));
+        placeVariableWithPlayer(level, partPos, TunnelAspects.Write.ItemFilter.BOOLEAN_SET_FILTER, variable, player);
+
+        assertAdvancementNotDone(helper, player, Reference.MOD_ID, "filter_storage_day/filter_storage_day");
+        helper.succeed();
+    }
+
+    @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
     public void testAdvancementFilterStorageMod(GameTestHelper helper) {
         Level level = helper.getLevel();
         helper.setBlock(POS, RegistryEntries.BLOCK_CABLE.value());
@@ -389,6 +596,24 @@ public class GameTestsAdvancements {
         placeVariableWithPlayer(level, partPos, TunnelAspects.Write.ItemFilter.PREDICATE_SET_FILTER, variable, player);
 
         assertAdvancement(helper, player, Reference.MOD_ID, "filter_storage_mod/filter_storage_mod");
+        helper.succeed();
+    }
+
+    @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
+    public void testAdvancementFilterStorageModNegative(GameTestHelper helper) {
+        Level level = helper.getLevel();
+        helper.setBlock(POS, RegistryEntries.BLOCK_CABLE.value());
+        PartHelpers.addPart(level, helper.absolutePos(POS), Direction.WEST,
+                org.cyclops.integratedtunnels.part.PartTypes.INTERFACE_FILTERING_ITEM,
+                new ItemStack(org.cyclops.integratedtunnels.part.PartTypes.INTERFACE_FILTERING_ITEM.getItem()));
+
+        ServerPlayer player = createMockPlayer(helper);
+        PartPos partPos = PartPos.of(level, helper.absolutePos(POS), Direction.WEST);
+        // Use relational_lt instead of operator_pipe - should NOT trigger the advancement
+        ItemStack variable = createVariableForOperator(level, Operators.RELATIONAL_LT, new int[0]);
+        placeVariableWithPlayer(level, partPos, TunnelAspects.Write.ItemFilter.PREDICATE_SET_FILTER, variable, player);
+
+        assertAdvancementNotDone(helper, player, Reference.MOD_ID, "filter_storage_mod/filter_storage_mod");
         helper.succeed();
     }
 
@@ -411,6 +636,25 @@ public class GameTestsAdvancements {
     }
 
     @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
+    public void testAdvancementImportAllItemsNegative(GameTestHelper helper) {
+        Level level = helper.getLevel();
+        helper.setBlock(POS, RegistryEntries.BLOCK_CABLE.value());
+        PartHelpers.addPart(level, helper.absolutePos(POS), Direction.WEST,
+                org.cyclops.integratedtunnels.part.PartTypes.IMPORTER_ITEM,
+                new ItemStack(org.cyclops.integratedtunnels.part.PartTypes.IMPORTER_ITEM.getItem()));
+
+        ServerPlayer player = createMockPlayer(helper);
+        PartPos partPos = PartPos.of(level, helper.absolutePos(POS), Direction.WEST);
+        // Use false instead of true - should NOT trigger the advancement
+        ItemStack variable = createVariableForValue(level, ValueTypes.BOOLEAN,
+                ValueTypeBoolean.ValueBoolean.of(false));
+        placeVariableWithPlayer(level, partPos, TunnelAspects.Write.Item.BOOLEAN_IMPORT, variable, player);
+
+        assertAdvancementNotDone(helper, player, Reference.MOD_ID, "import_all_items/import_all_items");
+        helper.succeed();
+    }
+
+    @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
     public void testAdvancementImportItemsList(GameTestHelper helper) {
         Level level = helper.getLevel();
         helper.setBlock(POS, RegistryEntries.BLOCK_CABLE.value());
@@ -425,6 +669,25 @@ public class GameTestsAdvancements {
         placeVariableWithPlayer(level, partPos, TunnelAspects.Write.Item.LIST_IMPORT, variable, player);
 
         assertAdvancement(helper, player, Reference.MOD_ID, "import_items_list/import_items_list");
+        helper.succeed();
+    }
+
+    @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
+    public void testAdvancementImportItemsListNegative(GameTestHelper helper) {
+        Level level = helper.getLevel();
+        helper.setBlock(POS, RegistryEntries.BLOCK_CABLE.value());
+        PartHelpers.addPart(level, helper.absolutePos(POS), Direction.WEST,
+                org.cyclops.integratedtunnels.part.PartTypes.IMPORTER_ITEM,
+                new ItemStack(org.cyclops.integratedtunnels.part.PartTypes.IMPORTER_ITEM.getItem()));
+
+        ServerPlayer player = createMockPlayer(helper);
+        PartPos partPos = PartPos.of(level, helper.absolutePos(POS), Direction.WEST);
+        // Use boolean_import aspect instead of list_import - should NOT trigger the advancement
+        ItemStack variable = createVariableForValue(level, ValueTypes.BOOLEAN,
+                ValueTypeBoolean.ValueBoolean.of(true));
+        placeVariableWithPlayer(level, partPos, TunnelAspects.Write.Item.BOOLEAN_IMPORT, variable, player);
+
+        assertAdvancementNotDone(helper, player, Reference.MOD_ID, "import_items_list/import_items_list");
         helper.succeed();
     }
 
@@ -447,6 +710,25 @@ public class GameTestsAdvancements {
     }
 
     @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
+    public void testAdvancementPickupItemsLimitNegative(GameTestHelper helper) {
+        Level level = helper.getLevel();
+        helper.setBlock(POS, RegistryEntries.BLOCK_CABLE.value());
+        PartHelpers.addPart(level, helper.absolutePos(POS), Direction.WEST,
+                org.cyclops.integratedtunnels.part.PartTypes.IMPORTER_WORLD_ITEM,
+                new ItemStack(org.cyclops.integratedtunnels.part.PartTypes.IMPORTER_WORLD_ITEM.getItem()));
+
+        ServerPlayer player = createMockPlayer(helper);
+        PartPos partPos = PartPos.of(level, helper.absolutePos(POS), Direction.WEST);
+        // Use integer 3 instead of 5 - should NOT trigger the advancement
+        ItemStack variable = createVariableForValue(level, ValueTypes.INTEGER,
+                ValueTypeInteger.ValueInteger.of(3));
+        placeVariableWithPlayer(level, partPos, TunnelAspects.Write.World.ENTITYITEM_INTEGER_IMPORT, variable, player);
+
+        assertAdvancementNotDone(helper, player, Reference.MOD_ID, "pickup_items_limit/pickup_items_limit");
+        helper.succeed();
+    }
+
+    @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
     public void testAdvancementPlaceLogwood(GameTestHelper helper) {
         Level level = helper.getLevel();
         helper.setBlock(POS, RegistryEntries.BLOCK_CABLE.value());
@@ -462,6 +744,24 @@ public class GameTestsAdvancements {
         placeVariableWithPlayer(level, partPos, TunnelAspects.Write.World.BLOCK_LISTITEMSTACK_EXPORT, variable, player);
 
         assertAdvancement(helper, player, Reference.MOD_ID, "place_logwood/place_logwood");
+        helper.succeed();
+    }
+
+    @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
+    public void testAdvancementPlaceLogwoodNegative(GameTestHelper helper) {
+        Level level = helper.getLevel();
+        helper.setBlock(POS, RegistryEntries.BLOCK_CABLE.value());
+        PartHelpers.addPart(level, helper.absolutePos(POS), Direction.WEST,
+                org.cyclops.integratedtunnels.part.PartTypes.EXPORTER_WORLD_BLOCK,
+                new ItemStack(org.cyclops.integratedtunnels.part.PartTypes.EXPORTER_WORLD_BLOCK.getItem()));
+
+        ServerPlayer player = createMockPlayer(helper);
+        PartPos partPos = PartPos.of(level, helper.absolutePos(POS), Direction.WEST);
+        // Use relational_lt instead of string_tag - should NOT trigger the advancement
+        ItemStack variable = createVariableForOperator(level, Operators.RELATIONAL_LT, new int[0]);
+        placeVariableWithPlayer(level, partPos, TunnelAspects.Write.World.BLOCK_LISTITEMSTACK_EXPORT, variable, player);
+
+        assertAdvancementNotDone(helper, player, Reference.MOD_ID, "place_logwood/place_logwood");
         helper.succeed();
     }
 
