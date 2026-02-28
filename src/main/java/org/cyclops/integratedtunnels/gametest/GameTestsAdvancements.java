@@ -426,9 +426,9 @@ public class GameTestsAdvancements {
 
         ServerPlayer player = createMockPlayer(helper);
         PartPos partPos = PartPos.of(level, helper.absolutePos(POS), Direction.WEST);
-        // The advancement uses "integrateddynamics:string_tag" which may not be in the current registry;
-        // the predicate falls back to matching any operator variable when the operator is not found.
-        ItemStack variable = createVariableForOperator(level, Operators.OBJECT_ITEMSTACK_TAG, new int[0]);
+        // The advancement requires "integrateddynamics:string_tag" = Operators.OBJECT_ITEMSTACK_TAG_STACKS,
+        // which takes a String (tag name) input and returns matching item stacks.
+        ItemStack variable = createVariableForOperator(level, Operators.OBJECT_ITEMSTACK_TAG_STACKS, new int[0]);
         placeVariableWithPlayer(level, partPos, TunnelAspects.Write.World.BLOCK_LISTITEMSTACK_EXPORT, variable, player);
 
         assertAdvancement(helper, player, Reference.MOD_ID, "place_logwood/place_logwood");
