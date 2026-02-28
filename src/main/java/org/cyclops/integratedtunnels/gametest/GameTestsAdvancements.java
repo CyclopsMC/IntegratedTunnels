@@ -114,6 +114,17 @@ public class GameTestsAdvancements {
         );
     }
 
+    /**
+     * Asserts that a given advancement (by namespace:path) has NOT been completed by the player.
+     */
+    private static void assertAdvancementNotDone(GameTestHelper helper, ServerPlayer player, String namespace, String path) {
+        ResourceLocation advancementId = ResourceLocation.fromNamespaceAndPath(namespace, path);
+        AdvancementHolder advancement = helper.getLevel().getServer().getAdvancements().get(advancementId);
+        if (advancement != null && player.getAdvancements().getOrStartProgress(advancement).isDone()) {
+            throw new GameTestAssertException("Advancement should NOT have been obtained: " + advancementId);
+        }
+    }
+
     // ===== Root advancement (minecraft:inventory_changed) =====
 
     @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
@@ -256,6 +267,25 @@ public class GameTestsAdvancements {
         placeVariableWithPlayer(level, partPos, TunnelAspects.Write.Player.CLICK_ITEM_ITEMSTACK, variable, player);
 
         assertAdvancement(helper, player, Reference.MOD_ID, "click_sword/click_sword");
+        helper.succeed();
+    }
+
+    @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
+    public void testAdvancementClickSwordNegative(GameTestHelper helper) {
+        Level level = helper.getLevel();
+        helper.setBlock(POS, RegistryEntries.BLOCK_CABLE.value());
+        PartHelpers.addPart(level, helper.absolutePos(POS), Direction.WEST,
+                org.cyclops.integratedtunnels.part.PartTypes.PLAYER_SIMULATOR,
+                new ItemStack(org.cyclops.integratedtunnels.part.PartTypes.PLAYER_SIMULATOR.getItem()));
+
+        ServerPlayer player = createMockPlayer(helper);
+        PartPos partPos = PartPos.of(level, helper.absolutePos(POS), Direction.WEST);
+        // Use bone_meal instead of diamond_sword - should NOT trigger the advancement
+        ItemStack variable = createVariableForValue(level, ValueTypes.OBJECT_ITEMSTACK,
+                ValueObjectTypeItemStack.ValueItemStack.of(new ItemStack(Items.BONE_MEAL)));
+        placeVariableWithPlayer(level, partPos, TunnelAspects.Write.Player.CLICK_ITEM_ITEMSTACK, variable, player);
+
+        assertAdvancementNotDone(helper, player, Reference.MOD_ID, "click_sword/click_sword");
         helper.succeed();
     }
 
