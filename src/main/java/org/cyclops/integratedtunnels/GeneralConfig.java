@@ -1,5 +1,6 @@
 package org.cyclops.integratedtunnels;
 
+import com.google.common.collect.Lists;
 import net.neoforged.fml.config.ModConfig;
 import org.cyclops.cyclopscore.config.ConfigurableProperty;
 import org.cyclops.cyclopscore.config.extendedconfig.DummyConfig;
@@ -94,7 +95,7 @@ public class GeneralConfig extends DummyConfig {
     public static int playerSimulatorBaseConsumptionDisabled = 1;
 
     @ConfigurableProperty(category = "core", comment = "A list of regex patterns for block id's that should not be importable by world block importers. Example patterns: 'minecraft:bedrock', 'minecraft:.*_portal.*', '.*:end_.*'", configLocation = ModConfig.Type.SERVER)
-    public static List<String> blockImporterBlacklist = List.of();
+    public static List<String> blockImporterBlacklist = Lists.newArrayList();
 
     public GeneralConfig() {
         super(IntegratedTunnels._instance, "general");
