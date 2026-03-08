@@ -136,6 +136,7 @@ public class IntegratedTunnels extends ModBaseNeoForge<IntegratedTunnels> {
     @Override
     public Class<?>[] getGameTestClasses() {
         return new Class<?>[] {
+                GameTestsAdvancements.class,
                 GameTestsEnergy.class,
                 GameTestsFluids.class,
                 GameTestsItems.class,

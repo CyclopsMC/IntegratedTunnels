@@ -31,7 +31,7 @@
           "value": {
             "type": "itemstack",
             "item": {
-              "item": "minecraft:diamond_sword"
+              "items": "minecraft:diamond_sword"
             }
           }
         }

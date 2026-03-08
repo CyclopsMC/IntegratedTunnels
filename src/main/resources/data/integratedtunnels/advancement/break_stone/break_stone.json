@@ -31,7 +31,7 @@
           "value": {
             "type": "serialized",
             "value_type": "integrateddynamics:block",
-            "value": "{Name:\"minecraft:stone\"}"
+            "value": "{v:{Name:\"minecraft:stone\"}}"
           }
         }
       }
