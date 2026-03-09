@@ -1,0 +1,6 @@
+As always, don't forget to backup your world before updating!
+Requires CyclopsCore version 1.26.0 or higher.
+
+Fixes:
+* Set blockImporterBlacklist default value to mutable ArrayList (#358), Closes #357
+* Fix ItemPredicate field name in click_sword advancement causing it to trigger for any item (#355), Closes CyclopsMC/IntegratedDynamics#1606

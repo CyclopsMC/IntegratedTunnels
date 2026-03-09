@@ -1,8 +1,16 @@
 # Changelog for Minecraft 1.21.1
 All notable changes to this project will be documented in this file.
 
+<a name="1.21.1-1.9.4"></a>
+## [1.21.1-1.9.4](https://github.com/CyclopsMC/IntegratedTunnels/compare/1.21.1-1.9.3...1.21.1-1.9.4) - 2026-03-09 16:16:19
+
+
+### Fixed
+* Set blockImporterBlacklist default value to mutable ArrayList (#358), Closes #357
+* Fix ItemPredicate field name in click_sword advancement causing it to trigger for any item (#355), Closes CyclopsMC/IntegratedDynamics#1606
+
 <a name="1.21.1-1.9.3"></a>
-## [1.21.1-1.9.3](https://github.com/CyclopsMC/IntegratedTunnels/compare/1.21.1-1.9.2...1.21.1-1.9.3) - 2026-02-17 11:04:39
+## [1.21.1-1.9.3](https://github.com/CyclopsMC/IntegratedTunnels/compare/1.21.1-1.9.2...1.21.1-1.9.3) - 2026-02-17 11:04:39 +0100
 
 
 ### Added
