@@ -1,5 +1,5 @@
 plugins {
-    id 'net.neoforged.moddev' version '2.0.137'
+    id 'net.neoforged.moddev' version '2.0.141'
     id 'net.darkhax.curseforgegradle' version '1.1.28'
 	id 'com.github.kt3k.coveralls' version '2.12.0'
     id 'com.diffplug.spotless' version '6.25.0'
@@ -132,18 +132,18 @@ dependencies {
 
     // Add something like 'cyclopscore_version_local=0.1.0-DEV' to your gradle.properties if you want to use a custom local CyclopsCore version.
     if(secrets.cyclopscore_version_local) {
-        implementation "org.cyclops.cyclopscore:cyclopscore-${project.minecraft_version}-neoforge:${secrets.cyclopscore_version_local}:deobf"
+        implementation "org.cyclops.cyclopscore:cyclopscore-${project.minecraft_version}-neoforge:${secrets.cyclopscore_version_local}"
     } else {
-		implementation "org.cyclops.cyclopscore:cyclopscore-${project.minecraft_version}-neoforge:${project.cyclopscore_version}:deobf"
+		implementation "org.cyclops.cyclopscore:cyclopscore-${project.minecraft_version}-neoforge:${project.cyclopscore_version}"
     }
 	
     // Add something like 'integrateddynamics_version_local=0.1.0-DEV' to your gradle.properties if you want to use a custom local Integrated Tunnels Compat version.
     if(secrets.integrateddynamics_version_local) {
-        implementation("org.cyclops.integrateddynamics:integrateddynamics-${project.minecraft_version}-neoforge:${secrets.integrateddynamics_version_local}:deobf") {
+        implementation("org.cyclops.integrateddynamics:integrateddynamics-${project.minecraft_version}-neoforge:${secrets.integrateddynamics_version_local}") {
             transitive = false
         }
     } else {
-        implementation("org.cyclops.integrateddynamics:integrateddynamics-${project.minecraft_version}-neoforge:${project.integrateddynamics_version}:deobf") {
+        implementation("org.cyclops.integrateddynamics:integrateddynamics-${project.minecraft_version}-neoforge:${project.integrateddynamics_version}") {
             transitive = false
         }
     }
@@ -161,9 +161,9 @@ dependencies {
 //    }
 
     if(secrets.commoncapabilities_version_local) {
-        implementation "org.cyclops.commoncapabilities:commoncapabilities-${project.minecraft_version}-neoforge:${secrets.commoncapabilities_version_local}:deobf"
+        implementation "org.cyclops.commoncapabilities:commoncapabilities-${project.minecraft_version}-neoforge:${secrets.commoncapabilities_version_local}"
     } else {
-        implementation("org.cyclops.commoncapabilities:commoncapabilities-${project.minecraft_version}-neoforge:${project.commoncapabilities_version}:deobf") { // https://dl.bintray.com/cyclopsmc/dev/org/cyclops/commoncapabilities/CommonCapabilities/
+        implementation("org.cyclops.commoncapabilities:commoncapabilities-${project.minecraft_version}-neoforge:${project.commoncapabilities_version}") { // https://dl.bintray.com/cyclopsmc/dev/org/cyclops/commoncapabilities/CommonCapabilities/
             transitive = false
         }
     }
@@ -180,11 +180,6 @@ test {
 
 neoForge {
     version = "${neoforge_version}"
-
-    parchment {
-        mappingsVersion = "${parchment_version}"
-        minecraftVersion = "${parchment_minecraft_version}"
-    }
 
     // Automatically enable neoforge AccessTransformers if the file exists
     def at = file('src/main/resources/META-INF/accesstransformer.cfg')
@@ -246,23 +241,6 @@ javadoc {
     options.addStringOption('Xdoclint:accessibility,html,reference,syntax', '-quiet')
 }
 
-task deobfJar(type: Jar) {
-    from sourceSets.main.output
-    archiveClassifier.set('deobf')
-    manifest {
-        attributes([
-                "FMLAT": "accesstransformer.cfg",
-                "Specification-Title": "${secrets.name}",
-                "Specification-Vendor": "rubensworks",
-                "Specification-Version": "${project.mod_version}",
-                "Implementation-Title": "${secrets.name}",
-                "Implementation-Version": "${project.mod_version}",
-                "Implementation-Vendor" :"rubensworks",
-                "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
-        ])
-    }
-}
-
 task sourcesJar(type: Jar) {
     duplicatesStrategy(DuplicatesStrategy.FAIL)
     archiveClassifier.set('sources')
@@ -288,7 +266,6 @@ jar {
 
 artifacts {
     archives shadowJar
-    archives deobfJar
     archives sourcesJar
     archives javadocJar
 }
@@ -382,8 +359,8 @@ publishing {
 
     publications { PublicationContainer publicationContainer ->
         publicationContainer.register("maven", MavenPublication) { MavenPublication publication ->
-            publication.artifacts = [shadowJar, javadocJar, deobfJar, sourcesJar]
-            publication.artifactId = project.archivesBaseName.toLowerCase() // GH can't handle uppercase...
+            publication.artifacts = [shadowJar, javadocJar, sourcesJar]
+            publication.artifactId = project.base.archivesName.get().toLowerCase() // GH can't handle uppercase...
         }
     }
 }
@@ -411,7 +388,7 @@ jacocoTestReport {
 // Also measure coverage for game tests
 jacocoTestReport.dependsOn test, runGameTestServer
 jacoco {
-    toolVersion = "0.8.12"
+    toolVersion = "0.8.14"
     applyTo runGameTestServer
 }
 

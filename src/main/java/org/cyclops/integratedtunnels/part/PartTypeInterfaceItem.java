@@ -266,12 +266,12 @@ public class PartTypeInterfaceItem extends PartTypeInterfacePositionedAddon<IIte
         }
 
         @Override
-        public int getLimit() {
+        public long getLimit() {
             if (!state.isNetworkAndPositionValid()) {
                 return 0;
             }
             state.disablePosition();
-            int limit = 0;
+            long limit = 0;
             ResourceHandler<ItemResource> itemHandler = getItemHandler();
             for (int i = 0; i < itemHandler.size(); i++) {
                 limit += itemHandler.getCapacityAsInt(i, ItemResource.EMPTY);

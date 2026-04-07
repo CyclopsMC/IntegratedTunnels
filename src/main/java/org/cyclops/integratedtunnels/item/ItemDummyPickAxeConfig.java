@@ -8,6 +8,7 @@ import org.cyclops.integratedtunnels.IntegratedTunnels;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.function.Supplier;
 
 /**
  * Config for a dummy pickaxe that can harvest everything.
@@ -24,7 +25,7 @@ public class ItemDummyPickAxeConfig extends ItemConfigCommon<IModBase> {
     }
 
     @Override
-    public Collection<ItemStack> getDefaultCreativeTabEntries() {
+    public Collection<Supplier<ItemStack>> getDefaultCreativeTabEntries() {
         return Collections.emptyList();
     }
 }

@@ -1,7 +1,7 @@
 package org.cyclops.integratedtunnels.core.part;
 
 import com.google.common.collect.Lists;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.input.CharacterEvent;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
@@ -97,16 +97,16 @@ public class ContainerScreenInterfaceSettings extends ContainerScreenPartSetting
     }
 
     @Override
-    protected void renderBg(GuiGraphics guiGraphics, float partialTicks, int mouseX, int mouseY) {
-        super.renderBg(guiGraphics, partialTicks, mouseX, mouseY);
-        guiGraphics.drawString(font, IModHelpers.get().getL10NHelpers().localize("gui.integratedtunnels.partsettings.channel.interface"),
+    public void extractBackground(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTicks) {
+        super.extractBackground(guiGraphics, mouseX, mouseY, partialTicks);
+        guiGraphics.text(font, IModHelpers.get().getL10NHelpers().localize("gui.integratedtunnels.partsettings.channel.interface"),
                 leftPos + 8, topPos + 112, IModHelpers.get().getBaseHelpers().RGBAToInt(0, 0, 0, 255), false);
-        numberFieldChannelInterface.render(guiGraphics, mouseX, mouseY, partialTicks);
+        numberFieldChannelInterface.extractRenderState(guiGraphics, mouseX, mouseY, partialTicks);
     }
 
     @Override
-    protected void renderLabels(GuiGraphics guiGraphics, int mouseX, int mouseY) {
-        super.renderLabels(guiGraphics, mouseX, mouseY);
+    protected void extractLabels(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY) {
+        super.extractLabels(guiGraphics, mouseX, mouseY);
 
         if (isHovering(-20, 0, 18, 18, mouseX, mouseY)) {
             drawTooltip(Lists.newArrayList(Component.translatable("gui.integrateddynamics.part_offsets")), guiGraphics, mouseX, mouseY);

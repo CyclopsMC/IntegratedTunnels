@@ -76,7 +76,7 @@ public class TunnelAspectWriteBuilders {
         Entity entity = null;
         if (entities.size() > 0 && entityIndex < entities.size()) {
             if (entityIndex == -1) {
-                entity = entities.get(target.getPos().getLevel(true).random.nextInt(entities.size()));
+                entity = entities.get(target.getPos().getLevel(true).getRandom().nextInt(entities.size()));
             } else {
                 entity = entities.get(entityIndex);
             }

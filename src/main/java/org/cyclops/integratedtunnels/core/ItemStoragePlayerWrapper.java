@@ -93,7 +93,7 @@ public class ItemStoragePlayerWrapper implements IIngredientComponentStorage<Ite
 
     protected Entity getEntity(List<Entity> entities) {
         if (this.entityIndex < 0) {
-            return entities.get(world.random.nextInt(entities.size()));
+            return entities.get(world.getRandom().nextInt(entities.size()));
         }
         return entities.get(Math.min(this.entityIndex, entities.size() - 1));
     }
@@ -203,7 +203,7 @@ public class ItemStoragePlayerWrapper implements IIngredientComponentStorage<Ite
             List<Entity> entities = world.getEntitiesOfClass(Entity.class, new AABB(pos));
             if (entities.size() > 0) {
                 Entity entity = getEntity(entities);
-                InteractionResult actionResult = player.interactOn(entity, hand);
+                InteractionResult actionResult = player.interactOn(entity, hand, entity.position());
 
                 // Remove simulated player again from villager, to avoid locked villagers.
                 if (entity instanceof Villager villager) {

@@ -7,7 +7,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.ShulkerBoxBlock;
 import net.minecraft.world.level.block.entity.RandomizableContainerBlockEntity;
 import net.minecraft.world.level.block.entity.ShulkerBoxBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -29,7 +28,7 @@ public class BlockBreakHandlerShulkerBox implements IBlockBreakHandler {
         return IModHelpers.get().getBlockEntityHelpers().get(world, pos, ShulkerBoxBlockEntity.class)
                 .map(tile -> {
                     if (!tile.isEmpty()) {
-                        ItemStack itemStack = ShulkerBoxBlock.getColoredItemStack(tile.getColor());
+                        ItemStack itemStack = new ItemStack(blockState.getBlock());
                         BlockItem.updateCustomBlockEntityTag(world, player, pos, itemStack);
 
                         if (tile.hasCustomName()) {

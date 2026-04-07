@@ -190,7 +190,7 @@ public class TunnelFluidHelpers {
             if (prototype == null) {
                 return count == 0 ? null : new FluidStack(Fluids.WATER, count);
             } else {
-                prototype = new FluidStack(prototype.getFluidHolder(), count, prototype.getComponentsPatch());
+                prototype = new FluidStack(prototype.typeHolder(), count, prototype.getComponentsPatch());
             }
         }
         return prototype;
