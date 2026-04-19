@@ -194,7 +194,6 @@ neoForge {
         }
         server {
             server()
-            programArgument '--nogui'
         }
         gameTestServer {
             type = "gameTestServer"
