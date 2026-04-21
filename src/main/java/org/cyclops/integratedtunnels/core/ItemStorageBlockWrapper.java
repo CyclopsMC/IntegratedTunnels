@@ -23,7 +23,7 @@ import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.event.level.BlockEvent;
+import net.neoforged.neoforge.event.level.block.BreakBlockEvent;
 import net.neoforged.neoforge.transfer.transaction.SnapshotJournal;
 import net.neoforged.neoforge.transfer.transaction.TransactionContext;
 import org.cyclops.commoncapabilities.api.ingredient.IIngredientMatcher;
@@ -189,7 +189,7 @@ public class ItemStorageBlockWrapper implements IIngredientComponentStorage<Item
                 if (blockBreakHandler != null) {
                     cachedDrops = blockBreakHandler.getDrops(blockState, world, pos, player);
                 } else {
-                    BlockEvent.BreakEvent blockBreakEvent = new BlockEvent.BreakEvent(world, pos, blockState, player);
+                    BreakBlockEvent blockBreakEvent = new BreakBlockEvent(world, pos, blockState, player);
                     if (!NeoForge.EVENT_BUS.post(blockBreakEvent).isCanceled()) {
                         List<ItemStack> drops = Block.getDrops(blockState, world, pos, world.getBlockEntity(pos), null, ItemDummyPickAxe.getItemStack(silkTouch, fortune));
                         if (drops.size() == 0) {
