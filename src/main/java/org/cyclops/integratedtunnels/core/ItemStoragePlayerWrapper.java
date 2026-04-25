@@ -236,7 +236,8 @@ public class ItemStoragePlayerWrapper implements IIngredientComponentStorage<Ite
                         return stack;
                     }
                     if (actionresult instanceof InteractionResult.Success success) {
-                        if (success.itemContext().heldItemTransformedTo().isEmpty()) {
+                        ItemStack heldItemTransformedTo = success.itemContext().heldItemTransformedTo();
+                        if (heldItemTransformedTo == null || heldItemTransformedTo.isEmpty()) {
                             PlayerHelpers.setHeldItemSilent(player, hand, ItemStack.EMPTY);
                             EventHooks.onPlayerDestroyItem(player, copyBeforeUse, hand);
                         } else {
