@@ -19,7 +19,18 @@ description="${description}"
     versionRange="[${cyclopscore_version_semver},)"
     ordering="NONE"
     side="BOTH"
-
+[[dependencies.${mod_id}]]
+    modId="integrateddynamics"
+    type="required"
+    versionRange="[${integrateddynamics_version_semver},)"
+    ordering="NONE"
+    side="BOTH"
+[[dependencies.${mod_id}]]
+    modId="commoncapabilities"
+    type="required"
+    versionRange="[${commoncapabilities_version_semver},)"
+    ordering="NONE"
+    side="BOTH"
 [[dependencies.${mod_id}]]
     modId="neoforge"
     type="required"

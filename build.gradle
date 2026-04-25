@@ -143,7 +143,7 @@ dependencies {
             transitive = false
         }
     } else {
-        implementation("org.cyclops.integrateddynamics:integrateddynamics-${project.integrateddynamics_version}") {
+        implementation("org.cyclops.integrateddynamics:integrateddynamics-${project.minecraft_version}-neoforge:${project.integrateddynamics_version}") {
             transitive = false
         }
     }
@@ -162,7 +162,7 @@ dependencies {
     if(secrets.commoncapabilities_version_local) {
         implementation "org.cyclops.commoncapabilities:commoncapabilities-${project.minecraft_version}-neoforge:${secrets.commoncapabilities_version_local}"
     } else {
-        implementation("org.cyclops.commoncapabilities:commoncapabilities-${project.commoncapabilities_version}") { // https://dl.bintray.com/cyclopsmc/dev/org/cyclops/commoncapabilities/CommonCapabilities/
+        implementation("org.cyclops.commoncapabilities:commoncapabilities-${project.minecraft_version}-neoforge:${project.commoncapabilities_version}") { // https://dl.bintray.com/cyclopsmc/dev/org/cyclops/commoncapabilities/CommonCapabilities/
             transitive = false
         }
     }
