@@ -4,12 +4,16 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.LeverBlock;
 import net.minecraft.world.level.block.entity.ChestBlockEntity;
+import net.minecraft.world.level.portal.DimensionTransition;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import org.cyclops.integrateddynamics.RegistryEntries;
@@ -23,6 +27,7 @@ import org.cyclops.integrateddynamics.core.evaluate.variable.ValueTypeBoolean;
 import org.cyclops.integrateddynamics.core.evaluate.variable.ValueTypes;
 import org.cyclops.integrateddynamics.core.helper.PartHelpers;
 import org.cyclops.integratedtunnels.Reference;
+import org.cyclops.integratedtunnels.core.ExtendedFakePlayer;
 import org.cyclops.integratedtunnels.part.PartTypes;
 import org.cyclops.integratedtunnels.part.aspect.TunnelAspectWriteBuilders;
 import org.cyclops.integratedtunnels.part.aspect.TunnelAspects;
@@ -37,6 +42,20 @@ public class GameTestsPlayerSimulator {
     public static final String TEMPLATE_EMPTY = "empty10";
     public static final int TIMEOUT = 2000;
     public static final BlockPos POS = BlockPos.ZERO.offset(2, 1, 2);
+
+    @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
+    public void testPlayerSimulatorFakePlayerChangeDimensionNoOp(GameTestHelper helper) {
+        ServerLevel level = helper.getLevel();
+        ServerLevel endLevel = level.getServer().getLevel(Level.END);
+        helper.assertTrue(endLevel != null, "The End level is not available");
+
+        ExtendedFakePlayer fakePlayer = new ExtendedFakePlayer(level);
+        Entity returnedEntity = fakePlayer.changeDimension(new DimensionTransition(endLevel, fakePlayer, DimensionTransition.DO_NOTHING));
+
+        helper.assertValueEqual(returnedEntity, fakePlayer, "Fake player changeDimension return value is incorrect");
+        helper.assertValueEqual(fakePlayer.level(), level, "Fake player changed dimensions unexpectedly");
+        helper.succeed();
+    }
 
     @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
     public void testPlayerSimulatorMilkCow(GameTestHelper helper) {
