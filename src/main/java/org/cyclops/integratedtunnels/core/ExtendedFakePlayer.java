@@ -4,12 +4,15 @@ import com.mojang.authlib.GameProfile;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.portal.DimensionTransition;
 import net.neoforged.neoforge.common.CommonHooks;
 import net.neoforged.neoforge.common.util.FakePlayer;
 import net.neoforged.neoforge.event.EventHooks;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
 
@@ -96,5 +99,10 @@ public class ExtendedFakePlayer extends FakePlayer {
     @Override
     public void startSleeping(BlockPos blockPos) {
         // Do nothing
+    }
+
+    @Override
+    public @Nullable Entity changeDimension(DimensionTransition transition) {
+        return this;
     }
 }
