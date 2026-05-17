@@ -26,9 +26,6 @@ public class GeneralConfig extends DummyConfigCommon<IModBase> {
     @ConfigurablePropertyCommon(category = "core", comment = "If particles should be shown and sounds should be played when tunnels are interacting with the world.", isCommandable = true)
     public static boolean worldInteractionEvents = true;
 
-    @ConfigurablePropertyCommon(category = "core", comment = "If items should be ejected into the world when item movement failed due to item handlers declaring inconsistent movement in simulation mode. If disabled, items can be voided.", isCommandable = true, configLocation = ModConfigLocation.SERVER)
-    public static boolean ejectItemsOnInconsistentSimulationMovement = true;
-
     @ConfigurablePropertyCommon(category = "core", comment = "If items should be ejected into the world when a block is broken and not all items fit into the target. Will be voided otherwise.", isCommandable = true)
     public static boolean ejectItemsOnBlockDropOverflow = true;
 

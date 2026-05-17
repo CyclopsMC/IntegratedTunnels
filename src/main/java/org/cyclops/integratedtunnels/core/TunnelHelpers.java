@@ -4,7 +4,6 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -12,12 +11,12 @@ import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
+import net.neoforged.neoforge.transfer.transaction.Transaction;
+import net.neoforged.neoforge.transfer.transaction.TransactionContext;
 import org.cyclops.commoncapabilities.api.ingredient.IIngredientMatcher;
-import org.cyclops.commoncapabilities.api.ingredient.IngredientComponent;
 import org.cyclops.commoncapabilities.api.ingredient.storage.IIngredientComponentStorage;
 import org.cyclops.commoncapabilities.api.ingredient.storage.IIngredientComponentStorageSlotted;
 import org.cyclops.cyclopscore.helper.IModHelpers;
-import org.cyclops.cyclopscore.ingredient.storage.InconsistentIngredientInsertionException;
 import org.cyclops.cyclopscore.ingredient.storage.IngredientStorageHelpers;
 import org.cyclops.integrateddynamics.IntegratedDynamics;
 import org.cyclops.integrateddynamics.api.evaluate.EvaluationException;
@@ -56,8 +55,7 @@ public class TunnelHelpers {
      * @param destinationSlot The destination slot.
      * @param ingredientPredicate Only instances matching this predicate will be moved.
      * @param movementPosition The position at which the movement is happening.
-     *                         This is used for handling {@link InconsistentIngredientInsertionException}.
-     * @param simulate If the transfer should be simulated.
+     * @param transaction The transaction context.
      * @param <T> The instance type.
      * @param <M> The matching condition parameter.
      * @return The moved instance.
@@ -67,41 +65,57 @@ public class TunnelHelpers {
     public static <T, M> T moveSingle(IIngredientComponentStorage<T, M> source, int sourceSlot,
                                       IIngredientComponentStorage<T, M> destination, int destinationSlot,
                                       IngredientPredicate<T, M> ingredientPredicate, PartPos movementPosition,
-                                      boolean simulate) throws EvaluationException {
+                                      TransactionContext transaction) throws EvaluationException {
         try {
-            try {
-                if (ingredientPredicate.hasMatchFlags()) {
-                    IIngredientMatcher<T, M> matcher = ingredientPredicate.getIngredientComponent().getMatcher();
-                    for (T instance : ingredientPredicate.getInstances()) {
-                        T movedInstance = IngredientStorageHelpers.moveIngredientsSlotted(source, sourceSlot, destination, destinationSlot,
-                                instance, ingredientPredicate.getMatchFlags(), simulate);
-                        if (!matcher.isEmpty(movedInstance)) {
-                            return movedInstance;
-                        }
+            if (ingredientPredicate.hasMatchFlags()) {
+                IIngredientMatcher<T, M> matcher = ingredientPredicate.getIngredientComponent().getMatcher();
+                for (T instance : ingredientPredicate.getInstances()) {
+                    T movedInstance = IngredientStorageHelpers.moveIngredientsSlotted(source, sourceSlot, destination, destinationSlot,
+                            instance, ingredientPredicate.getMatchFlags(), transaction);
+                    if (!matcher.isEmpty(movedInstance)) {
+                        return movedInstance;
                     }
-                    return matcher.getEmptyInstance();
-                } else {
-                    return IngredientStorageHelpers.moveIngredientsSlotted(source, sourceSlot, destination, destinationSlot,
-                            ingredientPredicate, ingredientPredicate.getMaxQuantity(), ingredientPredicate.isExactQuantity(), simulate);
                 }
-            } catch (InconsistentIngredientInsertionException e) {
-                // Handle movement errors due to inconsistent simulation.
-                // If we are moving items, emit them in the world, otherwise they go lost.
-                if (GeneralConfig.ejectItemsOnInconsistentSimulationMovement && e.getIngredientComponent().equals(IngredientComponent.ITEMSTACK)) {
-                    IModHelpers.get().getItemStackHelpers().spawnItemStack(movementPosition.getPos().getLevel(true), movementPosition.getPos().getBlockPos(), e.getRemainder());
-                    throw new EvaluationException(Component.literal("Ingredient movement failed " +
-                            "due to inconsistent insertion behaviour by destination in simulation " +
-                            "and non-simulation mode. This can be caused by invalid network setups. " +
-                            "Ejected failed item in world."));
-                }
-                throw new EvaluationException(Component.literal("Ingredient movement failed " +
-                        "due to inconsistent insertion behaviour by destination in simulation " +
-                        "and non-simulation mode. This can be caused by invalid network setups. Lost ")
-                            .append(e.getIngredientComponent().getMatcher().getDisplayName(e.getRemainder())));
+                return matcher.getEmptyInstance();
+            } else {
+                return IngredientStorageHelpers.moveIngredientsSlotted(source, sourceSlot, destination, destinationSlot,
+                        ingredientPredicate, ingredientPredicate.getMaxQuantity(), ingredientPredicate.isExactQuantity(), transaction);
             }
         } catch (IllegalStateException e) {
             IntegratedTunnels.clog(org.apache.logging.log4j.Level.WARN, e.getMessage());
             return source.getComponent().getMatcher().getEmptyInstance();
+        }
+    }
+
+    /**
+     * Move instances from source to destination.
+     * @param source The source instance storage.
+     * @param sourceSlot The source slot.
+     * @param destination The destination ingredient storage.
+     * @param destinationSlot The destination slot.
+     * @param ingredientPredicate Only instances matching this predicate will be moved.
+     * @param movementPosition The position at which the movement is happening.
+     *                         This is used for handling inconsistent simulation behaviour.
+     * @param simulate If the transfer should be simulated.
+     * @param <T> The instance type.
+     * @param <M> The matching condition parameter.
+     * @return The moved instance.
+     * @throws EvaluationException If illegal movement occured and further movement should stop.
+     * @deprecated Use {@link #moveSingle(IIngredientComponentStorage, int, IIngredientComponentStorage, int, IngredientPredicate, PartPos, TransactionContext)} instead.
+     */
+    @Deprecated
+    // TODO: remove in next major
+    @Nonnull
+    public static <T, M> T moveSingle(IIngredientComponentStorage<T, M> source, int sourceSlot,
+                                      IIngredientComponentStorage<T, M> destination, int destinationSlot,
+                                      IngredientPredicate<T, M> ingredientPredicate, PartPos movementPosition,
+                                      boolean simulate) throws EvaluationException {
+        try (Transaction tx = Transaction.openRoot()) {
+            T result = moveSingle(source, sourceSlot, destination, destinationSlot, ingredientPredicate, movementPosition, tx);
+            if (!simulate) {
+                tx.commit();
+            }
+            return result;
         }
     }
 
@@ -117,8 +131,8 @@ public class TunnelHelpers {
      * @param destinationSlot The destination slot.
      * @param ingredientPredicate Only ingredientstack matching this predicate will be moved.
      * @param movementPosition The position at which the movement is happening.
-     *                         This is used for handling {@link InconsistentIngredientInsertionException}.
      * @param craftIfFailed If the exact ingredient from ingredientPredicate should be crafted if transfer failed.
+     * @param transaction The transaction context.
      * @param <T> The instance type.
      * @param <M> The matching condition parameter.
      * @return The moved ingredientstack.
@@ -130,7 +144,7 @@ public class TunnelHelpers {
                                                     IIngredientComponentStorage<T, M> source, int sourceSlot,
                                                     IIngredientComponentStorage<T, M> destination, int destinationSlot,
                                                     IngredientPredicate<T, M> ingredientPredicate, PartPos movementPosition,
-                                                    boolean craftIfFailed) throws EvaluationException {
+                                                    boolean craftIfFailed, TransactionContext transaction) throws EvaluationException {
         IIngredientMatcher<T, M> matcher = source.getComponent().getMatcher();
 
         // Don't craft if we still have a running crafting job for the instance.
@@ -154,7 +168,7 @@ public class TunnelHelpers {
         }
 
         // Do the actual movement
-        T moved = moveSingle(source, sourceSlot, destination, destinationSlot, ingredientPredicate, movementPosition, false);
+        T moved = moveSingle(source, sourceSlot, destination, destinationSlot, ingredientPredicate, movementPosition, transaction);
         if (matcher.isEmpty(moved)) {
             // Mark this connection as 'sleeping' if nothing was moved
             CACHE_INV_CHECKS.put(connection, sleepCheck == null ? 1 : sleepCheck + 1);
@@ -186,12 +200,17 @@ public class TunnelHelpers {
 
                 // Only craft if the target accepts the crafting output completely
                 boolean targetAcceptsCraftingResult;
+                T finalCraftInstance = craftInstance;
                 if (destinationSlot >= 0) {
-                    targetAcceptsCraftingResult = destination instanceof IIngredientComponentStorageSlotted
-                            && matcher.isEmpty(((IIngredientComponentStorageSlotted<T, M>) destination)
-                            .insert(destinationSlot, craftInstance, true));
+                    try (Transaction checkTx = Transaction.openRoot()) {
+                        targetAcceptsCraftingResult = destination instanceof IIngredientComponentStorageSlotted
+                                && matcher.isEmpty(((IIngredientComponentStorageSlotted<T, M>) destination)
+                                .insert(destinationSlot, finalCraftInstance, checkTx));
+                    }
                 } else {
-                    targetAcceptsCraftingResult = matcher.isEmpty(destination.insert(craftInstance, true));
+                    try (Transaction checkTx = Transaction.openRoot()) {
+                        targetAcceptsCraftingResult = matcher.isEmpty(destination.insert(finalCraftInstance, checkTx));
+                    }
                 }
 
                 if (targetAcceptsCraftingResult) {
@@ -203,6 +222,40 @@ public class TunnelHelpers {
         }
 
         return moved;
+    }
+
+    /**
+     * Move ingredients from source to destination.
+     * @param network The network in which the movement is happening.
+     * @param ingredientsNetwork The ingredients network in which the movement is happening.
+     * @param channel The channel.
+     * @param connection The connection object.
+     * @param source The source ingredient storage.
+     * @param sourceSlot The source slot.
+     * @param destination The destination ingredient storage.
+     * @param destinationSlot The destination slot.
+     * @param ingredientPredicate Only ingredientstack matching this predicate will be moved.
+     * @param movementPosition The position at which the movement is happening.
+     * @param craftIfFailed If the exact ingredient from ingredientPredicate should be crafted if transfer failed.
+     * @param <T> The instance type.
+     * @param <M> The matching condition parameter.
+     * @return The moved ingredientstack.
+     * @throws EvaluationException If illegal movement occured and further movement should stop.
+     */
+    @Nonnull
+    public static <T, M> T moveSingleStateOptimized(INetwork network, IPositionedAddonsNetworkIngredients<T, M> ingredientsNetwork,
+                                                    int channel, ITunnelConnection connection,
+                                                    IIngredientComponentStorage<T, M> source, int sourceSlot,
+                                                    IIngredientComponentStorage<T, M> destination, int destinationSlot,
+                                                    IngredientPredicate<T, M> ingredientPredicate, PartPos movementPosition,
+                                                    boolean craftIfFailed) throws EvaluationException {
+        try (Transaction tx = Transaction.openRoot()) {
+            T result = moveSingleStateOptimized(network, ingredientsNetwork, channel, connection,
+                    source, sourceSlot, destination, destinationSlot,
+                    ingredientPredicate, movementPosition, craftIfFailed, tx);
+            tx.commit();
+            return result;
+        }
     }
 
     /**
