@@ -2,9 +2,7 @@ package org.cyclops.integratedtunnels.core.world;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
-import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.RandomizableContainerBlockEntity;
@@ -29,12 +27,7 @@ public class BlockBreakHandlerShulkerBox implements IBlockBreakHandler {
                 .map(tile -> {
                     if (!tile.isEmpty()) {
                         ItemStack itemStack = new ItemStack(blockState.getBlock());
-                        BlockItem.updateCustomBlockEntityTag(world, player, pos, itemStack);
-
-                        if (tile.hasCustomName()) {
-                            itemStack.set(DataComponents.CUSTOM_NAME, tile.getName());
-                        }
-
+                        itemStack.applyComponents(tile.collectComponents());
                         NonNullList<ItemStack> list = NonNullList.create();
                         list.add(itemStack);
                         return list;

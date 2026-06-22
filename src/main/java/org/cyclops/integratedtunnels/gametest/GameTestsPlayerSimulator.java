@@ -4,7 +4,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
@@ -51,12 +51,12 @@ public class GameTestsPlayerSimulator {
         helper.setBlock(POS.east().east(), Blocks.CHEST);
 
         // Place cow before player simulator
-        helper.spawnWithNoFreeWill(EntityType.COW, POS.west());
+        helper.spawnWithNoFreeWill(EntityTypes.COW, POS.west());
         helper.setBlock(POS.west().below(), Blocks.STONE);
 
         // Insert some items into interface
         ChestBlockEntity chestIn = helper.getBlockEntity(POS.east().east(), ChestBlockEntity.class);
-        chestIn.setItem(0, new ItemStack(Items.WHITE_WOOL));
+        chestIn.setItem(0, new ItemStack(Items.WOOL.white()));
         chestIn.setItem(1, new ItemStack(Items.BUCKET));
         chestIn.setItem(2, new ItemStack(Items.DIAMOND_PICKAXE));
 
@@ -65,13 +65,13 @@ public class GameTestsPlayerSimulator {
 
         helper.succeedWhen(() -> {
             // Check bucket is filled
-            helper.assertContainerContains(POS.east().east(), Items.WHITE_WOOL);
+            helper.assertContainerContains(POS.east().east(), Items.WOOL.white());
             helper.assertContainerContains(POS.east().east(), Items.MILK_BUCKET);
             helper.assertContainerContains(POS.east().east(), Items.DIAMOND_PICKAXE);
             helper.assertTrue(chestIn.getItem(3).isEmpty(), Component.literal("Chest contains too many items"));
 
             // Check cow still exists
-            helper.assertEntityPresent(EntityType.COW);
+            helper.assertEntityPresent(EntityTypes.COW);
 
             // Check importer state
             IPartStateWriter partStateWriter = (IPartStateWriter) PartHelpers.getPart(PartPos.of(helper.getLevel(), helper.absolutePos(POS), Direction.WEST)).getState();
@@ -102,7 +102,7 @@ public class GameTestsPlayerSimulator {
         helper.setBlock(POS.east().east(), Blocks.CHEST);
 
         // Place cow before player simulator
-        helper.spawnWithNoFreeWill(EntityType.COW, POS.west());
+        helper.spawnWithNoFreeWill(EntityTypes.COW, POS.west());
         helper.setBlock(POS.west().below(), Blocks.STONE);
 
         // Build prison around cow
@@ -131,7 +131,7 @@ public class GameTestsPlayerSimulator {
             helper.assertContainerContains(POS.east().east(), Items.DIAMOND_SWORD);
 
             // Check cow is dead
-            helper.assertEntityNotPresent(EntityType.COW);
+            helper.assertEntityNotPresent(EntityTypes.COW);
         });
     }
 

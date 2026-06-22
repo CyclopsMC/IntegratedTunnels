@@ -1,8 +1,7 @@
 package org.cyclops.integratedtunnels.core;
 
-import net.minecraft.network.chat.Component;
+import net.neoforged.neoforge.transfer.transaction.Transaction;
 import org.cyclops.commoncapabilities.api.ingredient.storage.IIngredientComponentStorage;
-import org.cyclops.cyclopscore.ingredient.storage.InconsistentIngredientInsertionException;
 import org.cyclops.cyclopscore.ingredient.storage.IngredientStorageHelpers;
 import org.cyclops.integrateddynamics.api.evaluate.EvaluationException;
 import org.cyclops.integrateddynamics.api.network.INetwork;
@@ -31,14 +30,9 @@ public class TunnelEnergyHelpers {
                                  IIngredientComponentStorage<Long, Boolean> target, long amount, boolean exact,
                                  boolean craftIfFailed) throws EvaluationException {
         long moved;
-        try {
-            moved = IngredientStorageHelpers.moveIngredients(source, target, amount, exact, false);
-        } catch (InconsistentIngredientInsertionException e) {
-            // Handle movement errors due to inconsistent simulation.
-            throw new EvaluationException(Component.literal("Ingredient movement failed " +
-                    "due to inconsistent insertion behaviour by destination in simulation " +
-                    "and non-simulation mode. This can be caused by invalid network setups. Lost ")
-                        .append(e.getIngredientComponent().getMatcher().getDisplayName(e.getRemainder())));
+        try (var tx = Transaction.openRoot()) {
+            moved = IngredientStorageHelpers.moveIngredients(source, target, amount, exact, tx);
+            tx.commit();
         }
 
         // Schedule a new observation for the network, as its contents may have changed

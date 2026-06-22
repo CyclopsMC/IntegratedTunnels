@@ -187,7 +187,7 @@ public class ItemStorageBlockWrapper implements IIngredientComponentStorage<Item
 
                 blockBreakHandler = getBlockBreakHandler(blockState, world, pos, player);
                 if (blockBreakHandler != null) {
-                    cachedDrops = blockBreakHandler.getDrops(blockState, world, pos, player);
+                    return cachedDrops = blockBreakHandler.getDrops(blockState, world, pos, player);
                 } else {
                     BreakBlockEvent blockBreakEvent = new BreakBlockEvent(world, pos, blockState, player);
                     if (!NeoForge.EVENT_BUS.post(blockBreakEvent).isCanceled()) {

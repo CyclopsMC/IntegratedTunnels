@@ -2,7 +2,7 @@ package org.cyclops.integratedtunnels.gametest;
 
 import com.mojang.authlib.GameProfile;
 import net.minecraft.advancements.AdvancementHolder;
-import net.minecraft.advancements.CriteriaTriggers;
+import net.minecraft.advancements.triggers.CriteriaTriggers;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTestAssertException;
