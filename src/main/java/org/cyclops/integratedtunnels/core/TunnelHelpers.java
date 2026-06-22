@@ -88,38 +88,6 @@ public class TunnelHelpers {
     }
 
     /**
-     * Move instances from source to destination.
-     * @param source The source instance storage.
-     * @param sourceSlot The source slot.
-     * @param destination The destination ingredient storage.
-     * @param destinationSlot The destination slot.
-     * @param ingredientPredicate Only instances matching this predicate will be moved.
-     * @param movementPosition The position at which the movement is happening.
-     *                         This is used for handling inconsistent simulation behaviour.
-     * @param simulate If the transfer should be simulated.
-     * @param <T> The instance type.
-     * @param <M> The matching condition parameter.
-     * @return The moved instance.
-     * @throws EvaluationException If illegal movement occured and further movement should stop.
-     * @deprecated Use {@link #moveSingle(IIngredientComponentStorage, int, IIngredientComponentStorage, int, IngredientPredicate, PartPos, TransactionContext)} instead.
-     */
-    @Deprecated
-    // TODO: remove in next major
-    @Nonnull
-    public static <T, M> T moveSingle(IIngredientComponentStorage<T, M> source, int sourceSlot,
-                                      IIngredientComponentStorage<T, M> destination, int destinationSlot,
-                                      IngredientPredicate<T, M> ingredientPredicate, PartPos movementPosition,
-                                      boolean simulate) throws EvaluationException {
-        try (Transaction tx = Transaction.openRoot()) {
-            T result = moveSingle(source, sourceSlot, destination, destinationSlot, ingredientPredicate, movementPosition, tx);
-            if (!simulate) {
-                tx.commit();
-            }
-            return result;
-        }
-    }
-
-    /**
      * Move ingredients from source to destination.
      * @param network The network in which the movement is happening.
      * @param ingredientsNetwork The ingredients network in which the movement is happening.
