@@ -1,6 +1,5 @@
 package org.cyclops.integratedtunnels.gametest;
 
-import com.mojang.authlib.GameProfile;
 import net.minecraft.advancements.AdvancementHolder;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.core.BlockPos;
@@ -9,7 +8,6 @@ import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestAssertException;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.level.ClientInformation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.item.ItemStack;
@@ -34,7 +32,6 @@ import org.cyclops.integratedtunnels.Reference;
 import org.cyclops.integratedtunnels.part.aspect.TunnelAspects;
 
 import java.util.List;
-import java.util.UUID;
 
 import static org.cyclops.integrateddynamics.gametest.GameTestHelpersIntegratedDynamics.createVariableForOperator;
 import static org.cyclops.integrateddynamics.gametest.GameTestHelpersIntegratedDynamics.createVariableForValue;
@@ -59,20 +56,8 @@ public class GameTestsAdvancements {
      * The player's PlayerAdvancements is fully initialized via the ServerPlayer constructor.
      */
     private static ServerPlayer createMockPlayer(GameTestHelper helper) {
-        GameProfile profile = new GameProfile(UUID.randomUUID(), "test-advancement-player");
-        return new ServerPlayer(
-                helper.getLevel().getServer(), helper.getLevel(), profile, ClientInformation.createDefault()
-        ) {
-            @Override
-            public boolean isSpectator() {
-                return false;
-            }
-
-            @Override
-            public boolean isCreative() {
-                return true;
-            }
-        };
+        //noinspection removal
+        return helper.makeMockServerPlayerInLevel();
     }
 
     /**
