@@ -14,15 +14,12 @@ import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import org.cyclops.integrateddynamics.RegistryEntries;
 import org.cyclops.integrateddynamics.api.part.PartPos;
-import org.cyclops.integrateddynamics.api.part.PartTarget;
-import org.cyclops.integrateddynamics.api.part.aspect.property.IAspectProperties;
 import org.cyclops.integrateddynamics.core.evaluate.variable.ValueTypeInteger;
 import org.cyclops.integrateddynamics.core.evaluate.variable.ValueObjectTypeItemStack;
 import org.cyclops.integrateddynamics.core.evaluate.variable.ValueTypes;
 import org.cyclops.integrateddynamics.core.helper.PartHelpers;
 import org.cyclops.integratedtunnels.Reference;
 import org.cyclops.integratedtunnels.part.PartTypes;
-import org.cyclops.integratedtunnels.part.aspect.TunnelAspectWriteBuilders;
 import org.cyclops.integratedtunnels.part.aspect.TunnelAspects;
 
 import static org.cyclops.integrateddynamics.gametest.GameTestHelpersIntegratedDynamics.createVariableForValue;
@@ -145,17 +142,12 @@ public class GameTestsWorldItem {
         helper.setBlock(POS.east().east(), Blocks.CHEST);
 
         Donkey donkey = (Donkey) helper.spawnWithNoFreeWill(EntityType.DONKEY, POS.west());
-        donkey.setChest(true);
+        donkey.getSlot(499).set(new ItemStack(Items.CHEST));
         donkey.getInventory().setItem(2, new ItemStack(Items.APPLE));
 
         PartPos importerPos = PartPos.of(helper.getLevel(), helper.absolutePos(POS), Direction.WEST);
         placeVariableInWriter(helper.getLevel(), importerPos, TunnelAspects.Write.World.ENTITY_ITEM_INTEGER_SLOT_IMPORT,
-                createVariableForValue(helper.getLevel(), ValueTypes.INTEGER, ValueTypeInteger.ValueInteger.of(1)));
-        PartHelpers.PartStateHolder partStateHolder = PartHelpers.getPart(importerPos);
-        IAspectProperties properties = TunnelAspects.Write.World.ENTITY_ITEM_INTEGER_SLOT_IMPORT.getProperties(
-                partStateHolder.getPart(), PartTarget.fromCenter(importerPos), partStateHolder.getState());
-        properties.setValue(TunnelAspectWriteBuilders.Item.PROP_SLOT, ValueTypeInteger.ValueInteger.of(2));
-        partStateHolder.getState().setAspectProperties(TunnelAspects.Write.World.ENTITY_ITEM_INTEGER_SLOT_IMPORT, properties);
+                createVariableForValue(helper.getLevel(), ValueTypes.INTEGER, ValueTypeInteger.ValueInteger.of(2)));
 
         helper.succeedWhen(() -> {
             helper.assertTrue(donkey.getInventory().getItem(2).isEmpty(), "Donkey slot was not imported");
@@ -172,18 +164,13 @@ public class GameTestsWorldItem {
         helper.setBlock(POS.west(), Blocks.CHEST);
 
         Donkey donkey = (Donkey) helper.spawnWithNoFreeWill(EntityType.DONKEY, POS.east().north());
-        donkey.setChest(true);
+        donkey.getSlot(499).set(new ItemStack(Items.CHEST));
         ChestBlockEntity chestIn = helper.getBlockEntity(POS.west());
         chestIn.setItem(0, new ItemStack(Items.APPLE));
 
         PartPos exporterPos = PartPos.of(helper.getLevel(), helper.absolutePos(POS.east()), Direction.NORTH);
         placeVariableInWriter(helper.getLevel(), exporterPos, TunnelAspects.Write.World.ENTITY_ITEM_INTEGER_SLOT_EXPORT,
-                createVariableForValue(helper.getLevel(), ValueTypes.INTEGER, ValueTypeInteger.ValueInteger.of(1)));
-        PartHelpers.PartStateHolder partStateHolder = PartHelpers.getPart(exporterPos);
-        IAspectProperties properties = TunnelAspects.Write.World.ENTITY_ITEM_INTEGER_SLOT_EXPORT.getProperties(
-                partStateHolder.getPart(), PartTarget.fromCenter(exporterPos), partStateHolder.getState());
-        properties.setValue(TunnelAspectWriteBuilders.Item.PROP_SLOT, ValueTypeInteger.ValueInteger.of(2));
-        partStateHolder.getState().setAspectProperties(TunnelAspects.Write.World.ENTITY_ITEM_INTEGER_SLOT_EXPORT, properties);
+                createVariableForValue(helper.getLevel(), ValueTypes.INTEGER, ValueTypeInteger.ValueInteger.of(2)));
 
         helper.succeedWhen(() -> {
             helper.assertContainerEmpty(POS.west());
