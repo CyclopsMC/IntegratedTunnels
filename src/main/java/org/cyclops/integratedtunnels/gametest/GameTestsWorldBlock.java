@@ -233,7 +233,7 @@ public class GameTestsWorldBlock {
         });
     }
 
-    @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
+    @GameTest(template = TEMPLATE_EMPTY, batch = "blacklist_regex", timeoutTicks = TIMEOUT)
     public void testWorldBlockImporterBlacklistRegex(GameTestHelper helper) {
         // Test that regex patterns work for blacklisting
 
@@ -273,7 +273,7 @@ public class GameTestsWorldBlock {
         });
     }
 
-    @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
+    @GameTest(template = TEMPLATE_EMPTY, batch = "non_blacklisted_block", timeoutTicks = TIMEOUT)
     public void testWorldBlockImporterNonBlacklistedBlock(GameTestHelper helper) {
         // Test that non-blacklisted blocks can still be imported normally
 
