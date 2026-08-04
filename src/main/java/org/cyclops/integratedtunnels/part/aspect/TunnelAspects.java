@@ -618,6 +618,13 @@ public class TunnelAspects {
                                 .handle(TunnelAspectWriteBuilders.World.Item.PROP_ENTITY_ITEMTARGET)
                                 .handle(TunnelAspectWriteBuilders.Item.PROP_IMPORT)
                                 .appendKind("entity").appendKind("item").appendKind("import").buildWrite();
+                public static final IAspectWrite<ValueTypeInteger.ValueInteger, ValueTypeInteger> ENTITY_ITEM_INTEGER_SLOT_IMPORT =
+                        TunnelAspectWriteBuilders.World.BUILDER_INTEGER
+                                .withProperties(TunnelAspectWriteBuilders.World.Item.PROPERTIES_RATE)
+                                .handle(TunnelAspectWriteBuilders.Item.PROP_INTEGER_SLOT_ITEMPREDICATE)
+                                .handle(TunnelAspectWriteBuilders.World.Item.PROP_ENTITY_ITEMTARGET)
+                                .handle(TunnelAspectWriteBuilders.Item.PROP_IMPORT)
+                                .appendKind("entity").appendKind("item").appendKind("slot").appendKind("import").buildWrite();
                 public static final IAspectWrite<ValueObjectTypeItemStack.ValueItemStack, ValueObjectTypeItemStack> ENTITY_ITEM_ITEMSTACK_IMPORT =
                         TunnelAspectWriteBuilders.World.BUILDER_ITEMSTACK
                                 .withProperties(TunnelAspectWriteBuilders.World.Item.PROPERTIES_RATESLOTCHECKSCRAFT)
@@ -661,6 +668,13 @@ public class TunnelAspects {
                                 .handle(TunnelAspectWriteBuilders.World.Item.PROP_ENTITY_ITEMTARGET)
                                 .handle(TunnelAspectWriteBuilders.Item.PROP_EXPORT)
                                 .appendKind("entity").appendKind("item").appendKind("export").buildWrite();
+                public static final IAspectWrite<ValueTypeInteger.ValueInteger, ValueTypeInteger> ENTITY_ITEM_INTEGER_SLOT_EXPORT =
+                        TunnelAspectWriteBuilders.World.BUILDER_INTEGER
+                                .withProperties(TunnelAspectWriteBuilders.World.Item.PROPERTIES_RATE)
+                                .handle(TunnelAspectWriteBuilders.Item.PROP_INTEGER_SLOT_ITEMPREDICATE)
+                                .handle(TunnelAspectWriteBuilders.World.Item.PROP_ENTITY_ITEMTARGET)
+                                .handle(TunnelAspectWriteBuilders.Item.PROP_EXPORT)
+                                .appendKind("entity").appendKind("item").appendKind("slot").appendKind("export").buildWrite();
                 public static final IAspectWrite<ValueObjectTypeItemStack.ValueItemStack, ValueObjectTypeItemStack> ENTITY_ITEM_ITEMSTACK_EXPORT =
                         TunnelAspectWriteBuilders.World.BUILDER_ITEMSTACK
                                 .withProperties(TunnelAspectWriteBuilders.World.Item.PROPERTIES_RATESLOTCHECKSCRAFT)
