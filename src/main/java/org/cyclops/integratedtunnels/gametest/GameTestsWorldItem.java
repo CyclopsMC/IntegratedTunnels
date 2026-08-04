@@ -9,6 +9,7 @@ import net.minecraft.world.entity.animal.horse.Donkey;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.entity.ChestBlockEntity;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import org.cyclops.integrateddynamics.RegistryEntries;
@@ -150,10 +151,11 @@ public class GameTestsWorldItem {
         PartPos importerPos = PartPos.of(helper.getLevel(), helper.absolutePos(POS), Direction.WEST);
         placeVariableInWriter(helper.getLevel(), importerPos, TunnelAspects.Write.World.ENTITY_ITEM_INTEGER_SLOT_IMPORT,
                 createVariableForValue(helper.getLevel(), ValueTypes.INTEGER, ValueTypeInteger.ValueInteger.of(1)));
+        PartHelpers.PartStateHolder partStateHolder = PartHelpers.getPart(importerPos);
         IAspectProperties properties = TunnelAspects.Write.World.ENTITY_ITEM_INTEGER_SLOT_IMPORT.getProperties(
-                PartHelpers.getPart(importerPos).getPart(), PartTarget.fromCenter(importerPos), PartHelpers.getPart(importerPos).getState());
+                partStateHolder.getPart(), PartTarget.fromCenter(importerPos), partStateHolder.getState());
         properties.setValue(TunnelAspectWriteBuilders.Item.PROP_SLOT, ValueTypeInteger.ValueInteger.of(2));
-        PartHelpers.getPart(importerPos).getState().setAspectProperties(TunnelAspects.Write.World.ENTITY_ITEM_INTEGER_SLOT_IMPORT, properties);
+        partStateHolder.getState().setAspectProperties(TunnelAspects.Write.World.ENTITY_ITEM_INTEGER_SLOT_IMPORT, properties);
 
         helper.succeedWhen(() -> {
             helper.assertTrue(donkey.getInventory().getItem(2).isEmpty(), "Donkey slot was not imported");
@@ -171,15 +173,17 @@ public class GameTestsWorldItem {
 
         Donkey donkey = (Donkey) helper.spawnWithNoFreeWill(EntityType.DONKEY, POS.east().north());
         donkey.setChest(true);
-        helper.getBlockEntity(POS.west()).setItem(0, new ItemStack(Items.APPLE));
+        ChestBlockEntity chestIn = helper.getBlockEntity(POS.west());
+        chestIn.setItem(0, new ItemStack(Items.APPLE));
 
         PartPos exporterPos = PartPos.of(helper.getLevel(), helper.absolutePos(POS.east()), Direction.NORTH);
         placeVariableInWriter(helper.getLevel(), exporterPos, TunnelAspects.Write.World.ENTITY_ITEM_INTEGER_SLOT_EXPORT,
                 createVariableForValue(helper.getLevel(), ValueTypes.INTEGER, ValueTypeInteger.ValueInteger.of(1)));
+        PartHelpers.PartStateHolder partStateHolder = PartHelpers.getPart(exporterPos);
         IAspectProperties properties = TunnelAspects.Write.World.ENTITY_ITEM_INTEGER_SLOT_EXPORT.getProperties(
-                PartHelpers.getPart(exporterPos).getPart(), PartTarget.fromCenter(exporterPos), PartHelpers.getPart(exporterPos).getState());
+                partStateHolder.getPart(), PartTarget.fromCenter(exporterPos), partStateHolder.getState());
         properties.setValue(TunnelAspectWriteBuilders.Item.PROP_SLOT, ValueTypeInteger.ValueInteger.of(2));
-        PartHelpers.getPart(exporterPos).getState().setAspectProperties(TunnelAspects.Write.World.ENTITY_ITEM_INTEGER_SLOT_EXPORT, properties);
+        partStateHolder.getState().setAspectProperties(TunnelAspects.Write.World.ENTITY_ITEM_INTEGER_SLOT_EXPORT, properties);
 
         helper.succeedWhen(() -> {
             helper.assertContainerEmpty(POS.west());
