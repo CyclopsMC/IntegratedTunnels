@@ -25,6 +25,7 @@ public class PartTypeExporterWorldItem extends PartTypeTunnelAspectsWorld<PartTy
 
                 TunnelAspects.Write.World.ENTITY_ITEM_BOOLEAN_EXPORT,
                 TunnelAspects.Write.World.ENTITY_ITEM_INTEGER_EXPORT,
+                TunnelAspects.Write.World.ENTITY_ITEM_INTEGER_SLOT_EXPORT,
                 TunnelAspects.Write.World.ENTITY_ITEM_ITEMSTACK_EXPORT,
                 TunnelAspects.Write.World.ENTITY_ITEM_LISTITEMSTACK_EXPORT,
                 TunnelAspects.Write.World.ENTITY_ITEM_PREDICATEITEMSTACK_EXPORT,
