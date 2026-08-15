@@ -9,15 +9,18 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.common.util.FakePlayer;
 
+import com.google.common.collect.MapMaker;
+
 import java.util.Map;
-import java.util.WeakHashMap;
 
 /**
  * @author rubensworks
  */
 public class PlayerHelpers {
 
-    private static final Map<ServerLevel, FakePlayer> FAKE_PLAYERS = new WeakHashMap<ServerLevel, FakePlayer>();
+    // Weak keys AND values: the FakePlayer value holds a reference to its ServerLevel key,
+    // so a WeakHashMap (weak keys only) would keep the key alive forever and leak.
+    private static final Map<ServerLevel, FakePlayer> FAKE_PLAYERS = new MapMaker().weakKeys().weakValues().makeMap();
 
     public static FakePlayer getFakePlayer(ServerLevel world) {
         FakePlayer fakePlayer = FAKE_PLAYERS.get(world);

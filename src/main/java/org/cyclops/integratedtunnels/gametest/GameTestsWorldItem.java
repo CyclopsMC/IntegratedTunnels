@@ -3,11 +3,16 @@ package org.cyclops.integratedtunnels.gametest;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTestHelper;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.animal.equine.Donkey;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.entity.ChestBlockEntity;
 import org.cyclops.cyclopscore.gametest.GameTest;
 import org.cyclops.integrateddynamics.RegistryEntries;
 import org.cyclops.integrateddynamics.api.part.PartPos;
+import org.cyclops.integrateddynamics.core.evaluate.variable.ValueTypeInteger;
 import org.cyclops.integrateddynamics.core.evaluate.variable.ValueObjectTypeItemStack;
 import org.cyclops.integrateddynamics.core.evaluate.variable.ValueTypes;
 import org.cyclops.integrateddynamics.core.helper.PartHelpers;
@@ -121,6 +126,51 @@ public class GameTestsWorldItem {
             helper.assertItemEntityPresent(Blocks.STONE.asItem(), POS.west(), 0.25);
             helper.assertContainerEmpty(POS.east().east());
             helper.assertItemEntityNotPresent(Blocks.STONE.asItem(), POS.east().north(), 0.25);
+        });
+    }
+
+    @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
+    public void testWorldItemImporterEntitySlot(GameTestHelper helper) {
+        helper.setBlock(POS, RegistryEntries.BLOCK_CABLE.value());
+        helper.setBlock(POS.east(), RegistryEntries.BLOCK_CABLE.value());
+        PartHelpers.addPart(helper.getLevel(), helper.absolutePos(POS), Direction.WEST, PartTypes.IMPORTER_WORLD_ITEM, new ItemStack(PartTypes.IMPORTER_WORLD_ITEM.getItem()));
+        PartHelpers.addPart(helper.getLevel(), helper.absolutePos(POS.east()), Direction.EAST, PartTypes.INTERFACE_ITEM, new ItemStack(PartTypes.INTERFACE_ITEM.getItem()));
+        helper.setBlock(POS.east().east(), Blocks.CHEST);
+
+        Donkey donkey = (Donkey) helper.spawnWithNoFreeWill(EntityType.DONKEY, POS.west());
+        donkey.getSlot(499).set(new ItemStack(Items.CHEST));
+        donkey.getInventory().setItem(2, new ItemStack(Items.APPLE));
+
+        PartPos importerPos = PartPos.of(helper.getLevel(), helper.absolutePos(POS), Direction.WEST);
+        placeVariableInWriter(helper, helper.getLevel(), importerPos, TunnelAspects.Write.World.ENTITY_ITEM_INTEGER_SLOT_IMPORT,
+                createVariableForValue(helper.getLevel(), ValueTypes.INTEGER, ValueTypeInteger.ValueInteger.of(2)));
+
+        helper.succeedWhen(() -> {
+            helper.assertTrue(donkey.getInventory().getItem(2).isEmpty(), "Donkey slot was not imported");
+            helper.assertContainerContains(POS.east().east(), Items.APPLE);
+        });
+    }
+
+    @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
+    public void testWorldItemExporterEntitySlot(GameTestHelper helper) {
+        helper.setBlock(POS, RegistryEntries.BLOCK_CABLE.value());
+        helper.setBlock(POS.east(), RegistryEntries.BLOCK_CABLE.value());
+        PartHelpers.addPart(helper.getLevel(), helper.absolutePos(POS), Direction.WEST, PartTypes.INTERFACE_ITEM, new ItemStack(PartTypes.INTERFACE_ITEM.getItem()));
+        PartHelpers.addPart(helper.getLevel(), helper.absolutePos(POS.east()), Direction.NORTH, PartTypes.EXPORTER_WORLD_ITEM, new ItemStack(PartTypes.EXPORTER_WORLD_ITEM.getItem()));
+        helper.setBlock(POS.west(), Blocks.CHEST);
+
+        Donkey donkey = (Donkey) helper.spawnWithNoFreeWill(EntityType.DONKEY, POS.east().north());
+        donkey.getSlot(499).set(new ItemStack(Items.CHEST));
+        ChestBlockEntity chestIn = helper.getBlockEntity(POS.west(), ChestBlockEntity.class);
+        chestIn.setItem(0, new ItemStack(Items.APPLE));
+
+        PartPos exporterPos = PartPos.of(helper.getLevel(), helper.absolutePos(POS.east()), Direction.NORTH);
+        placeVariableInWriter(helper, helper.getLevel(), exporterPos, TunnelAspects.Write.World.ENTITY_ITEM_INTEGER_SLOT_EXPORT,
+                createVariableForValue(helper.getLevel(), ValueTypes.INTEGER, ValueTypeInteger.ValueInteger.of(2)));
+
+        helper.succeedWhen(() -> {
+            helper.assertContainerEmpty(POS.west());
+            helper.assertTrue(donkey.getInventory().getItem(2).is(Items.APPLE), "Donkey slot was not exported");
         });
     }
 

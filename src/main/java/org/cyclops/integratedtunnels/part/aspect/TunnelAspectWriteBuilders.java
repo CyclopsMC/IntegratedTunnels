@@ -1502,6 +1502,7 @@ public class TunnelAspectWriteBuilders {
             public static final IAspectProperties PROPERTIES_RATESLOT = TunnelAspectWriteBuilders.Item.PROPERTIES_RATESLOT.clone();
             public static final IAspectProperties PROPERTIES_RATESLOTPREDICATE = TunnelAspectWriteBuilders.Item.PROPERTIES_RATESLOTPREDICATE.clone();
             public static final IAspectProperties PROPERTIES_SLOT = TunnelAspectWriteBuilders.Item.PROPERTIES_SLOT.clone();
+            public static final IAspectProperties PROPERTIES_RATE = TunnelAspectWriteBuilders.Item.PROPERTIES_RATE.clone();
             public static final IAspectProperties PROPERTIES_RATESLOTCHECKS = TunnelAspectWriteBuilders.Item.PROPERTIES_RATESLOTCHECKS.clone();
             public static final IAspectProperties PROPERTIES_RATESLOTCHECKSPREDICATE = TunnelAspectWriteBuilders.Item.PROPERTIES_RATESLOTCHECKS.clone();
             public static final IAspectProperties PROPERTIES_RATESLOTCHECKSCRAFT = TunnelAspectWriteBuilders.Item.PROPERTIES_RATESLOTCHECKSCRAFT.clone();
@@ -1516,6 +1517,9 @@ public class TunnelAspectWriteBuilders {
 
                 PROPERTIES_SLOT.setValue(World.PROPERTY_ENTITYINDEX, ValueTypeInteger.ValueInteger.of(0));
                 PROPERTIES_SLOT.removeValue(PROP_PASSIVE_IO);
+
+                PROPERTIES_RATE.setValue(World.PROPERTY_ENTITYINDEX, ValueTypeInteger.ValueInteger.of(0));
+                PROPERTIES_RATE.removeValue(PROP_PASSIVE_IO);
 
                 PROPERTIES_RATESLOTCHECKS.setValue(World.PROPERTY_ENTITYINDEX, ValueTypeInteger.ValueInteger.of(0));
                 PROPERTIES_RATESLOTCHECKS.setValue(PROP_BLACKLIST, ValueTypeBoolean.ValueBoolean.of(false));
