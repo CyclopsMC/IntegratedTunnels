@@ -13,6 +13,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.Container;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -101,7 +102,7 @@ public class CommandGenerateTunnels implements Command<CommandSourceStack> {
         FLUIDINTERFACES,
         /** Energy interfaces observing filled energy batteries. */
         ENERGYINTERFACES,
-        /** A few item interfaces observing completely filled chests. */
+        /** Fewer item interfaces, but observing completely filled chests. */
         ITEMINTERFACESDEEP,
         /** Item interfaces with item exporters and importers continuously moving items around. */
         ITEMTRANSFER,
@@ -213,8 +214,11 @@ public class CommandGenerateTunnels implements Command<CommandSourceStack> {
 
         /**
          * The number of cells that the "deep" preset uses.
+         * This is chosen so that the preset observes fewer positions but more total slots
+         * than {@link #generateItemInterfaces}, which is what makes it "deep":
+         * 64 completely filled chests hold 1728 slots, against 160 chests holding 1440 slots.
          */
-        public static final int DEEP_CELLS = 16;
+        public static final int DEEP_CELLS = 64;
 
         /**
          * The amount of fluid that is inserted into each generated fluid container.
@@ -383,9 +387,12 @@ public class CommandGenerateTunnels implements Command<CommandSourceStack> {
          * Create a variable holding a predicate that matches the given item.
          */
         public static ItemStack createItemPredicate(ServerLevel level, Item item) {
+            // Match on the raw item only. Itemstack equality includes the stack size
+            // (ItemMatch.EXACT contains ItemMatch.STACKSIZE), so a general equality operator
+            // would never match the full stacks that the generated containers are filled with.
             return GameTestHelpersIntegratedDynamics.createVariableForValue(level, ValueTypes.OPERATOR,
                     ValueTypeOperator.ValueOperator.of(new CurriedOperator(
-                            Operators.RELATIONAL_EQUALS,
+                            Operators.OBJECT_ITEMSTACK_ISITEMEQUALNODATA,
                             new Variable<>(ValueObjectTypeItemStack.ValueItemStack.of(new ItemStack(item)))
                     )));
         }
@@ -769,6 +776,12 @@ public class CommandGenerateTunnels implements Command<CommandSourceStack> {
          * @param cell The cell to remove.
          */
         public static void removeCell(ServerLevel level, BlockPos cell) {
+            // Empty the container before removing it. Even without block drops, a container block
+            // spills its contents as item entities when it is removed, and ticking those entities
+            // would dominate the measurement instead of the network shrinking itself.
+            if (level.getBlockEntity(cell) instanceof Container container) {
+                container.clearContent();
+            }
             level.destroyBlock(cell, false);
             level.destroyBlock(cell.below(), false);
         }

@@ -55,7 +55,7 @@ No ingredients are moved: this is the idle cost of simply having storage attache
 | `interfaces_item_idle` | Every cell holds a chest with 9 distinct item types, exposed by an item interface |
 | `interfaces_fluid_idle` | Every cell holds a filled drying basin, exposed by a fluid interface |
 | `interfaces_energy_idle` | Every cell holds a filled energy battery, exposed by an energy interface |
-| `interfaces_item_idle_deep` | Only 16 cells, but with completely filled chests, which shifts the cost from the number of observed positions to the number of observed slots |
+| `interfaces_item_idle_deep` | Only 64 cells, but with completely filled chests, which shifts the cost from the number of observed positions to the number of observed slots: 1728 observed slots across 64 positions, against 1440 slots across 160 positions for `interfaces_item_idle` |
 
 ### Active transfer
 
@@ -68,7 +68,7 @@ ingredients out of the network into the cell, plus an importer that pulls them b
 | `items_transfer` | Items are continuously exported and imported again |
 | `fluids_transfer` | Fluids are continuously exported and imported again |
 | `energy_transfer` | Energy is continuously exported and imported again |
-| `items_transfer_predicate` | As `items_transfer`, but driven by predicate aspects, which additionally measures the cost of evaluating a predicate per candidate ingredient |
+| `items_transfer_predicate` | As `items_transfer`, but driven by predicate aspects, which additionally measures the cost of evaluating a predicate per candidate ingredient. The predicate matches on the raw item, because itemstack equality also compares stack sizes |
 | `items_filtering_interfaces` | As `items_transfer`, but with filtering item interfaces as network storage |
 
 ### Index scaling
