@@ -37,7 +37,8 @@ public class FluidTargetCapabilityProvider extends ChanneledTargetCapabilityProv
                 properties.getValue(TunnelAspectWriteBuilders.PROP_CHANNEL).getRawValue(),
                 properties.getValue(TunnelAspectWriteBuilders.PROP_ROUNDROBIN).getRawValue(),
                 properties.getValue(TunnelAspectWriteBuilders.PROP_CRAFT).getRawValue(),
-                properties.getValue(TunnelAspectWriteBuilders.PROP_PASSIVE_IO).getRawValue());
+                properties.getValue(TunnelAspectWriteBuilders.PROP_PASSIVE_IO).getRawValue(),
+                properties.getValue(TunnelAspectWriteBuilders.PROP_PASSIVE_IO_IGNORE_FILTER).getRawValue());
         this.connection = new TunnelConnectionPositionedNetworkCapabilityProvider(network, getChannel(), partTarget.getTarget(), transfer, capabilityProvider);
         this.fluidStackMatcher = fluidStackMatcher;
         this.partTarget = partTarget;

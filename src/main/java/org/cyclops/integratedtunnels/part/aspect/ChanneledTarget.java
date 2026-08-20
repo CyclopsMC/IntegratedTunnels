@@ -22,9 +22,11 @@ public abstract class ChanneledTarget<N extends IPositionedAddonsNetwork, T> imp
     private final boolean roundRobin;
     private final boolean craftIfFailed;
     private final boolean passiveIO;
+    private final boolean passiveIOIgnoreFilter;
 
     public ChanneledTarget(INetwork network, N channeledNetwork, @Nullable PartStateRoundRobin<?> partState, int channel,
-                           boolean roundRobin, boolean craftIfFailed, boolean passiveIO) {
+                           boolean roundRobin, boolean craftIfFailed, boolean passiveIO,
+                           boolean passiveIOIgnoreFilter) {
         this.network = network;
         this.channeledNetwork = channeledNetwork;
         this.partState = partState;
@@ -32,6 +34,7 @@ public abstract class ChanneledTarget<N extends IPositionedAddonsNetwork, T> imp
         this.roundRobin = roundRobin;
         this.craftIfFailed = craftIfFailed;
         this.passiveIO = passiveIO;
+        this.passiveIOIgnoreFilter = passiveIOIgnoreFilter;
     }
 
     @Override
@@ -68,6 +71,11 @@ public abstract class ChanneledTarget<N extends IPositionedAddonsNetwork, T> imp
     @Override
     public boolean isPassiveIO() {
         return passiveIO;
+    }
+
+    @Override
+    public boolean isPassiveIOIgnoreFilter() {
+        return passiveIOIgnoreFilter;
     }
 
     @Override

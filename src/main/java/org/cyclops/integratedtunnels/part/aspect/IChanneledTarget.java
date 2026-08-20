@@ -38,6 +38,8 @@ public interface IChanneledTarget<N extends IPositionedAddonsNetwork, T> {
 
     public boolean isPassiveIO();
 
+    public boolean isPassiveIOIgnoreFilter();
+
     public void preTransfer();
 
     public void postTransfer();

@@ -24,8 +24,9 @@ public abstract class ChanneledTargetCapabilityProvider<C, N extends IPositioned
 
     public ChanneledTargetCapabilityProvider(INetwork network, Class<?> capabilityType, @Nullable ICapabilityGetter<Direction> capabilityGetter, Direction side,
                                              N channeledNetwork, @Nullable PartStateRoundRobin<?> partState, int channel,
-                                             boolean roundRobin, boolean craftIfFailed, boolean passiveIO) {
-        super(network, channeledNetwork, partState, channel, roundRobin, craftIfFailed, passiveIO);
+                                             boolean roundRobin, boolean craftIfFailed, boolean passiveIO,
+                                             boolean passiveIOIgnoreFilter) {
+        super(network, channeledNetwork, partState, channel, roundRobin, craftIfFailed, passiveIO, passiveIOIgnoreFilter);
         this.capabilityType = capabilityType;
         this.capabilityGetter = capabilityGetter;
         this.side = side;
