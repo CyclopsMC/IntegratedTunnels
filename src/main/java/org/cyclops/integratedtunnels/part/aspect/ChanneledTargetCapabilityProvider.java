@@ -22,6 +22,13 @@ public abstract class ChanneledTargetCapabilityProvider<C, N extends IPositioned
 
     private IIngredientComponentStorage<T, M> storage = null;
 
+    @Deprecated // TODO: rm in next major
+    public ChanneledTargetCapabilityProvider(INetwork network, Class<?> capabilityType, @Nullable ICapabilityGetter<Direction> capabilityGetter, Direction side,
+                                             N channeledNetwork, @Nullable PartStateRoundRobin<?> partState, int channel,
+                                             boolean roundRobin, boolean craftIfFailed, boolean passiveIO) {
+        this(network, capabilityType, capabilityGetter, side, channeledNetwork, partState, channel, roundRobin, craftIfFailed, passiveIO, false);
+    }
+
     public ChanneledTargetCapabilityProvider(INetwork network, Class<?> capabilityType, @Nullable ICapabilityGetter<Direction> capabilityGetter, Direction side,
                                              N channeledNetwork, @Nullable PartStateRoundRobin<?> partState, int channel,
                                              boolean roundRobin, boolean craftIfFailed, boolean passiveIO,

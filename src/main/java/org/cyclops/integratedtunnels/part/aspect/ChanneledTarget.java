@@ -24,6 +24,12 @@ public abstract class ChanneledTarget<N extends IPositionedAddonsNetwork, T> imp
     private final boolean passiveIO;
     private final boolean passiveIOIgnoreFilter;
 
+    @Deprecated // TODO: rm in next major
+    public ChanneledTarget(INetwork network, N channeledNetwork, @Nullable PartStateRoundRobin<?> partState, int channel,
+                           boolean roundRobin, boolean craftIfFailed, boolean passiveIO) {
+        this(network, channeledNetwork, partState, channel, roundRobin, craftIfFailed, passiveIO, false);
+    }
+
     public ChanneledTarget(INetwork network, N channeledNetwork, @Nullable PartStateRoundRobin<?> partState, int channel,
                            boolean roundRobin, boolean craftIfFailed, boolean passiveIO,
                            boolean passiveIOIgnoreFilter) {

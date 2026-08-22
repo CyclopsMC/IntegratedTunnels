@@ -19,7 +19,6 @@ import org.cyclops.cyclopscore.datastructure.DimPos;
 import org.cyclops.integrateddynamics.RegistryEntries;
 import org.cyclops.integrateddynamics.api.part.PartPos;
 import org.cyclops.integrateddynamics.api.part.PartTarget;
-import org.cyclops.integrateddynamics.api.part.aspect.IAspectWrite;
 import org.cyclops.integrateddynamics.api.part.aspect.property.IAspectProperties;
 import org.cyclops.integrateddynamics.api.part.write.IPartStateWriter;
 import org.cyclops.integrateddynamics.core.block.IgnoredBlockStatus;
@@ -34,6 +33,7 @@ import org.cyclops.integratedtunnels.part.aspect.TunnelAspects;
 
 import static org.cyclops.integrateddynamics.gametest.GameTestHelpersIntegratedDynamics.createVariableForValue;
 import static org.cyclops.integrateddynamics.gametest.GameTestHelpersIntegratedDynamics.placeVariableInWriter;
+import static org.cyclops.integratedtunnels.gametest.GameTestHelpersIntegratedTunnels.setPassiveInteraction;
 
 @GameTestHolder(Reference.MOD_ID)
 @PrefixGameTestTemplate(false)
@@ -772,18 +772,6 @@ public class GameTestsItems {
             helper.assertContainerContains(POS.west(), Items.ACACIA_LEAVES);
             helper.assertContainerContains(POS.west(), Items.DIAMOND_PICKAXE);
         });
-    }
-
-    /**
-     * Configure the passive interaction properties of the given aspect within the given part.
-     */
-    protected static void setPassiveInteraction(PartPos partPos, IAspectWrite<?, ?> aspect,
-                                                boolean passiveInteraction, boolean ignoreFilter) {
-        PartHelpers.PartStateHolder partStateHolder = PartHelpers.getPart(partPos);
-        IAspectProperties properties = aspect.getProperties(partStateHolder.getPart(), PartTarget.fromCenter(partPos), partStateHolder.getState());
-        properties.setValue(TunnelAspectWriteBuilders.PROP_PASSIVE_IO, ValueTypeBoolean.ValueBoolean.of(passiveInteraction));
-        properties.setValue(TunnelAspectWriteBuilders.PROP_PASSIVE_IO_IGNORE_FILTER, ValueTypeBoolean.ValueBoolean.of(ignoreFilter));
-        partStateHolder.getState().setAspectProperties(aspect, properties);
     }
 
     /**
