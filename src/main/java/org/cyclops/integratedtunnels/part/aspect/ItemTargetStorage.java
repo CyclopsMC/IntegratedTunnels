@@ -33,7 +33,8 @@ public class ItemTargetStorage extends ChanneledTarget<IItemNetwork, ItemStack> 
                 properties.getValue(TunnelAspectWriteBuilders.PROP_CHANNEL).getRawValue(),
                 properties.getValue(TunnelAspectWriteBuilders.PROP_ROUNDROBIN).getRawValue(),
                 properties.getValue(TunnelAspectWriteBuilders.PROP_CRAFT).getRawValue(),
-                properties.getValue(TunnelAspectWriteBuilders.PROP_PASSIVE_IO).getRawValue());
+                properties.getValue(TunnelAspectWriteBuilders.PROP_PASSIVE_IO).getRawValue(),
+                properties.getValue(TunnelAspectWriteBuilders.PROP_PASSIVE_IO_IGNORE_FILTER).getRawValue());
         this.connection = new TunnelConnectionPositionedNetwork(network, getChannel(), partTarget.getTarget(), transfer);
         this.storage = storage;
         this.slot = slot;

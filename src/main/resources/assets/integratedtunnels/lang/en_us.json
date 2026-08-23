@@ -168,6 +168,8 @@
   "aspect.aspecttypes.integratedtunnels.boolean.craft.info": "If the instance should be crafted if it is not present in the network.",
   "aspect.aspecttypes.integratedtunnels.boolean.passiveio": "Passive Interaction",
   "aspect.aspecttypes.integratedtunnels.boolean.passiveio.info": "If the target may insert into/extract from the network.",
+  "aspect.aspecttypes.integratedtunnels.boolean.passiveioignorefilter": "Passive Interaction Ignores Filter",
+  "aspect.aspecttypes.integratedtunnels.boolean.passiveioignorefilter.info": "If anything may always be inserted into/extracted from the network.",
   "aspect.aspecttypes.integratedtunnels.boolean.filter.applytoinsert": "Apply to Insertions",
   "aspect.aspecttypes.integratedtunnels.boolean.filter.applytoinsert.info": "If the filter should apply to insertions into the network.",
   "aspect.aspecttypes.integratedtunnels.boolean.filter.applytoextract": "Apply to Extractions",

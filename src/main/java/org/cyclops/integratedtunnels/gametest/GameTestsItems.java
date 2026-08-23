@@ -10,6 +10,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.HopperBlock;
 import net.minecraft.world.level.block.entity.ChestBlockEntity;
 import net.minecraft.world.level.block.entity.HopperBlockEntity;
 import net.neoforged.neoforge.gametest.GameTestHolder;
@@ -32,6 +33,7 @@ import org.cyclops.integratedtunnels.part.aspect.TunnelAspects;
 
 import static org.cyclops.integrateddynamics.gametest.GameTestHelpersIntegratedDynamics.createVariableForValue;
 import static org.cyclops.integrateddynamics.gametest.GameTestHelpersIntegratedDynamics.placeVariableInWriter;
+import static org.cyclops.integratedtunnels.gametest.GameTestHelpersIntegratedTunnels.setPassiveInteraction;
 
 @GameTestHolder(Reference.MOD_ID)
 @PrefixGameTestTemplate(false)
@@ -39,6 +41,7 @@ public class GameTestsItems {
 
     public static final String TEMPLATE_EMPTY = "empty10";
     public static final int TIMEOUT = 2000;
+    public static final int TICKS_PASSIVE_INTERACTION = 100;
     public static final BlockPos POS = BlockPos.ZERO.offset(2, 0, 2);
 
     @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
@@ -768,6 +771,142 @@ public class GameTestsItems {
             helper.assertTrue(chestIn.getItem(0).getCount() == 2, "Incorrect output item size was moved");
             helper.assertContainerContains(POS.west(), Items.ACACIA_LEAVES);
             helper.assertContainerContains(POS.west(), Items.DIAMOND_PICKAXE);
+        });
+    }
+
+    /**
+     * Setup an importer with a false boolean aspect, so that it never imports actively,
+     * next to a hopper that tries to push items into it.
+     * @return The position of the importer part.
+     */
+    protected static PartPos setupPassiveImporter(GameTestHelper helper) {
+        // Place cable
+        helper.setBlock(POS, RegistryEntries.BLOCK_CABLE.value());
+        helper.setBlock(POS.east(), RegistryEntries.BLOCK_CABLE.value());
+
+        // Place item importer
+        PartHelpers.addPart(helper.getLevel(), helper.absolutePos(POS), Direction.WEST, PartTypes.IMPORTER_ITEM, new ItemStack(PartTypes.IMPORTER_ITEM.getItem()));
+
+        // Place item interface with a chest to store the network's items in
+        PartHelpers.addPart(helper.getLevel(), helper.absolutePos(POS.east()), Direction.EAST, PartTypes.INTERFACE_ITEM, new ItemStack(PartTypes.INTERFACE_ITEM.getItem()));
+        helper.setBlock(POS.east().east(), Blocks.CHEST);
+
+        // Place a hopper that pushes items into the importer
+        helper.setBlock(POS.west(), Blocks.HOPPER.defaultBlockState().setValue(HopperBlock.FACING, Direction.EAST));
+        HopperBlockEntity hopperIn = helper.getBlockEntity(POS.west());
+        hopperIn.setItem(0, new ItemStack(Items.WHITE_WOOL));
+
+        // Make the importer never import anything by itself
+        PartPos posImporter = PartPos.of(helper.getLevel(), helper.absolutePos(POS), Direction.WEST);
+        placeVariableInWriter(helper.getLevel(), posImporter, TunnelAspects.Write.Item.BOOLEAN_IMPORT,
+                createVariableForValue(helper.getLevel(), ValueTypes.BOOLEAN, ValueTypeBoolean.ValueBoolean.of(false)));
+
+        return posImporter;
+    }
+
+    @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
+    public void testItemsPassiveImporterIgnoreFilter(GameTestHelper helper) {
+        PartPos posImporter = setupPassiveImporter(helper);
+        setPassiveInteraction(posImporter, TunnelAspects.Write.Item.BOOLEAN_IMPORT, true, true);
+
+        helper.succeedWhen(() -> {
+            // Check if the hopper was able to push its items into the network
+            helper.assertContainerEmpty(POS.west());
+            helper.assertContainerContains(POS.east().east(), Items.WHITE_WOOL);
+        });
+    }
+
+    @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
+    public void testItemsPassiveImporterRespectFilter(GameTestHelper helper) {
+        PartPos posImporter = setupPassiveImporter(helper);
+        setPassiveInteraction(posImporter, TunnelAspects.Write.Item.BOOLEAN_IMPORT, true, false);
+
+        helper.runAfterDelay(TICKS_PASSIVE_INTERACTION, () -> {
+            // Check if the hopper was not able to push its items into the network
+            helper.assertContainerContains(POS.west(), Items.WHITE_WOOL);
+            helper.assertContainerEmpty(POS.east().east());
+            helper.succeed();
+        });
+    }
+
+    @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
+    public void testItemsPassiveImporterDisabled(GameTestHelper helper) {
+        PartPos posImporter = setupPassiveImporter(helper);
+        setPassiveInteraction(posImporter, TunnelAspects.Write.Item.BOOLEAN_IMPORT, false, true);
+
+        helper.runAfterDelay(TICKS_PASSIVE_INTERACTION, () -> {
+            // Check if the hopper was not able to push its items into the network
+            helper.assertContainerContains(POS.west(), Items.WHITE_WOOL);
+            helper.assertContainerEmpty(POS.east().east());
+            helper.succeed();
+        });
+    }
+
+    /**
+     * Setup an exporter with a false boolean aspect, so that it never exports actively,
+     * below which a hopper tries to pull items out of it.
+     * @return The position of the exporter part.
+     */
+    protected static PartPos setupPassiveExporter(GameTestHelper helper) {
+        // Place cable
+        helper.setBlock(POS.above(), RegistryEntries.BLOCK_CABLE.value());
+        helper.setBlock(POS.east().above(), RegistryEntries.BLOCK_CABLE.value());
+
+        // Place item interface with a chest holding the network's items
+        PartHelpers.addPart(helper.getLevel(), helper.absolutePos(POS.above()), Direction.WEST, PartTypes.INTERFACE_ITEM, new ItemStack(PartTypes.INTERFACE_ITEM.getItem()));
+        helper.setBlock(POS.west().above(), Blocks.CHEST);
+        ChestBlockEntity chestIn = helper.getBlockEntity(POS.west().above());
+        chestIn.setItem(0, new ItemStack(Items.WHITE_WOOL));
+
+        // Place item exporter
+        PartHelpers.addPart(helper.getLevel(), helper.absolutePos(POS.east().above()), Direction.DOWN, PartTypes.EXPORTER_ITEM, new ItemStack(PartTypes.EXPORTER_ITEM.getItem()));
+
+        // Place a hopper that pulls items out of the exporter
+        helper.setBlock(POS.east(), Blocks.HOPPER.defaultBlockState().setValue(HopperBlock.FACING, Direction.NORTH));
+
+        // Make the exporter never export anything by itself
+        PartPos posExporter = PartPos.of(helper.getLevel(), helper.absolutePos(POS.east().above()), Direction.DOWN);
+        placeVariableInWriter(helper.getLevel(), posExporter, TunnelAspects.Write.Item.BOOLEAN_EXPORT,
+                createVariableForValue(helper.getLevel(), ValueTypes.BOOLEAN, ValueTypeBoolean.ValueBoolean.of(false)));
+
+        return posExporter;
+    }
+
+    @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
+    public void testItemsPassiveExporterIgnoreFilter(GameTestHelper helper) {
+        PartPos posExporter = setupPassiveExporter(helper);
+        setPassiveInteraction(posExporter, TunnelAspects.Write.Item.BOOLEAN_EXPORT, true, true);
+
+        helper.succeedWhen(() -> {
+            // Check if the hopper was able to pull items out of the network
+            helper.assertContainerContains(POS.east(), Items.WHITE_WOOL);
+            helper.assertContainerEmpty(POS.west().above());
+        });
+    }
+
+    @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
+    public void testItemsPassiveExporterRespectFilter(GameTestHelper helper) {
+        PartPos posExporter = setupPassiveExporter(helper);
+        setPassiveInteraction(posExporter, TunnelAspects.Write.Item.BOOLEAN_EXPORT, true, false);
+
+        helper.runAfterDelay(TICKS_PASSIVE_INTERACTION, () -> {
+            // Check if the hopper was not able to pull items out of the network
+            helper.assertContainerEmpty(POS.east());
+            helper.assertContainerContains(POS.west().above(), Items.WHITE_WOOL);
+            helper.succeed();
+        });
+    }
+
+    @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
+    public void testItemsPassiveExporterDisabled(GameTestHelper helper) {
+        PartPos posExporter = setupPassiveExporter(helper);
+        setPassiveInteraction(posExporter, TunnelAspects.Write.Item.BOOLEAN_EXPORT, false, true);
+
+        helper.runAfterDelay(TICKS_PASSIVE_INTERACTION, () -> {
+            // Check if the hopper was not able to pull items out of the network
+            helper.assertContainerEmpty(POS.east());
+            helper.assertContainerContains(POS.west().above(), Items.WHITE_WOOL);
+            helper.succeed();
         });
     }
 

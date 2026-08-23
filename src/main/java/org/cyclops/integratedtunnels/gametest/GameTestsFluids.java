@@ -31,6 +31,7 @@ import org.cyclops.integratedtunnels.part.aspect.TunnelAspects;
 
 import static org.cyclops.integrateddynamics.gametest.GameTestHelpersIntegratedDynamics.createVariableForValue;
 import static org.cyclops.integrateddynamics.gametest.GameTestHelpersIntegratedDynamics.placeVariableInWriter;
+import static org.cyclops.integratedtunnels.gametest.GameTestHelpersIntegratedTunnels.setPassiveInteraction;
 
 @GameTestHolder(Reference.MOD_ID)
 @PrefixGameTestTemplate(false)
@@ -38,6 +39,7 @@ public class GameTestsFluids {
 
     public static final String TEMPLATE_EMPTY = "empty10";
     public static final int TIMEOUT = 2000;
+    public static final int TICKS_PASSIVE_INTERACTION = 100;
     public static final BlockPos POS = BlockPos.ZERO.offset(2, 0, 2);
 
     @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
@@ -748,6 +750,172 @@ public class GameTestsFluids {
             helper.assertValueEqual(basinOut.getTank().getFluidType(), RegistryEntries.FLUID_MENRIL_RESIN.get(), "Basin out does not contain the correct fluid type");
             helper.assertValueEqual(basinIn1.getTank().getFluidAmount(), 1_000, "Basin in 1 was incorrectly drained");
             helper.assertValueEqual(basinIn2.getTank().getFluidAmount(), 0, "Basin in 2 was not drained");
+        });
+    }
+
+    /**
+     * Setup a fluid importer filtered on a fluid that is not available, so that it never imports actively,
+     * next to a separate subnetwork that actively exports fluids into it.
+     * The two networks are not connected, as both cables hold a part on their touching face.
+     * @return The position of the importer part.
+     */
+    protected static PartPos setupPassiveImporter(GameTestHelper helper) {
+        // Place cables of the network under test
+        helper.setBlock(POS, RegistryEntries.BLOCK_CABLE.value());
+        helper.setBlock(POS.east(), RegistryEntries.BLOCK_CABLE.value());
+
+        // Place fluid importer under test
+        PartHelpers.addPart(helper.getLevel(), helper.absolutePos(POS), Direction.WEST, PartTypes.IMPORTER_FLUID, new ItemStack(PartTypes.IMPORTER_FLUID.getItem()));
+
+        // Place fluid interface with a basin to store the network's fluids in
+        PartHelpers.addPart(helper.getLevel(), helper.absolutePos(POS.east()), Direction.EAST, PartTypes.INTERFACE_FLUID, new ItemStack(PartTypes.INTERFACE_FLUID.getItem()));
+        helper.setBlock(POS.east().east(), RegistryEntries.BLOCK_DRYING_BASIN.get());
+
+        // Place a subnetwork that exports fluids into the importer under test
+        helper.setBlock(POS.west(), RegistryEntries.BLOCK_CABLE.value());
+        PartHelpers.addPart(helper.getLevel(), helper.absolutePos(POS.west()), Direction.EAST, PartTypes.EXPORTER_FLUID, new ItemStack(PartTypes.EXPORTER_FLUID.getItem()));
+        PartHelpers.addPart(helper.getLevel(), helper.absolutePos(POS.west()), Direction.WEST, PartTypes.INTERFACE_FLUID, new ItemStack(PartTypes.INTERFACE_FLUID.getItem()));
+        helper.setBlock(POS.west().west(), RegistryEntries.BLOCK_DRYING_BASIN.get());
+        BlockEntityDryingBasin basinIn = helper.getBlockEntity(POS.west().west());
+        basinIn.getTank().setFluid(new FluidStack(Fluids.WATER, 1_000));
+
+        // Let the subnetwork export everything it holds
+        placeVariableInWriter(helper.getLevel(), PartPos.of(helper.getLevel(), helper.absolutePos(POS.west()), Direction.EAST), TunnelAspects.Write.Fluid.BOOLEAN_EXPORT,
+                createVariableForValue(helper.getLevel(), ValueTypes.BOOLEAN, ValueTypeBoolean.ValueBoolean.of(true)));
+
+        // Filter the importer under test on a fluid that the subnetwork does not hold,
+        // so that it never imports anything by itself.
+        PartPos posImporter = PartPos.of(helper.getLevel(), helper.absolutePos(POS), Direction.WEST);
+        placeVariableInWriter(helper.getLevel(), posImporter, TunnelAspects.Write.Fluid.FLUIDSTACK_IMPORT,
+                createVariableForValue(helper.getLevel(), ValueTypes.OBJECT_FLUIDSTACK, ValueObjectTypeFluidStack.ValueFluidStack.of(new FluidStack(RegistryEntries.FLUID_MENRIL_RESIN, 1_000))));
+
+        return posImporter;
+    }
+
+    @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
+    public void testFluidsPassiveImporterIgnoreFilter(GameTestHelper helper) {
+        PartPos posImporter = setupPassiveImporter(helper);
+        setPassiveInteraction(posImporter, TunnelAspects.Write.Fluid.FLUIDSTACK_IMPORT, true, true);
+
+        helper.succeedWhen(() -> {
+            // Check if the subnetwork was able to push its fluids into the network under test
+            BlockEntityDryingBasin basinIn = helper.getBlockEntity(POS.west().west());
+            BlockEntityDryingBasin basinOut = helper.getBlockEntity(POS.east().east());
+            helper.assertValueEqual(basinIn.getTank().getFluidAmount(), 0, "Basin in was not drained");
+            helper.assertValueEqual(basinOut.getTank().getFluidAmount(), 1_000, "Basin out does not contain fluids");
+        });
+    }
+
+    @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
+    public void testFluidsPassiveImporterRespectFilter(GameTestHelper helper) {
+        PartPos posImporter = setupPassiveImporter(helper);
+        setPassiveInteraction(posImporter, TunnelAspects.Write.Fluid.FLUIDSTACK_IMPORT, true, false);
+
+        helper.runAfterDelay(TICKS_PASSIVE_INTERACTION, () -> {
+            // Check if the subnetwork was not able to push its fluids into the network under test
+            BlockEntityDryingBasin basinIn = helper.getBlockEntity(POS.west().west());
+            BlockEntityDryingBasin basinOut = helper.getBlockEntity(POS.east().east());
+            helper.assertValueEqual(basinIn.getTank().getFluidAmount(), 1_000, "Basin in was incorrectly drained");
+            helper.assertValueEqual(basinOut.getTank().getFluidAmount(), 0, "Basin out incorrectly contains fluids");
+            helper.succeed();
+        });
+    }
+
+    @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
+    public void testFluidsPassiveImporterDisabled(GameTestHelper helper) {
+        PartPos posImporter = setupPassiveImporter(helper);
+        setPassiveInteraction(posImporter, TunnelAspects.Write.Fluid.FLUIDSTACK_IMPORT, false, true);
+
+        helper.runAfterDelay(TICKS_PASSIVE_INTERACTION, () -> {
+            // Check if the subnetwork was not able to push its fluids into the network under test
+            BlockEntityDryingBasin basinIn = helper.getBlockEntity(POS.west().west());
+            BlockEntityDryingBasin basinOut = helper.getBlockEntity(POS.east().east());
+            helper.assertValueEqual(basinIn.getTank().getFluidAmount(), 1_000, "Basin in was incorrectly drained");
+            helper.assertValueEqual(basinOut.getTank().getFluidAmount(), 0, "Basin out incorrectly contains fluids");
+            helper.succeed();
+        });
+    }
+
+    /**
+     * Setup a fluid exporter filtered on a fluid that is not available, so that it never exports actively,
+     * next to a separate subnetwork that actively imports fluids out of it.
+     * The two networks are not connected, as both cables hold a part on their touching face.
+     * @return The position of the exporter part.
+     */
+    protected static PartPos setupPassiveExporter(GameTestHelper helper) {
+        // Place cables of the network under test
+        helper.setBlock(POS, RegistryEntries.BLOCK_CABLE.value());
+        helper.setBlock(POS.east(), RegistryEntries.BLOCK_CABLE.value());
+
+        // Place fluid exporter under test
+        PartHelpers.addPart(helper.getLevel(), helper.absolutePos(POS), Direction.WEST, PartTypes.EXPORTER_FLUID, new ItemStack(PartTypes.EXPORTER_FLUID.getItem()));
+
+        // Place fluid interface with a basin holding the network's fluids
+        PartHelpers.addPart(helper.getLevel(), helper.absolutePos(POS.east()), Direction.EAST, PartTypes.INTERFACE_FLUID, new ItemStack(PartTypes.INTERFACE_FLUID.getItem()));
+        helper.setBlock(POS.east().east(), RegistryEntries.BLOCK_DRYING_BASIN.get());
+        BlockEntityDryingBasin basinIn = helper.getBlockEntity(POS.east().east());
+        basinIn.getTank().setFluid(new FluidStack(Fluids.WATER, 1_000));
+
+        // Place a subnetwork that imports fluids out of the exporter under test
+        helper.setBlock(POS.west(), RegistryEntries.BLOCK_CABLE.value());
+        PartHelpers.addPart(helper.getLevel(), helper.absolutePos(POS.west()), Direction.EAST, PartTypes.IMPORTER_FLUID, new ItemStack(PartTypes.IMPORTER_FLUID.getItem()));
+        PartHelpers.addPart(helper.getLevel(), helper.absolutePos(POS.west()), Direction.WEST, PartTypes.INTERFACE_FLUID, new ItemStack(PartTypes.INTERFACE_FLUID.getItem()));
+        helper.setBlock(POS.west().west(), RegistryEntries.BLOCK_DRYING_BASIN.get());
+
+        // Let the subnetwork import everything it can
+        placeVariableInWriter(helper.getLevel(), PartPos.of(helper.getLevel(), helper.absolutePos(POS.west()), Direction.EAST), TunnelAspects.Write.Fluid.BOOLEAN_IMPORT,
+                createVariableForValue(helper.getLevel(), ValueTypes.BOOLEAN, ValueTypeBoolean.ValueBoolean.of(true)));
+
+        // Filter the exporter under test on a fluid that the network does not hold,
+        // so that it never exports anything by itself.
+        PartPos posExporter = PartPos.of(helper.getLevel(), helper.absolutePos(POS), Direction.WEST);
+        placeVariableInWriter(helper.getLevel(), posExporter, TunnelAspects.Write.Fluid.FLUIDSTACK_EXPORT,
+                createVariableForValue(helper.getLevel(), ValueTypes.OBJECT_FLUIDSTACK, ValueObjectTypeFluidStack.ValueFluidStack.of(new FluidStack(RegistryEntries.FLUID_MENRIL_RESIN, 1_000))));
+
+        return posExporter;
+    }
+
+    @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
+    public void testFluidsPassiveExporterIgnoreFilter(GameTestHelper helper) {
+        PartPos posExporter = setupPassiveExporter(helper);
+        setPassiveInteraction(posExporter, TunnelAspects.Write.Fluid.FLUIDSTACK_EXPORT, true, true);
+
+        helper.succeedWhen(() -> {
+            // Check if the subnetwork was able to pull fluids out of the network under test
+            BlockEntityDryingBasin basinIn = helper.getBlockEntity(POS.east().east());
+            BlockEntityDryingBasin basinOut = helper.getBlockEntity(POS.west().west());
+            helper.assertValueEqual(basinIn.getTank().getFluidAmount(), 0, "Basin in was not drained");
+            helper.assertValueEqual(basinOut.getTank().getFluidAmount(), 1_000, "Basin out does not contain fluids");
+        });
+    }
+
+    @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
+    public void testFluidsPassiveExporterRespectFilter(GameTestHelper helper) {
+        PartPos posExporter = setupPassiveExporter(helper);
+        setPassiveInteraction(posExporter, TunnelAspects.Write.Fluid.FLUIDSTACK_EXPORT, true, false);
+
+        helper.runAfterDelay(TICKS_PASSIVE_INTERACTION, () -> {
+            // Check if the subnetwork was not able to pull fluids out of the network under test
+            BlockEntityDryingBasin basinIn = helper.getBlockEntity(POS.east().east());
+            BlockEntityDryingBasin basinOut = helper.getBlockEntity(POS.west().west());
+            helper.assertValueEqual(basinIn.getTank().getFluidAmount(), 1_000, "Basin in was incorrectly drained");
+            helper.assertValueEqual(basinOut.getTank().getFluidAmount(), 0, "Basin out incorrectly contains fluids");
+            helper.succeed();
+        });
+    }
+
+    @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
+    public void testFluidsPassiveExporterDisabled(GameTestHelper helper) {
+        PartPos posExporter = setupPassiveExporter(helper);
+        setPassiveInteraction(posExporter, TunnelAspects.Write.Fluid.FLUIDSTACK_EXPORT, false, true);
+
+        helper.runAfterDelay(TICKS_PASSIVE_INTERACTION, () -> {
+            // Check if the subnetwork was not able to pull fluids out of the network under test
+            BlockEntityDryingBasin basinIn = helper.getBlockEntity(POS.east().east());
+            BlockEntityDryingBasin basinOut = helper.getBlockEntity(POS.west().west());
+            helper.assertValueEqual(basinIn.getTank().getFluidAmount(), 1_000, "Basin in was incorrectly drained");
+            helper.assertValueEqual(basinOut.getTank().getFluidAmount(), 0, "Basin out incorrectly contains fluids");
+            helper.succeed();
         });
     }
 
