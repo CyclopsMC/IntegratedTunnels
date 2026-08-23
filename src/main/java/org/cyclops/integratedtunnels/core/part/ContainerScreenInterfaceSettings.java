@@ -8,6 +8,7 @@ import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
+import net.minecraft.util.ARGB;
 import net.minecraft.world.entity.player.Inventory;
 import org.cyclops.cyclopscore.client.gui.component.button.ButtonImage;
 import org.cyclops.cyclopscore.client.gui.component.input.WidgetNumberField;
@@ -54,7 +55,7 @@ public class ContainerScreenInterfaceSettings extends ContainerScreenPartSetting
         numberFieldChannelInterface.setPositiveOnly(false);
         numberFieldChannelInterface.setMaxLength(15);
         numberFieldChannelInterface.setVisible(true);
-        numberFieldChannelInterface.setTextColor(16777215);
+        numberFieldChannelInterface.setTextColor(ARGB.opaque(16777215));
         numberFieldChannelInterface.setCanLoseFocus(true);
 
         addRenderableWidget(new ButtonImage(this.leftPos - 20, this.topPos + 0, 18, 18,
