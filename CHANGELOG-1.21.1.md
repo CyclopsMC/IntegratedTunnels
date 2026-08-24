@@ -1,8 +1,24 @@
 # Changelog for Minecraft 1.21.1
 All notable changes to this project will be documented in this file.
 
+<a name="1.21.1-1.10.0"></a>
+## [1.21.1-1.10.0](https://github.com/CyclopsMC/IntegratedTunnels/compare/1.21.1-1.9.4...1.21.1-1.10.0) - 2026-08-24 19:44:52
+
+
+### Added
+* Add option to ignore aspect filter during passive interaction (#377), Closes #310
+* Add 'Craft' checkbox to export items aspect (#373), Closes #344
+* Add export/import item slot option for world item exporters/importers (#372), Closes CyclopsMC/IntegratedDynamics#1560
+
+### Changed
+* Auto-save interface settings when closing the gui (#378), Closes #161
+
+### Fixed
+* Fix memory leak in per-level FakePlayer cache
+* Prevent Player Simulator crashes from fake-player dimension transitions (#366), Closes #365
+
 <a name="1.21.1-1.9.4"></a>
-## [1.21.1-1.9.4](https://github.com/CyclopsMC/IntegratedTunnels/compare/1.21.1-1.9.3...1.21.1-1.9.4) - 2026-03-09 16:16:19
+## [1.21.1-1.9.4](https://github.com/CyclopsMC/IntegratedTunnels/compare/1.21.1-1.9.3...1.21.1-1.9.4) - 2026-03-09 16:16:19 +0100
 
 
 ### Fixed
