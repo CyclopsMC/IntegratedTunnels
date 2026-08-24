@@ -3,7 +3,7 @@ package org.cyclops.integratedtunnels.gametest;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTestHelper;
-import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.entity.animal.equine.Donkey;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -137,7 +137,7 @@ public class GameTestsWorldItem {
         PartHelpers.addPart(helper.getLevel(), helper.absolutePos(POS.east()), Direction.EAST, PartTypes.INTERFACE_ITEM, new ItemStack(PartTypes.INTERFACE_ITEM.getItem()));
         helper.setBlock(POS.east().east(), Blocks.CHEST);
 
-        Donkey donkey = (Donkey) helper.spawnWithNoFreeWill(EntityType.DONKEY, POS.west());
+        Donkey donkey = (Donkey) helper.spawnWithNoFreeWill(EntityTypes.DONKEY, POS.west());
         donkey.getSlot(499).set(new ItemStack(Items.CHEST));
         donkey.getInventory().setItem(2, new ItemStack(Items.APPLE));
 
@@ -159,7 +159,7 @@ public class GameTestsWorldItem {
         PartHelpers.addPart(helper.getLevel(), helper.absolutePos(POS.east()), Direction.NORTH, PartTypes.EXPORTER_WORLD_ITEM, new ItemStack(PartTypes.EXPORTER_WORLD_ITEM.getItem()));
         helper.setBlock(POS.west(), Blocks.CHEST);
 
-        Donkey donkey = (Donkey) helper.spawnWithNoFreeWill(EntityType.DONKEY, POS.east().north());
+        Donkey donkey = (Donkey) helper.spawnWithNoFreeWill(EntityTypes.DONKEY, POS.east().north());
         donkey.getSlot(499).set(new ItemStack(Items.CHEST));
         ChestBlockEntity chestIn = helper.getBlockEntity(POS.west(), ChestBlockEntity.class);
         chestIn.setItem(0, new ItemStack(Items.APPLE));

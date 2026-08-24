@@ -8,6 +8,7 @@ import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
+import net.minecraft.util.ARGB;
 import net.minecraft.world.entity.player.Inventory;
 import org.cyclops.cyclopscore.client.gui.component.button.ButtonImage;
 import org.cyclops.cyclopscore.client.gui.component.input.WidgetNumberField;
@@ -54,13 +55,12 @@ public class ContainerScreenInterfaceSettings extends ContainerScreenPartSetting
         numberFieldChannelInterface.setPositiveOnly(false);
         numberFieldChannelInterface.setMaxLength(15);
         numberFieldChannelInterface.setVisible(true);
-        numberFieldChannelInterface.setTextColor(16777215);
+        numberFieldChannelInterface.setTextColor(ARGB.opaque(16777215));
         numberFieldChannelInterface.setCanLoseFocus(true);
 
         addRenderableWidget(new ButtonImage(this.leftPos - 20, this.topPos + 0, 18, 18,
                 Component.translatable("gui.integrateddynamics.part_offsets"),
-                createServerPressable(ContainerMultipartAspects.BUTTON_OFFSETS, (button) -> {
-                }),
+                createServerPressable(ContainerMultipartAspects.BUTTON_OFFSETS, (button) -> onSave()),
                 new IImage[]{
                         org.cyclops.integrateddynamics.client.gui.image.Images.BUTTON_BACKGROUND_INACTIVE,
                         org.cyclops.integrateddynamics.client.gui.image.Images.BUTTON_MIDDLE_OFFSET
@@ -68,6 +68,14 @@ public class ContainerScreenInterfaceSettings extends ContainerScreenPartSetting
                 false, 0, 0));
 
         this.refreshValues();
+    }
+
+    @Override
+    public void onClose() {
+        // Auto-save the settings when the gui is closed,
+        // so that the save button becomes optional.
+        onSave();
+        super.onClose();
     }
 
     @Override

@@ -1,0 +1,9 @@
+As always, don't forget to backup your world before updating!
+Requires CyclopsCore version 1.18.4 or higher.
+
+Additions:
+* Add 'Craft' checkbox to export items aspect (#373), Closes #344
+* Add export/import item slot option for world item exporters/importers (#372), Closes CyclopsMC/IntegratedDynamics#1560
+
+Changes:
+* Auto-save interface settings when closing the gui (#378), Closes #161
