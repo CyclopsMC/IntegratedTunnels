@@ -1,0 +1,14 @@
+As always, don't forget to backup your world before updating!
+Requires CyclopsCore version 1.26.0 or higher.
+
+Additions:
+* Add option to ignore aspect filter during passive interaction (#377), Closes #310
+* Add 'Craft' checkbox to export items aspect (#373), Closes #344
+* Add export/import item slot option for world item exporters/importers (#372), Closes CyclopsMC/IntegratedDynamics#1560
+
+Changes:
+* Auto-save interface settings when closing the gui (#378), Closes #161
+
+Fixes:
+* Fix memory leak in per-level FakePlayer cache
+* Prevent Player Simulator crashes from fake-player dimension transitions (#366), Closes #365

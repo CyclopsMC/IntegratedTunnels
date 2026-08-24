@@ -60,8 +60,7 @@ public class ContainerScreenInterfaceSettings extends ContainerScreenPartSetting
 
         addRenderableWidget(new ButtonImage(this.leftPos - 20, this.topPos + 0, 18, 18,
                 Component.translatable("gui.integrateddynamics.part_offsets"),
-                createServerPressable(ContainerMultipartAspects.BUTTON_OFFSETS, (button) -> {
-                }),
+                createServerPressable(ContainerMultipartAspects.BUTTON_OFFSETS, (button) -> onSave()),
                 new IImage[]{
                         org.cyclops.integrateddynamics.client.gui.image.Images.BUTTON_BACKGROUND_INACTIVE,
                         org.cyclops.integrateddynamics.client.gui.image.Images.BUTTON_MIDDLE_OFFSET
@@ -69,6 +68,14 @@ public class ContainerScreenInterfaceSettings extends ContainerScreenPartSetting
                 false, 0, 0));
 
         this.refreshValues();
+    }
+
+    @Override
+    public void onClose() {
+        // Auto-save the settings when the gui is closed,
+        // so that the save button becomes optional.
+        onSave();
+        super.onClose();
     }
 
     @Override
