@@ -13,6 +13,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.cyclops.commoncapabilities.api.capability.itemhandler.ItemMatch;
 import org.cyclops.commoncapabilities.api.ingredient.IngredientComponent;
 import org.cyclops.commoncapabilities.api.ingredient.storage.IIngredientComponentStorage;
+import org.cyclops.cyclopscore.helper.BlockHelpers;
 import org.cyclops.cyclopscore.helper.ItemStackHelpers;
 import org.cyclops.integrateddynamics.api.evaluate.EvaluationException;
 import org.cyclops.integrateddynamics.api.evaluate.operator.IOperator;
@@ -41,6 +42,11 @@ import java.util.Optional;
  * @author rubensworks
  */
 public class TunnelItemHelpers {
+
+    /**
+     * The maximum stack size that is imported at once when matching by block.
+     */
+    private static final int MATCH_BLOCK_DROPS_AMOUNT = 64;
 
     public static final IngredientPredicate<ItemStack, Integer> MATCH_NONE = new IngredientPredicate<ItemStack, Integer>(IngredientComponent.ITEMSTACK, ItemStack.EMPTY, ItemMatch.EXACT, false, true, 0, false) {
         @Override
@@ -191,6 +197,8 @@ public class TunnelItemHelpers {
      * @param fortune The fortune level.
      * @param silkTouch If the block should be broken with silk touch.
      * @param breakOnNoDrops If the block should be broken if it produced no drops.
+     * @param matchBlock If the item form of the to-be-broken block should be matched
+     *                   instead of the items that the block would drop.
      * @return The picked-up items.
      * @throws EvaluationException If illegal movement occured and further movement should stop.
      */
@@ -199,12 +207,21 @@ public class TunnelItemHelpers {
                                               IIngredientComponentStorage<ItemStack, Integer> destination,
                                               IngredientPredicate<ItemStack, Integer> itemStackMatcher, InteractionHand hand, boolean blockUpdate,
                                               boolean ignoreReplacable, int fortune, boolean silkTouch,
-                                              boolean breakOnNoDrops) throws EvaluationException {
+                                              boolean breakOnNoDrops, boolean matchBlock) throws EvaluationException {
         BlockState destBlockState = world.getBlockState(pos);
         final boolean isDestReplaceable = destBlockState.canBeReplaced(TunnelHelpers.createBlockItemUseContext(world, null, pos, side, hand));
         if (world.isEmptyBlock(pos)
                 || ((ignoreReplacable && isDestReplaceable) || destBlockState.liquid())) {
             return null;
+        }
+
+        // If we have to match by block, check the item form of the block that is present in the world.
+        // If it matches, all drops of that block are imported, no matter what they are.
+        if (matchBlock) {
+            if (!itemStackMatcher.test(BlockHelpers.getItemStackFromBlockState(destBlockState))) {
+                return null;
+            }
+            itemStackMatcher = matchAll(MATCH_BLOCK_DROPS_AMOUNT, false);
         }
 
         ItemStorageBlockWrapper sourceBlock = new ItemStorageBlockWrapper(
