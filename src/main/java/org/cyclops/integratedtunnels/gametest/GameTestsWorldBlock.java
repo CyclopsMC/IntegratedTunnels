@@ -29,6 +29,7 @@ import org.cyclops.integratedtunnels.part.aspect.TunnelAspects;
 import static org.cyclops.integrateddynamics.gametest.GameTestHelpersIntegratedDynamics.createVariableForValue;
 import static org.cyclops.integrateddynamics.gametest.GameTestHelpersIntegratedDynamics.placeVariableInWriter;
 import static org.cyclops.integratedtunnels.gametest.GameTestHelpersIntegratedTunnels.setMatchBlock;
+import static org.cyclops.integratedtunnels.gametest.GameTestHelpersIntegratedTunnels.setSilkTouch;
 
 @GameTestHolder(Reference.MOD_ID)
 @PrefixGameTestTemplate(false)
@@ -508,6 +509,23 @@ public class GameTestsWorldBlock {
             // Check that the predicate did not error
             IPartStateWriter partStateWriter = (IPartStateWriter) PartHelpers.getPart(importer).getState();
             helper.assertFalse(partStateWriter.isDeactivated(), "Importer is deactivated");
+        });
+    }
+
+    @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
+    public void testWorldBlockImporterMatchBlockSilkTouch(GameTestHelper helper) {
+        // Coal ore only drops itself when it is broken with silk touch.
+        setupImporterNetwork(helper, Blocks.COAL_ORE);
+
+        PartPos importer = PartPos.of(helper.getLevel(), helper.absolutePos(POS), Direction.WEST);
+        placeVariableInWriter(helper.getLevel(), importer, TunnelAspects.Write.World.BLOCK_BLOCK_IMPORT, createVariableForValue(helper.getLevel(), ValueTypes.OBJECT_BLOCK, ValueObjectTypeBlock.ValueBlock.of(Blocks.COAL_ORE.defaultBlockState())));
+        setMatchBlock(importer, TunnelAspects.Write.World.BLOCK_BLOCK_IMPORT, true);
+        setSilkTouch(importer, TunnelAspects.Write.World.BLOCK_BLOCK_IMPORT, true);
+
+        helper.succeedWhen(() -> {
+            // Check if the block is broken, and the silk touch drops are imported
+            helper.assertBlockNotPresent(Blocks.COAL_ORE, POS.west());
+            helper.assertContainerContains(POS.east().east(), Blocks.COAL_ORE.asItem());
         });
     }
 

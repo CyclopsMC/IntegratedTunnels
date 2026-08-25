@@ -43,11 +43,6 @@ import java.util.Optional;
  */
 public class TunnelItemHelpers {
 
-    /**
-     * The maximum stack size that is imported at once when matching by block.
-     */
-    private static final int MATCH_BLOCK_DROPS_AMOUNT = 64;
-
     public static final IngredientPredicate<ItemStack, Integer> MATCH_NONE = new IngredientPredicate<ItemStack, Integer>(IngredientComponent.ITEMSTACK, ItemStack.EMPTY, ItemMatch.EXACT, false, true, 0, false) {
         @Override
         public boolean test(@Nullable ItemStack input) {
@@ -221,7 +216,7 @@ public class TunnelItemHelpers {
             if (!itemStackMatcher.test(BlockHelpers.getItemStackFromBlockState(destBlockState))) {
                 return null;
             }
-            itemStackMatcher = matchAll(MATCH_BLOCK_DROPS_AMOUNT, false);
+            itemStackMatcher = matchAll(itemStackMatcher.getMaxQuantity(), itemStackMatcher.isExactQuantity());
         }
 
         ItemStorageBlockWrapper sourceBlock = new ItemStorageBlockWrapper(
