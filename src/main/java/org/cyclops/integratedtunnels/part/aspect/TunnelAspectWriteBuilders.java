@@ -1343,6 +1343,8 @@ public class TunnelAspectWriteBuilders {
                 new AspectPropertyTypeInstance<>(ValueTypes.BOOLEAN, "aspect.aspecttypes.integratedtunnels.boolean.world.ignorereplacable");
         public static final IAspectPropertyTypeInstance<ValueTypeBoolean, ValueTypeBoolean.ValueBoolean> PROP_BREAK_ON_NO_DROPS =
                 new AspectPropertyTypeInstance<>(ValueTypes.BOOLEAN, "aspect.aspecttypes.integratedtunnels.boolean.world.breaknodrops");
+        public static final IAspectPropertyTypeInstance<ValueTypeBoolean, ValueTypeBoolean.ValueBoolean> PROP_MATCH_BLOCK =
+                new AspectPropertyTypeInstance<>(ValueTypes.BOOLEAN, "aspect.aspecttypes.integratedtunnels.boolean.world.matchblock");
         public static final IAspectPropertyTypeInstance<ValueTypeBoolean, ValueTypeBoolean.ValueBoolean> PROP_IGNORE_PICK_UP_DELAY =
                 new AspectPropertyTypeInstance<>(ValueTypes.BOOLEAN, "aspect.aspecttypes.integratedtunnels.boolean.world.ignorepickupdelay");
         public static final IAspectPropertyTypeInstance<ValueTypeBoolean, ValueTypeBoolean.ValueBoolean> PROP_DISPENSE =
@@ -2035,7 +2037,8 @@ public class TunnelAspectWriteBuilders {
                     PROP_HAND_RIGHT,
                     PROP_SILK_TOUCH,
                     PROP_IGNORE_REPLACABLE,
-                    PROP_BREAK_ON_NO_DROPS
+                    PROP_BREAK_ON_NO_DROPS,
+                    PROP_MATCH_BLOCK
             ));
             public static final IAspectProperties PROPERTIES_ITEM_PICK_UP = new AspectProperties(ImmutableList.<IAspectPropertyTypeInstance>of(
                     PROP_CHANNEL,
@@ -2047,7 +2050,8 @@ public class TunnelAspectWriteBuilders {
                     PROP_HAND_RIGHT,
                     PROP_SILK_TOUCH,
                     PROP_IGNORE_REPLACABLE,
-                    PROP_BREAK_ON_NO_DROPS
+                    PROP_BREAK_ON_NO_DROPS,
+                    PROP_MATCH_BLOCK
             ));
             public static final IAspectProperties PROPERTIES_ITEM_PICK_UP_NBT = new AspectProperties(ImmutableList.<IAspectPropertyTypeInstance>of(
                     PROP_CHANNEL,
@@ -2058,6 +2062,7 @@ public class TunnelAspectWriteBuilders {
                     PROP_SILK_TOUCH,
                     PROP_IGNORE_REPLACABLE,
                     PROP_BREAK_ON_NO_DROPS,
+                    PROP_MATCH_BLOCK,
                     TunnelAspectWriteBuilders.Item.PROP_NBT_SUBSET,
                     TunnelAspectWriteBuilders.Item.PROP_NBT_SUPERSET,
                     TunnelAspectWriteBuilders.Item.PROP_NBT_REQUIRE,
@@ -2077,7 +2082,8 @@ public class TunnelAspectWriteBuilders {
                     PROP_HAND_RIGHT,
                     PROP_SILK_TOUCH,
                     PROP_IGNORE_REPLACABLE,
-                    PROP_BREAK_ON_NO_DROPS
+                    PROP_BREAK_ON_NO_DROPS,
+                    PROP_MATCH_BLOCK
             ));
 
             static {
@@ -2115,6 +2121,7 @@ public class TunnelAspectWriteBuilders {
                 PROPERTIES_ITEM_PICK_UP_NOCHECKS.setValue(PROP_SILK_TOUCH, ValueTypeBoolean.ValueBoolean.of(false));
                 PROPERTIES_ITEM_PICK_UP_NOCHECKS.setValue(PROP_IGNORE_REPLACABLE, ValueTypeBoolean.ValueBoolean.of(false));
                 PROPERTIES_ITEM_PICK_UP_NOCHECKS.setValue(PROP_BREAK_ON_NO_DROPS, ValueTypeBoolean.ValueBoolean.of(true));
+                PROPERTIES_ITEM_PICK_UP_NOCHECKS.setValue(PROP_MATCH_BLOCK, ValueTypeBoolean.ValueBoolean.of(false));
 
                 PROPERTIES_ITEM_PICK_UP.setValue(PROP_CHANNEL, ValueTypeInteger.ValueInteger.of(IPositionedAddonsNetworkIngredients.DEFAULT_CHANNEL));
                 PROPERTIES_ITEM_PICK_UP.setValue(PROP_ROUNDROBIN, ValueTypeBoolean.ValueBoolean.of(false));
@@ -2126,6 +2133,7 @@ public class TunnelAspectWriteBuilders {
                 PROPERTIES_ITEM_PICK_UP.setValue(PROP_SILK_TOUCH, ValueTypeBoolean.ValueBoolean.of(false));
                 PROPERTIES_ITEM_PICK_UP.setValue(PROP_IGNORE_REPLACABLE, ValueTypeBoolean.ValueBoolean.of(false));
                 PROPERTIES_ITEM_PICK_UP.setValue(PROP_BREAK_ON_NO_DROPS, ValueTypeBoolean.ValueBoolean.of(true));
+                PROPERTIES_ITEM_PICK_UP.setValue(PROP_MATCH_BLOCK, ValueTypeBoolean.ValueBoolean.of(false));
 
                 PROPERTIES_ITEM_PICK_UP_NBT.setValue(PROP_CHANNEL, ValueTypeInteger.ValueInteger.of(IPositionedAddonsNetworkIngredients.DEFAULT_CHANNEL));
                 PROPERTIES_ITEM_PICK_UP_NBT.setValue(PROP_ROUNDROBIN, ValueTypeBoolean.ValueBoolean.of(false));
@@ -2135,6 +2143,7 @@ public class TunnelAspectWriteBuilders {
                 PROPERTIES_ITEM_PICK_UP_NBT.setValue(PROP_SILK_TOUCH, ValueTypeBoolean.ValueBoolean.of(false));
                 PROPERTIES_ITEM_PICK_UP_NBT.setValue(PROP_IGNORE_REPLACABLE, ValueTypeBoolean.ValueBoolean.of(false));
                 PROPERTIES_ITEM_PICK_UP_NBT.setValue(PROP_BREAK_ON_NO_DROPS, ValueTypeBoolean.ValueBoolean.of(true));
+                PROPERTIES_ITEM_PICK_UP_NBT.setValue(PROP_MATCH_BLOCK, ValueTypeBoolean.ValueBoolean.of(false));
                 PROPERTIES_ITEM_PICK_UP_NBT.setValue(TunnelAspectWriteBuilders.Item.PROP_NBT_SUBSET, ValueTypeBoolean.ValueBoolean.of(true));
                 PROPERTIES_ITEM_PICK_UP_NBT.setValue(TunnelAspectWriteBuilders.Item.PROP_NBT_SUPERSET, ValueTypeBoolean.ValueBoolean.of(true));
                 PROPERTIES_ITEM_PICK_UP_NBT.setValue(TunnelAspectWriteBuilders.Item.PROP_NBT_REQUIRE, ValueTypeBoolean.ValueBoolean.of(true));
@@ -2153,6 +2162,7 @@ public class TunnelAspectWriteBuilders {
                 PROPERTIES_BLOCK_PICK_UP.setValue(PROP_SILK_TOUCH, ValueTypeBoolean.ValueBoolean.of(false));
                 PROPERTIES_BLOCK_PICK_UP.setValue(PROP_IGNORE_REPLACABLE, ValueTypeBoolean.ValueBoolean.of(false));
                 PROPERTIES_BLOCK_PICK_UP.setValue(PROP_BREAK_ON_NO_DROPS, ValueTypeBoolean.ValueBoolean.of(true));
+                PROPERTIES_BLOCK_PICK_UP.setValue(PROP_MATCH_BLOCK, ValueTypeBoolean.ValueBoolean.of(false));
             }
             public static final IAspectProperties PROPERTIES_ITEM_PLACELIST = PROPERTIES_ITEMCRAFT_PLACE.clone();
             public static final IAspectProperties PROPERTIES_ITEM_PICK_UPLIST = PROPERTIES_ITEM_PICK_UP.clone();
@@ -2218,6 +2228,7 @@ public class TunnelAspectWriteBuilders {
                     int fortune = 0;
                     boolean silkTouch = input.getProperties().getValue(PROP_SILK_TOUCH).getRawValue();
                     boolean breakOnNoDrops = input.getProperties().getValue(PROP_BREAK_ON_NO_DROPS).getRawValue();
+                    boolean matchBlock = input.getProperties().getValue(PROP_MATCH_BLOCK).getRawValue();
                     TunnelItemHelpers.pickUpItems(
                             input.getNetwork(),
                             input.getChanneledNetwork(),
@@ -2233,7 +2244,8 @@ public class TunnelAspectWriteBuilders {
                             ignoreReplacable,
                             fortune,
                             silkTouch,
-                            breakOnNoDrops
+                            breakOnNoDrops,
+                            matchBlock
                     );
                 }
                 return null;

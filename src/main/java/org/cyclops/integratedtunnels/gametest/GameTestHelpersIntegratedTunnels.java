@@ -30,4 +30,30 @@ public class GameTestHelpersIntegratedTunnels {
         partStateHolder.getState().setAspectProperties(aspect, properties);
     }
 
+    /**
+     * Configure the match block property of the given aspect within the given part.
+     * @param partPos The position of the part.
+     * @param aspect The active aspect of the part.
+     * @param matchBlock If the to-be-broken block should be matched instead of the items it would drop.
+     */
+    public static void setMatchBlock(PartPos partPos, IAspectWrite<?, ?> aspect, boolean matchBlock) {
+        PartHelpers.PartStateHolder partStateHolder = PartHelpers.getPart(partPos);
+        IAspectProperties properties = aspect.getProperties(partStateHolder.getPart(), PartTarget.fromCenter(partPos), partStateHolder.getState());
+        properties.setValue(TunnelAspectWriteBuilders.World.PROP_MATCH_BLOCK, ValueTypeBoolean.ValueBoolean.of(matchBlock));
+        partStateHolder.getState().setAspectProperties(aspect, properties);
+    }
+
+    /**
+     * Configure the silk touch property of the given aspect within the given part.
+     * @param partPos The position of the part.
+     * @param aspect The active aspect of the part.
+     * @param silkTouch If blocks should be broken with silk touch.
+     */
+    public static void setSilkTouch(PartPos partPos, IAspectWrite<?, ?> aspect, boolean silkTouch) {
+        PartHelpers.PartStateHolder partStateHolder = PartHelpers.getPart(partPos);
+        IAspectProperties properties = aspect.getProperties(partStateHolder.getPart(), PartTarget.fromCenter(partPos), partStateHolder.getState());
+        properties.setValue(TunnelAspectWriteBuilders.World.PROP_SILK_TOUCH, ValueTypeBoolean.ValueBoolean.of(silkTouch));
+        partStateHolder.getState().setAspectProperties(aspect, properties);
+    }
+
 }

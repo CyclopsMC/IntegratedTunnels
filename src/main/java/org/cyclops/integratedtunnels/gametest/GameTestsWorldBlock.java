@@ -6,6 +6,7 @@ import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.ShulkerBoxBlockEntity;
 import net.neoforged.neoforge.gametest.GameTestHolder;
@@ -14,7 +15,11 @@ import org.cyclops.integrateddynamics.RegistryEntries;
 import org.cyclops.integrateddynamics.api.part.PartPos;
 import org.cyclops.integrateddynamics.api.part.write.IPartStateWriter;
 import org.cyclops.integrateddynamics.core.block.IgnoredBlockStatus;
+import org.cyclops.integrateddynamics.core.evaluate.operator.Operators;
+import org.cyclops.integrateddynamics.core.evaluate.variable.ValueObjectTypeBlock;
 import org.cyclops.integrateddynamics.core.evaluate.variable.ValueObjectTypeItemStack;
+import org.cyclops.integrateddynamics.core.evaluate.variable.ValueTypeList;
+import org.cyclops.integrateddynamics.core.evaluate.variable.ValueTypeOperator;
 import org.cyclops.integrateddynamics.core.evaluate.variable.ValueTypes;
 import org.cyclops.integrateddynamics.core.helper.PartHelpers;
 import org.cyclops.integratedtunnels.Reference;
@@ -23,6 +28,8 @@ import org.cyclops.integratedtunnels.part.aspect.TunnelAspects;
 
 import static org.cyclops.integrateddynamics.gametest.GameTestHelpersIntegratedDynamics.createVariableForValue;
 import static org.cyclops.integrateddynamics.gametest.GameTestHelpersIntegratedDynamics.placeVariableInWriter;
+import static org.cyclops.integratedtunnels.gametest.GameTestHelpersIntegratedTunnels.setMatchBlock;
+import static org.cyclops.integratedtunnels.gametest.GameTestHelpersIntegratedTunnels.setSilkTouch;
 
 @GameTestHolder(Reference.MOD_ID)
 @PrefixGameTestTemplate(false)
@@ -309,6 +316,216 @@ public class GameTestsWorldBlock {
 
             // Restore original config
             org.cyclops.integratedtunnels.GeneralConfig.blockImporterBlacklist = originalBlacklist;
+        });
+    }
+
+    /**
+     * Set up a network with a world block importer facing the given block,
+     * and an item interface with a chest to store the imported items in.
+     * @param helper The game test helper.
+     * @param block The block to place in front of the importer.
+     */
+    private static void setupImporterNetwork(GameTestHelper helper, Block block) {
+        // Place cable
+        helper.setBlock(POS, RegistryEntries.BLOCK_CABLE.value());
+        helper.setBlock(POS.east(), RegistryEntries.BLOCK_CABLE.value());
+
+        // Place world block importer
+        PartHelpers.addPart(helper.getLevel(), helper.absolutePos(POS), Direction.WEST, PartTypes.IMPORTER_WORLD_BLOCK, new ItemStack(PartTypes.IMPORTER_WORLD_BLOCK.getItem()));
+
+        // Place item interface
+        PartHelpers.addPart(helper.getLevel(), helper.absolutePos(POS.east()), Direction.EAST, PartTypes.INTERFACE_ITEM, new ItemStack(PartTypes.INTERFACE_ITEM.getItem()));
+
+        // Place chest for interface
+        helper.setBlock(POS.east().east(), Blocks.CHEST);
+
+        // Place block before importer
+        helper.setBlock(POS.west(), block);
+    }
+
+    @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
+    public void testWorldBlockImporterMatchBlockBlockCorrect(GameTestHelper helper) {
+        // Stone drops cobblestone, so it can only be imported by matching the stone block itself.
+        setupImporterNetwork(helper, Blocks.STONE);
+
+        PartPos importer = PartPos.of(helper.getLevel(), helper.absolutePos(POS), Direction.WEST);
+        placeVariableInWriter(helper.getLevel(), importer, TunnelAspects.Write.World.BLOCK_BLOCK_IMPORT, createVariableForValue(helper.getLevel(), ValueTypes.OBJECT_BLOCK, ValueObjectTypeBlock.ValueBlock.of(Blocks.STONE.defaultBlockState())));
+        setMatchBlock(importer, TunnelAspects.Write.World.BLOCK_BLOCK_IMPORT, true);
+
+        helper.succeedWhen(() -> {
+            // Check if the block is broken, and its drops are imported
+            helper.assertBlockNotPresent(Blocks.STONE, POS.west());
+            helper.assertContainerContains(POS.east().east(), Items.COBBLESTONE);
+        });
+    }
+
+    @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
+    public void testWorldBlockImporterMatchBlockBlockIncorrect(GameTestHelper helper) {
+        // Stone drops cobblestone, but cobblestone must not match when the block itself is matched.
+        setupImporterNetwork(helper, Blocks.STONE);
+
+        PartPos importer = PartPos.of(helper.getLevel(), helper.absolutePos(POS), Direction.WEST);
+        placeVariableInWriter(helper.getLevel(), importer, TunnelAspects.Write.World.BLOCK_BLOCK_IMPORT, createVariableForValue(helper.getLevel(), ValueTypes.OBJECT_BLOCK, ValueObjectTypeBlock.ValueBlock.of(Blocks.COBBLESTONE.defaultBlockState())));
+        setMatchBlock(importer, TunnelAspects.Write.World.BLOCK_BLOCK_IMPORT, true);
+
+        helper.runAfterDelay(200, () -> {
+            // Check that the block is not broken
+            helper.assertBlockPresent(Blocks.STONE, POS.west());
+            helper.assertContainerEmpty(POS.east().east());
+            helper.succeed();
+        });
+    }
+
+    @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
+    public void testWorldBlockImporterMatchBlockDisabledMatchesDrops(GameTestHelper helper) {
+        // Without the match block option, the drops of the block are matched.
+        setupImporterNetwork(helper, Blocks.STONE);
+
+        PartPos importer = PartPos.of(helper.getLevel(), helper.absolutePos(POS), Direction.WEST);
+        placeVariableInWriter(helper.getLevel(), importer, TunnelAspects.Write.World.BLOCK_BLOCK_IMPORT, createVariableForValue(helper.getLevel(), ValueTypes.OBJECT_BLOCK, ValueObjectTypeBlock.ValueBlock.of(Blocks.COBBLESTONE.defaultBlockState())));
+        setMatchBlock(importer, TunnelAspects.Write.World.BLOCK_BLOCK_IMPORT, false);
+
+        helper.succeedWhen(() -> {
+            // Check if the block is broken, and its drops are imported
+            helper.assertBlockNotPresent(Blocks.STONE, POS.west());
+            helper.assertContainerContains(POS.east().east(), Items.COBBLESTONE);
+        });
+    }
+
+    @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
+    public void testWorldBlockImporterMatchBlockItemStackCorrect(GameTestHelper helper) {
+        setupImporterNetwork(helper, Blocks.STONE);
+
+        PartPos importer = PartPos.of(helper.getLevel(), helper.absolutePos(POS), Direction.WEST);
+        placeVariableInWriter(helper.getLevel(), importer, TunnelAspects.Write.World.BLOCK_ITEMSTACK_IMPORT, createVariableForValue(helper.getLevel(), ValueTypes.OBJECT_ITEMSTACK, ValueObjectTypeItemStack.ValueItemStack.of(new ItemStack(Blocks.STONE))));
+        setMatchBlock(importer, TunnelAspects.Write.World.BLOCK_ITEMSTACK_IMPORT, true);
+
+        helper.succeedWhen(() -> {
+            // Check if the block is broken, and its drops are imported
+            helper.assertBlockNotPresent(Blocks.STONE, POS.west());
+            helper.assertContainerContains(POS.east().east(), Items.COBBLESTONE);
+        });
+    }
+
+    @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
+    public void testWorldBlockImporterMatchBlockItemStackIncorrect(GameTestHelper helper) {
+        setupImporterNetwork(helper, Blocks.STONE);
+
+        PartPos importer = PartPos.of(helper.getLevel(), helper.absolutePos(POS), Direction.WEST);
+        placeVariableInWriter(helper.getLevel(), importer, TunnelAspects.Write.World.BLOCK_ITEMSTACK_IMPORT, createVariableForValue(helper.getLevel(), ValueTypes.OBJECT_ITEMSTACK, ValueObjectTypeItemStack.ValueItemStack.of(new ItemStack(Blocks.COBBLESTONE))));
+        setMatchBlock(importer, TunnelAspects.Write.World.BLOCK_ITEMSTACK_IMPORT, true);
+
+        helper.runAfterDelay(200, () -> {
+            // Check that the block is not broken
+            helper.assertBlockPresent(Blocks.STONE, POS.west());
+            helper.assertContainerEmpty(POS.east().east());
+            helper.succeed();
+        });
+    }
+
+    @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
+    public void testWorldBlockImporterMatchBlockListCorrect(GameTestHelper helper) {
+        setupImporterNetwork(helper, Blocks.STONE);
+
+        PartPos importer = PartPos.of(helper.getLevel(), helper.absolutePos(POS), Direction.WEST);
+        placeVariableInWriter(helper.getLevel(), importer, TunnelAspects.Write.World.BLOCK_LISTBLOCK_IMPORT, createVariableForValue(helper.getLevel(), ValueTypes.LIST, ValueTypeList.ValueList.ofAll(
+                ValueObjectTypeBlock.ValueBlock.of(Blocks.DIRT.defaultBlockState()),
+                ValueObjectTypeBlock.ValueBlock.of(Blocks.STONE.defaultBlockState())
+        )));
+        setMatchBlock(importer, TunnelAspects.Write.World.BLOCK_LISTBLOCK_IMPORT, true);
+
+        helper.succeedWhen(() -> {
+            // Check if the block is broken, and its drops are imported
+            helper.assertBlockNotPresent(Blocks.STONE, POS.west());
+            helper.assertContainerContains(POS.east().east(), Items.COBBLESTONE);
+        });
+    }
+
+    @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
+    public void testWorldBlockImporterMatchBlockListIncorrect(GameTestHelper helper) {
+        setupImporterNetwork(helper, Blocks.STONE);
+
+        PartPos importer = PartPos.of(helper.getLevel(), helper.absolutePos(POS), Direction.WEST);
+        placeVariableInWriter(helper.getLevel(), importer, TunnelAspects.Write.World.BLOCK_LISTBLOCK_IMPORT, createVariableForValue(helper.getLevel(), ValueTypes.LIST, ValueTypeList.ValueList.ofAll(
+                ValueObjectTypeBlock.ValueBlock.of(Blocks.DIRT.defaultBlockState()),
+                ValueObjectTypeBlock.ValueBlock.of(Blocks.COBBLESTONE.defaultBlockState())
+        )));
+        setMatchBlock(importer, TunnelAspects.Write.World.BLOCK_LISTBLOCK_IMPORT, true);
+
+        helper.runAfterDelay(200, () -> {
+            // Check that the block is not broken
+            helper.assertBlockPresent(Blocks.STONE, POS.west());
+            helper.assertContainerEmpty(POS.east().east());
+            helper.succeed();
+        });
+    }
+
+    @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
+    public void testWorldBlockImporterMatchBlockBoolean(GameTestHelper helper) {
+        // The match block option must not break importing all blocks.
+        setupImporterNetwork(helper, Blocks.STONE);
+
+        PartPos importer = PartPos.of(helper.getLevel(), helper.absolutePos(POS), Direction.WEST);
+        placeVariableInWriter(helper.getLevel(), importer, TunnelAspects.Write.World.BLOCK_BOOLEAN_IMPORT, new ItemStack(RegistryEntries.ITEM_VARIABLE));
+        setMatchBlock(importer, TunnelAspects.Write.World.BLOCK_BOOLEAN_IMPORT, true);
+
+        helper.succeedWhen(() -> {
+            // Check if the block is broken, and its drops are imported
+            helper.assertBlockNotPresent(Blocks.STONE, POS.west());
+            helper.assertContainerContains(POS.east().east(), Items.COBBLESTONE);
+        });
+    }
+
+    @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
+    public void testWorldBlockImporterMatchBlockWithoutItemDrops(GameTestHelper helper) {
+        // Coal ore does not drop itself, so it can only be imported by matching the block.
+        setupImporterNetwork(helper, Blocks.COAL_ORE);
+
+        PartPos importer = PartPos.of(helper.getLevel(), helper.absolutePos(POS), Direction.WEST);
+        placeVariableInWriter(helper.getLevel(), importer, TunnelAspects.Write.World.BLOCK_BLOCK_IMPORT, createVariableForValue(helper.getLevel(), ValueTypes.OBJECT_BLOCK, ValueObjectTypeBlock.ValueBlock.of(Blocks.COAL_ORE.defaultBlockState())));
+        setMatchBlock(importer, TunnelAspects.Write.World.BLOCK_BLOCK_IMPORT, true);
+
+        helper.succeedWhen(() -> {
+            // Check if the block is broken, and its drops are imported
+            helper.assertBlockNotPresent(Blocks.COAL_ORE, POS.west());
+            helper.assertContainerContains(POS.east().east(), Items.COAL);
+        });
+    }
+
+    @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
+    public void testWorldBlockImporterMatchBlockPredicate(GameTestHelper helper) {
+        // Coal ore drops coal, which is not a block, so block predicates can only match the block itself.
+        setupImporterNetwork(helper, Blocks.COAL_ORE);
+
+        PartPos importer = PartPos.of(helper.getLevel(), helper.absolutePos(POS), Direction.WEST);
+        placeVariableInWriter(helper.getLevel(), importer, TunnelAspects.Write.World.BLOCK_PREDICATEBLOCK_IMPORT, createVariableForValue(helper.getLevel(), ValueTypes.OPERATOR, ValueTypeOperator.ValueOperator.of(Operators.OBJECT_BLOCK_OPAQUE)));
+        setMatchBlock(importer, TunnelAspects.Write.World.BLOCK_PREDICATEBLOCK_IMPORT, true);
+
+        helper.succeedWhen(() -> {
+            // Check if the block is broken, and its drops are imported
+            helper.assertBlockNotPresent(Blocks.COAL_ORE, POS.west());
+            helper.assertContainerContains(POS.east().east(), Items.COAL);
+
+            // Check that the predicate did not error
+            IPartStateWriter partStateWriter = (IPartStateWriter) PartHelpers.getPart(importer).getState();
+            helper.assertFalse(partStateWriter.isDeactivated(), "Importer is deactivated");
+        });
+    }
+
+    @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
+    public void testWorldBlockImporterMatchBlockSilkTouch(GameTestHelper helper) {
+        // Coal ore only drops itself when it is broken with silk touch.
+        setupImporterNetwork(helper, Blocks.COAL_ORE);
+
+        PartPos importer = PartPos.of(helper.getLevel(), helper.absolutePos(POS), Direction.WEST);
+        placeVariableInWriter(helper.getLevel(), importer, TunnelAspects.Write.World.BLOCK_BLOCK_IMPORT, createVariableForValue(helper.getLevel(), ValueTypes.OBJECT_BLOCK, ValueObjectTypeBlock.ValueBlock.of(Blocks.COAL_ORE.defaultBlockState())));
+        setMatchBlock(importer, TunnelAspects.Write.World.BLOCK_BLOCK_IMPORT, true);
+        setSilkTouch(importer, TunnelAspects.Write.World.BLOCK_BLOCK_IMPORT, true);
+
+        helper.succeedWhen(() -> {
+            // Check if the block is broken, and the silk touch drops are imported
+            helper.assertBlockNotPresent(Blocks.COAL_ORE, POS.west());
+            helper.assertContainerContains(POS.east().east(), Blocks.COAL_ORE.asItem());
         });
     }
 
