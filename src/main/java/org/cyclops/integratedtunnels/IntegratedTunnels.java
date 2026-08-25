@@ -1,6 +1,10 @@
 package org.cyclops.integratedtunnels;
 
 import com.google.common.collect.Lists;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import net.minecraft.commands.CommandBuildContext;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.api.distmarker.Dist;
@@ -24,6 +28,7 @@ import org.cyclops.integratedtunnels.api.world.IBlockBreakHandlerRegistry;
 import org.cyclops.integratedtunnels.api.world.IBlockPlaceHandlerRegistry;
 import org.cyclops.integratedtunnels.capability.ingredient.TunnelIngredientComponentCapabilities;
 import org.cyclops.integratedtunnels.capability.network.TunnelNetworkCapabilityConstructors;
+import org.cyclops.integratedtunnels.command.CommandGenerateTunnels;
 import org.cyclops.integratedtunnels.core.ItemStoragePlayerWrapper;
 import org.cyclops.integratedtunnels.core.part.ContainerInterfaceSettingsConfig;
 import org.cyclops.integratedtunnels.core.world.BlockBreakHandlerRegistry;
@@ -70,6 +75,15 @@ public class IntegratedTunnels extends ModBaseVersionable<IntegratedTunnels> {
         PartTypes.load();
         BlockBreakHandlers.load();
         BlockPlaceHandlers.load();
+    }
+
+    @Override
+    protected LiteralArgumentBuilder<CommandSourceStack> constructBaseCommand(Commands.CommandSelection selection, CommandBuildContext context) {
+        LiteralArgumentBuilder<CommandSourceStack> root = super.constructBaseCommand(selection, context);
+
+        root.then(CommandGenerateTunnels.make());
+
+        return root;
     }
 
     @Override
