@@ -138,7 +138,10 @@ public abstract class PartTypeInterfacePositionedAddon<N extends IPositionedAddo
         }
         boolean ret = super.setTargetOffset(state, center, offset);
         if (network != null) {
-            addTargetToNetwork(network, getTarget(center, state), state.getPriority(), state.getChannelInterface(), state);
+            PartTarget target = getTarget(center, state);
+            addTargetToNetwork(network, target, state.getPriority(), state.getChannelInterface(), state);
+            // Force an observation, so that the network index does not linger on the old target
+            scheduleNetworkObservation(target, state);
         }
         return ret;
     }
@@ -154,7 +157,10 @@ public abstract class PartTypeInterfacePositionedAddon<N extends IPositionedAddo
         }
         super.setTargetSideOverride(state, side);
         if (network != null && center != null) {
-            addTargetToNetwork(network, getTarget(center, state), state.getPriority(), state.getChannelInterface(), state);
+            PartTarget target = getTarget(center, state);
+            addTargetToNetwork(network, target, state.getPriority(), state.getChannelInterface(), state);
+            // Force an observation, so that the network index does not linger on the old target side
+            scheduleNetworkObservation(target, state);
         }
     }
 

@@ -81,6 +81,26 @@ public interface IPartTypeInterfacePositionedAddon<N extends IPositionedAddonsNe
 
     public void onRemovingPositionFromNetwork(N networkCapability, INetwork network, PartPos pos, S state);
 
+    /**
+     * @deprecated Use {@link #addTargetToNetwork(INetwork, PartTarget, int, int, IState)} instead,
+     *             which also keeps track of the part's center position.
+     */
+    @Deprecated // TODO: remove in next major
+    public default void addTargetToNetwork(INetwork network, PartPos posTarget, int priority, int channelInterface, S state) {
+        Pair<N, Boolean> ret = addPositionToNetwork(network, posTarget, priority, channelInterface, state);
+        N networkCapability = ret.getLeft();
+        boolean validTargetCapability = ret.getRight();
+        if (networkCapability != null) {
+            state.setPositionedAddonsNetwork(networkCapability);
+            state.setNetworks(network, NetworkHelpers.getPartNetworkChecked(network), ValueDeseralizationContext.of(posTarget.getPos().getLevel(true)));
+            state.setPos(posTarget);
+            state.setValidTargetCapability(validTargetCapability);
+            if (validTargetCapability) {
+                onAddingPositionToNetwork(networkCapability, network, posTarget, priority, channelInterface, state);
+            }
+        }
+    }
+
     public default void addTargetToNetwork(INetwork network, PartTarget target, int priority, int channelInterface, S state) {
         PartPos posTarget = getEffectiveTargetPos(target, state);
         Pair<N, Boolean> ret = addPositionToNetwork(network, posTarget, priority, channelInterface, state);
@@ -98,6 +118,15 @@ public interface IPartTypeInterfacePositionedAddon<N extends IPositionedAddonsNe
         }
     }
 
+    /**
+     * @deprecated Use {@link #removeTargetFromNetwork(INetwork, IState)} instead,
+     *             which always removes the position that was added before.
+     */
+    @Deprecated // TODO: remove in next major
+    public default void removeTargetFromNetwork(INetwork network, PartPos pos, S state) {
+        removeTargetFromNetwork(network, state);
+    }
+
     public default void removeTargetFromNetwork(INetwork network, S state) {
         // Remove the position that was added to the network before,
         // as the effective target position may have changed in the meantime,
@@ -110,6 +139,25 @@ public interface IPartTypeInterfacePositionedAddon<N extends IPositionedAddonsNe
         state.setNetworks(null, null, null);
         state.setPos(null);
         state.setValidTargetCapability(false);
+    }
+
+    /**
+     * @deprecated Use {@link #updateTargetInNetwork(INetwork, PartTarget, int, int, IState)} instead,
+     *             which also keeps track of the part's center position.
+     */
+    @Deprecated // TODO: remove in next major
+    public default void updateTargetInNetwork(INetwork network, PartPos pos, int priority, int channelInterface, S state) {
+        if (network.getCapability(getNetworkCapability()).isPresent()) {
+            boolean validTargetCapability = getTargetCapabilityInstance(pos)
+                    .map(this::isTargetCapabilityValid)
+                    .orElse(false);
+            boolean wasValidTargetCapability = state.isValidTargetCapability();
+            // Only trigger a change if the capability presence has changed.
+            if (validTargetCapability != wasValidTargetCapability) {
+                removeTargetFromNetwork(network, state);
+                addTargetToNetwork(network, pos, priority, channelInterface, state);
+            }
+        }
     }
 
     public default void updateTargetInNetwork(INetwork network, PartTarget target, int priority, int channelInterface, S state) {
@@ -140,6 +188,7 @@ public interface IPartTypeInterfacePositionedAddon<N extends IPositionedAddonsNe
         /**
          * @return The center position of this part, or null if this part was never added to a network.
          */
+        // TODO: make a non-default method in next major
         @Nullable
         public default PartPos getCenter() {
             return null;
@@ -149,6 +198,7 @@ public interface IPartTypeInterfacePositionedAddon<N extends IPositionedAddonsNe
          * Set the center position of this part.
          * @param center The center position.
          */
+        // TODO: make a non-default method in next major
         public default void setCenter(@Nullable PartPos center) {
 
         }
