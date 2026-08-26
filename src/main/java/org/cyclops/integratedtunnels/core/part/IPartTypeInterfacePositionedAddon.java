@@ -35,11 +35,32 @@ public interface IPartTypeInterfacePositionedAddon<N extends IPositionedAddonsNe
         return BlockEntityHelpers.getCapability(pos.getPos(), pos.getSide(), getTargetCapability());
     }
 
+    /**
+     * Determine the position that this interface should expose to the network for the given target.
+     *
+     * The target position that is passed around by the part lifecycle methods
+     * does not always take the part state's target side override and offset into account,
+     * so it is recalculated here based on the part state.
+     *
+     * As a side-effect, the center position is stored inside the given state,
+     * so that the target position can be recalculated at a later point in time,
+     * for example when the target side override changes.
+     *
+     * @param target The part target.
+     * @param state The part state.
+     * @return The effective target position.
+     */
+    public default PartPos getEffectiveTargetPos(PartTarget target, S state) {
+        PartTarget effectiveTarget = getTarget(target.getCenter(), state);
+        state.setCenter(effectiveTarget.getCenter());
+        return effectiveTarget.getTarget();
+    }
+
     public default void scheduleNetworkObservation(PartTarget target, S state) {
         IPositionedAddonsNetwork positionedAddonsNetwork = state.getPositionedAddonsNetwork();
         if (positionedAddonsNetwork instanceof IPositionedAddonsNetworkIngredients) {
             ((IPositionedAddonsNetworkIngredients) positionedAddonsNetwork).scheduleObservationForced(
-                    state.getChannelInterface(), target.getTarget());
+                    state.getChannelInterface(), getEffectiveTargetPos(target, state));
         }
     }
 
@@ -81,7 +102,11 @@ public interface IPartTypeInterfacePositionedAddon<N extends IPositionedAddonsNe
     }
 
     public default void removeTargetFromNetwork(INetwork network, PartPos pos, S state) {
-        removePositionFromNetwork(network, pos, state);
+        // Remove the position that was effectively added to the network before,
+        // as the given position may have changed in the meantime,
+        // for example when the target side override or offset was modified.
+        PartPos addedPos = state.getPos();
+        removePositionFromNetwork(network, addedPos != null ? addedPos : pos, state);
         state.setPositionedAddonsNetwork(null);
         state.setNetworks(null, null, null);
         state.setPos(null);
@@ -112,6 +137,22 @@ public interface IPartTypeInterfacePositionedAddon<N extends IPositionedAddonsNe
         public void setValidTargetCapability(boolean validTargetCapability);
         public PartPos getPos();
         public void setPos(PartPos pos);
+
+        /**
+         * @return The center position of this part, or null if it is not known (yet).
+         */
+        @Nullable
+        public default PartPos getCenter() {
+            return null;
+        }
+
+        /**
+         * Set the center position of this part.
+         * @param center The center position.
+         */
+        public default void setCenter(@Nullable PartPos center) {
+
+        }
 
         public default void disablePosition() {
             N positionedNetwork = getPositionedAddonsNetwork();

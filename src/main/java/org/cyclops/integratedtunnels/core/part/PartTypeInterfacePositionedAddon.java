@@ -1,6 +1,7 @@
 package org.cyclops.integratedtunnels.core.part;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
@@ -93,20 +94,20 @@ public abstract class PartTypeInterfacePositionedAddon<N extends IPositionedAddo
     @Override
     public void afterNetworkReAlive(INetwork network, IPartNetwork partNetwork, PartTarget target, S state) {
         super.afterNetworkReAlive(network, partNetwork, target, state);
-        addTargetToNetwork(network, target.getTarget(), state.getPriority(), state.getChannelInterface(), state);
+        addTargetToNetwork(network, getEffectiveTargetPos(target, state), state.getPriority(), state.getChannelInterface(), state);
     }
 
     @Override
     public void onNetworkRemoval(INetwork network, IPartNetwork partNetwork, PartTarget target, S state) {
         super.onNetworkRemoval(network, partNetwork, target, state);
         scheduleNetworkObservation(target, state);
-        removeTargetFromNetwork(network, target.getTarget(), state);
+        removeTargetFromNetwork(network, getEffectiveTargetPos(target, state), state);
     }
 
     @Override
     public void onNetworkAddition(INetwork network, IPartNetwork partNetwork, PartTarget target, S state) {
         super.onNetworkAddition(network, partNetwork, target, state);
-        addTargetToNetwork(network, target.getTarget(), state.getPriority(), state.getChannelInterface(), state);
+        addTargetToNetwork(network, getEffectiveTargetPos(target, state), state.getPriority(), state.getChannelInterface(), state);
         scheduleNetworkObservation(target, state);
     }
 
@@ -114,7 +115,7 @@ public abstract class PartTypeInterfacePositionedAddon<N extends IPositionedAddo
     public void onBlockNeighborChange(INetwork network, IPartNetwork partNetwork, PartTarget target, S state, BlockGetter world, Block neighbourBlock, BlockPos neighbourBlockPos) {
         super.onBlockNeighborChange(network, partNetwork, target, state, world, neighbourBlock, neighbourBlockPos);
         if (network != null) {
-            updateTargetInNetwork(network, target.getTarget(), state.getPriority(), state.getChannelInterface(), state);
+            updateTargetInNetwork(network, getEffectiveTargetPos(target, state), state.getPriority(), state.getChannelInterface(), state);
         }
     }
 
@@ -122,9 +123,9 @@ public abstract class PartTypeInterfacePositionedAddon<N extends IPositionedAddo
     public void setPriorityAndChannel(INetwork network, IPartNetwork partNetwork, PartTarget target, S state, int priority, int channel) {
         // We need to do this because the energy network is not automagically aware of the priority changes,
         // so we have to re-add it.
-        removeTargetFromNetwork(network, target.getTarget(), state);
+        removeTargetFromNetwork(network, getEffectiveTargetPos(target, state), state);
         super.setPriorityAndChannel(network, partNetwork, target, state, priority, channel);
-        addTargetToNetwork(network, target.getTarget(), priority, state.getChannelInterface(), state);
+        addTargetToNetwork(network, getEffectiveTargetPos(target, state), priority, state.getChannelInterface(), state);
     }
 
     @Override
@@ -140,6 +141,21 @@ public abstract class PartTypeInterfacePositionedAddon<N extends IPositionedAddo
             addTargetToNetwork(network, getTarget(center, state).getTarget(), state.getPriority(), state.getChannelInterface(), state);
         }
         return ret;
+    }
+
+    @Override
+    public void setTargetSideOverride(S state, @Nullable Direction side) {
+        // Remove interface before changing the target side, and re-add after,
+        // because the target side determines the position of this interface in the network.
+        INetwork network = state.getNetwork();
+        PartPos center = state.getCenter();
+        if (network != null && center != null) {
+            removeTargetFromNetwork(network, getTarget(center, state).getTarget(), state);
+        }
+        super.setTargetSideOverride(state, side);
+        if (network != null && center != null) {
+            addTargetToNetwork(network, getTarget(center, state).getTarget(), state.getPriority(), state.getChannelInterface(), state);
+        }
     }
 
     @Override
@@ -162,6 +178,7 @@ public abstract class PartTypeInterfacePositionedAddon<N extends IPositionedAddo
 
         private N positionedAddonsNetwork = null;
         private PartPos pos = null;
+        private PartPos center = null;
         private boolean validTargetCapability = false;
         private int channelInterface = 0;
 
@@ -222,6 +239,17 @@ public abstract class PartTypeInterfacePositionedAddon<N extends IPositionedAddo
         @Override
         public void setPos(PartPos pos) {
             this.pos = pos;
+        }
+
+        @Nullable
+        @Override
+        public PartPos getCenter() {
+            return center;
+        }
+
+        @Override
+        public void setCenter(@Nullable PartPos center) {
+            this.center = center;
         }
 
         @Override

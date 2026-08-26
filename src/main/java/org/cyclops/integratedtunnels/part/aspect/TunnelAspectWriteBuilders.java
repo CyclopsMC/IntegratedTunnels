@@ -134,7 +134,7 @@ public class TunnelAspectWriteBuilders {
                 if (partStateHolder.getState().getNetwork() != null) {
                     partType.addTargetToNetwork(
                             partStateHolder.getState().getNetwork(),
-                            target.getTarget(),
+                            partType.getEffectiveTargetPos(target, partState),
                             partStateHolder.getState().getPriority(),
                             partStateHolder.getState().getChannelInterface(),
                             partState
