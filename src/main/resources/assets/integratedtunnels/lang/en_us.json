@@ -134,7 +134,7 @@
   "aspect.aspecttypes.integratedtunnels.boolean.world.breaknodrops": "Break Block When No Drops",
   "aspect.aspecttypes.integratedtunnels.boolean.world.breaknodrops.info": "If the block should only be broken if it produces drops.",
   "aspect.aspecttypes.integratedtunnels.boolean.world.matchblock": "Match Block",
-  "aspect.aspecttypes.integratedtunnels.boolean.world.matchblock.info": "Match item form of block instead dropped items",
+  "aspect.aspecttypes.integratedtunnels.boolean.world.matchblock.info": "Match item form of block instead of dropped items.",
   "aspect.aspecttypes.integratedtunnels.boolean.world.ignorepickupdelay": "Ignore Pickup Delay",
   "aspect.aspecttypes.integratedtunnels.boolean.world.dispense": "Dispense",
   "aspect.aspecttypes.integratedtunnels.double.world.offsetx": "Offset X",
