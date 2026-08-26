@@ -12,6 +12,7 @@ import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.HopperBlock;
 import net.minecraft.world.level.block.entity.ChestBlockEntity;
+import net.minecraft.world.level.block.entity.FurnaceBlockEntity;
 import net.minecraft.world.level.block.entity.HopperBlockEntity;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
@@ -34,6 +35,8 @@ import org.cyclops.integratedtunnels.part.aspect.TunnelAspects;
 import static org.cyclops.integrateddynamics.gametest.GameTestHelpersIntegratedDynamics.createVariableForValue;
 import static org.cyclops.integrateddynamics.gametest.GameTestHelpersIntegratedDynamics.placeVariableInWriter;
 import static org.cyclops.integratedtunnels.gametest.GameTestHelpersIntegratedTunnels.setPassiveInteraction;
+import static org.cyclops.integratedtunnels.gametest.GameTestHelpersIntegratedTunnels.setTargetSide;
+import static org.cyclops.integratedtunnels.gametest.GameTestHelpersIntegratedTunnels.setTargetSideViaSettings;
 
 @GameTestHolder(Reference.MOD_ID)
 @PrefixGameTestTemplate(false)
@@ -42,6 +45,11 @@ public class GameTestsItems {
     public static final String TEMPLATE_EMPTY = "empty10";
     public static final int TIMEOUT = 2000;
     public static final int TICKS_PASSIVE_INTERACTION = 100;
+    public static final int TICKS_NETWORK_INIT = 20;
+    public static final int TICKS_TRANSFER = 100;
+    public static final int SLOT_FURNACE_INPUT = 0;
+    public static final int SLOT_FURNACE_FUEL = 1;
+    public static final int SLOT_FURNACE_OUTPUT = 2;
     public static final BlockPos POS = BlockPos.ZERO.offset(2, 0, 2);
 
     @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
@@ -908,6 +916,138 @@ public class GameTestsItems {
             helper.assertContainerContains(POS.west().above(), Items.WHITE_WOOL);
             helper.succeed();
         });
+    }
+
+    /**
+     * Set up an item interface that targets a furnace from above,
+     * with an item in the furnace's input slot (only reachable from above)
+     * and an item in the furnace's output slot (only reachable from below).
+     *
+     * The exporter that empties the network into a chest is not placed yet,
+     * so that the target side of the interface can first be changed
+     * while the interface is already part of a live network.
+     *
+     * @return The position of the interface part.
+     */
+    protected static PartPos setupInterfaceTargetSide(GameTestHelper helper) {
+        // Place cable
+        helper.setBlock(POS.above(), RegistryEntries.BLOCK_CABLE.value());
+        helper.setBlock(POS.east().above(), RegistryEntries.BLOCK_CABLE.value());
+
+        // Place furnace below the cable, and fill its input and output slot
+        helper.setBlock(POS, Blocks.FURNACE);
+        FurnaceBlockEntity furnace = helper.getBlockEntity(POS);
+        furnace.setItem(SLOT_FURNACE_INPUT, new ItemStack(Items.WHITE_WOOL));
+        furnace.setItem(SLOT_FURNACE_OUTPUT, new ItemStack(Items.DIAMOND));
+
+        // Place item interface, targeting the furnace from above
+        PartHelpers.addPart(helper.getLevel(), helper.absolutePos(POS.above()), Direction.DOWN, PartTypes.INTERFACE_ITEM, new ItemStack(PartTypes.INTERFACE_ITEM.getItem()));
+
+        // Place output chest for the exporter that is placed later
+        helper.setBlock(POS.east().east().above(), Blocks.CHEST);
+
+        return PartPos.of(helper.getLevel(), helper.absolutePos(POS.above()), Direction.DOWN);
+    }
+
+    /**
+     * Place an item exporter that exports everything inside the network into a chest.
+     */
+    protected static void placeInterfaceTargetSideExporter(GameTestHelper helper) {
+        PartHelpers.addPart(helper.getLevel(), helper.absolutePos(POS.east().above()), Direction.EAST, PartTypes.EXPORTER_ITEM, new ItemStack(PartTypes.EXPORTER_ITEM.getItem()));
+        placeVariableInWriter(helper.getLevel(), PartPos.of(helper.getLevel(), helper.absolutePos(POS.east().above()), Direction.EAST),
+                TunnelAspects.Write.Item.BOOLEAN_EXPORT, new ItemStack(RegistryEntries.ITEM_VARIABLE));
+    }
+
+    /**
+     * Check that only the furnace's output slot was exposed to the network.
+     */
+    protected static void assertInterfaceTargetSideExported(GameTestHelper helper) {
+        FurnaceBlockEntity furnace = helper.getBlockEntity(POS);
+        helper.assertTrue(furnace.getItem(SLOT_FURNACE_INPUT).is(Items.WHITE_WOOL), "Furnace input slot was exposed to the network");
+        helper.assertTrue(furnace.getItem(SLOT_FURNACE_OUTPUT).isEmpty(), "Furnace output slot was not exposed to the network");
+        helper.assertContainerContains(POS.east().east().above(), Items.DIAMOND);
+    }
+
+    /**
+     * An interface must only expose the side of the target block that it is configured with,
+     * even if that side is changed after the interface has been added to the network.
+     */
+    @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
+    public void testItemsInterfaceTargetSideExport(GameTestHelper helper) {
+        PartPos posInterface = setupInterfaceTargetSide(helper);
+
+        helper.startSequence()
+                // Let the interface add itself to the network with its default target side
+                .thenIdle(TICKS_NETWORK_INIT)
+                .thenExecute(() -> setTargetSide(posInterface, Direction.DOWN))
+                // Let the network index catch up with the new target side
+                .thenIdle(TICKS_NETWORK_INIT)
+                .thenExecute(() -> placeInterfaceTargetSideExporter(helper))
+                .thenIdle(TICKS_TRANSFER)
+                .thenExecute(() -> assertInterfaceTargetSideExported(helper))
+                .thenSucceed();
+    }
+
+    /**
+     * Just like {@link #testItemsInterfaceTargetSideExport(GameTestHelper)},
+     * but with the target side being changed in the same way as the part settings gui does.
+     */
+    @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
+    public void testItemsInterfaceTargetSideExportViaSettings(GameTestHelper helper) {
+        PartPos posInterface = setupInterfaceTargetSide(helper);
+
+        helper.startSequence()
+                // Let the interface add itself to the network with its default target side
+                .thenIdle(TICKS_NETWORK_INIT)
+                .thenExecute(() -> setTargetSideViaSettings(posInterface, Direction.DOWN))
+                // Let the network index catch up with the new target side
+                .thenIdle(TICKS_NETWORK_INIT)
+                .thenExecute(() -> placeInterfaceTargetSideExporter(helper))
+                .thenIdle(TICKS_TRANSFER)
+                .thenExecute(() -> assertInterfaceTargetSideExported(helper))
+                .thenSucceed();
+    }
+
+    /**
+     * Insertions into an interface must also only apply to the configured target side,
+     * so coal must end up in the furnace's fuel slot instead of its input slot.
+     */
+    @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
+    public void testItemsInterfaceTargetSideImport(GameTestHelper helper) {
+        // Place cable
+        helper.setBlock(POS.above(), RegistryEntries.BLOCK_CABLE.value());
+        helper.setBlock(POS.east().above(), RegistryEntries.BLOCK_CABLE.value());
+
+        // Place empty furnace below the cable
+        helper.setBlock(POS, Blocks.FURNACE);
+
+        // Place item interface, targeting the furnace from above
+        PartHelpers.addPart(helper.getLevel(), helper.absolutePos(POS.above()), Direction.DOWN, PartTypes.INTERFACE_ITEM, new ItemStack(PartTypes.INTERFACE_ITEM.getItem()));
+        PartPos posInterface = PartPos.of(helper.getLevel(), helper.absolutePos(POS.above()), Direction.DOWN);
+
+        // Place input chest with coal for the importer that is placed later
+        helper.setBlock(POS.east().east().above(), Blocks.CHEST);
+        ChestBlockEntity chestIn = helper.getBlockEntity(POS.east().east().above());
+        chestIn.setItem(0, new ItemStack(Items.COAL));
+
+        helper.startSequence()
+                // Let the interface add itself to the network with its default target side
+                .thenIdle(TICKS_NETWORK_INIT)
+                .thenExecute(() -> setTargetSide(posInterface, Direction.DOWN))
+                .thenExecute(() -> {
+                    // Place item importer that imports everything from the chest into the network
+                    PartHelpers.addPart(helper.getLevel(), helper.absolutePos(POS.east().above()), Direction.EAST, PartTypes.IMPORTER_ITEM, new ItemStack(PartTypes.IMPORTER_ITEM.getItem()));
+                    placeVariableInWriter(helper.getLevel(), PartPos.of(helper.getLevel(), helper.absolutePos(POS.east().above()), Direction.EAST),
+                            TunnelAspects.Write.Item.BOOLEAN_IMPORT, new ItemStack(RegistryEntries.ITEM_VARIABLE));
+                })
+                .thenIdle(TICKS_TRANSFER)
+                .thenExecute(() -> {
+                    FurnaceBlockEntity furnace = helper.getBlockEntity(POS);
+                    helper.assertTrue(furnace.getItem(SLOT_FURNACE_INPUT).isEmpty(), "Furnace input slot was exposed to the network");
+                    helper.assertTrue(furnace.getItem(SLOT_FURNACE_FUEL).is(Items.COAL), "Furnace fuel slot was not exposed to the network");
+                    helper.assertContainerEmpty(POS.east().east().above());
+                })
+                .thenSucceed();
     }
 
 }
