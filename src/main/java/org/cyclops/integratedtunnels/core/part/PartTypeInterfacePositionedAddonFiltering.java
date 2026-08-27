@@ -16,7 +16,6 @@ import net.minecraft.world.level.block.Block;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import org.apache.commons.lang3.tuple.Triple;
-import org.cyclops.integrateddynamics.api.evaluate.variable.IVariable;
 import org.cyclops.integrateddynamics.api.evaluate.variable.ValueDeseralizationContext;
 import org.cyclops.integrateddynamics.api.network.INetwork;
 import org.cyclops.integrateddynamics.api.network.IPartNetwork;
@@ -275,20 +274,12 @@ public abstract class PartTypeInterfacePositionedAddonFiltering<N extends IPosit
         public void setTargetFilter(@Nullable PositionedAddonsNetworkIngredientsFilter<T> targetFilter) {
             this.targetFilter = targetFilter;
 
-            // Trigger aspect re-execution if needed
-            if (targetFilter == null) {
-                this.requireAspectUpdate();
-            } else if (this.network == null || this.partNetwork == null) {
-                // Our networks are unset while this part is detached from its network,
-                // which happens in-between a chunk unload and the corresponding network element revalidation.
-                // In that case, we can not resolve our variable yet,
-                // so we schedule another aspect update, which retries this once the networks are set again.
+            // Trigger aspect re-execution if needed.
+            // Our networks are unset while this part is detached from its network, in which case we retry later.
+            if (targetFilter == null || network == null || partNetwork == null) {
                 this.requireAspectUpdate();
             } else {
-                IVariable<?> variable = getVariable(this.network, this.partNetwork, this.valueDeseralizationContext);
-                if (variable != null) {
-                    variable.addInvalidationListener(this::requireAspectUpdate);
-                }
+                getVariable(network, partNetwork, valueDeseralizationContext).addInvalidationListener(this::requireAspectUpdate);
             }
         }
 
