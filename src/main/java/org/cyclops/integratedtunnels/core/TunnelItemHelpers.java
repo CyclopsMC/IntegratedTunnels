@@ -162,11 +162,14 @@ public class TunnelItemHelpers {
                                        IngredientPredicate<ItemStack, Integer> itemStackMatcher, InteractionHand hand,
                                        boolean blockUpdate, boolean ignoreReplacable, boolean craftIfFailed) throws EvaluationException {
         BlockState destBlockState = world.getBlockState(pos);
-        final boolean isDestNonSolid = !destBlockState.isSolid();
-        final boolean isDestReplaceable = destBlockState.canBeReplaced(TunnelHelpers.createBlockItemUseContext(world, null, pos, side, hand));
-        if (!world.isEmptyBlock(pos)
-                && (!isDestNonSolid || !(ignoreReplacable && isDestReplaceable))) {
-            return null;
+        if (!world.isEmptyBlock(pos)) {
+            // Only determine replaceability when it can still influence the outcome,
+            // as constructing a block place context is relatively expensive.
+            if (destBlockState.isSolid()
+                    || !ignoreReplacable
+                    || !destBlockState.canBeReplaced(TunnelHelpers.createBlockItemUseContext(world, null, pos, side, hand))) {
+                return null;
+            }
         }
 
         IIngredientComponentStorage<ItemStack, Integer> destinationBlock = new ItemStorageBlockWrapper(
@@ -204,9 +207,11 @@ public class TunnelItemHelpers {
                                               boolean ignoreReplacable, int fortune, boolean silkTouch,
                                               boolean breakOnNoDrops, boolean matchBlock) throws EvaluationException {
         BlockState destBlockState = world.getBlockState(pos);
-        final boolean isDestReplaceable = destBlockState.canBeReplaced(TunnelHelpers.createBlockItemUseContext(world, null, pos, side, hand));
+        // Only determine replaceability when it can still influence the outcome,
+        // as constructing a block place context is relatively expensive.
         if (world.isEmptyBlock(pos)
-                || ((ignoreReplacable && isDestReplaceable) || destBlockState.liquid())) {
+                || destBlockState.liquid()
+                || (ignoreReplacable && destBlockState.canBeReplaced(TunnelHelpers.createBlockItemUseContext(world, null, pos, side, hand)))) {
             return null;
         }
 
