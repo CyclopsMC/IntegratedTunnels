@@ -274,8 +274,9 @@ public abstract class PartTypeInterfacePositionedAddonFiltering<N extends IPosit
         public void setTargetFilter(@Nullable PositionedAddonsNetworkIngredientsFilter<T> targetFilter) {
             this.targetFilter = targetFilter;
 
-            // Trigger aspect re-execution if needed
-            if (targetFilter == null) {
+            // Trigger aspect re-execution if needed.
+            // Our networks are unset while this part is detached from its network, in which case we retry later.
+            if (targetFilter == null || network == null || partNetwork == null) {
                 this.requireAspectUpdate();
             } else {
                 getVariable(network, partNetwork, valueDeseralizationContext).addInvalidationListener(this::requireAspectUpdate);
