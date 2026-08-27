@@ -14,6 +14,7 @@ import net.minecraft.world.level.block.HopperBlock;
 import net.minecraft.world.level.block.entity.ChestBlockEntity;
 import net.minecraft.world.level.block.entity.FurnaceBlockEntity;
 import net.minecraft.world.level.block.entity.HopperBlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import org.cyclops.cyclopscore.datastructure.DimPos;
@@ -32,6 +33,7 @@ import org.cyclops.integrateddynamics.core.helper.NetworkHelpers;
 import org.cyclops.integrateddynamics.core.helper.PartHelpers;
 import org.cyclops.integrateddynamics.part.aspect.Aspects;
 import org.cyclops.integratedtunnels.Reference;
+import org.cyclops.integratedtunnels.core.part.IPartTypeInterfacePositionedAddon;
 import org.cyclops.integratedtunnels.part.PartTypeInterfaceFilteringItem;
 import org.cyclops.integratedtunnels.part.PartTypes;
 import org.cyclops.integratedtunnels.part.aspect.TunnelAspectWriteBuilders;
@@ -1100,6 +1102,123 @@ public class GameTestsItems {
                 .thenIdle(TICKS_TRANSFER)
                 .thenExecute(() -> assertInterfaceTargetSideExported(helper))
                 .thenSucceed();
+    }
+
+    /**
+     * An interface must pick up a container that is only placed after the interface joined the network.
+     */
+    @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
+    public void testItemsInterfaceTargetPlacedLater(GameTestHelper helper) {
+        // Place cable
+        helper.setBlock(POS, RegistryEntries.BLOCK_CABLE.value());
+        helper.setBlock(POS.east(), RegistryEntries.BLOCK_CABLE.value());
+
+        // Place item interface, without a container to expose yet
+        PartHelpers.addPart(helper.getLevel(), helper.absolutePos(POS), Direction.WEST, PartTypes.INTERFACE_ITEM, new ItemStack(PartTypes.INTERFACE_ITEM.getItem()));
+        PartPos posInterface = PartPos.of(helper.getLevel(), helper.absolutePos(POS), Direction.WEST);
+
+        // Place item exporter with an output chest, but don't activate it yet
+        PartHelpers.addPart(helper.getLevel(), helper.absolutePos(POS.east()), Direction.EAST, PartTypes.EXPORTER_ITEM, new ItemStack(PartTypes.EXPORTER_ITEM.getItem()));
+        helper.setBlock(POS.east().east(), Blocks.CHEST);
+
+        helper.startSequence()
+                // Let the interface join the network without a container
+                .thenIdle(TICKS_NETWORK_INIT)
+                .thenExecute(() -> helper.assertFalse(isInterfaceTargetValid(posInterface), "Interface exposed a container before one was placed"))
+                .thenExecute(() -> {
+                    // Only now place the container that the interface should expose
+                    helper.setBlock(POS.west(), Blocks.CHEST);
+                    ChestBlockEntity chestIn = helper.getBlockEntity(POS.west());
+                    chestIn.setItem(0, new ItemStack(Items.WHITE_WOOL));
+                })
+                .thenIdle(TICKS_NETWORK_INIT)
+                .thenExecute(() -> helper.assertTrue(isInterfaceTargetValid(posInterface), "Interface did not expose the container that was placed later"))
+                // Only start exporting once the container is part of the network.
+                // An exporter that runs on an empty network first would fall asleep,
+                // and that sleep expires on wall-clock time rather than on ticks.
+                .thenExecute(() -> placeVariableInWriter(helper.getLevel(), PartPos.of(helper.getLevel(), helper.absolutePos(POS.east()), Direction.EAST),
+                        TunnelAspects.Write.Item.BOOLEAN_EXPORT, new ItemStack(RegistryEntries.ITEM_VARIABLE)))
+                .thenIdle(TICKS_TRANSFER)
+                .thenExecute(() -> {
+                    helper.assertContainerContains(POS.east().east(), Items.WHITE_WOOL);
+                    helper.assertContainerEmpty(POS.west());
+                })
+                .thenSucceed();
+    }
+
+    /**
+     * An interface must stop exposing its container once that container is removed from the world.
+     */
+    @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
+    public void testItemsInterfaceTargetRemovedLater(GameTestHelper helper) {
+        // Place cable
+        helper.setBlock(POS, RegistryEntries.BLOCK_CABLE.value());
+
+        // Place item interface with a container to expose
+        PartHelpers.addPart(helper.getLevel(), helper.absolutePos(POS), Direction.WEST, PartTypes.INTERFACE_ITEM, new ItemStack(PartTypes.INTERFACE_ITEM.getItem()));
+        helper.setBlock(POS.west(), Blocks.CHEST);
+        PartPos posInterface = PartPos.of(helper.getLevel(), helper.absolutePos(POS), Direction.WEST);
+
+        helper.startSequence()
+                // Let the interface join the network with its container
+                .thenIdle(TICKS_NETWORK_INIT)
+                .thenExecute(() -> helper.assertTrue(isInterfaceTargetValid(posInterface), "Interface did not expose its container"))
+                .thenExecute(() -> helper.setBlock(POS.west(), Blocks.AIR))
+                .thenIdle(TICKS_NETWORK_INIT)
+                .thenExecute(() -> helper.assertFalse(isInterfaceTargetValid(posInterface), "Interface still exposes its removed container"))
+                .thenSucceed();
+    }
+
+    /**
+     * A capability can appear or disappear at the target position without its block state changing at all,
+     * for example when the configuration of a block entity changes.
+     * NeoForge requires such changes to be signalled through {@link net.minecraft.world.level.Level#invalidateCapabilities(BlockPos)},
+     * so the interface must subscribe to those invalidations and re-check its target on the next neighbour change.
+     */
+    @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
+    public void testItemsInterfaceTargetCapabilityInvalidated(GameTestHelper helper) {
+        // Place cable
+        helper.setBlock(POS, RegistryEntries.BLOCK_CABLE.value());
+
+        // Place item interface with a container to expose
+        PartHelpers.addPart(helper.getLevel(), helper.absolutePos(POS), Direction.WEST, PartTypes.INTERFACE_ITEM, new ItemStack(PartTypes.INTERFACE_ITEM.getItem()));
+        helper.setBlock(POS.west(), Blocks.CHEST);
+        PartPos posInterface = PartPos.of(helper.getLevel(), helper.absolutePos(POS), Direction.WEST);
+
+        helper.startSequence()
+                // Let the interface join the network with its container
+                .thenIdle(TICKS_NETWORK_INIT)
+                .thenExecute(() -> {
+                    helper.assertTrue(isInterfaceTargetValid(posInterface), "Interface did not expose its container");
+                    helper.assertFalse(isInterfaceTargetCapabilityInvalidated(posInterface), "Interface did not validate its target capability");
+                })
+                .thenExecute(() -> {
+                    // Signal that the capabilities at the target changed, without touching its block state
+                    BlockState blockStateBefore = helper.getLevel().getBlockState(helper.absolutePos(POS.west()));
+                    helper.getLevel().invalidateCapabilities(helper.absolutePos(POS.west()));
+                    helper.assertValueEqual(helper.getLevel().getBlockState(helper.absolutePos(POS.west())), blockStateBefore,
+                            "Block state at the target changed");
+
+                    helper.assertTrue(isInterfaceTargetCapabilityInvalidated(posInterface), "Interface did not observe the invalidation of its target capability");
+                })
+                // Trigger a neighbour change that is unrelated to the target
+                .thenExecute(() -> helper.setBlock(POS.above(), Blocks.STONE))
+                .thenIdle(TICKS_NETWORK_INIT)
+                .thenExecute(() -> {
+                    helper.assertFalse(isInterfaceTargetCapabilityInvalidated(posInterface), "Interface did not re-check its invalidated target capability");
+                    helper.assertTrue(isInterfaceTargetValid(posInterface), "Interface stopped exposing its unchanged container");
+                })
+                .thenSucceed();
+    }
+
+    protected static boolean isInterfaceTargetValid(PartPos posInterface) {
+        return ((IPartTypeInterfacePositionedAddon.IState<?, ?, ?, ?>) PartHelpers.getPart(posInterface).getState())
+                .isValidTargetCapability();
+    }
+
+    protected static boolean isInterfaceTargetCapabilityInvalidated(PartPos posInterface) {
+        return ((IPartTypeInterfacePositionedAddon.IState<?, ?, ?, ?>) PartHelpers.getPart(posInterface).getState())
+                .isTargetCapabilityInvalidated();
     }
 
     /**
