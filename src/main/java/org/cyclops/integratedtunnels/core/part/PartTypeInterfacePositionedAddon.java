@@ -15,6 +15,8 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.neoforged.neoforge.capabilities.ICapabilityInvalidationListener;
 import org.apache.commons.lang3.tuple.Triple;
 import org.cyclops.cyclopscore.datastructure.DimPos;
 import org.cyclops.cyclopscore.network.PacketCodec;
@@ -118,7 +120,7 @@ public abstract class PartTypeInterfacePositionedAddon<N extends IPositionedAddo
     @Override
     public void onBlockNeighborChange(INetwork network, IPartNetwork partNetwork, PartTarget target, S state, BlockGetter world, Block neighbourBlock, BlockPos neighbourBlockPos) {
         super.onBlockNeighborChange(network, partNetwork, target, state, world, neighbourBlock, neighbourBlockPos);
-        if (network != null) {
+        if (network != null && canNeighbourChangeAffectTarget(state, world, neighbourBlockPos)) {
             updateTargetInNetwork(network, target, state.getPriority(), state.getChannelInterface(), state);
         }
     }
@@ -189,6 +191,11 @@ public abstract class PartTypeInterfacePositionedAddon<N extends IPositionedAddo
         private N positionedAddonsNetwork = null;
         private PartPos pos = null;
         private PartPos center = null;
+        private BlockState validatedTargetBlockState = null;
+        private boolean targetCapabilityInvalidated = true;
+        private BlockPos targetCapabilityListenerPos = null;
+        // Strong reference: NeoForge only holds capability invalidation listeners weakly.
+        private ICapabilityInvalidationListener targetCapabilityListener = null;
         private boolean validTargetCapability = false;
         private int channelInterface = 0;
 
@@ -260,6 +267,39 @@ public abstract class PartTypeInterfacePositionedAddon<N extends IPositionedAddo
         @Override
         public void setCenter(@Nullable PartPos center) {
             this.center = center;
+        }
+
+        @Nullable
+        @Override
+        public BlockState getValidatedTargetBlockState() {
+            return validatedTargetBlockState;
+        }
+
+        @Override
+        public void setValidatedTargetBlockState(@Nullable BlockState validatedTargetBlockState) {
+            this.validatedTargetBlockState = validatedTargetBlockState;
+        }
+
+        @Override
+        public boolean isTargetCapabilityInvalidated() {
+            return targetCapabilityInvalidated;
+        }
+
+        @Override
+        public void setTargetCapabilityInvalidated(boolean targetCapabilityInvalidated) {
+            this.targetCapabilityInvalidated = targetCapabilityInvalidated;
+        }
+
+        @Nullable
+        @Override
+        public BlockPos getTargetCapabilityListenerPos() {
+            return targetCapabilityListenerPos;
+        }
+
+        @Override
+        public void setTargetCapabilityListener(BlockPos pos, ICapabilityInvalidationListener listener) {
+            this.targetCapabilityListenerPos = pos;
+            this.targetCapabilityListener = listener;
         }
 
         @Override
