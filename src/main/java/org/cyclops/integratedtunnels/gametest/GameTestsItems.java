@@ -18,6 +18,8 @@ import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import org.cyclops.cyclopscore.datastructure.DimPos;
 import org.cyclops.integrateddynamics.RegistryEntries;
+import org.cyclops.integrateddynamics.api.network.INetwork;
+import org.cyclops.integrateddynamics.api.network.IPartNetwork;
 import org.cyclops.integrateddynamics.api.part.PartPos;
 import org.cyclops.integrateddynamics.api.part.PartTarget;
 import org.cyclops.integrateddynamics.api.part.aspect.property.IAspectProperties;
@@ -26,13 +28,17 @@ import org.cyclops.integrateddynamics.core.block.IgnoredBlockStatus;
 import org.cyclops.integrateddynamics.core.evaluate.operator.CurriedOperator;
 import org.cyclops.integrateddynamics.core.evaluate.operator.Operators;
 import org.cyclops.integrateddynamics.core.evaluate.variable.*;
+import org.cyclops.integrateddynamics.core.helper.NetworkHelpers;
 import org.cyclops.integrateddynamics.core.helper.PartHelpers;
+import org.cyclops.integrateddynamics.part.aspect.Aspects;
 import org.cyclops.integratedtunnels.Reference;
+import org.cyclops.integratedtunnels.part.PartTypeInterfaceFilteringItem;
 import org.cyclops.integratedtunnels.part.PartTypes;
 import org.cyclops.integratedtunnels.part.aspect.TunnelAspectWriteBuilders;
 import org.cyclops.integratedtunnels.part.aspect.TunnelAspects;
 
 import static org.cyclops.integrateddynamics.gametest.GameTestHelpersIntegratedDynamics.createVariableForValue;
+import static org.cyclops.integrateddynamics.gametest.GameTestHelpersIntegratedDynamics.createVariableFromReader;
 import static org.cyclops.integrateddynamics.gametest.GameTestHelpersIntegratedDynamics.placeVariableInWriter;
 import static org.cyclops.integratedtunnels.gametest.GameTestHelpersIntegratedTunnels.setPassiveInteraction;
 import static org.cyclops.integratedtunnels.gametest.GameTestHelpersIntegratedTunnels.setTargetSide;
@@ -368,6 +374,94 @@ public class GameTestsItems {
                     "Block status filtering interface is incorrect"
             );
             helper.assertValueEqual(partStateInterface.getActiveAspect(), TunnelAspects.Write.ItemFilter.BOOLEAN_SET_FILTER, "Active aspect filtering interface is incorrect");
+            helper.assertTrue(partStateInterface.getErrors(TunnelAspects.Write.ItemFilter.BOOLEAN_SET_FILTER).isEmpty(), "Active aspect filtering interface has errors");
+        });
+    }
+
+    /**
+     * Regression test for CyclopsMC/IntegratedDynamics#1711.
+     *
+     * A filtering interface caches its network and part network,
+     * which are unset while the part is detached from its network,
+     * such as in-between a chunk unload and the corresponding network element revalidation.
+     * Updating the part in that window used to crash the server with an NPE on the unset part network,
+     * which in turn marked the whole network as crashed, even after a server restart.
+     */
+    @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
+    public void testItemsImporterToFilteredInterfaceDetachedFromNetwork(GameTestHelper helper) {
+        // Place cable
+        helper.setBlock(POS, RegistryEntries.BLOCK_CABLE.value());
+        helper.setBlock(POS.east(), RegistryEntries.BLOCK_CABLE.value());
+
+        // Place item importer
+        PartHelpers.addPart(helper.getLevel(), helper.absolutePos(POS), Direction.WEST, PartTypes.IMPORTER_ITEM, new ItemStack(PartTypes.IMPORTER_ITEM.getItem()));
+
+        // Place filtering item interface
+        PartHelpers.addPart(helper.getLevel(), helper.absolutePos(POS.east()), Direction.EAST, PartTypes.INTERFACE_FILTERING_ITEM, new ItemStack(PartTypes.INTERFACE_FILTERING_ITEM.getItem()));
+
+        // Place redstone reader, as source of the interface's filter variable
+        PartHelpers.addPart(helper.getLevel(), helper.absolutePos(POS), Direction.NORTH,
+                org.cyclops.integrateddynamics.core.part.PartTypes.REDSTONE_READER,
+                new ItemStack(org.cyclops.integrateddynamics.core.part.PartTypes.REDSTONE_READER.getItem()));
+
+        // Place chests
+        helper.setBlock(POS.west(), Blocks.CHEST);
+        helper.setBlock(POS.east().east(), Blocks.CHEST);
+
+        // Insert items in importer chest
+        ChestBlockEntity chestIn = helper.getBlockEntity(POS.west());
+        chestIn.setItem(0, new ItemStack(Items.WHITE_WOOL));
+
+        PartPos importerPos = PartPos.of(helper.getLevel(), helper.absolutePos(POS), Direction.WEST);
+        PartPos interfacePos = PartPos.of(helper.getLevel(), helper.absolutePos(POS.east()), Direction.EAST);
+        PartPos readerPos = PartPos.of(helper.getLevel(), helper.absolutePos(POS), Direction.NORTH);
+
+        // Place empty variable in importer
+        placeVariableInWriter(helper.getLevel(), importerPos, TunnelAspects.Write.Item.BOOLEAN_IMPORT, new ItemStack(RegistryEntries.ITEM_VARIABLE));
+
+        // Place an aspect variable in the filtering interface.
+        // This must be an aspect variable rather than an empty or value variable,
+        // as only its facade resolves itself through the part network.
+        // The redstone reader is not powered, so this filter always evaluates to true.
+        ItemStack variableFilter = createVariableFromReader(helper.getLevel(), readerPos, Aspects.Read.Redstone.BOOLEAN_LOW);
+        placeVariableInWriter(helper.getLevel(), interfacePos, TunnelAspects.Write.ItemFilter.BOOLEAN_SET_FILTER, variableFilter);
+
+        helper.runAfterDelay(TICKS_NETWORK_INIT + TICKS_TRANSFER, () -> {
+            // The filter has been applied by now, so the first item has been imported through the interface
+            helper.assertContainerContains(POS.east().east(), Items.WHITE_WOOL);
+
+            PartHelpers.PartStateHolder partStateHolder = PartHelpers.getPart(interfacePos);
+            PartTypeInterfaceFilteringItem.State partStateInterface = (PartTypeInterfaceFilteringItem.State) partStateHolder.getState();
+            INetwork network = NetworkHelpers.getNetworkChecked(interfacePos);
+            IPartNetwork partNetwork = NetworkHelpers.getPartNetworkChecked(network);
+            PartTarget target = PartTypes.INTERFACE_FILTERING_ITEM.getTarget(interfacePos, partStateInterface);
+
+            // Detach the interface from its network, like onNetworkRemoval does on chunk unload,
+            // and mark its filter aspect as requiring an update, like onVariableContentsUpdated does.
+            PartTypes.INTERFACE_FILTERING_ITEM.removeTargetFromNetwork(network, partStateInterface);
+            partStateInterface.requireAspectUpdate();
+
+            // Updating the part while detached must not throw
+            PartTypes.INTERFACE_FILTERING_ITEM.update(network, partNetwork, target, partStateInterface);
+
+            // Re-attach the interface, like afterNetworkReAlive does on revalidation
+            PartTypes.INTERFACE_FILTERING_ITEM.addTargetToNetwork(network, target,
+                    partStateInterface.getPriority(), partStateInterface.getChannelInterface(), partStateInterface);
+
+            // Insert another item, which must be imported through the re-attached interface
+            ChestBlockEntity chestInAfter = helper.getBlockEntity(POS.west());
+            chestInAfter.setItem(0, new ItemStack(Items.ACACIA_LEAVES));
+        });
+
+        helper.succeedWhen(() -> {
+            // Check if items are moved
+            helper.assertContainerContains(POS.east().east(), Items.WHITE_WOOL);
+            helper.assertContainerContains(POS.east().east(), Items.ACACIA_LEAVES);
+            helper.assertContainerEmpty(POS.west());
+
+            // Check filtering interface state
+            IPartStateWriter partStateInterface = (IPartStateWriter) PartHelpers.getPart(interfacePos).getState();
+            helper.assertFalse(partStateInterface.isDeactivated(), "Filtering interface is deactivated");
             helper.assertTrue(partStateInterface.getErrors(TunnelAspects.Write.ItemFilter.BOOLEAN_SET_FILTER).isEmpty(), "Active aspect filtering interface has errors");
         });
     }
