@@ -63,8 +63,8 @@ public class IngredientPredicateFluidStackNbt extends IngredientPredicate<FluidS
     }
 
     @Override
-    public int hashCode() {
-        return super.hashCode()
+    protected int computeHashCode() {
+        return super.computeHashCode()
                 ^ (this.blacklist ? 1 : 0) << 1
                 ^ (this.requireNbt ? 1 : 0) << 2
                 ^ (this.subset ? 1 : 0) << 3
