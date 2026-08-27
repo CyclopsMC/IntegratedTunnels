@@ -58,8 +58,8 @@ public class IngredientPredicateFluidStackOperator extends IngredientPredicate<F
     }
 
     @Override
-    public int hashCode() {
-        return super.hashCode()
+    protected int computeHashCode() {
+        return super.computeHashCode()
                 ^ this.predicate.hashCode()
                 ^ this.partTarget.hashCode();
     }

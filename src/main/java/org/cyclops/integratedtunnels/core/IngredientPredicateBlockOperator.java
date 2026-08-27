@@ -62,8 +62,8 @@ public class IngredientPredicateBlockOperator extends IngredientPredicate<ItemSt
     }
 
     @Override
-    public int hashCode() {
-        return super.hashCode()
+    protected int computeHashCode() {
+        return super.computeHashCode()
                 ^ this.predicate.hashCode()
                 ^ this.partTarget.hashCode();
     }
