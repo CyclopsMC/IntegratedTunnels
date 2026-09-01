@@ -164,9 +164,11 @@ public class ItemStorageBlockWrapper implements IIngredientComponentStorage<Item
         }
         if (writeOnly) {
             if (!world.isEmptyBlock(pos)) {
-                boolean isDestReplaceable = world.getBlockState(pos).canBeReplaced(TunnelHelpers.createBlockItemUseContext(world, null, pos, side, hand));
-                if (!isDestReplaceable || !ignoreReplacable) {
-                    BlockState blockState = world.getBlockState(pos);
+                BlockState blockState = world.getBlockState(pos);
+                // Only determine replaceability when it can still influence the outcome,
+                // as constructing a block place context is relatively expensive.
+                if (!ignoreReplacable
+                        || !blockState.canBeReplaced(TunnelHelpers.createBlockItemUseContext(world, null, pos, side, hand))) {
                     return Lists.newArrayList(IModHelpers.get().getBlockHelpers().getItemStackFromBlockState(blockState));
                 }
             }

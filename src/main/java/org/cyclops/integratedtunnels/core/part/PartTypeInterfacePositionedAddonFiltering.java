@@ -1,6 +1,8 @@
 package org.cyclops.integratedtunnels.core.part;
 
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.Vec3i;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.SimpleContainer;
@@ -8,8 +10,10 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+import net.neoforged.neoforge.capabilities.ICapabilityInvalidationListener;
 import org.apache.commons.lang3.tuple.Triple;
 import org.cyclops.integrateddynamics.api.evaluate.variable.ValueDeseralizationContext;
 import org.cyclops.integrateddynamics.api.network.*;
@@ -96,28 +100,28 @@ public abstract class PartTypeInterfacePositionedAddonFiltering<N extends IPosit
     @Override
     public void afterNetworkReAlive(INetwork network, IPartNetwork partNetwork, PartTarget target, S state) {
         super.afterNetworkReAlive(network, partNetwork, target, state);
-        addTargetToNetwork(network, target.getTarget(), state.getPriority(), state.getChannelInterface(), state);
+        addTargetToNetwork(network, target, state.getPriority(), state.getChannelInterface(), state);
     }
 
     @Override
     public void onNetworkRemoval(INetwork network, IPartNetwork partNetwork, PartTarget target, S state) {
         super.onNetworkRemoval(network, partNetwork, target, state);
         scheduleNetworkObservation(target, state);
-        removeTargetFromNetwork(network, target.getTarget(), state);
+        removeTargetFromNetwork(network, state);
     }
 
     @Override
     public void onNetworkAddition(INetwork network, IPartNetwork partNetwork, PartTarget target, S state) {
         super.onNetworkAddition(network, partNetwork, target, state);
-        addTargetToNetwork(network, target.getTarget(), state.getPriority(), state.getChannelInterface(), state);
+        addTargetToNetwork(network, target, state.getPriority(), state.getChannelInterface(), state);
         scheduleNetworkObservation(target, state);
     }
 
     @Override
     public void onBlockNeighborChange(INetwork network, IPartNetwork partNetwork, PartTarget target, S state, BlockGetter world, @Nullable Direction side) {
         super.onBlockNeighborChange(network, partNetwork, target, state, world, side);
-        if (network != null) {
-            updateTargetInNetwork(network, target.getTarget(), state.getPriority(), state.getChannelInterface(), state);
+        if (network != null && canNeighbourChangeAffectTarget(state, world)) {
+            updateTargetInNetwork(network, target, state.getPriority(), state.getChannelInterface(), state);
         }
     }
 
@@ -125,9 +129,45 @@ public abstract class PartTypeInterfacePositionedAddonFiltering<N extends IPosit
     public void setPriorityAndChannel(INetwork network, IPartNetwork partNetwork, PartTarget target, S state, int priority, int channel) {
         // We need to do this because the energy network is not automagically aware of the priority changes,
         // so we have to re-add it.
-        removeTargetFromNetwork(network, target.getTarget(), state);
+        removeTargetFromNetwork(network, state);
         super.setPriorityAndChannel(network, partNetwork, target, state, priority, channel);
-        addTargetToNetwork(network, target.getTarget(), priority, state.getChannelInterface(), state);
+        addTargetToNetwork(network, target, priority, state.getChannelInterface(), state);
+    }
+
+    @Override
+    public boolean setTargetOffset(S state, PartPos center, Vec3i offset) {
+        // Remove interface before changing offset, and re-add after,
+        // because the target offset might change the interface.
+        INetwork network = state.getNetwork();
+        if (network != null) {
+            removeTargetFromNetwork(network, state);
+        }
+        boolean ret = super.setTargetOffset(state, center, offset);
+        if (network != null) {
+            PartTarget target = getTarget(center, state);
+            addTargetToNetwork(network, target, state.getPriority(), state.getChannelInterface(), state);
+            // Force an observation, so that the network index does not linger on the old target
+            scheduleNetworkObservation(target, state);
+        }
+        return ret;
+    }
+
+    @Override
+    public void setTargetSideOverride(S state, @Nullable Direction side) {
+        // Remove interface before changing the target side, and re-add after,
+        // because the target side determines the position of this interface in the network.
+        INetwork network = state.getNetwork();
+        PartPos center = state.getCenter();
+        if (network != null && center != null) {
+            removeTargetFromNetwork(network, state);
+        }
+        super.setTargetSideOverride(state, side);
+        if (network != null && center != null) {
+            PartTarget target = getTarget(center, state);
+            addTargetToNetwork(network, target, state.getPriority(), state.getChannelInterface(), state);
+            // Force an observation, so that the network index does not linger on the old target side
+            scheduleNetworkObservation(target, state);
+        }
     }
 
     public static abstract class State<N extends IPositionedAddonsNetwork, T, P extends PartTypeInterfacePositionedAddonFiltering<N, T, P, S>, S extends PartTypeInterfacePositionedAddonFiltering.State<N, T, P, S>>
@@ -135,6 +175,12 @@ public abstract class PartTypeInterfacePositionedAddonFiltering<N extends IPosit
             implements IPartTypeInterfacePositionedAddon.IState<N, T, P, S> {
         private N positionedAddonsNetwork = null;
         private PartPos pos = null;
+        private PartPos center = null;
+        private BlockState validatedTargetBlockState = null;
+        private boolean targetCapabilityInvalidated = true;
+        private BlockPos targetCapabilityListenerPos = null;
+        // Strong reference: NeoForge only holds capability invalidation listeners weakly.
+        private ICapabilityInvalidationListener targetCapabilityListener = null;
         private boolean validTargetCapability = false;
         private int channelInterface = 0;
 
@@ -207,6 +253,50 @@ public abstract class PartTypeInterfacePositionedAddonFiltering<N extends IPosit
             this.pos = pos;
         }
 
+        @Nullable
+        @Override
+        public PartPos getCenter() {
+            return center;
+        }
+
+        @Override
+        public void setCenter(@Nullable PartPos center) {
+            this.center = center;
+        }
+
+        @Nullable
+        @Override
+        public BlockState getValidatedTargetBlockState() {
+            return validatedTargetBlockState;
+        }
+
+        @Override
+        public void setValidatedTargetBlockState(@Nullable BlockState validatedTargetBlockState) {
+            this.validatedTargetBlockState = validatedTargetBlockState;
+        }
+
+        @Override
+        public boolean isTargetCapabilityInvalidated() {
+            return targetCapabilityInvalidated;
+        }
+
+        @Override
+        public void setTargetCapabilityInvalidated(boolean targetCapabilityInvalidated) {
+            this.targetCapabilityInvalidated = targetCapabilityInvalidated;
+        }
+
+        @Nullable
+        @Override
+        public BlockPos getTargetCapabilityListenerPos() {
+            return targetCapabilityListenerPos;
+        }
+
+        @Override
+        public void setTargetCapabilityListener(BlockPos pos, ICapabilityInvalidationListener listener) {
+            this.targetCapabilityListenerPos = pos;
+            this.targetCapabilityListener = listener;
+        }
+
         public boolean isRequireAspectUpdateAndReset() {
             boolean ret = this.requireAspectUpdate;
             this.requireAspectUpdate = false;
@@ -221,8 +311,9 @@ public abstract class PartTypeInterfacePositionedAddonFiltering<N extends IPosit
         public void setTargetFilter(@Nullable PositionedAddonsNetworkIngredientsFilter<T> targetFilter) {
             this.targetFilter = targetFilter;
 
-            // Trigger aspect re-execution if needed
-            if (targetFilter == null) {
+            // Trigger aspect re-execution if needed.
+            // Our networks are unset while this part is detached from its network, in which case we retry later.
+            if (targetFilter == null || network == null || partNetwork == null) {
                 this.requireAspectUpdate();
             } else {
                 getVariable(network, partNetwork, valueDeseralizationContext).addInvalidationListener(this::requireAspectUpdate);

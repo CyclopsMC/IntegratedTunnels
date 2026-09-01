@@ -57,8 +57,8 @@ public class IngredientPredicateItemStackList extends IngredientPredicate<ItemSt
     }
 
     @Override
-    public int hashCode() {
-        return super.hashCode()
+    protected int computeHashCode() {
+        return super.computeHashCode()
                 ^ (this.blacklist ? 1 : 0) << 1
                 ^ (this.checkItem ? 1 : 0) << 2
                 ^ (this.checkStackSize ? 1 : 0) << 3

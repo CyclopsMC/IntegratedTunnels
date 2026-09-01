@@ -161,11 +161,14 @@ public class TunnelItemHelpers {
                                        IngredientPredicate<ItemStack, Integer> itemStackMatcher, InteractionHand hand,
                                        boolean blockUpdate, boolean ignoreReplacable, boolean craftIfFailed) throws EvaluationException {
         BlockState destBlockState = world.getBlockState(pos);
-        final boolean isDestNonSolid = !destBlockState.isSolid();
-        final boolean isDestReplaceable = destBlockState.canBeReplaced(TunnelHelpers.createBlockItemUseContext(world, null, pos, side, hand));
-        if (!world.isEmptyBlock(pos)
-                && (!isDestNonSolid || !(ignoreReplacable && isDestReplaceable))) {
-            return null;
+        if (!world.isEmptyBlock(pos)) {
+            // Only determine replaceability when it can still influence the outcome,
+            // as constructing a block place context is relatively expensive.
+            if (destBlockState.isSolid()
+                    || !ignoreReplacable
+                    || !destBlockState.canBeReplaced(TunnelHelpers.createBlockItemUseContext(world, null, pos, side, hand))) {
+                return null;
+            }
         }
 
         IIngredientComponentStorage<ItemStack, Integer> destinationBlock = new ItemStorageBlockWrapper(
@@ -191,6 +194,8 @@ public class TunnelItemHelpers {
      * @param fortune The fortune level.
      * @param silkTouch If the block should be broken with silk touch.
      * @param breakOnNoDrops If the block should be broken if it produced no drops.
+     * @param matchBlock If the item form of the to-be-broken block should be matched
+     *                   instead of the items that the block would drop.
      * @return The picked-up items.
      * @throws EvaluationException If illegal movement occured and further movement should stop.
      */
@@ -199,12 +204,23 @@ public class TunnelItemHelpers {
                                               IIngredientComponentStorage<ItemStack, Integer> destination,
                                               IngredientPredicate<ItemStack, Integer> itemStackMatcher, InteractionHand hand, boolean blockUpdate,
                                               boolean ignoreReplacable, int fortune, boolean silkTouch,
-                                              boolean breakOnNoDrops) throws EvaluationException {
+                                              boolean breakOnNoDrops, boolean matchBlock) throws EvaluationException {
         BlockState destBlockState = world.getBlockState(pos);
-        final boolean isDestReplaceable = destBlockState.canBeReplaced(TunnelHelpers.createBlockItemUseContext(world, null, pos, side, hand));
+        // Only determine replaceability when it can still influence the outcome,
+        // as constructing a block place context is relatively expensive.
         if (world.isEmptyBlock(pos)
-                || ((ignoreReplacable && isDestReplaceable) || destBlockState.liquid())) {
+                || destBlockState.liquid()
+                || (ignoreReplacable && destBlockState.canBeReplaced(TunnelHelpers.createBlockItemUseContext(world, null, pos, side, hand)))) {
             return null;
+        }
+
+        // If we have to match by block, check the item form of the block that is present in the world.
+        // If it matches, all drops of that block are imported, no matter what they are.
+        if (matchBlock) {
+            if (!itemStackMatcher.test(IModHelpers.get().getBlockHelpers().getItemStackFromBlockState(destBlockState))) {
+                return null;
+            }
+            itemStackMatcher = matchAll(itemStackMatcher.getMaxQuantity(), itemStackMatcher.isExactQuantity());
         }
 
         ItemStorageBlockWrapper sourceBlock = new ItemStorageBlockWrapper(
