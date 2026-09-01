@@ -139,11 +139,15 @@ public class TunnelFluidHelpers {
                                          IngredientPredicate<FluidStack, Integer> fluidStackMatcher, boolean blockUpdate,
                                          boolean ignoreReplacable, boolean craftIfFailed) throws EvaluationException {
         BlockState destBlockState = world.getBlockState(pos);
-        final boolean isDestNonSolid = !destBlockState.isSolid();
-        final boolean isDestReplaceable = destBlockState.canBeReplaced(TunnelHelpers.createBlockItemUseContext(world, null, pos, Direction.UP, InteractionHand.MAIN_HAND));
-        if (!world.isEmptyBlock(pos)
-                && (!isDestNonSolid || !(ignoreReplacable && isDestReplaceable) || destBlockState.liquid())) {
-            return null;
+        if (!world.isEmptyBlock(pos)) {
+            // Only determine replaceability when it can still influence the outcome,
+            // as constructing a block place context is relatively expensive.
+            if (destBlockState.isSolid()
+                    || destBlockState.liquid()
+                    || !ignoreReplacable
+                    || !destBlockState.canBeReplaced(TunnelHelpers.createBlockItemUseContext(world, null, pos, Direction.UP, InteractionHand.MAIN_HAND))) {
+                return null;
+            }
         }
 
         IIngredientComponentStorage<FluidStack, Integer> destination = new FluidStorageBlockWrapper((ServerLevel) world, pos, null, blockUpdate);

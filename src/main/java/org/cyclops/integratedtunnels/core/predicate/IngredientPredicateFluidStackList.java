@@ -57,8 +57,8 @@ public class IngredientPredicateFluidStackList extends IngredientPredicate<Fluid
     }
 
     @Override
-    public int hashCode() {
-        return super.hashCode()
+    protected int computeHashCode() {
+        return super.computeHashCode()
                 ^ (this.blacklist ? 1 : 0) << 1
                 ^ (this.checkFluid ? 1 : 0) << 2
                 ^ (this.checkAmount ? 1 : 0) << 3

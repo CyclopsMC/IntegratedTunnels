@@ -12,10 +12,14 @@ import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.HopperBlock;
 import net.minecraft.world.level.block.entity.ChestBlockEntity;
+import net.minecraft.world.level.block.entity.FurnaceBlockEntity;
 import net.minecraft.world.level.block.entity.HopperBlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 import org.cyclops.cyclopscore.datastructure.DimPos;
 import org.cyclops.cyclopscore.gametest.GameTest;
 import org.cyclops.integrateddynamics.RegistryEntries;
+import org.cyclops.integrateddynamics.api.network.INetwork;
+import org.cyclops.integrateddynamics.api.network.IPartNetwork;
 import org.cyclops.integrateddynamics.api.part.PartPos;
 import org.cyclops.integrateddynamics.api.part.PartTarget;
 import org.cyclops.integrateddynamics.api.part.aspect.property.IAspectProperties;
@@ -24,21 +28,33 @@ import org.cyclops.integrateddynamics.core.block.IgnoredBlockStatus;
 import org.cyclops.integrateddynamics.core.evaluate.operator.CurriedOperator;
 import org.cyclops.integrateddynamics.core.evaluate.operator.Operators;
 import org.cyclops.integrateddynamics.core.evaluate.variable.*;
+import org.cyclops.integrateddynamics.core.helper.NetworkHelpers;
 import org.cyclops.integrateddynamics.core.helper.PartHelpers;
+import org.cyclops.integrateddynamics.part.aspect.Aspects;
 import org.cyclops.integratedtunnels.Reference;
+import org.cyclops.integratedtunnels.core.part.IPartTypeInterfacePositionedAddon;
+import org.cyclops.integratedtunnels.part.PartTypeInterfaceFilteringItem;
 import org.cyclops.integratedtunnels.part.PartTypes;
 import org.cyclops.integratedtunnels.part.aspect.TunnelAspectWriteBuilders;
 import org.cyclops.integratedtunnels.part.aspect.TunnelAspects;
 
 import static org.cyclops.integrateddynamics.gametest.GameTestHelpersIntegratedDynamics.createVariableForValue;
+import static org.cyclops.integrateddynamics.gametest.GameTestHelpersIntegratedDynamics.createVariableFromReader;
 import static org.cyclops.integrateddynamics.gametest.GameTestHelpersIntegratedDynamics.placeVariableInWriter;
 import static org.cyclops.integratedtunnels.gametest.GameTestHelpersIntegratedTunnels.setPassiveInteraction;
+import static org.cyclops.integratedtunnels.gametest.GameTestHelpersIntegratedTunnels.setTargetSide;
+import static org.cyclops.integratedtunnels.gametest.GameTestHelpersIntegratedTunnels.setTargetSideViaSettings;
 
 public class GameTestsItems {
 
     public static final String TEMPLATE_EMPTY = Reference.MOD_ID + ":empty10";
     public static final int TIMEOUT = 2000;
     public static final int TICKS_PASSIVE_INTERACTION = 100;
+    public static final int TICKS_NETWORK_INIT = 20;
+    public static final int TICKS_TRANSFER = 100;
+    public static final int SLOT_FURNACE_INPUT = 0;
+    public static final int SLOT_FURNACE_FUEL = 1;
+    public static final int SLOT_FURNACE_OUTPUT = 2;
     public static final BlockPos POS = BlockPos.ZERO.offset(2, 0, 2);
 
     @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
@@ -358,6 +374,94 @@ public class GameTestsItems {
             );
             helper.assertValueEqual(partStateInterface.getActiveAspect(), TunnelAspects.Write.ItemFilter.BOOLEAN_SET_FILTER, Component.literal("Active aspect filtering interface is incorrect"));
             helper.assertTrue(partStateInterface.getErrors(TunnelAspects.Write.ItemFilter.BOOLEAN_SET_FILTER).isEmpty(), Component.literal("Active aspect filtering interface has errors"));
+        });
+    }
+
+    /**
+     * Regression test for CyclopsMC/IntegratedDynamics#1711.
+     *
+     * A filtering interface caches its network and part network,
+     * which are unset while the part is detached from its network,
+     * such as in-between a chunk unload and the corresponding network element revalidation.
+     * Updating the part in that window used to crash the server with an NPE on the unset part network,
+     * which in turn marked the whole network as crashed, even after a server restart.
+     */
+    @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
+    public void testItemsImporterToFilteredInterfaceDetachedFromNetwork(GameTestHelper helper) {
+        // Place cable
+        helper.setBlock(POS, RegistryEntries.BLOCK_CABLE.value());
+        helper.setBlock(POS.east(), RegistryEntries.BLOCK_CABLE.value());
+
+        // Place item importer
+        PartHelpers.addPart(helper.getLevel(), helper.absolutePos(POS), Direction.WEST, PartTypes.IMPORTER_ITEM, new ItemStack(PartTypes.IMPORTER_ITEM.getItem()));
+
+        // Place filtering item interface
+        PartHelpers.addPart(helper.getLevel(), helper.absolutePos(POS.east()), Direction.EAST, PartTypes.INTERFACE_FILTERING_ITEM, new ItemStack(PartTypes.INTERFACE_FILTERING_ITEM.getItem()));
+
+        // Place redstone reader, as source of the interface's filter variable
+        PartHelpers.addPart(helper.getLevel(), helper.absolutePos(POS), Direction.NORTH,
+                org.cyclops.integrateddynamics.core.part.PartTypes.REDSTONE_READER,
+                new ItemStack(org.cyclops.integrateddynamics.core.part.PartTypes.REDSTONE_READER.getItem()));
+
+        // Place chests
+        helper.setBlock(POS.west(), Blocks.CHEST);
+        helper.setBlock(POS.east().east(), Blocks.CHEST);
+
+        // Insert items in importer chest
+        ChestBlockEntity chestIn = helper.getBlockEntity(POS.west(), ChestBlockEntity.class);
+        chestIn.setItem(0, new ItemStack(Items.WHITE_WOOL));
+
+        PartPos importerPos = PartPos.of(helper.getLevel(), helper.absolutePos(POS), Direction.WEST);
+        PartPos interfacePos = PartPos.of(helper.getLevel(), helper.absolutePos(POS.east()), Direction.EAST);
+        PartPos readerPos = PartPos.of(helper.getLevel(), helper.absolutePos(POS), Direction.NORTH);
+
+        // Place empty variable in importer
+        placeVariableInWriter(helper, helper.getLevel(), importerPos, TunnelAspects.Write.Item.BOOLEAN_IMPORT, new ItemStack(RegistryEntries.ITEM_VARIABLE));
+
+        // Place an aspect variable in the filtering interface.
+        // This must be an aspect variable rather than an empty or value variable,
+        // as only its facade resolves itself through the part network.
+        // The redstone reader is not powered, so this filter always evaluates to true.
+        ItemStack variableFilter = createVariableFromReader(helper.getLevel(), readerPos, Aspects.Read.Redstone.BOOLEAN_LOW);
+        placeVariableInWriter(helper, helper.getLevel(), interfacePos, TunnelAspects.Write.ItemFilter.BOOLEAN_SET_FILTER, variableFilter);
+
+        helper.runAfterDelay(TICKS_NETWORK_INIT + TICKS_TRANSFER, () -> {
+            // The filter has been applied by now, so the first item has been imported through the interface
+            helper.assertContainerContains(POS.east().east(), Items.WHITE_WOOL);
+
+            PartHelpers.PartStateHolder partStateHolder = PartHelpers.getPart(interfacePos);
+            PartTypeInterfaceFilteringItem.State partStateInterface = (PartTypeInterfaceFilteringItem.State) partStateHolder.getState();
+            INetwork network = NetworkHelpers.getNetworkChecked(interfacePos);
+            IPartNetwork partNetwork = NetworkHelpers.getPartNetworkChecked(network);
+            PartTarget target = PartTypes.INTERFACE_FILTERING_ITEM.getTarget(interfacePos, partStateInterface);
+
+            // Detach the interface from its network, like onNetworkRemoval does on chunk unload,
+            // and mark its filter aspect as requiring an update, like onVariableContentsUpdated does.
+            PartTypes.INTERFACE_FILTERING_ITEM.removeTargetFromNetwork(network, partStateInterface);
+            partStateInterface.requireAspectUpdate();
+
+            // Updating the part while detached must not throw
+            PartTypes.INTERFACE_FILTERING_ITEM.update(network, partNetwork, target, partStateInterface);
+
+            // Re-attach the interface, like afterNetworkReAlive does on revalidation
+            PartTypes.INTERFACE_FILTERING_ITEM.addTargetToNetwork(network, target,
+                    partStateInterface.getPriority(), partStateInterface.getChannelInterface(), partStateInterface);
+
+            // Insert another item, which must be imported through the re-attached interface
+            ChestBlockEntity chestInAfter = helper.getBlockEntity(POS.west(), ChestBlockEntity.class);
+            chestInAfter.setItem(0, new ItemStack(Items.ACACIA_LEAVES));
+        });
+
+        helper.succeedWhen(() -> {
+            // Check if items are moved
+            helper.assertContainerContains(POS.east().east(), Items.WHITE_WOOL);
+            helper.assertContainerContains(POS.east().east(), Items.ACACIA_LEAVES);
+            helper.assertContainerEmpty(POS.west());
+
+            // Check filtering interface state
+            IPartStateWriter partStateInterface = (IPartStateWriter) PartHelpers.getPart(interfacePos).getState();
+            helper.assertFalse(partStateInterface.isDeactivated(), "Filtering interface is deactivated");
+            helper.assertTrue(partStateInterface.getErrors(TunnelAspects.Write.ItemFilter.BOOLEAN_SET_FILTER).isEmpty(), "Active aspect filtering interface has errors");
         });
     }
 
@@ -905,6 +1009,255 @@ public class GameTestsItems {
             helper.assertContainerContains(POS.west().above(), Items.WHITE_WOOL);
             helper.succeed();
         });
+    }
+
+    /**
+     * Set up an item interface that targets a furnace from above,
+     * with an item in the furnace's input slot (only reachable from above)
+     * and an item in the furnace's output slot (only reachable from below).
+     *
+     * The exporter that empties the network into a chest is not placed yet,
+     * so that the target side of the interface can first be changed
+     * while the interface is already part of a live network.
+     *
+     * @return The position of the interface part.
+     */
+    protected static PartPos setupInterfaceTargetSide(GameTestHelper helper) {
+        // Place cable
+        helper.setBlock(POS.above(), RegistryEntries.BLOCK_CABLE.value());
+        helper.setBlock(POS.east().above(), RegistryEntries.BLOCK_CABLE.value());
+
+        // Place furnace below the cable, and fill its input and output slot
+        helper.setBlock(POS, Blocks.FURNACE);
+        FurnaceBlockEntity furnace = helper.getBlockEntity(POS, FurnaceBlockEntity.class);
+        furnace.setItem(SLOT_FURNACE_INPUT, new ItemStack(Items.WHITE_WOOL));
+        furnace.setItem(SLOT_FURNACE_OUTPUT, new ItemStack(Items.DIAMOND));
+
+        // Place item interface, targeting the furnace from above
+        PartHelpers.addPart(helper.getLevel(), helper.absolutePos(POS.above()), Direction.DOWN, PartTypes.INTERFACE_ITEM, new ItemStack(PartTypes.INTERFACE_ITEM.getItem()));
+
+        // Place output chest for the exporter that is placed later
+        helper.setBlock(POS.east().east().above(), Blocks.CHEST);
+
+        return PartPos.of(helper.getLevel(), helper.absolutePos(POS.above()), Direction.DOWN);
+    }
+
+    /**
+     * Place an item exporter that exports everything inside the network into a chest.
+     */
+    protected static void placeInterfaceTargetSideExporter(GameTestHelper helper) {
+        PartHelpers.addPart(helper.getLevel(), helper.absolutePos(POS.east().above()), Direction.EAST, PartTypes.EXPORTER_ITEM, new ItemStack(PartTypes.EXPORTER_ITEM.getItem()));
+        placeVariableInWriter(helper, helper.getLevel(), PartPos.of(helper.getLevel(), helper.absolutePos(POS.east().above()), Direction.EAST),
+                TunnelAspects.Write.Item.BOOLEAN_EXPORT, new ItemStack(RegistryEntries.ITEM_VARIABLE));
+    }
+
+    /**
+     * Check that only the furnace's output slot was exposed to the network.
+     */
+    protected static void assertInterfaceTargetSideExported(GameTestHelper helper) {
+        FurnaceBlockEntity furnace = helper.getBlockEntity(POS, FurnaceBlockEntity.class);
+        helper.assertTrue(furnace.getItem(SLOT_FURNACE_INPUT).is(Items.WHITE_WOOL), "Furnace input slot was exposed to the network");
+        helper.assertTrue(furnace.getItem(SLOT_FURNACE_OUTPUT).isEmpty(), "Furnace output slot was not exposed to the network");
+        helper.assertContainerContains(POS.east().east().above(), Items.DIAMOND);
+    }
+
+    /**
+     * An interface must only expose the side of the target block that it is configured with,
+     * even if that side is changed after the interface has been added to the network.
+     */
+    @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
+    public void testItemsInterfaceTargetSideExport(GameTestHelper helper) {
+        PartPos posInterface = setupInterfaceTargetSide(helper);
+
+        helper.startSequence()
+                // Let the interface add itself to the network with its default target side
+                .thenIdle(TICKS_NETWORK_INIT)
+                .thenExecute(() -> setTargetSide(posInterface, Direction.DOWN))
+                // Let the network index catch up with the new target side
+                .thenIdle(TICKS_NETWORK_INIT)
+                .thenExecute(() -> placeInterfaceTargetSideExporter(helper))
+                .thenIdle(TICKS_TRANSFER)
+                .thenExecute(() -> assertInterfaceTargetSideExported(helper))
+                .thenSucceed();
+    }
+
+    /**
+     * Just like {@link #testItemsInterfaceTargetSideExport(GameTestHelper)},
+     * but with the target side being changed in the same way as the part settings gui does.
+     */
+    @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
+    public void testItemsInterfaceTargetSideExportViaSettings(GameTestHelper helper) {
+        PartPos posInterface = setupInterfaceTargetSide(helper);
+
+        helper.startSequence()
+                // Let the interface add itself to the network with its default target side
+                .thenIdle(TICKS_NETWORK_INIT)
+                .thenExecute(() -> setTargetSideViaSettings(posInterface, Direction.DOWN))
+                // Let the network index catch up with the new target side
+                .thenIdle(TICKS_NETWORK_INIT)
+                .thenExecute(() -> placeInterfaceTargetSideExporter(helper))
+                .thenIdle(TICKS_TRANSFER)
+                .thenExecute(() -> assertInterfaceTargetSideExported(helper))
+                .thenSucceed();
+    }
+
+    /**
+     * An interface must pick up a container that is only placed after the interface joined the network.
+     */
+    @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
+    public void testItemsInterfaceTargetPlacedLater(GameTestHelper helper) {
+        // Place cable
+        helper.setBlock(POS, RegistryEntries.BLOCK_CABLE.value());
+        helper.setBlock(POS.east(), RegistryEntries.BLOCK_CABLE.value());
+
+        // Place item interface, without a container to expose yet
+        PartHelpers.addPart(helper.getLevel(), helper.absolutePos(POS), Direction.WEST, PartTypes.INTERFACE_ITEM, new ItemStack(PartTypes.INTERFACE_ITEM.getItem()));
+        PartPos posInterface = PartPos.of(helper.getLevel(), helper.absolutePos(POS), Direction.WEST);
+
+        // Place item exporter with an output chest, but don't activate it yet
+        PartHelpers.addPart(helper.getLevel(), helper.absolutePos(POS.east()), Direction.EAST, PartTypes.EXPORTER_ITEM, new ItemStack(PartTypes.EXPORTER_ITEM.getItem()));
+        helper.setBlock(POS.east().east(), Blocks.CHEST);
+
+        helper.startSequence()
+                // Let the interface join the network without a container
+                .thenIdle(TICKS_NETWORK_INIT)
+                .thenExecute(() -> helper.assertFalse(isInterfaceTargetValid(posInterface), "Interface exposed a container before one was placed"))
+                .thenExecute(() -> {
+                    // Only now place the container that the interface should expose
+                    helper.setBlock(POS.west(), Blocks.CHEST);
+                    ChestBlockEntity chestIn = helper.getBlockEntity(POS.west(), ChestBlockEntity.class);
+                    chestIn.setItem(0, new ItemStack(Items.WHITE_WOOL));
+                })
+                .thenIdle(TICKS_NETWORK_INIT)
+                .thenExecute(() -> helper.assertTrue(isInterfaceTargetValid(posInterface), "Interface did not expose the container that was placed later"))
+                // Only start exporting once the container is part of the network.
+                // An exporter that runs on an empty network first would fall asleep,
+                // and that sleep expires on wall-clock time rather than on ticks.
+                .thenExecute(() -> placeVariableInWriter(helper, helper.getLevel(), PartPos.of(helper.getLevel(), helper.absolutePos(POS.east()), Direction.EAST),
+                        TunnelAspects.Write.Item.BOOLEAN_EXPORT, new ItemStack(RegistryEntries.ITEM_VARIABLE)))
+                .thenIdle(TICKS_TRANSFER)
+                .thenExecute(() -> {
+                    helper.assertContainerContains(POS.east().east(), Items.WHITE_WOOL);
+                    helper.assertContainerEmpty(POS.west());
+                })
+                .thenSucceed();
+    }
+
+    /**
+     * An interface must stop exposing its container once that container is removed from the world.
+     */
+    @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
+    public void testItemsInterfaceTargetRemovedLater(GameTestHelper helper) {
+        // Place cable
+        helper.setBlock(POS, RegistryEntries.BLOCK_CABLE.value());
+
+        // Place item interface with a container to expose
+        PartHelpers.addPart(helper.getLevel(), helper.absolutePos(POS), Direction.WEST, PartTypes.INTERFACE_ITEM, new ItemStack(PartTypes.INTERFACE_ITEM.getItem()));
+        helper.setBlock(POS.west(), Blocks.CHEST);
+        PartPos posInterface = PartPos.of(helper.getLevel(), helper.absolutePos(POS), Direction.WEST);
+
+        helper.startSequence()
+                // Let the interface join the network with its container
+                .thenIdle(TICKS_NETWORK_INIT)
+                .thenExecute(() -> helper.assertTrue(isInterfaceTargetValid(posInterface), "Interface did not expose its container"))
+                .thenExecute(() -> helper.setBlock(POS.west(), Blocks.AIR))
+                .thenIdle(TICKS_NETWORK_INIT)
+                .thenExecute(() -> helper.assertFalse(isInterfaceTargetValid(posInterface), "Interface still exposes its removed container"))
+                .thenSucceed();
+    }
+
+    /**
+     * A capability can appear or disappear at the target position without its block state changing at all,
+     * for example when the configuration of a block entity changes.
+     * NeoForge requires such changes to be signalled through {@link net.minecraft.world.level.Level#invalidateCapabilities(BlockPos)},
+     * so the interface must subscribe to those invalidations and re-check its target on the next neighbour change.
+     */
+    @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
+    public void testItemsInterfaceTargetCapabilityInvalidated(GameTestHelper helper) {
+        // Place cable
+        helper.setBlock(POS, RegistryEntries.BLOCK_CABLE.value());
+
+        // Place item interface with a container to expose
+        PartHelpers.addPart(helper.getLevel(), helper.absolutePos(POS), Direction.WEST, PartTypes.INTERFACE_ITEM, new ItemStack(PartTypes.INTERFACE_ITEM.getItem()));
+        helper.setBlock(POS.west(), Blocks.CHEST);
+        PartPos posInterface = PartPos.of(helper.getLevel(), helper.absolutePos(POS), Direction.WEST);
+
+        helper.startSequence()
+                // Let the interface join the network with its container
+                .thenIdle(TICKS_NETWORK_INIT)
+                .thenExecute(() -> {
+                    helper.assertTrue(isInterfaceTargetValid(posInterface), "Interface did not expose its container");
+                    helper.assertFalse(isInterfaceTargetCapabilityInvalidated(posInterface), "Interface did not validate its target capability");
+                })
+                .thenExecute(() -> {
+                    // Signal that the capabilities at the target changed, without touching its block state
+                    BlockState blockStateBefore = helper.getLevel().getBlockState(helper.absolutePos(POS.west()));
+                    helper.getLevel().invalidateCapabilities(helper.absolutePos(POS.west()));
+                    helper.assertValueEqual(helper.getLevel().getBlockState(helper.absolutePos(POS.west())), blockStateBefore,
+                            "Block state at the target changed");
+
+                    helper.assertTrue(isInterfaceTargetCapabilityInvalidated(posInterface), "Interface did not observe the invalidation of its target capability");
+                })
+                // Trigger a neighbour change that is unrelated to the target
+                .thenExecute(() -> helper.setBlock(POS.above(), Blocks.STONE))
+                .thenIdle(TICKS_NETWORK_INIT)
+                .thenExecute(() -> {
+                    helper.assertFalse(isInterfaceTargetCapabilityInvalidated(posInterface), "Interface did not re-check its invalidated target capability");
+                    helper.assertTrue(isInterfaceTargetValid(posInterface), "Interface stopped exposing its unchanged container");
+                })
+                .thenSucceed();
+    }
+
+    protected static boolean isInterfaceTargetValid(PartPos posInterface) {
+        return ((IPartTypeInterfacePositionedAddon.IState<?, ?, ?, ?>) PartHelpers.getPart(posInterface).getState())
+                .isValidTargetCapability();
+    }
+
+    protected static boolean isInterfaceTargetCapabilityInvalidated(PartPos posInterface) {
+        return ((IPartTypeInterfacePositionedAddon.IState<?, ?, ?, ?>) PartHelpers.getPart(posInterface).getState())
+                .isTargetCapabilityInvalidated();
+    }
+
+    /**
+     * Insertions into an interface must also only apply to the configured target side,
+     * so coal must end up in the furnace's fuel slot instead of its input slot.
+     */
+    @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
+    public void testItemsInterfaceTargetSideImport(GameTestHelper helper) {
+        // Place cable
+        helper.setBlock(POS.above(), RegistryEntries.BLOCK_CABLE.value());
+        helper.setBlock(POS.east().above(), RegistryEntries.BLOCK_CABLE.value());
+
+        // Place empty furnace below the cable
+        helper.setBlock(POS, Blocks.FURNACE);
+
+        // Place item interface, targeting the furnace from above
+        PartHelpers.addPart(helper.getLevel(), helper.absolutePos(POS.above()), Direction.DOWN, PartTypes.INTERFACE_ITEM, new ItemStack(PartTypes.INTERFACE_ITEM.getItem()));
+        PartPos posInterface = PartPos.of(helper.getLevel(), helper.absolutePos(POS.above()), Direction.DOWN);
+
+        // Place input chest with coal for the importer that is placed later
+        helper.setBlock(POS.east().east().above(), Blocks.CHEST);
+        ChestBlockEntity chestIn = helper.getBlockEntity(POS.east().east().above(), ChestBlockEntity.class);
+        chestIn.setItem(0, new ItemStack(Items.COAL));
+
+        helper.startSequence()
+                // Let the interface add itself to the network with its default target side
+                .thenIdle(TICKS_NETWORK_INIT)
+                .thenExecute(() -> setTargetSide(posInterface, Direction.DOWN))
+                .thenExecute(() -> {
+                    // Place item importer that imports everything from the chest into the network
+                    PartHelpers.addPart(helper.getLevel(), helper.absolutePos(POS.east().above()), Direction.EAST, PartTypes.IMPORTER_ITEM, new ItemStack(PartTypes.IMPORTER_ITEM.getItem()));
+                    placeVariableInWriter(helper, helper.getLevel(), PartPos.of(helper.getLevel(), helper.absolutePos(POS.east().above()), Direction.EAST),
+                            TunnelAspects.Write.Item.BOOLEAN_IMPORT, new ItemStack(RegistryEntries.ITEM_VARIABLE));
+                })
+                .thenIdle(TICKS_TRANSFER)
+                .thenExecute(() -> {
+                    FurnaceBlockEntity furnace = helper.getBlockEntity(POS, FurnaceBlockEntity.class);
+                    helper.assertTrue(furnace.getItem(SLOT_FURNACE_INPUT).isEmpty(), "Furnace input slot was exposed to the network");
+                    helper.assertTrue(furnace.getItem(SLOT_FURNACE_FUEL).is(Items.COAL), "Furnace fuel slot was not exposed to the network");
+                    helper.assertContainerEmpty(POS.east().east().above());
+                })
+                .thenSucceed();
     }
 
 }

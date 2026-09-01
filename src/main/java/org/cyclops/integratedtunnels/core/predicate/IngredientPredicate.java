@@ -1,16 +1,14 @@
 package org.cyclops.integratedtunnels.core.predicate;
 
-import com.google.common.collect.Lists;
 import org.cyclops.commoncapabilities.api.ingredient.IIngredientMatcher;
 import org.cyclops.commoncapabilities.api.ingredient.IngredientComponent;
 import org.cyclops.integratedtunnels.part.aspect.ITunnelTransfer;
 
 import javax.annotation.Nonnull;
-import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.Objects;
 import java.util.function.Predicate;
-import java.util.stream.StreamSupport;
 
 /**
  * A predicate for matching ingredient components.
@@ -27,6 +25,15 @@ public abstract class IngredientPredicate<T, M> implements Predicate<T>, ITunnel
     private final boolean empty;
     private final int maxQuantity;
     private final boolean exactQuantity;
+
+    /**
+     * Lazily computed value of {@link #hashCode()}.
+     * Predicates are immutable, but are constructed anew on every aspect evaluation,
+     * while their hash is needed on every transfer for the transfer cache lookup,
+     * so it pays off to only compute it once.
+     * A value of 0 means 'not computed yet'.
+     */
+    private int hashCodeCached = 0;
 
     public IngredientPredicate(IngredientComponent<T, M> ingredientComponent,
                                Iterable<T> instances, M matchFlags, boolean blacklist, boolean empty,
@@ -88,6 +95,9 @@ public abstract class IngredientPredicate<T, M> implements Predicate<T>, ITunnel
 
     @Override
     public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
         if (!(obj instanceof IngredientPredicate)) {
             return false;
         }
@@ -102,27 +112,49 @@ public abstract class IngredientPredicate<T, M> implements Predicate<T>, ITunnel
             return false;
         }
 
-        ArrayList<T> instances1 = Lists.newArrayList(this.instances);
-        ArrayList<T> instances2 = Lists.newArrayList(that.instances);
-        if (instances1.size() != instances2.size()) {
-            return false;
-        }
+        // Compare both instance iterables in lock-step, so that no intermediate collections are needed.
         IIngredientMatcher<T, M> matcher = this.ingredientComponent.getMatcher();
-        for (int i = 0; i < instances1.size(); i++) {
-            if (!matcher.matchesExactly(instances1.get(i), instances2.get(i))) {
+        Iterator<T> it1 = this.instances.iterator();
+        Iterator<T> it2 = ((IngredientPredicate<T, M>) that).instances.iterator();
+        while (it1.hasNext() && it2.hasNext()) {
+            if (!matcher.matchesExactly(it1.next(), it2.next())) {
                 return false;
             }
         }
 
-        return true;
+        return !it1.hasNext() && !it2.hasNext();
     }
 
     @Override
     public int hashCode() {
+        int hash = this.hashCodeCached;
+        if (hash == 0) {
+            hash = computeHashCode();
+            if (hash == 0) {
+                // Reserve 0 for 'not computed yet'
+                hash = 1;
+            }
+            this.hashCodeCached = hash;
+        }
+        return hash;
+    }
+
+    /**
+     * Calculate the hash code of this predicate.
+     *
+     * The result of this method is cached by {@link #hashCode()},
+     * so subclasses must override this method instead of {@link #hashCode()}.
+     *
+     * @return The hash code.
+     */
+    protected int computeHashCode() {
+        IIngredientMatcher<T, M> matcher = ingredientComponent.getMatcher();
+        int instancesHash = 0;
+        for (T instance : instances) {
+            instancesHash = instancesHash ^ matcher.hash(instance);
+        }
         return ingredientComponent.hashCode()
-                ^ StreamSupport.stream(instances.spliterator(), false)
-                    .map(instance -> ingredientComponent.getMatcher().hash(instance))
-                    .reduce(0, (a, b) -> a ^ b)
+                ^ instancesHash
                 ^ Objects.hashCode(matchFlags)
                 ^ (blacklist ? 1 : 0)
                 ^ (empty ? 2 : 4)
