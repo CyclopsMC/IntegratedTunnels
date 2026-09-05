@@ -1133,13 +1133,13 @@ public class GameTestsItems {
                 })
                 .thenIdle(TICKS_NETWORK_INIT)
                 .thenExecute(() -> helper.assertTrue(isInterfaceTargetValid(posInterface), "Interface did not expose the container that was placed later"))
-                // Only start exporting once the container is part of the network.
-                // An exporter that runs on an empty network first would fall asleep,
-                // and that sleep expires on wall-clock time rather than on ticks.
+                // Only start exporting once the container is part of the network
                 .thenExecute(() -> placeVariableInWriter(helper.getLevel(), PartPos.of(helper.getLevel(), helper.absolutePos(POS.east()), Direction.EAST),
                         TunnelAspects.Write.Item.BOOLEAN_EXPORT, new ItemStack(RegistryEntries.ITEM_VARIABLE)))
-                .thenIdle(TICKS_TRANSFER)
-                .thenExecute(() -> {
+                // The exporter can still run before the network observed the container that just
+                // joined it, after which it sleeps. That sleep expires on wall-clock time rather
+                // than on ticks, so wait for the transfer instead of asserting after fixed ticks.
+                .thenWaitUntil(() -> {
                     helper.assertContainerContains(POS.east().east(), Items.WHITE_WOOL);
                     helper.assertContainerEmpty(POS.west());
                 })
