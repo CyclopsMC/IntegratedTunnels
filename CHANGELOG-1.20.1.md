@@ -1,8 +1,16 @@
 # Changelog for Minecraft 1.20.1
 All notable changes to this project will be documented in this file.
 
+<a name="1.20.1-1.10.1"></a>
+## [1.20.1-1.10.1](/compare/1.20.1-1.10.0...1.20.1-1.10.1) - 2026-09-05 13:49:18
+
+
+### Fixed
+* Fix server crash when a filtered interface ticks while detached from its network (#385), Closes CyclopsMC/IntegratedDynamics#1711
+* Fix interfaces not respecting the target side configuration (#382), Closes #381
+
 <a name="1.20.1-1.10.0"></a>
-## [1.20.1-1.10.0](/compare/1.20.1-1.9.3...1.20.1-1.10.0) - 2026-08-24 19:40:49
+## [1.20.1-1.10.0](/compare/1.20.1-1.9.3...1.20.1-1.10.0) - 2026-08-24 19:40:49 +0200
 
 
 ### Added
