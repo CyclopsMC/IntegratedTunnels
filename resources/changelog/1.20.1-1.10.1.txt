@@ -1,0 +1,6 @@
+As always, don't forget to backup your world before updating!
+Requires CyclopsCore version 1.18.4 or higher.
+
+Fixes:
+* Fix server crash when a filtered interface ticks while detached from its network (#385), Closes CyclopsMC/IntegratedDynamics#1711
+* Fix interfaces not respecting the target side configuration (#382), Closes #381
