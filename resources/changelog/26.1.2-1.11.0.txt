@@ -1,0 +1,16 @@
+As always, don't forget to backup your world before updating!
+Requires CyclopsCore version 1.29.8 or higher.
+
+Additions:
+* Add match block option to world block importer aspects (#380), Closes #347
+
+Changes:
+* Improve overall performance:
+  * Avoid constructing block place contexts for unused replaceability checks
+  * Improve ingredient predicate hashing and equality performance
+  * Improve interface performance by skipping redundant target capability checks
+
+Fixes:
+* Fix server crash when a filtered interface ticks while detached from its network (#385), Closes CyclopsMC/IntegratedDynamics#1711
+* Fix interfaces not respecting the target side configuration (#382), Closes #381
+* Fix grammar in new matchblock aspect property description (#383)

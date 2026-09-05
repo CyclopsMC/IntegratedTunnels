@@ -1,8 +1,26 @@
 # Changelog for Minecraft 1.21.1
 All notable changes to this project will be documented in this file.
 
+<a name="1.21.1-1.11.0"></a>
+## [1.21.1-1.11.0](https://github.com/CyclopsMC/IntegratedTunnels/compare/1.21.1-1.10.0...1.21.1-1.11.0) - 2026-09-05 13:53:59
+
+
+### Added
+* Add match block option to world block importer aspects (#380), Closes #347
+
+### Changed
+* Improve overall performance
+  * Avoid constructing block place contexts for unused replaceability checks
+  * Improve ingredient predicate hashing and equality performance
+  * Improve interface performance by skipping redundant target capability checks
+
+### Fixed
+* Fix server crash when a filtered interface ticks while detached from its network (#385), Closes CyclopsMC/IntegratedDynamics#1711
+* Fix interfaces not respecting the target side configuration (#382), Closes #381
+* Fix grammar in new matchblock aspect property description (#383)
+
 <a name="1.21.1-1.10.0"></a>
-## [1.21.1-1.10.0](https://github.com/CyclopsMC/IntegratedTunnels/compare/1.21.1-1.9.4...1.21.1-1.10.0) - 2026-08-24 19:44:52
+## [1.21.1-1.10.0](https://github.com/CyclopsMC/IntegratedTunnels/compare/1.21.1-1.9.4...1.21.1-1.10.0) - 2026-08-24 19:44:52 +0200
 
 
 ### Added
