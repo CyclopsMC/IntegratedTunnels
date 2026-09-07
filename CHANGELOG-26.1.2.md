@@ -1,8 +1,15 @@
 # Changelog for Minecraft 26.1.2
 All notable changes to this project will be documented in this file.
 
+<a name="26.1.2-1.11.1"></a>
+## [26.1.2-1.11.1](https://github.com/CyclopsMC/IntegratedTunnels/compare/26.1.2-1.11.0...26.1.2-1.11.1) - 2026-09-07 16:47:48
+
+
+### Fixed
+* Fix interfaces without filter not being closable with escape (#387), Closes CyclopsMC/IntegratedDynamics#1726
+
 <a name="26.1.2-1.11.0"></a>
-## [26.1.2-1.11.0](https://github.com/CyclopsMC/IntegratedTunnels/compare/26.1.2-1.10.0...26.1.2-1.11.0) - 2026-09-05 14:01:46
+## [26.1.2-1.11.0](https://github.com/CyclopsMC/IntegratedTunnels/compare/26.1.2-1.10.0...26.1.2-1.11.0) - 2026-09-05 14:01:46 +0200
 
 
 ### Added

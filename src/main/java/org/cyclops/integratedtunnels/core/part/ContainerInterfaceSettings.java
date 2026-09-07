@@ -51,6 +51,14 @@ public class ContainerInterfaceSettings extends ContainerPartSettings {
         ValueNotifierHelpers.setValue(this, lastChannelInterfaceValueId, ((IPartTypeInterfacePositionedAddon.IState) getPartState()).getChannelInterface());
     }
 
+    /**
+     * @return If this container is the part's main gui,
+     *         as opposed to a settings sub-gui that was opened from within another part gui.
+     */
+    public boolean isPartGui() {
+        return getPartType() instanceof PartTypeInterfacePositionedAddon;
+    }
+
     public int getLastChannelInterfaceValueId() {
         return lastChannelInterfaceValueId;
     }
