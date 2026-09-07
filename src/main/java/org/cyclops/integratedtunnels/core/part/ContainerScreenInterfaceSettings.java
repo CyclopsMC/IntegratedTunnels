@@ -86,10 +86,15 @@ public class ContainerScreenInterfaceSettings extends ContainerScreenPartSetting
 
     @Override
     public boolean keyPressed(int typedChar, int keyCode, int modifiers) {
-        if (typedChar != GLFW.GLFW_KEY_ESCAPE) {
-            if (this.numberFieldChannelInterface.keyPressed(typedChar, keyCode, modifiers)) {
+        if (typedChar == GLFW.GLFW_KEY_ESCAPE) {
+            if (getMenu().isPartGui()) {
+                // Interfaces without filter show these settings as their part gui,
+                // so escaping to the part gui would just re-open this gui.
+                onClose();
                 return true;
             }
+        } else if (this.numberFieldChannelInterface.keyPressed(typedChar, keyCode, modifiers)) {
+            return true;
         }
         return super.keyPressed(typedChar, keyCode, modifiers);
     }
