@@ -1,8 +1,15 @@
 # Changelog for Minecraft 1.21.1
 All notable changes to this project will be documented in this file.
 
+<a name="1.21.1-1.11.1"></a>
+## [1.21.1-1.11.1](https://github.com/CyclopsMC/IntegratedTunnels/compare/1.21.1-1.11.0...1.21.1-1.11.1) - 2026-09-07 16:40:27
+
+
+### Fixed
+* Fix interfaces without filter not being closable with escape (#387), Closes CyclopsMC/IntegratedDynamics#1726
+
 <a name="1.21.1-1.11.0"></a>
-## [1.21.1-1.11.0](https://github.com/CyclopsMC/IntegratedTunnels/compare/1.21.1-1.10.0...1.21.1-1.11.0) - 2026-09-05 13:53:59
+## [1.21.1-1.11.0](https://github.com/CyclopsMC/IntegratedTunnels/compare/1.21.1-1.10.0...1.21.1-1.11.0) - 2026-09-05 13:53:59 +0200
 
 
 ### Added
