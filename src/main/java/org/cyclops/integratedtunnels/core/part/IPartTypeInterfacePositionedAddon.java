@@ -2,7 +2,11 @@ package org.cyclops.integratedtunnels.core.part;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
@@ -22,6 +26,10 @@ import org.cyclops.integrateddynamics.api.part.PartCapability;
 import org.cyclops.integrateddynamics.api.part.PartPos;
 import org.cyclops.integrateddynamics.api.part.PartTarget;
 import org.cyclops.integrateddynamics.core.helper.NetworkHelpers;
+import org.cyclops.integrateddynamics.core.part.PartConfigApplyResult;
+import org.cyclops.integrateddynamics.core.part.PartConfigSection;
+import org.cyclops.integrateddynamics.core.part.PartConfigSnapshot;
+import org.cyclops.integrateddynamics.core.part.PartTypes;
 
 import javax.annotation.Nullable;
 import java.util.Optional;
@@ -31,6 +39,37 @@ import java.util.Optional;
  * @author rubensworks
  */
 public interface IPartTypeInterfacePositionedAddon<N extends IPositionedAddonsNetwork, T, P extends IPartTypeInterfacePositionedAddon<N, T, P, S>, S extends IPartTypeInterfacePositionedAddon.IState<N, T, P, S>> extends IPartType<P, S> {
+
+    /**
+     * The key that the interface channel is stored under in a part configuration snapshot.
+     */
+    public static final String CONFIG_KEY_CHANNEL_INTERFACE = "channelInterface";
+
+    @Override
+    public default CompoundTag snapshotConfigExtra(ValueDeseralizationContext valueDeseralizationContext, S state,
+                                                   PartConfigSection section) {
+        CompoundTag tag = new CompoundTag();
+        // The interface channel is a part setting, and only a changed one is worth copying
+        if (section == PartConfigSection.PART_SETTINGS && state.getChannelInterface() != 0) {
+            tag.putInt(CONFIG_KEY_CHANNEL_INTERFACE, state.getChannelInterface());
+        }
+        return tag;
+    }
+
+    @Override
+    public default void applyConfigExtra(ValueDeseralizationContext valueDeseralizationContext, PartTarget target,
+                                         S state, PartConfigSection section, PartConfigSnapshot snapshot,
+                                         Player player, PartConfigApplyResult result) {
+        // The subset modes also paste onto other part types, so only read back what another interface wrote
+        if (!(PartTypes.REGISTRY.getPartType(snapshot.sourcePartType()) instanceof IPartTypeInterfacePositionedAddon)) {
+            return;
+        }
+        CompoundTag tag = snapshot.getExtraData(section);
+        if (tag.contains(CONFIG_KEY_CHANNEL_INTERFACE, Tag.TAG_INT)) {
+            state.setChannelInterface(tag.getInt(CONFIG_KEY_CHANNEL_INTERFACE));
+            result.addApplied(Component.translatable("gui.integratedtunnels.partsettings.channel.interface.pasted"));
+        }
+    }
 
     public NetworkCapability<N> getNetworkCapability();
 
