@@ -1,8 +1,15 @@
 # Changelog for Minecraft 1.21.1
 All notable changes to this project will be documented in this file.
 
+<a name="1.21.1-1.12.0"></a>
+## [1.21.1-1.12.0](https://github.com/CyclopsMC/IntegratedTunnels/compare/1.21.1-1.11.1...1.21.1-1.12.0) - 2026-09-11 21:58:34
+
+
+### Added
+* Support Wrench copy-pasting of the interface channel (#388)
+
 <a name="1.21.1-1.11.1"></a>
-## [1.21.1-1.11.1](https://github.com/CyclopsMC/IntegratedTunnels/compare/1.21.1-1.11.0...1.21.1-1.11.1) - 2026-09-07 16:40:27
+## [1.21.1-1.11.1](https://github.com/CyclopsMC/IntegratedTunnels/compare/1.21.1-1.11.0...1.21.1-1.11.1) - 2026-09-07 16:40:27 +0200
 
 
 ### Fixed
