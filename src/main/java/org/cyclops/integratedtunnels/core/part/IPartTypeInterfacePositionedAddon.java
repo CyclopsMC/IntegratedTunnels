@@ -2,7 +2,10 @@ package org.cyclops.integratedtunnels.core.part;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
@@ -14,8 +17,14 @@ import org.cyclops.integrateddynamics.api.evaluate.variable.ValueDeseralizationC
 import org.cyclops.integrateddynamics.api.network.*;
 import org.cyclops.integrateddynamics.api.part.*;
 import org.cyclops.integrateddynamics.core.helper.NetworkHelpers;
+import org.cyclops.integrateddynamics.core.part.PartConfigApplyResult;
+import org.cyclops.integrateddynamics.core.part.PartConfigEntry;
+import org.cyclops.integrateddynamics.core.part.PartConfigSection;
+import org.cyclops.integrateddynamics.core.part.PartConfigSnapshot;
+import org.cyclops.integrateddynamics.core.part.PartTypes;
 
 import javax.annotation.Nullable;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -23,6 +32,55 @@ import java.util.Optional;
  * @author rubensworks
  */
 public interface IPartTypeInterfacePositionedAddon<N extends IPositionedAddonsNetwork, T, P extends IPartTypeInterfacePositionedAddon<N, T, P, S>, S extends IPartTypeInterfacePositionedAddon.IState<N, T, P, S>> extends IPartType<P, S> {
+
+    /**
+     * The key that the interface channel is stored under in a part configuration snapshot.
+     */
+    public static final String CONFIG_KEY_CHANNEL_INTERFACE = "channelInterface";
+
+    @Override
+    public default CompoundTag snapshotConfigExtra(ValueDeseralizationContext valueDeseralizationContext, S state,
+                                                   PartConfigSection section) {
+        CompoundTag tag = new CompoundTag();
+        // The interface channel is a part setting, and only a changed one is worth copying
+        if (section == PartConfigSection.PART_SETTINGS && state.getChannelInterface() != 0) {
+            tag.putInt(CONFIG_KEY_CHANNEL_INTERFACE, state.getChannelInterface());
+        }
+        return tag;
+    }
+
+    @Override
+    public default List<PartConfigEntry> getConfigExtraEntries(ValueDeseralizationContext valueDeseralizationContext,
+                                                               PartConfigSnapshot snapshot, PartConfigSection section) {
+        CompoundTag tag = snapshot.getExtraData(section);
+        Optional<Integer> channelInterface = tag.getInt(CONFIG_KEY_CHANNEL_INTERFACE);
+        if (channelInterface.isEmpty()) {
+            return List.of();
+        }
+        // Shown next to the general part settings, as that is what the interface channel is
+        return List.of(new PartConfigEntry(
+                PartConfigEntry.idExtra(section, CONFIG_KEY_CHANNEL_INTERFACE),
+                Component.empty(),
+                Component.translatable("gui.integratedtunnels.partsettings.channel.interface"),
+                Component.literal(String.valueOf(channelInterface.get())),
+                section));
+    }
+
+    @Override
+    public default void applyConfigExtra(ValueDeseralizationContext valueDeseralizationContext, PartTarget target,
+                                         S state, PartConfigSection section, PartConfigSnapshot snapshot,
+                                         Player player, PartConfigApplyResult result) {
+        // The subset modes also paste onto other part types, so only read back what another interface wrote
+        if (!(PartTypes.REGISTRY.getPartType(snapshot.sourcePartType()) instanceof IPartTypeInterfacePositionedAddon)) {
+            return;
+        }
+        Optional<Integer> channelInterface = snapshot.getExtraData(section).getInt(CONFIG_KEY_CHANNEL_INTERFACE);
+        if (channelInterface.isPresent()
+                && snapshot.isEnabled(PartConfigEntry.idExtra(section, CONFIG_KEY_CHANNEL_INTERFACE))) {
+            state.setChannelInterface(channelInterface.get());
+            result.addApplied(Component.translatable("gui.integratedtunnels.partsettings.channel.interface.pasted"));
+        }
+    }
 
     public NetworkCapability<N> getNetworkCapability();
 

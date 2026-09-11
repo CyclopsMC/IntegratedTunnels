@@ -154,6 +154,7 @@ public class IntegratedTunnels extends ModBaseNeoForge<IntegratedTunnels> {
                 GameTestsEnergy.class,
                 GameTestsFluids.class,
                 GameTestsGuis.class,
+                GameTestsInterfaceConfig.class,
                 GameTestsItems.class,
                 GameTestsPerformance.class,
                 GameTestsPlayerSimulator.class,
