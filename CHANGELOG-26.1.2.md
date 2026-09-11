@@ -1,8 +1,15 @@
 # Changelog for Minecraft 26.1.2
 All notable changes to this project will be documented in this file.
 
+<a name="26.1.2-1.12.0"></a>
+## [26.1.2-1.12.0](https://github.com/CyclopsMC/IntegratedTunnels/compare/26.1.2-1.11.1...26.1.2-1.12.0) - 2026-09-11 22:06:37
+
+
+### Added
+* Support Wrench copy-pasting of the interface channel (#388)
+
 <a name="26.1.2-1.11.1"></a>
-## [26.1.2-1.11.1](https://github.com/CyclopsMC/IntegratedTunnels/compare/26.1.2-1.11.0...26.1.2-1.11.1) - 2026-09-07 16:47:48
+## [26.1.2-1.11.1](https://github.com/CyclopsMC/IntegratedTunnels/compare/26.1.2-1.11.0...26.1.2-1.11.1) - 2026-09-07 16:47:48 +0200
 
 
 ### Fixed
