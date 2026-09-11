@@ -27,11 +27,13 @@ import org.cyclops.integrateddynamics.api.part.PartPos;
 import org.cyclops.integrateddynamics.api.part.PartTarget;
 import org.cyclops.integrateddynamics.core.helper.NetworkHelpers;
 import org.cyclops.integrateddynamics.core.part.PartConfigApplyResult;
+import org.cyclops.integrateddynamics.core.part.PartConfigEntry;
 import org.cyclops.integrateddynamics.core.part.PartConfigSection;
 import org.cyclops.integrateddynamics.core.part.PartConfigSnapshot;
 import org.cyclops.integrateddynamics.core.part.PartTypes;
 
 import javax.annotation.Nullable;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -57,6 +59,22 @@ public interface IPartTypeInterfacePositionedAddon<N extends IPositionedAddonsNe
     }
 
     @Override
+    public default List<PartConfigEntry> getConfigExtraEntries(ValueDeseralizationContext valueDeseralizationContext,
+                                                               PartConfigSnapshot snapshot, PartConfigSection section) {
+        CompoundTag tag = snapshot.getExtraData(section);
+        if (!tag.contains(CONFIG_KEY_CHANNEL_INTERFACE, Tag.TAG_INT)) {
+            return List.of();
+        }
+        // Shown next to the general part settings, as that is what the interface channel is
+        return List.of(new PartConfigEntry(
+                PartConfigEntry.idExtra(section, CONFIG_KEY_CHANNEL_INTERFACE),
+                Component.empty(),
+                Component.translatable("gui.integratedtunnels.partsettings.channel.interface"),
+                Component.literal(String.valueOf(tag.getInt(CONFIG_KEY_CHANNEL_INTERFACE))),
+                section));
+    }
+
+    @Override
     public default void applyConfigExtra(ValueDeseralizationContext valueDeseralizationContext, PartTarget target,
                                          S state, PartConfigSection section, PartConfigSnapshot snapshot,
                                          Player player, PartConfigApplyResult result) {
@@ -65,7 +83,8 @@ public interface IPartTypeInterfacePositionedAddon<N extends IPositionedAddonsNe
             return;
         }
         CompoundTag tag = snapshot.getExtraData(section);
-        if (tag.contains(CONFIG_KEY_CHANNEL_INTERFACE, Tag.TAG_INT)) {
+        if (tag.contains(CONFIG_KEY_CHANNEL_INTERFACE, Tag.TAG_INT)
+                && snapshot.isEnabled(PartConfigEntry.idExtra(section, CONFIG_KEY_CHANNEL_INTERFACE))) {
             state.setChannelInterface(tag.getInt(CONFIG_KEY_CHANNEL_INTERFACE));
             result.addApplied(Component.translatable("gui.integratedtunnels.partsettings.channel.interface.pasted"));
         }

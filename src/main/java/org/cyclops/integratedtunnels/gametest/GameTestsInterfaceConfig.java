@@ -20,6 +20,7 @@ import org.cyclops.integrateddynamics.api.part.PartTarget;
 import org.cyclops.integrateddynamics.core.helper.NetworkHelpers;
 import org.cyclops.integrateddynamics.core.helper.PartHelpers;
 import org.cyclops.integrateddynamics.core.part.PartConfigApplyResult;
+import org.cyclops.integrateddynamics.core.part.PartConfigEntry;
 import org.cyclops.integrateddynamics.core.part.PartConfigSection;
 import org.cyclops.integrateddynamics.core.part.PartConfigSnapshot;
 import org.cyclops.integratedtunnels.Reference;
@@ -133,6 +134,46 @@ public class GameTestsInterfaceConfig {
                     "The interface channel was copied by the aspect section");
             helper.assertValueEqual(getChannelInterface(target), 0,
                     "The interface channel was pasted by the aspect section");
+        });
+    }
+
+    @GameTest(template = TEMPLATE_EMPTY)
+    public void testInterfaceChannelIsListedAsAnEntry(GameTestHelper helper) {
+        PartPos source = placePart(helper, POS_SOURCE, PartTypes.INTERFACE_ITEM);
+        setChannelInterface(source, 5);
+
+        PartConfigSnapshot snapshot = snapshotConfig(helper, source, PartConfigSection.ALL);
+        PartConfigEntry entry = snapshot.getEntries(ValueDeseralizationContext.of(helper.getLevel())).stream()
+                .filter(e -> e.id().equals(PartConfigEntry.idExtra(PartConfigSection.PART_SETTINGS,
+                        IPartTypeInterfacePositionedAddon.CONFIG_KEY_CHANNEL_INTERFACE)))
+                .findFirst()
+                .orElse(null);
+
+        helper.succeedWhen(() -> {
+            helper.assertTrue(entry != null, "The interface channel can not be switched off on its own");
+            helper.assertValueEqual(entry.value().getString(), "5",
+                    "The interface channel does not show its value");
+            helper.assertValueEqual(entry.section(), PartConfigSection.PART_SETTINGS,
+                    "The interface channel is not listed as a part setting");
+        });
+    }
+
+    @GameTest(template = TEMPLATE_EMPTY)
+    public void testDisabledInterfaceChannelIsNotPasted(GameTestHelper helper) {
+        PartPos source = placePart(helper, POS_SOURCE, PartTypes.INTERFACE_ITEM);
+        PartPos target = placePart(helper, POS_TARGET, PartTypes.INTERFACE_ITEM);
+        setChannelInterface(source, 5);
+
+        PartConfigSnapshot snapshot = snapshotConfig(helper, source, PartConfigSection.ALL)
+                .withEntryEnabled(PartConfigEntry.idExtra(PartConfigSection.PART_SETTINGS,
+                        IPartTypeInterfacePositionedAddon.CONFIG_KEY_CHANNEL_INTERFACE), false);
+        PartConfigApplyResult result = applyConfig(helper, target, snapshot, PartConfigSection.ALL);
+
+        helper.succeedWhen(() -> {
+            helper.assertValueEqual(getChannelInterface(target), 0,
+                    "The interface channel was pasted even though it was switched off");
+            helper.assertTrue(!result.getMessage().getString().contains("interface channel"),
+                    "The interface channel was reported as pasted even though it was switched off");
         });
     }
 
