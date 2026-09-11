@@ -5,6 +5,7 @@
 
   "_comment": "Gui",
   "gui.integratedtunnels.partsettings.channel.interface": "Interface Channel",
+  "gui.integratedtunnels.partsettings.channel.interface.pasted": "interface channel",
 
   "_comment": "Achievements",
   "advancement.integratedtunnels.interface_item": "Item Interfacing",
