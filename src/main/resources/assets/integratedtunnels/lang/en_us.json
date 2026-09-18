@@ -162,7 +162,7 @@
   "aspect.aspecttypes.integratedtunnels.boolean.player.sneak": "Sneak",
   "aspect.aspecttypes.integratedtunnels.boolean.player.sneak.info": "If player sneaking (holding shift) must be simulated.",
   "aspect.aspecttypes.integratedtunnels.boolean.player.networkinventory": "Network Inventory",
-  "aspect.aspecttypes.integratedtunnels.boolean.player.networkinventory.info": "If the simulated player can consume items from the network through its inventory, such as arrows when using a bow. Only a limited amount of different items from the network fits in the player inventory.",
+  "aspect.aspecttypes.integratedtunnels.boolean.player.networkinventory.info": "If the simulated player can consume items from the network through its inventory, such as arrows when using a bow.",
   "aspect.aspecttypes.integratedtunnels.boolean.roundrobin": "Round-Robin",
   "aspect.aspecttypes.integratedtunnels.boolean.roundrobin.info": "If interfaces should be iterated in circular order, ignoring priorities.",
   "aspect.aspecttypes.integratedtunnels.boolean.exactamount": "Exact Amount",

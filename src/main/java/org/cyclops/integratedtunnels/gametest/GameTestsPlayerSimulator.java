@@ -39,6 +39,7 @@ import org.cyclops.integratedtunnels.part.aspect.TunnelAspects;
 import static org.cyclops.integrateddynamics.gametest.GameTestHelpersIntegratedDynamics.createVariableForValue;
 import static org.cyclops.integrateddynamics.gametest.GameTestHelpersIntegratedDynamics.placeVariableInWriter;
 import static org.cyclops.integratedtunnels.gametest.GameTestHelpersIntegratedTunnels.setNetworkInventory;
+import static org.cyclops.integratedtunnels.gametest.GameTestHelpersIntegratedTunnels.setPriority;
 
 @GameTestHolder(Reference.MOD_ID)
 @PrefixGameTestTemplate(false)
@@ -361,8 +362,8 @@ public class GameTestsPlayerSimulator {
         setNetworkInventory(posPlayerSimulator, TunnelAspects.Write.Player.CLICK_ITEM_ITEMSTACK, true);
 
         helper.succeedWhen(() -> {
-            // Check that an arrow was taken from the network
-            helper.assertTrue(countItems(chestIn, Items.ARROW) < 64, "No arrow was consumed from the network");
+            // Check that exactly one arrow was taken from the network
+            helper.assertValueEqual(countItems(chestIn, Items.ARROW), 63, "Arrow count");
 
             // Check that an arrow was shot
             helper.assertEntityPresent(EntityType.ARROW);
@@ -409,12 +410,64 @@ public class GameTestsPlayerSimulator {
         PartHelpers.getPart(posPlayerSimulator).getState().setUpdateInterval(26);
 
         helper.succeedWhen(() -> {
-            // Check that an arrow was taken from the network
-            helper.assertTrue(countItems(chestIn, Items.ARROW) < 64, "No arrow was consumed from the network");
+            // Check that exactly one arrow was taken from the network
+            helper.assertValueEqual(countItems(chestIn, Items.ARROW), 63, "Arrow count");
 
             // Check that the crossbow was loaded with an arrow
             ChargedProjectiles chargedProjectiles = findItem(chestIn, Items.CROSSBOW).get(DataComponents.CHARGED_PROJECTILES);
             helper.assertTrue(chargedProjectiles != null && chargedProjectiles.contains(Items.ARROW), "The crossbow was not loaded with an arrow");
+        });
+    }
+
+    /**
+     * More different items than fit in a player inventory,
+     * so that items behind them can only be reached if the whole network is available to the player.
+     */
+    public static final Item[] MANY_ITEMS = new Item[]{
+            Items.DIRT, Items.STONE, Items.COBBLESTONE, Items.GRANITE, Items.DIORITE,
+            Items.ANDESITE, Items.SAND, Items.GRAVEL, Items.OAK_LOG, Items.BIRCH_LOG,
+            Items.SPRUCE_LOG, Items.JUNGLE_LOG, Items.ACACIA_LOG, Items.OAK_PLANKS, Items.BIRCH_PLANKS,
+            Items.SPRUCE_PLANKS, Items.JUNGLE_PLANKS, Items.ACACIA_PLANKS, Items.GLASS, Items.BRICK,
+            Items.CLAY_BALL, Items.COAL, Items.CHARCOAL, Items.IRON_INGOT, Items.GOLD_INGOT,
+            Items.COPPER_INGOT, Items.REDSTONE, Items.LAPIS_LAZULI, Items.QUARTZ, Items.EMERALD,
+            Items.DIAMOND, Items.WHEAT, Items.CARROT, Items.POTATO, Items.APPLE,
+            Items.BONE, Items.STRING,
+    };
+
+    @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
+    public void testPlayerSimulatorShootBowNetworkInventoryManyItems(GameTestHelper helper) {
+        ChestBlockEntity chestIn = prepareProjectileWeaponNetwork(helper);
+
+        // Place a second item interface with a chest, which is filled first due to its higher priority
+        PartHelpers.addPart(helper.getLevel(), helper.absolutePos(POS.east()), Direction.NORTH, PartTypes.INTERFACE_ITEM, new ItemStack(PartTypes.INTERFACE_ITEM.getItem()));
+        helper.setBlock(POS.east().north(), Blocks.CHEST);
+        setPriority(PartPos.of(helper.getLevel(), helper.absolutePos(POS.east()), Direction.NORTH), 1);
+        ChestBlockEntity chestFiller = helper.getBlockEntity(POS.east().north());
+
+        // Fill the network with more different items than fit in a player inventory
+        for (int i = 0; i < MANY_ITEMS.length; i++) {
+            if (i < chestFiller.getContainerSize()) {
+                chestFiller.setItem(i, new ItemStack(MANY_ITEMS[i]));
+            } else {
+                chestIn.setItem(i - chestFiller.getContainerSize(), new ItemStack(MANY_ITEMS[i]));
+            }
+        }
+
+        // Insert a bow and arrows into interface, behind all other items
+        chestIn.setItem(chestIn.getContainerSize() - 2, new ItemStack(Items.BOW));
+        chestIn.setItem(chestIn.getContainerSize() - 1, new ItemStack(Items.ARROW, 64));
+
+        // Click with the bow, and allow the simulated player to use the network as inventory
+        PartPos posPlayerSimulator = PartPos.of(helper.getLevel(), helper.absolutePos(POS), Direction.WEST);
+        placeVariableInWriter(helper.getLevel(), posPlayerSimulator, TunnelAspects.Write.Player.CLICK_ITEM_ITEMSTACK, createVariableForValue(helper.getLevel(), ValueTypes.OBJECT_ITEMSTACK, ValueObjectTypeItemStack.ValueItemStack.of(new ItemStack(Items.BOW))));
+        setNetworkInventory(posPlayerSimulator, TunnelAspects.Write.Player.CLICK_ITEM_ITEMSTACK, true);
+
+        helper.succeedWhen(() -> {
+            // Check that exactly one arrow was taken from the network
+            helper.assertValueEqual(countItems(chestIn, Items.ARROW) + countItems(chestFiller, Items.ARROW), 63, "Arrow count");
+
+            // Check that an arrow was shot
+            helper.assertEntityPresent(EntityType.ARROW);
         });
     }
 

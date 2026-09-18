@@ -2,6 +2,7 @@ package org.cyclops.integratedtunnels.gametest;
 
 import net.minecraft.core.Direction;
 import org.cyclops.integrateddynamics.api.network.INetwork;
+import org.cyclops.integrateddynamics.api.network.IPartNetwork;
 import org.cyclops.integrateddynamics.api.part.IPartState;
 import org.cyclops.integrateddynamics.api.part.IPartType;
 import org.cyclops.integrateddynamics.api.part.PartPos;
@@ -80,6 +81,21 @@ public class GameTestHelpersIntegratedTunnels {
         INetwork network = NetworkHelpers.getNetworkChecked(partPos.getPos().getLevel(true), partPos.getPos().getBlockPos(), partPos.getSide());
         network.setPriorityAndChannel(new PartNetworkElement<>(partType, partPos),
                 partType.getPriority(partState), partType.getChannel(partState));
+    }
+
+    /**
+     * Configure the priority of the given part.
+     * @param partPos The position of the part.
+     * @param priority The priority, where parts with a higher priority are handled first.
+     */
+    public static void setPriority(PartPos partPos, int priority) {
+        PartHelpers.PartStateHolder partStateHolder = PartHelpers.getPart(partPos);
+        IPartType partType = partStateHolder.getPart();
+        IPartState partState = partStateHolder.getState();
+        INetwork network = NetworkHelpers.getNetworkChecked(partPos);
+        IPartNetwork partNetwork = NetworkHelpers.getPartNetworkChecked(network);
+        partType.setPriorityAndChannel(network, partNetwork, PartTarget.fromCenter(partPos), partState,
+                priority, partType.getChannel(partState));
     }
 
     /**
