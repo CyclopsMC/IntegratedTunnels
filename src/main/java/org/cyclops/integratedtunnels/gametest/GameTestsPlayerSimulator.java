@@ -2,13 +2,17 @@ package org.cyclops.integratedtunnels.gametest;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.Container;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.component.ChargedProjectiles;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.LeverBlock;
@@ -34,6 +38,7 @@ import org.cyclops.integratedtunnels.part.aspect.TunnelAspects;
 
 import static org.cyclops.integrateddynamics.gametest.GameTestHelpersIntegratedDynamics.createVariableForValue;
 import static org.cyclops.integrateddynamics.gametest.GameTestHelpersIntegratedDynamics.placeVariableInWriter;
+import static org.cyclops.integratedtunnels.gametest.GameTestHelpersIntegratedTunnels.setNetworkInventory;
 
 @GameTestHolder(Reference.MOD_ID)
 @PrefixGameTestTemplate(false)
@@ -292,6 +297,124 @@ public class GameTestsPlayerSimulator {
 
             // Check block is placed
             helper.assertBlockPresent(Blocks.DIRT, POS.west().west());
+        });
+    }
+
+    /**
+     * Prepare a player simulator that is connected to a chest via an item interface,
+     * with a stone wall in front of it to catch shot projectiles.
+     * @param helper The game test helper.
+     * @return The chest that is exposed to the network.
+     */
+    protected static ChestBlockEntity prepareProjectileWeaponNetwork(GameTestHelper helper) {
+        // Place cable
+        helper.setBlock(POS, RegistryEntries.BLOCK_CABLE.value());
+        helper.setBlock(POS.east(), RegistryEntries.BLOCK_CABLE.value());
+
+        // Place player simulator
+        PartHelpers.addPart(helper.getLevel(), helper.absolutePos(POS), Direction.WEST, PartTypes.PLAYER_SIMULATOR, new ItemStack(PartTypes.PLAYER_SIMULATOR.getItem()));
+
+        // Place item interface
+        PartHelpers.addPart(helper.getLevel(), helper.absolutePos(POS.east()), Direction.EAST, PartTypes.INTERFACE_ITEM, new ItemStack(PartTypes.INTERFACE_ITEM.getItem()));
+
+        // Place chest for interface
+        helper.setBlock(POS.east().east(), Blocks.CHEST);
+
+        // Place block before the player simulator, so shot projectiles stay inside the test area
+        helper.setBlock(POS.west().west(), Blocks.STONE);
+
+        return helper.getBlockEntity(POS.east().east());
+    }
+
+    protected static int countItems(Container container, Item item) {
+        int count = 0;
+        for (int slot = 0; slot < container.getContainerSize(); slot++) {
+            ItemStack itemStack = container.getItem(slot);
+            if (itemStack.is(item)) {
+                count += itemStack.getCount();
+            }
+        }
+        return count;
+    }
+
+    protected static ItemStack findItem(Container container, Item item) {
+        for (int slot = 0; slot < container.getContainerSize(); slot++) {
+            ItemStack itemStack = container.getItem(slot);
+            if (itemStack.is(item)) {
+                return itemStack;
+            }
+        }
+        return ItemStack.EMPTY;
+    }
+
+    @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
+    public void testPlayerSimulatorShootBowNetworkInventory(GameTestHelper helper) {
+        ChestBlockEntity chestIn = prepareProjectileWeaponNetwork(helper);
+
+        // Insert a bow and arrows into interface
+        chestIn.setItem(0, new ItemStack(Items.BOW));
+        chestIn.setItem(1, new ItemStack(Items.ARROW, 64));
+
+        // Click with the bow, and allow the simulated player to use the network as inventory
+        PartPos posPlayerSimulator = PartPos.of(helper.getLevel(), helper.absolutePos(POS), Direction.WEST);
+        placeVariableInWriter(helper.getLevel(), posPlayerSimulator, TunnelAspects.Write.Player.CLICK_ITEM_ITEMSTACK, createVariableForValue(helper.getLevel(), ValueTypes.OBJECT_ITEMSTACK, ValueObjectTypeItemStack.ValueItemStack.of(new ItemStack(Items.BOW))));
+        setNetworkInventory(posPlayerSimulator, TunnelAspects.Write.Player.CLICK_ITEM_ITEMSTACK, true);
+
+        helper.succeedWhen(() -> {
+            // Check that an arrow was taken from the network
+            helper.assertTrue(countItems(chestIn, Items.ARROW) < 64, "No arrow was consumed from the network");
+
+            // Check that an arrow was shot
+            helper.assertEntityPresent(EntityType.ARROW);
+        });
+    }
+
+    @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
+    public void testPlayerSimulatorShootBowNoNetworkInventory(GameTestHelper helper) {
+        ChestBlockEntity chestIn = prepareProjectileWeaponNetwork(helper);
+
+        // Insert a bow and arrows into interface
+        chestIn.setItem(0, new ItemStack(Items.BOW));
+        chestIn.setItem(1, new ItemStack(Items.ARROW, 64));
+
+        // Click with the bow, without giving the simulated player access to the network as inventory
+        PartPos posPlayerSimulator = PartPos.of(helper.getLevel(), helper.absolutePos(POS), Direction.WEST);
+        placeVariableInWriter(helper.getLevel(), posPlayerSimulator, TunnelAspects.Write.Player.CLICK_ITEM_ITEMSTACK, createVariableForValue(helper.getLevel(), ValueTypes.OBJECT_ITEMSTACK, ValueObjectTypeItemStack.ValueItemStack.of(new ItemStack(Items.BOW))));
+
+        helper.runAfterDelay(200, () -> {
+            // Check that no arrow was taken from the network
+            helper.assertValueEqual(countItems(chestIn, Items.ARROW), 64, "Arrow count");
+
+            // Check that no arrow was shot
+            helper.assertEntityNotPresent(EntityType.ARROW);
+
+            helper.succeed();
+        });
+    }
+
+    @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
+    public void testPlayerSimulatorChargeCrossbowNetworkInventory(GameTestHelper helper) {
+        ChestBlockEntity chestIn = prepareProjectileWeaponNetwork(helper);
+
+        // Insert a crossbow and arrows into interface
+        chestIn.setItem(0, new ItemStack(Items.CROSSBOW));
+        chestIn.setItem(1, new ItemStack(Items.ARROW, 64));
+
+        // Click with the crossbow, and allow the simulated player to use the network as inventory
+        PartPos posPlayerSimulator = PartPos.of(helper.getLevel(), helper.absolutePos(POS), Direction.WEST);
+        placeVariableInWriter(helper.getLevel(), posPlayerSimulator, TunnelAspects.Write.Player.CLICK_ITEM_ITEMSTACK, createVariableForValue(helper.getLevel(), ValueTypes.OBJECT_ITEMSTACK, ValueObjectTypeItemStack.ValueItemStack.of(new ItemStack(Items.CROSSBOW))));
+        setNetworkInventory(posPlayerSimulator, TunnelAspects.Write.Player.CLICK_ITEM_ITEMSTACK, true);
+
+        // A crossbow only loads an arrow after being charged for 25 ticks within a single click
+        PartHelpers.getPart(posPlayerSimulator).getState().setUpdateInterval(26);
+
+        helper.succeedWhen(() -> {
+            // Check that an arrow was taken from the network
+            helper.assertTrue(countItems(chestIn, Items.ARROW) < 64, "No arrow was consumed from the network");
+
+            // Check that the crossbow was loaded with an arrow
+            ChargedProjectiles chargedProjectiles = findItem(chestIn, Items.CROSSBOW).get(DataComponents.CHARGED_PROJECTILES);
+            helper.assertTrue(chargedProjectiles != null && chargedProjectiles.contains(Items.ARROW), "The crossbow was not loaded with an arrow");
         });
     }
 

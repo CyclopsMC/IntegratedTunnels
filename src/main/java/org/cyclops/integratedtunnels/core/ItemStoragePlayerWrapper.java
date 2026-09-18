@@ -2,6 +2,7 @@ package org.cyclops.integratedtunnels.core;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Iterators;
+import com.google.common.collect.Lists;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
@@ -18,6 +19,7 @@ import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.npc.Villager;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
@@ -30,6 +32,8 @@ import net.neoforged.neoforge.common.util.TriState;
 import net.neoforged.neoforge.event.EventHooks;
 import net.neoforged.neoforge.event.entity.living.AnimalTameEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
+import org.apache.commons.lang3.tuple.Pair;
+import org.cyclops.commoncapabilities.api.capability.itemhandler.ItemMatch;
 import org.cyclops.commoncapabilities.api.ingredient.IngredientComponent;
 import org.cyclops.commoncapabilities.api.ingredient.storage.IIngredientComponentStorage;
 import org.cyclops.cyclopscore.helper.ItemStackHelpers;
@@ -61,11 +65,16 @@ public class ItemStoragePlayerWrapper implements IIngredientComponentStorage<Ite
     private final boolean sneaking;
     private final boolean continuousClick;
     private final int entityIndex;
+    private final boolean networkInventory;
     private final IIngredientComponentStorage<ItemStack, Integer> playerReturnHandler;
+
+    @Nullable
+    private List<Pair<Integer, ItemStack>> networkInventorySlots = null;
 
     public ItemStoragePlayerWrapper(@Nullable ExtendedFakePlayer player, ServerLevel world, BlockPos pos,
                                     double offsetX, double offsetY, double offsetZ, Direction side, InteractionHand hand,
                                     boolean rightClick, boolean sneaking, boolean continuousClick, int entityIndex,
+                                    boolean networkInventory,
                                     IIngredientComponentStorage<ItemStack, Integer> playerReturnHandler) {
         this.player = player;
         this.world = world;
@@ -79,6 +88,7 @@ public class ItemStoragePlayerWrapper implements IIngredientComponentStorage<Ite
         this.hand = hand;
         this.rightClick = rightClick;
         this.sneaking = sneaking;
+        this.networkInventory = networkInventory;
         this.playerReturnHandler = playerReturnHandler;
     }
 
@@ -94,7 +104,97 @@ public class ItemStoragePlayerWrapper implements IIngredientComponentStorage<Ite
         return entities.get(Math.min(this.entityIndex, entities.size() - 1));
     }
 
+    /**
+     * Fill the player inventory with a copy of the network's items,
+     * so that items that consume other items from the player inventory (such as bows) can use the network's items.
+     *
+     * As the player inventory is limited in size, only the first items of the network are made available.
+     * Equal items are merged to make as many different items as possible available.
+     */
+    private void fillPlayerInventoryFromNetwork(Player player) {
+        Inventory inventory = player.getInventory();
+        List<Integer> freeSlots = Lists.newArrayList();
+        for (int slot = 0; slot < inventory.items.size(); slot++) {
+            if (slot != inventory.selected && inventory.items.get(slot).isEmpty()) {
+                freeSlots.add(slot);
+            }
+        }
+
+        List<ItemStack> itemStacks = Lists.newArrayList();
+        Iterator<ItemStack> it = this.playerReturnHandler.iterator();
+        while (it.hasNext() && itemStacks.size() < freeSlots.size()) {
+            ItemStack networkStack = it.next();
+            if (networkStack.isEmpty()) {
+                continue;
+            }
+            ItemStack existing = itemStacks.stream()
+                    .filter(i -> ItemStack.isSameItemSameComponents(i, networkStack) && i.getCount() < i.getMaxStackSize())
+                    .findFirst()
+                    .orElse(null);
+            if (existing != null) {
+                existing.grow(Math.min(networkStack.getCount(), existing.getMaxStackSize() - existing.getCount()));
+            } else {
+                itemStacks.add(networkStack.copyWithCount(Math.min(networkStack.getCount(), networkStack.getMaxStackSize())));
+            }
+        }
+
+        this.networkInventorySlots = Lists.newArrayList();
+        for (int i = 0; i < itemStacks.size(); i++) {
+            int slot = freeSlots.get(i);
+            ItemStack itemStack = itemStacks.get(i);
+            inventory.items.set(slot, itemStack);
+            this.networkInventorySlots.add(Pair.of(slot, itemStack.copy()));
+        }
+    }
+
+    /**
+     * Remove the items that were made available from the network again from the player inventory,
+     * and effectively remove the consumed items from the network.
+     *
+     * Items that changed in an unexpected way are inserted back into the network as-is.
+     */
+    private void returnNetworkInventory(Player player) {
+        if (this.networkInventorySlots == null) {
+            return;
+        }
+        List<Pair<Integer, ItemStack>> slots = this.networkInventorySlots;
+        this.networkInventorySlots = null;
+
+        Inventory inventory = player.getInventory();
+        for (Pair<Integer, ItemStack> slotEntry : slots) {
+            int slot = slotEntry.getLeft();
+            ItemStack original = slotEntry.getRight();
+            ItemStack current = inventory.items.get(slot);
+            if (current.isEmpty() || (ItemStack.isSameItemSameComponents(original, current)
+                    && current.getCount() <= original.getCount())) {
+                // Only remove what was consumed from the network
+                int consumed = original.getCount() - current.getCount();
+                if (consumed > 0) {
+                    extractFromNetwork(original.copyWithCount(consumed));
+                }
+                inventory.items.set(slot, ItemStack.EMPTY);
+            } else {
+                // The item was changed, so remove the original from the network,
+                // and insert the changed item into the network.
+                int missing = original.getCount() - extractFromNetwork(original);
+                if (missing > 0) {
+                    current.shrink(missing);
+                }
+                if (!current.isEmpty()) {
+                    ItemStack remaining = this.playerReturnHandler.insert(current, false);
+                    ItemStackHelpers.spawnItemStackToPlayer(world, pos, remaining, player);
+                }
+                inventory.items.set(slot, ItemStack.EMPTY);
+            }
+        }
+    }
+
+    private int extractFromNetwork(ItemStack prototype) {
+        return this.playerReturnHandler.extract(prototype, ItemMatch.ITEM | ItemMatch.DATA, false).getCount();
+    }
+
     private void returnPlayerInventory(Player player) {
+        returnNetworkInventory(player);
         PlayerInventoryIterator it = new PlayerInventoryIterator(player);
         while (it.hasNext()) {
             ItemStack itemStack = it.next();
@@ -139,6 +239,17 @@ public class ItemStoragePlayerWrapper implements IIngredientComponentStorage<Ite
         PlayerHelpers.setPlayerState(player, hand, pos, offsetX, offsetY, offsetZ, side, sneaking);
         PlayerHelpers.setHeldItemSilent(player, hand, stack.copy());
 
+        if (networkInventory) {
+            fillPlayerInventoryFromNetwork(player);
+        }
+        try {
+            return click(stack);
+        } finally {
+            returnNetworkInventory(player);
+        }
+    }
+
+    protected ItemStack click(ItemStack stack) {
         if (!continuousClick) {
             cancelDestroyingBlock(player);
         }

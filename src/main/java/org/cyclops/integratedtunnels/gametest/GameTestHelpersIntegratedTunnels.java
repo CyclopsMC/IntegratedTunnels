@@ -83,6 +83,19 @@ public class GameTestHelpersIntegratedTunnels {
     }
 
     /**
+     * Configure the network inventory property of the given aspect within the given part.
+     * @param partPos The position of the part.
+     * @param aspect The active aspect of the part.
+     * @param networkInventory If the simulated player can use the network as its inventory.
+     */
+    public static void setNetworkInventory(PartPos partPos, IAspectWrite<?, ?> aspect, boolean networkInventory) {
+        PartHelpers.PartStateHolder partStateHolder = PartHelpers.getPart(partPos);
+        IAspectProperties properties = aspect.getProperties(partStateHolder.getPart(), PartTarget.fromCenter(partPos), partStateHolder.getState());
+        properties.setValue(TunnelAspectWriteBuilders.Player.PROP_NETWORK_INVENTORY, ValueTypeBoolean.ValueBoolean.of(networkInventory));
+        partStateHolder.getState().setAspectProperties(aspect, properties);
+    }
+
+    /**
      * Configure the silk touch property of the given aspect within the given part.
      * @param partPos The position of the part.
      * @param aspect The active aspect of the part.
