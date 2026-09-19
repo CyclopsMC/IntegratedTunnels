@@ -61,11 +61,13 @@ public class ItemStoragePlayerWrapper implements IIngredientComponentStorage<Ite
     private final boolean sneaking;
     private final boolean continuousClick;
     private final int entityIndex;
+    private final boolean networkInventory;
     private final IIngredientComponentStorage<ItemStack, Integer> playerReturnHandler;
 
     public ItemStoragePlayerWrapper(@Nullable ExtendedFakePlayer player, ServerLevel world, BlockPos pos,
                                     double offsetX, double offsetY, double offsetZ, Direction side, InteractionHand hand,
                                     boolean rightClick, boolean sneaking, boolean continuousClick, int entityIndex,
+                                    boolean networkInventory,
                                     IIngredientComponentStorage<ItemStack, Integer> playerReturnHandler) {
         this.player = player;
         this.world = world;
@@ -79,6 +81,7 @@ public class ItemStoragePlayerWrapper implements IIngredientComponentStorage<Ite
         this.hand = hand;
         this.rightClick = rightClick;
         this.sneaking = sneaking;
+        this.networkInventory = networkInventory;
         this.playerReturnHandler = playerReturnHandler;
     }
 
@@ -94,7 +97,31 @@ public class ItemStoragePlayerWrapper implements IIngredientComponentStorage<Ite
         return entities.get(Math.min(this.entityIndex, entities.size() - 1));
     }
 
+    /**
+     * Expose the network's items to the simulated player,
+     * so that items that consume other items from the player inventory (such as bows) can use the network's items.
+     */
+    private void attachNetworkInventory(Player player) {
+        if (player.getInventory() instanceof NetworkPlayerInventory networkPlayerInventory) {
+            networkPlayerInventory.setNetworkStorage(this.playerReturnHandler);
+        }
+    }
+
+    /**
+     * Stop exposing the network's items to the simulated player,
+     * and insert the items that were taken out of the network, but were not consumed, back into the network.
+     */
+    private void returnNetworkInventory(Player player) {
+        if (player.getInventory() instanceof NetworkPlayerInventory networkPlayerInventory) {
+            for (ItemStack itemStack : networkPlayerInventory.returnNetworkStorage()) {
+                ItemStack remaining = this.playerReturnHandler.insert(itemStack, false);
+                ItemStackHelpers.spawnItemStackToPlayer(world, pos, remaining, player);
+            }
+        }
+    }
+
     private void returnPlayerInventory(Player player) {
+        returnNetworkInventory(player);
         PlayerInventoryIterator it = new PlayerInventoryIterator(player);
         while (it.hasNext()) {
             ItemStack itemStack = it.next();
@@ -139,6 +166,17 @@ public class ItemStoragePlayerWrapper implements IIngredientComponentStorage<Ite
         PlayerHelpers.setPlayerState(player, hand, pos, offsetX, offsetY, offsetZ, side, sneaking);
         PlayerHelpers.setHeldItemSilent(player, hand, stack.copy());
 
+        if (networkInventory) {
+            attachNetworkInventory(player);
+        }
+        try {
+            return click(stack);
+        } finally {
+            returnNetworkInventory(player);
+        }
+    }
+
+    protected ItemStack click(ItemStack stack) {
         if (!continuousClick) {
             cancelDestroyingBlock(player);
         }

@@ -161,6 +161,8 @@
   "aspect.aspecttypes.integratedtunnels.boolean.blacklist.info": "If everything except for items in the given list must be handled.",
   "aspect.aspecttypes.integratedtunnels.boolean.player.sneak": "Sneak",
   "aspect.aspecttypes.integratedtunnels.boolean.player.sneak.info": "If player sneaking (holding shift) must be simulated.",
+  "aspect.aspecttypes.integratedtunnels.boolean.player.networkinventory": "Network Inventory",
+  "aspect.aspecttypes.integratedtunnels.boolean.player.networkinventory.info": "If the network is available as player inventory.",
   "aspect.aspecttypes.integratedtunnels.boolean.roundrobin": "Round-Robin",
   "aspect.aspecttypes.integratedtunnels.boolean.roundrobin.info": "If interfaces should be iterated in circular order, ignoring priorities.",
   "aspect.aspecttypes.integratedtunnels.boolean.exactamount": "Exact Amount",

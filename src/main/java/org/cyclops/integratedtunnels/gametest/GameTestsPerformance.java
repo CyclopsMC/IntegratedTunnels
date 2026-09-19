@@ -194,6 +194,18 @@ public class GameTestsPerformance {
                 CommandGenerateTunnels.TunnelsGenerationHelper.generatePlayerSimulators(helper.getLevel(), helper.absolutePos(START_POS), SIZE));
     }
 
+    @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT_TICKS, batch = "performance_player_simulator_bow")
+    public void testPerformancePlayerSimulatorsBow(GameTestHelper helper) {
+        testPerformance(helper, "player_simulator_bow", (measureServerTickTimeNow) ->
+                CommandGenerateTunnels.TunnelsGenerationHelper.generatePlayerSimulatorsBow(helper.getLevel(), helper.absolutePos(START_POS), SIZE));
+    }
+
+    @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT_TICKS, batch = "performance_player_simulator_bow_deep")
+    public void testPerformancePlayerSimulatorsBowDeep(GameTestHelper helper) {
+        testPerformance(helper, "player_simulator_bow_deep", (measureServerTickTimeNow) ->
+                CommandGenerateTunnels.TunnelsGenerationHelper.generatePlayerSimulatorsBowDeep(helper.getLevel(), helper.absolutePos(START_POS), SIZE));
+    }
+
     /**
      * Construct the given network, let it warm up, and measure its performance for {@link #EXECUTION_SECONDS}.
      * @param helper The game test helper.

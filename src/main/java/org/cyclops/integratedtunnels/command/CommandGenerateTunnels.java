@@ -11,12 +11,14 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.Container;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.component.Unbreakable;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.ChestBlockEntity;
@@ -40,6 +42,7 @@ import org.cyclops.integrateddynamics.core.helper.CableHelpers;
 import org.cyclops.integrateddynamics.core.helper.NetworkHelpers;
 import org.cyclops.integrateddynamics.core.helper.PartHelpers;
 import org.cyclops.integrateddynamics.gametest.GameTestHelpersIntegratedDynamics;
+import org.cyclops.integratedtunnels.gametest.GameTestHelpersIntegratedTunnels;
 import org.cyclops.integratedtunnels.part.PartTypes;
 import org.cyclops.integratedtunnels.part.aspect.TunnelAspects;
 
@@ -122,6 +125,10 @@ public class CommandGenerateTunnels implements Command<CommandSourceStack> {
         WORLDENTITYITEMCHURN,
         /** Player simulators continuously simulating right-clicks. */
         PLAYERSIMULATORS,
+        /** Player simulators continuously shooting a bow with arrows from the first interface of the network. */
+        PLAYERSIMULATORSBOW,
+        /** As {@link #PLAYERSIMULATORSBOW}, but with the arrows in the last interface of the network. */
+        PLAYERSIMULATORSBOWDEEP,
         /** Remove everything that the other presets generate. */
         CLEAR,
     }
@@ -213,6 +220,25 @@ public class CommandGenerateTunnels implements Command<CommandSourceStack> {
         public static final int DEFAULT_VARIETY = 9;
 
         /**
+         * The number of cells between two player simulators in the bow presets.
+         * All other cells hold storage, so that the simulators have many slots to iterate over.
+         */
+        private static final int BOW_SIMULATOR_INTERVAL = 16;
+
+        /**
+         * The number of bows in the supply container of the bow presets.
+         * Bows do not stack, so every bow takes up one slot.
+         */
+        private static final int BOW_SUPPLY_BOWS = 4;
+
+        /**
+         * The number of arrow stacks in the supply container of the bow presets.
+         * This is more than the simulators can shoot within a benchmark,
+         * so that the preset keeps behaving identically for its whole duration.
+         */
+        private static final int BOW_SUPPLY_ARROW_STACKS = 20;
+
+        /**
          * The number of cells that the "deep" preset uses.
          * This is chosen so that the preset observes fewer positions but more total slots
          * than {@link #generateItemInterfaces}, which is what makes it "deep":
@@ -253,6 +279,8 @@ public class CommandGenerateTunnels implements Command<CommandSourceStack> {
                 case WORLDBLOCKCHURN -> generateWorldBlockChurn(level, startPos, size);
                 case WORLDENTITYITEMCHURN -> generateWorldEntityItemChurn(level, startPos, size);
                 case PLAYERSIMULATORS -> generatePlayerSimulators(level, startPos, size);
+                case PLAYERSIMULATORSBOW -> generatePlayerSimulatorsBow(level, startPos, size);
+                case PLAYERSIMULATORSBOWDEEP -> generatePlayerSimulatorsBowDeep(level, startPos, size);
                 case CLEAR -> clearGrid(level, startPos, size);
             }
         }
@@ -754,6 +782,98 @@ public class CommandGenerateTunnels implements Command<CommandSourceStack> {
             }
 
             updateCells(level, cells);
+        }
+
+        /**
+         * Generate a grid where player simulators continuously shoot a bow,
+         * with the arrows in the first interface that is walked.
+         */
+        public static void generatePlayerSimulatorsBow(ServerLevel level, BlockPos startPos, int size) {
+            generatePlayerSimulatorsBow(level, startPos, size, 1);
+        }
+
+        /**
+         * Generate a grid where player simulators continuously shoot a bow,
+         * with the arrows in the last interface that is walked.
+         */
+        public static void generatePlayerSimulatorsBowDeep(ServerLevel level, BlockPos startPos, int size) {
+            generatePlayerSimulatorsBow(level, startPos, size, -1);
+        }
+
+        /**
+         * Generate a grid where player simulators continuously shoot a bow with arrows from the network.
+         *
+         * All cells except one hold a completely filled chest,
+         * and the single remaining cell is the only one that holds bows and arrows.
+         * Every other container is full, so the items that are not consumed always end up in that same cell again.
+         *
+         * The simulated players can only shoot if they can reach the network's arrows through their inventory.
+         * The priority of the supply cell therefore determines how far the network must be walked on every click,
+         * both to find the arrows, and to put back what was not consumed.
+         *
+         * @param level The level.
+         * @param startPos The lowest corner of the grid.
+         * @param size The edge length of the grid.
+         * @param supplyPriority The priority of the interface that holds the bows and arrows.
+         *                       A higher priority than the other interfaces makes it the first one that is walked,
+         *                       a lower priority the last one.
+         */
+        private static void generatePlayerSimulatorsBow(ServerLevel level, BlockPos startPos, int size, int supplyPriority) {
+            generateEmptyGrid(level, startPos, size);
+
+            ItemStack bow = createUnbreakableBow();
+            List<BlockPos> cells = getCells(startPos, size);
+            for (int i = 0; i < cells.size(); i++) {
+                BlockPos cell = cells.get(i);
+                if (i == cells.size() - 1) {
+                    // Supply cell: the only cell that holds bows and arrows, and the only one with free space
+                    // for the items that are not consumed
+                    placeBowSupplyChest(level, cell, bow);
+                    PartPos interfacePos = addPartBelow(level, cell, PartTypes.INTERFACE_ITEM);
+                    GameTestHelpersIntegratedTunnels.setPriority(interfacePos, supplyPriority);
+                } else if (i % BOW_SIMULATOR_INTERVAL == 0) {
+                    // Simulator cell: continuously click with a bow from the network
+                    PartPos simulator = addPartBelow(level, cell, PartTypes.PLAYER_SIMULATOR);
+                    activate(level, simulator, TunnelAspects.Write.Player.CLICK_ITEM_ITEMSTACK,
+                            GameTestHelpersIntegratedDynamics.createVariableForValue(level, ValueTypes.OBJECT_ITEMSTACK,
+                                    ValueObjectTypeItemStack.ValueItemStack.of(bow)));
+                    GameTestHelpersIntegratedTunnels.setNetworkInventory(simulator,
+                            TunnelAspects.Write.Player.CLICK_ITEM_ITEMSTACK, true);
+                } else {
+                    // Storage cell, completely filled, so that all of its slots have to be iterated
+                    placeChest(level, cell, Integer.MAX_VALUE, i * DEFAULT_VARIETY);
+                    addPartBelow(level, cell, PartTypes.INTERFACE_ITEM);
+                }
+            }
+
+            updateCells(level, cells);
+        }
+
+        /**
+         * Create a bow that never breaks,
+         * so that it keeps matching the itemstack the simulators click with.
+         */
+        private static ItemStack createUnbreakableBow() {
+            ItemStack bow = new ItemStack(Items.BOW);
+            bow.set(DataComponents.UNBREAKABLE, new Unbreakable(false));
+            return bow;
+        }
+
+        /**
+         * Place a chest at the given cell, holding the bows and arrows of the bow presets.
+         * It is deliberately not filled completely, as it must be able to take back what is not consumed.
+         */
+        private static void placeBowSupplyChest(ServerLevel level, BlockPos cell, ItemStack bow) {
+            level.setBlock(cell, Blocks.CHEST.defaultBlockState(), 2);
+            if (level.getBlockEntity(cell) instanceof ChestBlockEntity chest) {
+                int slot = 0;
+                for (; slot < BOW_SUPPLY_BOWS; slot++) {
+                    chest.setItem(slot, bow.copy());
+                }
+                for (; slot < BOW_SUPPLY_BOWS + BOW_SUPPLY_ARROW_STACKS; slot++) {
+                    chest.setItem(slot, createFullStack(Items.ARROW));
+                }
+            }
         }
 
         /**

@@ -2286,6 +2286,8 @@ public class TunnelAspectWriteBuilders {
                 new AspectPropertyTypeInstance<>(ValueTypes.BOOLEAN, "aspect.aspecttypes.integratedtunnels.boolean.player.continuousclick");
         public static final IAspectPropertyTypeInstance<ValueTypeBoolean, ValueTypeBoolean.ValueBoolean> PROP_SNEAK =
                 new AspectPropertyTypeInstance<>(ValueTypes.BOOLEAN, "aspect.aspecttypes.integratedtunnels.boolean.player.sneak");
+        public static final IAspectPropertyTypeInstance<ValueTypeBoolean, ValueTypeBoolean.ValueBoolean> PROP_NETWORK_INVENTORY =
+                new AspectPropertyTypeInstance<>(ValueTypes.BOOLEAN, "aspect.aspecttypes.integratedtunnels.boolean.player.networkinventory");
 
         public static final IAspectProperties PROPERTIES_CLICK_EMPTY = new AspectProperties(ImmutableList.<IAspectPropertyTypeInstance>of(
                 PROP_CHANNEL,
@@ -2294,6 +2296,7 @@ public class TunnelAspectWriteBuilders {
                 World.PROP_HAND_RIGHT,
                 PROP_CONTINUOUS_CLICK,
                 PROP_SNEAK,
+                PROP_NETWORK_INVENTORY,
                 World.PROPERTY_ENTITYINDEX,
                 World.PROP_OFFSET_X,
                 World.PROP_OFFSET_Y,
@@ -2306,6 +2309,7 @@ public class TunnelAspectWriteBuilders {
                 World.PROP_HAND_RIGHT,
                 PROP_CONTINUOUS_CLICK,
                 PROP_SNEAK,
+                PROP_NETWORK_INVENTORY,
                 Item.PROP_RATE,
                 World.PROPERTY_ENTITYINDEX,
                 World.PROP_OFFSET_X,
@@ -2319,6 +2323,7 @@ public class TunnelAspectWriteBuilders {
                 World.PROP_HAND_RIGHT,
                 PROP_CONTINUOUS_CLICK,
                 PROP_SNEAK,
+                PROP_NETWORK_INVENTORY,
                 World.PROPERTY_ENTITYINDEX,
                 World.PROP_OFFSET_X,
                 World.PROP_OFFSET_Y,
@@ -2333,6 +2338,7 @@ public class TunnelAspectWriteBuilders {
                 World.PROP_HAND_RIGHT,
                 PROP_CONTINUOUS_CLICK,
                 PROP_SNEAK,
+                PROP_NETWORK_INVENTORY,
                 Item.PROP_CHECK_STACKSIZE,
                 Item.PROP_CHECK_NBT,
                 Item.PROP_RATE,
@@ -2350,6 +2356,7 @@ public class TunnelAspectWriteBuilders {
                 World.PROP_HAND_RIGHT,
                 PROP_CONTINUOUS_CLICK,
                 PROP_SNEAK,
+                PROP_NETWORK_INVENTORY,
                 Item.PROP_CHECK_STACKSIZE,
                 Item.PROP_CHECK_NBT,
                 Item.PROP_RATE,
@@ -2365,6 +2372,7 @@ public class TunnelAspectWriteBuilders {
             PROPERTIES_CLICK_EMPTY.setValue(World.PROP_HAND_RIGHT, ValueTypeBoolean.ValueBoolean.of(true));
             PROPERTIES_CLICK_EMPTY.setValue(PROP_CONTINUOUS_CLICK, ValueTypeBoolean.ValueBoolean.of(true));
             PROPERTIES_CLICK_EMPTY.setValue(PROP_SNEAK, ValueTypeBoolean.ValueBoolean.of(false));
+            PROPERTIES_CLICK_EMPTY.setValue(PROP_NETWORK_INVENTORY, ValueTypeBoolean.ValueBoolean.of(false));
             PROPERTIES_CLICK_EMPTY.setValue(World.PROPERTY_ENTITYINDEX, ValueTypeInteger.ValueInteger.of(-1));
             PROPERTIES_CLICK_EMPTY.setValue(World.PROP_OFFSET_X, ValueTypeDouble.ValueDouble.of(0.5D));
             PROPERTIES_CLICK_EMPTY.setValue(World.PROP_OFFSET_Y, ValueTypeDouble.ValueDouble.of(0.5D));
@@ -2376,6 +2384,7 @@ public class TunnelAspectWriteBuilders {
             PROPERTIES_CLICK_SIMPLE.setValue(World.PROP_HAND_RIGHT, ValueTypeBoolean.ValueBoolean.of(true));
             PROPERTIES_CLICK_SIMPLE.setValue(PROP_CONTINUOUS_CLICK, ValueTypeBoolean.ValueBoolean.of(true));
             PROPERTIES_CLICK_SIMPLE.setValue(PROP_SNEAK, ValueTypeBoolean.ValueBoolean.of(false));
+            PROPERTIES_CLICK_SIMPLE.setValue(PROP_NETWORK_INVENTORY, ValueTypeBoolean.ValueBoolean.of(false));
             PROPERTIES_CLICK_SIMPLE.setValue(Item.PROP_RATE, ValueTypeInteger.ValueInteger.of(1));
             PROPERTIES_CLICK_SIMPLE.setValue(World.PROPERTY_ENTITYINDEX, ValueTypeInteger.ValueInteger.of(-1));
             PROPERTIES_CLICK_SIMPLE.setValue(World.PROP_OFFSET_X, ValueTypeDouble.ValueDouble.of(0.5D));
@@ -2388,6 +2397,7 @@ public class TunnelAspectWriteBuilders {
             PROPERTIES_CLICK_NORATE.setValue(World.PROP_HAND_RIGHT, ValueTypeBoolean.ValueBoolean.of(true));
             PROPERTIES_CLICK_NORATE.setValue(PROP_CONTINUOUS_CLICK, ValueTypeBoolean.ValueBoolean.of(true));
             PROPERTIES_CLICK_NORATE.setValue(PROP_SNEAK, ValueTypeBoolean.ValueBoolean.of(false));
+            PROPERTIES_CLICK_NORATE.setValue(PROP_NETWORK_INVENTORY, ValueTypeBoolean.ValueBoolean.of(false));
             PROPERTIES_CLICK_NORATE.setValue(World.PROPERTY_ENTITYINDEX, ValueTypeInteger.ValueInteger.of(-1));
             PROPERTIES_CLICK_NORATE.setValue(World.PROP_OFFSET_X, ValueTypeDouble.ValueDouble.of(0.5D));
             PROPERTIES_CLICK_NORATE.setValue(World.PROP_OFFSET_Y, ValueTypeDouble.ValueDouble.of(0.5D));
@@ -2400,6 +2410,7 @@ public class TunnelAspectWriteBuilders {
             PROPERTIES_CLICK.setValue(World.PROP_HAND_RIGHT, ValueTypeBoolean.ValueBoolean.of(true));
             PROPERTIES_CLICK.setValue(PROP_CONTINUOUS_CLICK, ValueTypeBoolean.ValueBoolean.of(true));
             PROPERTIES_CLICK.setValue(PROP_SNEAK, ValueTypeBoolean.ValueBoolean.of(false));
+            PROPERTIES_CLICK.setValue(PROP_NETWORK_INVENTORY, ValueTypeBoolean.ValueBoolean.of(false));
             PROPERTIES_CLICK.setValue(Item.PROP_CHECK_STACKSIZE, ValueTypeBoolean.ValueBoolean.of(false));
             PROPERTIES_CLICK.setValue(Item.PROP_CHECK_NBT, ValueTypeBoolean.ValueBoolean.of(true));
             PROPERTIES_CLICK.setValue(Item.PROP_RATE, ValueTypeInteger.ValueInteger.of(1));
@@ -2415,6 +2426,7 @@ public class TunnelAspectWriteBuilders {
             PROPERTIES_CLICKCRAFT.setValue(World.PROP_HAND_RIGHT, ValueTypeBoolean.ValueBoolean.of(true));
             PROPERTIES_CLICKCRAFT.setValue(PROP_CONTINUOUS_CLICK, ValueTypeBoolean.ValueBoolean.of(true));
             PROPERTIES_CLICKCRAFT.setValue(PROP_SNEAK, ValueTypeBoolean.ValueBoolean.of(false));
+            PROPERTIES_CLICKCRAFT.setValue(PROP_NETWORK_INVENTORY, ValueTypeBoolean.ValueBoolean.of(false));
             PROPERTIES_CLICKCRAFT.setValue(Item.PROP_CHECK_STACKSIZE, ValueTypeBoolean.ValueBoolean.of(false));
             PROPERTIES_CLICKCRAFT.setValue(Item.PROP_CHECK_NBT, ValueTypeBoolean.ValueBoolean.of(true));
             PROPERTIES_CLICKCRAFT.setValue(Item.PROP_RATE, ValueTypeInteger.ValueInteger.of(1));
@@ -2444,6 +2456,7 @@ public class TunnelAspectWriteBuilders {
                 boolean rightClick = properties.getValue(PROP_RIGHT_CLICK).getRawValue();
                 boolean continuousClick = properties.getValue(PROP_CONTINUOUS_CLICK).getRawValue();
                 boolean sneak = properties.getValue(PROP_SNEAK).getRawValue();
+                boolean networkInventory = properties.getValue(PROP_NETWORK_INVENTORY).getRawValue();
                 int entityIndex = properties.getValue(World.PROPERTY_ENTITYINDEX).getRawValue();
                 double offsetX = properties.getValue(World.PROP_OFFSET_X).getRawValue();
                 double offsetY = properties.getValue(World.PROP_OFFSET_Y).getRawValue();
@@ -2458,7 +2471,8 @@ public class TunnelAspectWriteBuilders {
                 IIngredientComponentStorage<ItemStack, Integer> storage = new ItemStoragePlayerWrapper(partState.getPlayer(),
                         (ServerLevel) target.getPos().getLevel(true), target.getPos().getBlockPos(),
                         offsetX, offsetY, offsetZ, target.getSide(), hand,
-                        rightClick, sneak, continuousClick, entityIndex, network.getCapability(Capabilities.ItemNetwork.NETWORK).orElse(null).getChannel(channel));
+                        rightClick, sneak, continuousClick, entityIndex, networkInventory,
+                        network.getCapability(Capabilities.ItemNetwork.NETWORK).orElse(null).getChannel(channel));
                 storage.insert(ItemStack.EMPTY, false);
             }
             return null;
@@ -2474,6 +2488,7 @@ public class TunnelAspectWriteBuilders {
             boolean rightClick = input.getMiddle().getValue(PROP_RIGHT_CLICK).getRawValue();
             boolean continuousClick = properties.getValue(PROP_CONTINUOUS_CLICK).getRawValue();
             boolean sneak = properties.getValue(PROP_SNEAK).getRawValue();
+            boolean networkInventory = properties.getValue(PROP_NETWORK_INVENTORY).getRawValue();
             int entityIndex = properties.getValue(World.PROPERTY_ENTITYINDEX).getRawValue();
             double offsetX = properties.getValue(World.PROP_OFFSET_X).getRawValue();
             double offsetY = properties.getValue(World.PROP_OFFSET_Y).getRawValue();
@@ -2488,7 +2503,8 @@ public class TunnelAspectWriteBuilders {
             IIngredientComponentStorage<ItemStack, Integer> storage = new ItemStoragePlayerWrapper(partState.getPlayer(),
                     (ServerLevel) target.getPos().getLevel(true), target.getPos().getBlockPos(),
                     offsetX, offsetY, offsetZ, target.getSide(), hand,
-                    rightClick, sneak, continuousClick, entityIndex, network.getCapability(Capabilities.ItemNetwork.NETWORK).orElse(null).getChannel(channel));
+                    rightClick, sneak, continuousClick, entityIndex, networkInventory,
+                    network.getCapability(Capabilities.ItemNetwork.NETWORK).orElse(null).getChannel(channel));
             ITunnelTransfer transfer = input.getRight().getTransfer();
             return IItemTarget.ofStorage(transfer, network, partTarget, properties,
                     itemStackMatcher, storage, input.getRight().getSlot());
