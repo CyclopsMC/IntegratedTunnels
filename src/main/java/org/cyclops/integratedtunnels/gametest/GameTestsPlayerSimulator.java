@@ -40,6 +40,7 @@ import static org.cyclops.integrateddynamics.gametest.GameTestHelpersIntegratedD
 import static org.cyclops.integrateddynamics.gametest.GameTestHelpersIntegratedDynamics.placeVariableInWriter;
 import static org.cyclops.integratedtunnels.gametest.GameTestHelpersIntegratedTunnels.setNetworkInventory;
 import static org.cyclops.integratedtunnels.gametest.GameTestHelpersIntegratedTunnels.setPriority;
+import static org.cyclops.integratedtunnels.gametest.GameTestHelpersIntegratedTunnels.setRightClickDuration;
 
 @GameTestHolder(Reference.MOD_ID)
 @PrefixGameTestTemplate(false)
@@ -468,6 +469,65 @@ public class GameTestsPlayerSimulator {
 
             // Check that an arrow was shot
             helper.assertEntityPresent(EntityType.ARROW);
+        });
+    }
+
+    /**
+     * The number of ticks to wait before starting to click.
+     * The first click of a simulated player holds right click for all the time that passed before it,
+     * so this makes sure that a shorter configured duration is what is actually being tested.
+     */
+    public static final int DELAY_CLICK = 40;
+
+    @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
+    public void testPlayerSimulatorShootBowRightClickDurationTooShort(GameTestHelper helper) {
+        ChestBlockEntity chestIn = prepareProjectileWeaponNetwork(helper);
+
+        // Insert a bow and arrows into interface
+        chestIn.setItem(0, new ItemStack(Items.BOW));
+        chestIn.setItem(1, new ItemStack(Items.ARROW, 64));
+
+        // Click with the bow, while holding right click too short to draw it
+        PartPos posPlayerSimulator = PartPos.of(helper.getLevel(), helper.absolutePos(POS), Direction.WEST);
+        helper.runAfterDelay(DELAY_CLICK, () -> {
+            placeVariableInWriter(helper.getLevel(), posPlayerSimulator, TunnelAspects.Write.Player.CLICK_ITEM_ITEMSTACK, createVariableForValue(helper.getLevel(), ValueTypes.OBJECT_ITEMSTACK, ValueObjectTypeItemStack.ValueItemStack.of(new ItemStack(Items.BOW))));
+            setNetworkInventory(posPlayerSimulator, TunnelAspects.Write.Player.CLICK_ITEM_ITEMSTACK, true);
+            setRightClickDuration(posPlayerSimulator, TunnelAspects.Write.Player.CLICK_ITEM_ITEMSTACK, 2);
+        });
+
+        helper.runAfterDelay(DELAY_CLICK + 200, () -> {
+            // Check that no arrow was taken from the network
+            helper.assertValueEqual(countItems(chestIn, Items.ARROW), 64, "Arrow count");
+
+            // Check that no arrow was shot
+            helper.assertEntityNotPresent(EntityType.ARROW);
+
+            helper.succeed();
+        });
+    }
+
+    @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
+    public void testPlayerSimulatorChargeCrossbowRightClickDuration(GameTestHelper helper) {
+        ChestBlockEntity chestIn = prepareProjectileWeaponNetwork(helper);
+
+        // Insert a crossbow and arrows into interface
+        chestIn.setItem(0, new ItemStack(Items.CROSSBOW));
+        chestIn.setItem(1, new ItemStack(Items.ARROW, 64));
+
+        // Click with the crossbow, while holding right click long enough to charge it,
+        // which takes longer than the time between two clicks
+        PartPos posPlayerSimulator = PartPos.of(helper.getLevel(), helper.absolutePos(POS), Direction.WEST);
+        placeVariableInWriter(helper.getLevel(), posPlayerSimulator, TunnelAspects.Write.Player.CLICK_ITEM_ITEMSTACK, createVariableForValue(helper.getLevel(), ValueTypes.OBJECT_ITEMSTACK, ValueObjectTypeItemStack.ValueItemStack.of(new ItemStack(Items.CROSSBOW))));
+        setNetworkInventory(posPlayerSimulator, TunnelAspects.Write.Player.CLICK_ITEM_ITEMSTACK, true);
+        setRightClickDuration(posPlayerSimulator, TunnelAspects.Write.Player.CLICK_ITEM_ITEMSTACK, 26);
+
+        helper.succeedWhen(() -> {
+            // Check that exactly one arrow was taken from the network
+            helper.assertValueEqual(countItems(chestIn, Items.ARROW), 63, "Arrow count");
+
+            // Check that the crossbow was loaded with an arrow
+            ChargedProjectiles chargedProjectiles = findItem(chestIn, Items.CROSSBOW).get(DataComponents.CHARGED_PROJECTILES);
+            helper.assertTrue(chargedProjectiles != null && chargedProjectiles.contains(Items.ARROW), "The crossbow was not loaded with an arrow");
         });
     }
 

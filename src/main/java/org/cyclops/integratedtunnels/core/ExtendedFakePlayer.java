@@ -37,6 +37,8 @@ public class ExtendedFakePlayer extends FakePlayer {
         this.inventory = new NetworkPlayerInventory(this);
         this.gameMode.changeGameModeForPlayer(GameType.SURVIVAL);
         this.connection = new FakeNetHandlerPlayServer(world.getServer(), this);
+        // Otherwise the first simulated click would hold right click for as long as the world has been running
+        this.lastUpdateTick = world.getGameTime();
     }
 
     @Override
@@ -106,8 +108,18 @@ public class ExtendedFakePlayer extends FakePlayer {
     }
 
     public void updateActiveHandSimulated() {
+        updateActiveHandSimulated(0);
+    }
+
+    /**
+     * Simulate the player holding its active item for the given number of ticks.
+     * @param duration The number of ticks to hold the item,
+     *                 or zero to hold it for the time that passed since the previous simulation.
+     */
+    public void updateActiveHandSimulated(int duration) {
+        int ticks = duration > 0 ? duration : this.ticksSinceLastTick;
         if (this.isUsingItem()) {
-            for (int i = 0; i < this.ticksSinceLastTick; i++) {
+            for (int i = 0; i < ticks; i++) {
                 if (this.isUsingItem()) {
                     ItemStack itemstack = this.getItemInHand(this.getUsedItemHand());
                     if (CommonHooks.canContinueUsing(this.useItem, itemstack)) {

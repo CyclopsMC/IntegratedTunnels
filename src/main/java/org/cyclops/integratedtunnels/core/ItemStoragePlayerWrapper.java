@@ -61,13 +61,14 @@ public class ItemStoragePlayerWrapper implements IIngredientComponentStorage<Ite
     private final boolean sneaking;
     private final boolean continuousClick;
     private final int entityIndex;
+    private final int rightClickDuration;
     private final boolean networkInventory;
     private final IIngredientComponentStorage<ItemStack, Integer> playerReturnHandler;
 
     public ItemStoragePlayerWrapper(@Nullable ExtendedFakePlayer player, ServerLevel world, BlockPos pos,
                                     double offsetX, double offsetY, double offsetZ, Direction side, InteractionHand hand,
                                     boolean rightClick, boolean sneaking, boolean continuousClick, int entityIndex,
-                                    boolean networkInventory,
+                                    int rightClickDuration, boolean networkInventory,
                                     IIngredientComponentStorage<ItemStack, Integer> playerReturnHandler) {
         this.player = player;
         this.world = world;
@@ -81,6 +82,7 @@ public class ItemStoragePlayerWrapper implements IIngredientComponentStorage<Ite
         this.hand = hand;
         this.rightClick = rightClick;
         this.sneaking = sneaking;
+        this.rightClickDuration = rightClickDuration;
         this.networkInventory = networkInventory;
         this.playerReturnHandler = playerReturnHandler;
     }
@@ -276,7 +278,7 @@ public class ItemStoragePlayerWrapper implements IIngredientComponentStorage<Ite
                     if (actionresult.getResult().consumesAction()) {
                         // If the hand was activated, simulate the activated hand for a number of ticks, and deactivate.
                         if (player.isUsingItem()) {
-                            player.updateActiveHandSimulated();
+                            player.updateActiveHandSimulated(rightClickDuration);
                             player.releaseUsingItem();
                         }
                         returnPlayerInventory(player);
@@ -310,7 +312,7 @@ public class ItemStoragePlayerWrapper implements IIngredientComponentStorage<Ite
                 } else if (actionResult.consumesAction()) {
                     // If the hand was activated, simulate the activated hand for a number of ticks, and deactivate.
                     if (player.isUsingItem()) {
-                        player.updateActiveHandSimulated();
+                        player.updateActiveHandSimulated(rightClickDuration);
                         player.releaseUsingItem();
                     }
                     returnPlayerInventory(player);
