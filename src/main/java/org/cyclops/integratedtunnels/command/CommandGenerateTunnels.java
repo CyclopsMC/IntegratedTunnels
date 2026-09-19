@@ -786,7 +786,7 @@ public class CommandGenerateTunnels implements Command<CommandSourceStack> {
 
         /**
          * Generate a grid where player simulators continuously shoot a bow,
-         * with the arrows in the first interface that is iterated.
+         * with the arrows in the first interface that is walked.
          */
         public static void generatePlayerSimulatorsBow(ServerLevel level, BlockPos startPos, int size) {
             generatePlayerSimulatorsBow(level, startPos, size, 1);
@@ -794,7 +794,7 @@ public class CommandGenerateTunnels implements Command<CommandSourceStack> {
 
         /**
          * Generate a grid where player simulators continuously shoot a bow,
-         * with the arrows in the last interface that is iterated.
+         * with the arrows in the last interface that is walked.
          */
         public static void generatePlayerSimulatorsBowDeep(ServerLevel level, BlockPos startPos, int size) {
             generatePlayerSimulatorsBow(level, startPos, size, -1);
@@ -807,15 +807,15 @@ public class CommandGenerateTunnels implements Command<CommandSourceStack> {
          * and the single remaining cell is the only one that holds bows and arrows.
          * Every other container is full, so the items that are not consumed always end up in that same cell again.
          *
-         * The simulated players can only shoot if they can reach the network's arrows through their inventory,
-         * which requires iterating over the network until the arrows are found.
-         * The priority of the supply cell therefore determines how many slots must be iterated on every click.
+         * The simulated players can only shoot if they can reach the network's arrows through their inventory.
+         * The priority of the supply cell therefore determines how far the network must be walked on every click,
+         * both to find the arrows, and to put back what was not consumed.
          *
          * @param level The level.
          * @param startPos The lowest corner of the grid.
          * @param size The edge length of the grid.
          * @param supplyPriority The priority of the interface that holds the bows and arrows.
-         *                       A higher priority than the other interfaces makes it the first one that is iterated,
+         *                       A higher priority than the other interfaces makes it the first one that is walked,
          *                       a lower priority the last one.
          */
         private static void generatePlayerSimulatorsBow(ServerLevel level, BlockPos startPos, int size, int supplyPriority) {
@@ -827,6 +827,7 @@ public class CommandGenerateTunnels implements Command<CommandSourceStack> {
                 BlockPos cell = cells.get(i);
                 if (i == cells.size() - 1) {
                     // Supply cell: the only cell that holds bows and arrows, and the only one with free space
+                    // for the items that are not consumed
                     placeBowSupplyChest(level, cell, bow);
                     PartPos interfacePos = addPartBelow(level, cell, PartTypes.INTERFACE_ITEM);
                     GameTestHelpersIntegratedTunnels.setPriority(interfacePos, supplyPriority);

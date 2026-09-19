@@ -91,8 +91,8 @@ ingredients out of the network into the cell, plus an importer that pulls them b
 | `world_block_churn` | Block exporters continuously place blocks into the cells, while block importers break them again |
 | `world_entityitem_churn` | Entity item exporters continuously drop items into the cells, while entity item importers pick them up again |
 | `player_simulator` | Player simulators continuously simulate right-clicks |
-| `player_simulator_bow` | Player simulators continuously shoot a bow with arrows that they take out of the network through their inventory. All cells except one hold a completely filled chest, and the single remaining cell is the only one holding bows and arrows. Its interface has the highest priority, so the arrows are found as soon as the network is iterated |
-| `player_simulator_bow_deep` | As `player_simulator_bow`, but the interface holding the bows and arrows has the lowest priority, so every click has to iterate over all slots of all other interfaces before finding an arrow. The difference with `player_simulator_bow` is the cost of iterating the network, as everything else about both presets is identical |
+| `player_simulator_bow` | Player simulators continuously shoot a bow with arrows that they take out of the network through their inventory. All cells except one hold a completely filled chest, and the single remaining cell is the only one holding bows and arrows. Its interface has the highest priority, so both the arrows and the space to put back what is not consumed are found immediately |
+| `player_simulator_bow_deep` | As `player_simulator_bow`, but the interface holding the bows and arrows has the lowest priority, so every click has to walk the whole network before it finds an arrow, and again before it can put back what it did not consume. The difference with `player_simulator_bow` is the cost of that walk, as everything else about both presets is identical. Note that searching the network walks its index, which holds one entry per distinct item type, while putting items back walks the containers themselves |
 
 ## Performance Metrics
 
