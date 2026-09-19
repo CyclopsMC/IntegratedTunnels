@@ -20,11 +20,7 @@ import java.util.function.Predicate;
  * The network's items are never copied into this inventory up-front:
  * the network is only iterated when something actually reads these additional slots,
  * and items are only taken out of the network at the moment they are effectively taken out of this inventory.
- * This way, the network's contents may safely change while the player is being simulated,
- * as no items are ever handed out that were not actually removed from the network first.
- *
- * The items that are read from the network's slots are only views on the network.
- * Modifying such a view without taking it out of this inventory has no effect on the network.
+ * This way, the network's contents may safely change while the player is being simulated.
  *
  * @author rubensworks
  */
