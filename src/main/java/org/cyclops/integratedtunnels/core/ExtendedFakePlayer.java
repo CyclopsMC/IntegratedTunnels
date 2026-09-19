@@ -37,6 +37,8 @@ public class ExtendedFakePlayer extends FakePlayer {
         this.inventory = new NetworkPlayerInventory(this);
         this.gameMode.changeGameModeForPlayer(GameType.SURVIVAL);
         this.connection = new FakeNetHandlerPlayServer(world.getServer(), this);
+        // Otherwise the first simulated click would hold right click for as long as the world has been running
+        this.lastUpdateTick = world.getGameTime();
     }
 
     @Override
