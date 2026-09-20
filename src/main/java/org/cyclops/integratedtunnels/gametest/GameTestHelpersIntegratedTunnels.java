@@ -10,6 +10,7 @@ import org.cyclops.integrateddynamics.api.part.PartTarget;
 import org.cyclops.integrateddynamics.api.part.aspect.IAspectWrite;
 import org.cyclops.integrateddynamics.api.part.aspect.property.IAspectProperties;
 import org.cyclops.integrateddynamics.core.evaluate.variable.ValueTypeBoolean;
+import org.cyclops.integrateddynamics.core.evaluate.variable.ValueTypeInteger;
 import org.cyclops.integrateddynamics.core.helper.NetworkHelpers;
 import org.cyclops.integrateddynamics.core.helper.PartHelpers;
 import org.cyclops.integrateddynamics.core.network.PartNetworkElement;
@@ -96,6 +97,33 @@ public class GameTestHelpersIntegratedTunnels {
         IPartNetwork partNetwork = NetworkHelpers.getPartNetworkChecked(network);
         partType.setPriorityAndChannel(network, partNetwork, PartTarget.fromCenter(partPos), partState,
                 priority, partType.getChannel(partState));
+    }
+
+    /**
+     * Configure the check data property of the given aspect within the given part.
+     * @param partPos The position of the part.
+     * @param aspect The active aspect of the part.
+     * @param checkNbt If the data of items must be equal for them to match.
+     */
+    public static void setCheckNbt(PartPos partPos, IAspectWrite<?, ?> aspect, boolean checkNbt) {
+        PartHelpers.PartStateHolder partStateHolder = PartHelpers.getPart(partPos);
+        IAspectProperties properties = aspect.getProperties(partStateHolder.getPart(), PartTarget.fromCenter(partPos), partStateHolder.getState());
+        properties.setValue(TunnelAspectWriteBuilders.Item.PROP_CHECK_NBT, ValueTypeBoolean.ValueBoolean.of(checkNbt));
+        partStateHolder.getState().setAspectProperties(aspect, properties);
+    }
+
+    /**
+     * Configure the right click duration property of the given aspect within the given part.
+     * @param partPos The position of the part.
+     * @param aspect The active aspect of the part.
+     * @param rightClickDuration The number of ticks right click must be held down,
+     *                           or zero to hold it for the time between two clicks.
+     */
+    public static void setRightClickDuration(PartPos partPos, IAspectWrite<?, ?> aspect, int rightClickDuration) {
+        PartHelpers.PartStateHolder partStateHolder = PartHelpers.getPart(partPos);
+        IAspectProperties properties = aspect.getProperties(partStateHolder.getPart(), PartTarget.fromCenter(partPos), partStateHolder.getState());
+        properties.setValue(TunnelAspectWriteBuilders.Player.PROP_RIGHT_CLICK_DURATION, ValueTypeInteger.ValueInteger.of(rightClickDuration));
+        partStateHolder.getState().setAspectProperties(aspect, properties);
     }
 
     /**
