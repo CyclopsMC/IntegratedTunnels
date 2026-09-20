@@ -100,6 +100,19 @@ public class GameTestHelpersIntegratedTunnels {
     }
 
     /**
+     * Configure the check data property of the given aspect within the given part.
+     * @param partPos The position of the part.
+     * @param aspect The active aspect of the part.
+     * @param checkNbt If the data of items must be equal for them to match.
+     */
+    public static void setCheckNbt(PartPos partPos, IAspectWrite<?, ?> aspect, boolean checkNbt) {
+        PartHelpers.PartStateHolder partStateHolder = PartHelpers.getPart(partPos);
+        IAspectProperties properties = aspect.getProperties(partStateHolder.getPart(), PartTarget.fromCenter(partPos), partStateHolder.getState());
+        properties.setValue(TunnelAspectWriteBuilders.Item.PROP_CHECK_NBT, ValueTypeBoolean.ValueBoolean.of(checkNbt));
+        partStateHolder.getState().setAspectProperties(aspect, properties);
+    }
+
+    /**
      * Configure the right click duration property of the given aspect within the given part.
      * @param partPos The position of the part.
      * @param aspect The active aspect of the part.

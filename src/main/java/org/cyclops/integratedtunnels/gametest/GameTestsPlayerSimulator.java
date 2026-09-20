@@ -41,6 +41,7 @@ import static org.cyclops.integrateddynamics.gametest.GameTestHelpersIntegratedD
 import static org.cyclops.integratedtunnels.gametest.GameTestHelpersIntegratedTunnels.setNetworkInventory;
 import static org.cyclops.integratedtunnels.gametest.GameTestHelpersIntegratedTunnels.setPriority;
 import static org.cyclops.integratedtunnels.gametest.GameTestHelpersIntegratedTunnels.setRightClickDuration;
+import static org.cyclops.integratedtunnels.gametest.GameTestHelpersIntegratedTunnels.setCheckNbt;
 
 @GameTestHolder(Reference.MOD_ID)
 @PrefixGameTestTemplate(false)
@@ -411,7 +412,9 @@ public class GameTestsPlayerSimulator {
         PartHelpers.getPart(posPlayerSimulator).getState().setUpdateInterval(26);
 
         helper.succeedWhen(() -> {
-            // Check that exactly one arrow was taken from the network
+            // Check that exactly one arrow was taken from the network.
+            // The loaded crossbow no longer matches the crossbow that is being clicked with,
+            // as their data differs, so it is only charged once and never shot.
             helper.assertValueEqual(countItems(chestIn, Items.ARROW), 63, "Arrow count");
 
             // Check that the crossbow was loaded with an arrow
@@ -522,12 +525,44 @@ public class GameTestsPlayerSimulator {
         setRightClickDuration(posPlayerSimulator, TunnelAspects.Write.Player.CLICK_ITEM_ITEMSTACK, 26);
 
         helper.succeedWhen(() -> {
-            // Check that exactly one arrow was taken from the network
+            // Check that exactly one arrow was taken from the network.
+            // The loaded crossbow no longer matches the crossbow that is being clicked with,
+            // as their data differs, so it is only charged once and never shot.
             helper.assertValueEqual(countItems(chestIn, Items.ARROW), 63, "Arrow count");
 
             // Check that the crossbow was loaded with an arrow
             ChargedProjectiles chargedProjectiles = findItem(chestIn, Items.CROSSBOW).get(DataComponents.CHARGED_PROJECTILES);
             helper.assertTrue(chargedProjectiles != null && chargedProjectiles.contains(Items.ARROW), "The crossbow was not loaded with an arrow");
+        });
+    }
+
+    @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
+    public void testPlayerSimulatorShootCrossbowRightClickDuration(GameTestHelper helper) {
+        ChestBlockEntity chestIn = prepareProjectileWeaponNetwork(helper);
+
+        // Insert a crossbow and arrows into interface
+        chestIn.setItem(0, new ItemStack(Items.CROSSBOW));
+        chestIn.setItem(1, new ItemStack(Items.ARROW, 64));
+
+        // Click with the crossbow, while holding right click long enough to charge it
+        PartPos posPlayerSimulator = PartPos.of(helper.getLevel(), helper.absolutePos(POS), Direction.WEST);
+        placeVariableInWriter(helper.getLevel(), posPlayerSimulator, TunnelAspects.Write.Player.CLICK_ITEM_ITEMSTACK, createVariableForValue(helper.getLevel(), ValueTypes.OBJECT_ITEMSTACK, ValueObjectTypeItemStack.ValueItemStack.of(new ItemStack(Items.CROSSBOW))));
+        setNetworkInventory(posPlayerSimulator, TunnelAspects.Write.Player.CLICK_ITEM_ITEMSTACK, true);
+        setRightClickDuration(posPlayerSimulator, TunnelAspects.Write.Player.CLICK_ITEM_ITEMSTACK, 26);
+
+        // The crossbow is loaded and damaged while it is being used,
+        // so it must be matched without its data for it to be clicked with again, which shoots it
+        setCheckNbt(posPlayerSimulator, TunnelAspects.Write.Player.CLICK_ITEM_ITEMSTACK, false);
+
+        helper.succeedWhen(() -> {
+            // Check that the crossbow was charged and shot multiple times
+            int arrowsShot = helper.getEntities(EntityType.ARROW).size();
+            helper.assertTrue(arrowsShot >= 2, "Less than two arrows were shot");
+
+            // Check that every shot arrow, plus at most one that is still loaded, was taken from the network
+            int arrowsTaken = 64 - countItems(chestIn, Items.ARROW);
+            helper.assertTrue(arrowsTaken == arrowsShot || arrowsTaken == arrowsShot + 1,
+                    "Took " + arrowsTaken + " arrows out of the network for " + arrowsShot + " shot arrows");
         });
     }
 
