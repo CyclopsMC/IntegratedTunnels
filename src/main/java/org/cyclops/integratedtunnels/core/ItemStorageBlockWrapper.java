@@ -406,7 +406,7 @@ public class ItemStorageBlockWrapper implements IIngredientComponentStorage<Item
 
             // Finalize placement of the item
             if (itemBlock.placeBlock(blockItemUseContext, blockState)) {
-                itemBlock.updateCustomBlockEntityTag(pos, world, blockItemUseContext.getPlayer(), itemStack, blockState);
+                BlockItem.updateCustomBlockEntityTag(world, blockItemUseContext.getPlayer(), pos, itemStack);
                 updateBlockEntityComponents(world, pos, itemStack);
                 itemBlock.getBlock().setPlacedBy(world, pos, blockState, player, itemStack);
                 if (GeneralConfig.worldInteractionEvents) {

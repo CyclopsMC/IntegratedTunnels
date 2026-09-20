@@ -90,7 +90,8 @@ public class ExtendedFakePlayer extends FakePlayer {
     }
 
     @Override
-    public void startSleeping(BlockPos blockPos) {
+    public boolean startSleeping(BlockPos blockPos) {
         // Do nothing
+        return false;
     }
 }

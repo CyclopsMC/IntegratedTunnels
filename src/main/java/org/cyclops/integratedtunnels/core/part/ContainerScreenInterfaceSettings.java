@@ -18,7 +18,7 @@ import org.cyclops.cyclopscore.helper.ValueNotifierHelpers;
 import org.cyclops.integrateddynamics.core.client.gui.container.ContainerScreenPartSettings;
 import org.cyclops.integrateddynamics.core.inventory.container.ContainerMultipartAspects;
 import org.cyclops.integratedtunnels.Reference;
-import org.lwjgl.glfw.GLFW;
+import com.mojang.blaze3d.platform.InputConstants;
 
 /**
  * @author rubensworks
@@ -88,7 +88,7 @@ public class ContainerScreenInterfaceSettings extends ContainerScreenPartSetting
 
     @Override
     public boolean keyPressed(KeyEvent evt) {
-        if (evt.key() == GLFW.GLFW_KEY_ESCAPE) {
+        if (evt.key() == InputConstants.KEY_ESCAPE) {
             if (getMenu().isPartGui()) {
                 // Interfaces without filter show these settings as their part gui,
                 // so escaping to the part gui would just re-open this gui.

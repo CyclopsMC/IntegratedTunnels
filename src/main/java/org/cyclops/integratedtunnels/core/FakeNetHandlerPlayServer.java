@@ -193,7 +193,12 @@ public class FakeNetHandlerPlayServer extends ServerGamePacketListenerImpl {
     }
 
     @Override
-    public void handleAnimate(ServerboundSwingPacket packetIn) {
+    public void handlePunch(ServerboundPunchPacket packetIn) {
+
+    }
+
+    @Override
+    public void handleAttack(ServerboundAttackPacket packetIn) {
 
     }
 
