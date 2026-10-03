@@ -1,8 +1,16 @@
 # Changelog for Minecraft 26.1.2
 All notable changes to this project will be documented in this file.
 
+<a name="26.1.2-1.13.0"></a>
+## [26.1.2-1.13.0](https://github.com/CyclopsMC/IntegratedTunnels/compare/26.1.2-1.12.0...26.1.2-1.13.0) - 2026-10-03 14:11:53
+
+
+### Added
+* Add a right click duration option to the Player Simulator (#390), Closes #281
+* Allow the Player Simulator to use the network as its inventory (#389), Closes #280
+
 <a name="26.1.2-1.12.0"></a>
-## [26.1.2-1.12.0](https://github.com/CyclopsMC/IntegratedTunnels/compare/26.1.2-1.11.1...26.1.2-1.12.0) - 2026-09-11 22:06:37
+## [26.1.2-1.12.0](https://github.com/CyclopsMC/IntegratedTunnels/compare/26.1.2-1.11.1...26.1.2-1.12.0) - 2026-09-11 22:06:37 +0200
 
 
 ### Added
