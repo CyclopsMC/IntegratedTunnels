@@ -39,6 +39,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Predicate;
 
 /**
@@ -61,6 +62,8 @@ public class ItemStoragePlayerWrapper implements IIngredientComponentStorage<Ite
     private final boolean sneaking;
     private final boolean continuousClick;
     private final int entityIndex;
+    private final int rightClickDuration;
+    private final boolean networkInventory;
     private final IIngredientComponentStorage<ItemStack, Integer> playerReturnHandler;
     private final ItemStoragePlayerWrapper.Journal journal;
     @Nullable
@@ -69,6 +72,7 @@ public class ItemStoragePlayerWrapper implements IIngredientComponentStorage<Ite
     public ItemStoragePlayerWrapper(@Nullable ExtendedFakePlayer player, ServerLevel world, BlockPos pos,
                                     double offsetX, double offsetY, double offsetZ, Direction side, InteractionHand hand,
                                     boolean rightClick, boolean sneaking, boolean continuousClick, int entityIndex,
+                                    int rightClickDuration, boolean networkInventory,
                                     IIngredientComponentStorage<ItemStack, Integer> playerReturnHandler) {
         this.player = player;
         this.world = world;
@@ -82,6 +86,8 @@ public class ItemStoragePlayerWrapper implements IIngredientComponentStorage<Ite
         this.hand = hand;
         this.rightClick = rightClick;
         this.sneaking = sneaking;
+        this.rightClickDuration = rightClickDuration;
+        this.networkInventory = networkInventory;
         this.playerReturnHandler = playerReturnHandler;
         this.journal = new ItemStoragePlayerWrapper.Journal();
     }
@@ -98,7 +104,31 @@ public class ItemStoragePlayerWrapper implements IIngredientComponentStorage<Ite
         return entities.get(Math.min(this.entityIndex, entities.size() - 1));
     }
 
+    /**
+     * Expose the network's items to the simulated player,
+     * so that items that consume other items from the player inventory (such as bows) can use the network's items.
+     */
+    private void attachNetworkInventory(Player player) {
+        if (player.getInventory() instanceof NetworkPlayerInventory networkPlayerInventory) {
+            networkPlayerInventory.setNetworkStorage(this.playerReturnHandler);
+        }
+    }
+
+    /**
+     * Stop exposing the network's items to the simulated player,
+     * and insert the items that were taken out of the network, but were not consumed, back into the network.
+     */
+    private void returnNetworkInventory(Player player) {
+        if (player.getInventory() instanceof NetworkPlayerInventory networkPlayerInventory) {
+            for (ItemStack itemStack : networkPlayerInventory.returnNetworkStorage()) {
+                ItemStack remaining = this.playerReturnHandler.insert(itemStack, false);
+                IModHelpers.get().getItemStackHelpers().spawnItemStackToPlayer(world, pos, remaining, player);
+            }
+        }
+    }
+
     private void returnPlayerInventory(Player player) {
+        returnNetworkInventory(player);
         PlayerInventoryIterator it = new PlayerInventoryIterator(player);
         while (it.hasNext()) {
             ItemStack itemStack = it.next();
@@ -145,6 +175,17 @@ public class ItemStoragePlayerWrapper implements IIngredientComponentStorage<Ite
         PlayerHelpers.setPlayerState(player, hand, pos, offsetX, offsetY, offsetZ, side, sneaking);
         PlayerHelpers.setHeldItemSilent(player, hand, stack.copy());
 
+        if (networkInventory) {
+            attachNetworkInventory(player);
+        }
+        try {
+            return click(stack);
+        } finally {
+            returnNetworkInventory(player);
+        }
+    }
+
+    protected ItemStack click(ItemStack stack) {
         if (!continuousClick) {
             cancelDestroyingBlock(player);
         }
@@ -236,18 +277,19 @@ public class ItemStoragePlayerWrapper implements IIngredientComponentStorage<Ite
                         return stack;
                     }
                     if (actionresult instanceof InteractionResult.Success success) {
-                        ItemStack heldItemTransformedTo = success.itemContext().heldItemTransformedTo();
-                        if (heldItemTransformedTo == null || heldItemTransformedTo.isEmpty()) {
+                        // If the item was not transformed, the held item is kept
+                        ItemStack heldItemTransformedTo = Objects.requireNonNullElse(success.heldItemTransformedTo(), player.getItemInHand(hand));
+                        if (heldItemTransformedTo.isEmpty()) {
                             PlayerHelpers.setHeldItemSilent(player, hand, ItemStack.EMPTY);
                             EventHooks.onPlayerDestroyItem(player, copyBeforeUse, hand);
                         } else {
-                            PlayerHelpers.setHeldItemSilent(player, hand, success.itemContext().heldItemTransformedTo());
+                            PlayerHelpers.setHeldItemSilent(player, hand, heldItemTransformedTo);
                         }
                     }
                     if (actionresult.consumesAction()) {
                         // If the hand was activated, simulate the activated hand for a number of ticks, and deactivate.
                         if (player.isUsingItem()) {
-                            player.updateActiveHandSimulated();
+                            player.updateActiveHandSimulated(rightClickDuration);
                             player.releaseUsingItem();
                         }
                         returnPlayerInventory(player);
@@ -275,7 +317,7 @@ public class ItemStoragePlayerWrapper implements IIngredientComponentStorage<Ite
                 } else if (actionResult.consumesAction()) {
                     // If the hand was activated, simulate the activated hand for a number of ticks, and deactivate.
                     if (player.isUsingItem()) {
-                        player.updateActiveHandSimulated();
+                        player.updateActiveHandSimulated(rightClickDuration);
                         player.releaseUsingItem();
                     }
                     returnPlayerInventory(player);
