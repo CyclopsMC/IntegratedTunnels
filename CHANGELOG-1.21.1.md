@@ -1,8 +1,16 @@
 # Changelog for Minecraft 1.21.1
 All notable changes to this project will be documented in this file.
 
+<a name="1.21.1-1.13.0"></a>
+## [1.21.1-1.13.0](https://github.com/CyclopsMC/IntegratedTunnels/compare/1.21.1-1.12.0...1.21.1-1.13.0) - 2026-10-03 14:03:07
+
+
+### Added
+* Add a right click duration option to the Player Simulator (#390), Closes #281
+* Allow the Player Simulator to use the network as its inventory (#389), Closes #280
+
 <a name="1.21.1-1.12.0"></a>
-## [1.21.1-1.12.0](https://github.com/CyclopsMC/IntegratedTunnels/compare/1.21.1-1.11.1...1.21.1-1.12.0) - 2026-09-11 21:58:34
+## [1.21.1-1.12.0](https://github.com/CyclopsMC/IntegratedTunnels/compare/1.21.1-1.11.1...1.21.1-1.12.0) - 2026-09-11 21:58:34 +0200
 
 
 ### Added

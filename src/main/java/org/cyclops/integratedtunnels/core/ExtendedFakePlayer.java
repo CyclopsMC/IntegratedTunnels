@@ -5,6 +5,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ProjectileWeaponItem;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.common.CommonHooks;
@@ -12,6 +13,7 @@ import net.neoforged.neoforge.common.util.FakePlayer;
 import net.neoforged.neoforge.event.EventHooks;
 
 import java.util.UUID;
+import java.util.function.Predicate;
 
 /**
  * An extended fake player with more capabilities.
@@ -27,8 +29,52 @@ public class ExtendedFakePlayer extends FakePlayer {
 
     public ExtendedFakePlayer(ServerLevel world) {
         super(world, PROFILE);
+        // The inventory can expose the items of a network, so that items such as bows can consume them.
+        // The inventory menu is not rebuilt for it, as fake players never open their inventory.
+        this.inventory = new NetworkPlayerInventory(this, this.equipment);
         this.gameMode.changeGameModeForPlayer(GameType.SURVIVAL);
         this.connection = new FakeNetHandlerPlayServer(world.getServer(), this);
+        // Otherwise the first simulated click would hold right click for as long as the world has been running
+        this.lastUpdateTick = world.getGameTime();
+    }
+
+    @Override
+    public NetworkPlayerInventory getInventory() {
+        return (NetworkPlayerInventory) super.getInventory();
+    }
+
+    /**
+     * Based on {@link net.minecraft.world.entity.player.Player#getProjectile(ItemStack)},
+     * but projectiles are taken out of the network before they are returned,
+     * instead of being read from the network's (virtual) inventory slots.
+     */
+    @Override
+    public ItemStack getProjectile(ItemStack shootable) {
+        if (!(shootable.getItem() instanceof ProjectileWeaponItem projectileWeaponItem)) {
+            return ItemStack.EMPTY;
+        }
+
+        ItemStack heldProjectile = ProjectileWeaponItem.getHeldProjectile(this, projectileWeaponItem.getSupportedHeldProjectiles(shootable));
+        if (!heldProjectile.isEmpty()) {
+            return CommonHooks.getProjectile(this, shootable, heldProjectile);
+        }
+
+        Predicate<ItemStack> predicate = projectileWeaponItem.getAllSupportedProjectiles(shootable);
+        NetworkPlayerInventory inventory = this.getInventory();
+        for (int slot = 0; slot < inventory.getRealContainerSize(); slot++) {
+            ItemStack itemStack = inventory.getItem(slot);
+            if (predicate.test(itemStack)) {
+                return CommonHooks.getProjectile(this, shootable, itemStack);
+            }
+        }
+
+        int borrowedSlot = inventory.borrowFromNetwork(predicate);
+        if (borrowedSlot >= 0) {
+            return CommonHooks.getProjectile(this, shootable, inventory.getItem(borrowedSlot));
+        }
+
+        return CommonHooks.getProjectile(this, shootable, this.getAbilities().instabuild
+                ? projectileWeaponItem.getDefaultCreativeAmmo(this, shootable) : ItemStack.EMPTY);
     }
 
     @Override
@@ -59,8 +105,18 @@ public class ExtendedFakePlayer extends FakePlayer {
     }
 
     public void updateActiveHandSimulated() {
+        updateActiveHandSimulated(0);
+    }
+
+    /**
+     * Simulate the player holding its active item for the given number of ticks.
+     * @param duration The number of ticks to hold the item,
+     *                 or zero to hold it for the time that passed since the previous simulation.
+     */
+    public void updateActiveHandSimulated(int duration) {
+        int ticks = duration > 0 ? duration : this.ticksSinceLastTick;
         if (this.isUsingItem()) {
-            for (int i = 0; i < this.ticksSinceLastTick; i++) {
+            for (int i = 0; i < ticks; i++) {
                 if (this.isUsingItem()) {
                     ItemStack itemstack = this.getItemInHand(this.getUsedItemHand());
                     if (CommonHooks.canContinueUsing(this.useItem, itemstack)) {
