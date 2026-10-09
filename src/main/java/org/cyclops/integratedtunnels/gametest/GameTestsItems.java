@@ -187,6 +187,44 @@ public class GameTestsItems {
     }
 
     @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
+    public void testItemsInterfaceToExporterItemCraftMissingRequestsCrafting(GameTestHelper helper) {
+        GameTestCraftingHandler craftingHandler = GameTestCraftingHandler.getInstance();
+        craftingHandler.getRequestedInstances().clear();
+
+        // Place cable
+        helper.setBlock(POS, RegistryEntries.BLOCK_CABLE.value());
+        helper.setBlock(POS.east(), RegistryEntries.BLOCK_CABLE.value());
+
+        // Place item interface
+        PartHelpers.addPart(helper.getLevel(), helper.absolutePos(POS), Direction.WEST, PartTypes.INTERFACE_ITEM, new ItemStack(PartTypes.INTERFACE_ITEM.getItem()));
+
+        // Place item exporter
+        PartPos exporterPos = PartPos.of(helper.getLevel(), helper.absolutePos(POS.east()), Direction.EAST);
+        PartHelpers.addPart(helper.getLevel(), helper.absolutePos(POS.east()), Direction.EAST, PartTypes.EXPORTER_ITEM, new ItemStack(PartTypes.EXPORTER_ITEM.getItem()));
+
+        // Place empty chests, so the exported item is not present in the network
+        helper.setBlock(POS.west(), Blocks.CHEST);
+        helper.setBlock(POS.east().east(), Blocks.CHEST);
+
+        // Export a craftable item with crafting enabled, which makes the exporter request crafting it
+        ItemStack variableAspect = createVariableForValue(helper.getLevel(), ValueTypes.OBJECT_ITEMSTACK, ValueObjectTypeItemStack.ValueItemStack.of(GameTestCraftingHandler.CRAFTABLE_ITEM.copy()));
+        placeVariableInWriter(helper, helper.getLevel(), exporterPos, TunnelAspects.Write.Item.ITEMSTACK_EXPORT, variableAspect);
+        setCraft(exporterPos, TunnelAspects.Write.Item.ITEMSTACK_EXPORT, true);
+
+        helper.runAfterDelay(TICKS_NETWORK_INIT + TICKS_TRANSFER, () -> {
+            // Check that crafting was requested
+            helper.assertFalse(craftingHandler.getRequestedInstances().isEmpty(), Component.literal("Crafting was not requested"));
+            helper.assertContainerEmpty(POS.east().east());
+
+            // Check exporter state
+            IPartStateWriter partStateWriter = (IPartStateWriter) PartHelpers.getPart(exporterPos).getState();
+            helper.assertFalse(partStateWriter.isDeactivated(), Component.literal("Exporter is deactivated"));
+            helper.assertTrue(partStateWriter.getErrors(TunnelAspects.Write.Item.ITEMSTACK_EXPORT).isEmpty(), Component.literal("Active aspect has errors"));
+            helper.succeed();
+        });
+    }
+
+    @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
     public void testItemsImporterToInterfaceToExporterBoolean(GameTestHelper helper) {
         // Place cable
         helper.setBlock(POS, RegistryEntries.BLOCK_CABLE.value());
