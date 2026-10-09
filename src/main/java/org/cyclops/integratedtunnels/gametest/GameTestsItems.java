@@ -41,6 +41,7 @@ import org.cyclops.integratedtunnels.part.aspect.TunnelAspects;
 import static org.cyclops.integrateddynamics.gametest.GameTestHelpersIntegratedDynamics.createVariableForValue;
 import static org.cyclops.integrateddynamics.gametest.GameTestHelpersIntegratedDynamics.createVariableFromReader;
 import static org.cyclops.integrateddynamics.gametest.GameTestHelpersIntegratedDynamics.placeVariableInWriter;
+import static org.cyclops.integratedtunnels.gametest.GameTestHelpersIntegratedTunnels.setCraft;
 import static org.cyclops.integratedtunnels.gametest.GameTestHelpersIntegratedTunnels.setPassiveInteraction;
 import static org.cyclops.integratedtunnels.gametest.GameTestHelpersIntegratedTunnels.setTargetSide;
 import static org.cyclops.integratedtunnels.gametest.GameTestHelpersIntegratedTunnels.setTargetSideViaSettings;
@@ -146,6 +147,42 @@ public class GameTestsItems {
             );
             helper.assertValueEqual(partStateWriter.getActiveAspect(), TunnelAspects.Write.Item.BOOLEAN_EXPORT, Component.literal("Active aspect is incorrect"));
             helper.assertTrue(partStateWriter.getErrors(TunnelAspects.Write.Item.BOOLEAN_EXPORT).isEmpty(), Component.literal("Active aspect has errors"));
+        });
+    }
+
+    @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
+    public void testItemsInterfaceToExporterItemCraftMissing(GameTestHelper helper) {
+        // Place cable
+        helper.setBlock(POS, RegistryEntries.BLOCK_CABLE.value());
+        helper.setBlock(POS.east(), RegistryEntries.BLOCK_CABLE.value());
+
+        // Place item interface
+        PartHelpers.addPart(helper.getLevel(), helper.absolutePos(POS), Direction.WEST, PartTypes.INTERFACE_ITEM, new ItemStack(PartTypes.INTERFACE_ITEM.getItem()));
+
+        // Place item exporter
+        PartPos exporterPos = PartPos.of(helper.getLevel(), helper.absolutePos(POS.east()), Direction.EAST);
+        PartHelpers.addPart(helper.getLevel(), helper.absolutePos(POS.east()), Direction.EAST, PartTypes.EXPORTER_ITEM, new ItemStack(PartTypes.EXPORTER_ITEM.getItem()));
+
+        // Place empty chests, so the exported item is not present in the network
+        helper.setBlock(POS.west(), Blocks.CHEST);
+        helper.setBlock(POS.east().east(), Blocks.CHEST);
+
+        // Export an item with crafting enabled, which makes the exporter check if the target accepts the crafting result
+        ItemStack variableAspect = createVariableForValue(helper.getLevel(), ValueTypes.OBJECT_ITEMSTACK, ValueObjectTypeItemStack.ValueItemStack.of(new ItemStack(Items.ACACIA_LEAVES)));
+        placeVariableInWriter(helper, helper.getLevel(), exporterPos, TunnelAspects.Write.Item.ITEMSTACK_EXPORT, variableAspect);
+        setCraft(exporterPos, TunnelAspects.Write.Item.ITEMSTACK_EXPORT, true);
+
+        helper.runAfterDelay(TICKS_NETWORK_INIT + TICKS_TRANSFER, () -> {
+            // Check that nothing was moved, and the simulated insertion of the crafting result was not committed
+            helper.assertContainerEmpty(POS.west());
+            helper.assertContainerEmpty(POS.east().east());
+
+            // Check exporter state
+            IPartStateWriter partStateWriter = (IPartStateWriter) PartHelpers.getPart(exporterPos).getState();
+            helper.assertFalse(partStateWriter.isDeactivated(), Component.literal("Exporter is deactivated"));
+            helper.assertValueEqual(partStateWriter.getActiveAspect(), TunnelAspects.Write.Item.ITEMSTACK_EXPORT, Component.literal("Active aspect is incorrect"));
+            helper.assertTrue(partStateWriter.getErrors(TunnelAspects.Write.Item.ITEMSTACK_EXPORT).isEmpty(), Component.literal("Active aspect has errors"));
+            helper.succeed();
         });
     }
 

@@ -199,16 +199,17 @@ public class TunnelHelpers {
                 }
 
                 // Only craft if the target accepts the crafting output completely
+                // (simulated in a nested transaction, which is aborted on close)
                 boolean targetAcceptsCraftingResult;
                 T finalCraftInstance = craftInstance;
                 if (destinationSlot >= 0) {
-                    try (Transaction checkTx = Transaction.openRoot()) {
+                    try (Transaction checkTx = Transaction.open(transaction)) {
                         targetAcceptsCraftingResult = destination instanceof IIngredientComponentStorageSlotted
                                 && matcher.isEmpty(((IIngredientComponentStorageSlotted<T, M>) destination)
                                 .insert(destinationSlot, finalCraftInstance, checkTx));
                     }
                 } else {
-                    try (Transaction checkTx = Transaction.openRoot()) {
+                    try (Transaction checkTx = Transaction.open(transaction)) {
                         targetAcceptsCraftingResult = matcher.isEmpty(destination.insert(finalCraftInstance, checkTx));
                     }
                 }

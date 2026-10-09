@@ -113,6 +113,19 @@ public class GameTestHelpersIntegratedTunnels {
     }
 
     /**
+     * Configure the craft property of the given aspect within the given part.
+     * @param partPos The position of the part.
+     * @param aspect The active aspect of the part.
+     * @param craft If the ingredient should be crafted if it could not be moved.
+     */
+    public static void setCraft(PartPos partPos, IAspectWrite<?, ?> aspect, boolean craft) {
+        PartHelpers.PartStateHolder partStateHolder = PartHelpers.getPart(partPos);
+        IAspectProperties properties = aspect.getProperties(partStateHolder.getPart(), PartTarget.fromCenter(partPos), partStateHolder.getState());
+        properties.setValue(TunnelAspectWriteBuilders.PROP_CRAFT, ValueTypeBoolean.ValueBoolean.of(craft));
+        partStateHolder.getState().setAspectProperties(aspect, properties);
+    }
+
+    /**
      * Configure the right click duration property of the given aspect within the given part.
      * @param partPos The position of the part.
      * @param aspect The active aspect of the part.
