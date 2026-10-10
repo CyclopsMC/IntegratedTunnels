@@ -11,6 +11,7 @@ import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
+import net.neoforged.neoforge.transfer.transaction.RootCommitJournal;
 import net.neoforged.neoforge.transfer.transaction.Transaction;
 import net.neoforged.neoforge.transfer.transaction.TransactionContext;
 import org.cyclops.commoncapabilities.api.ingredient.IIngredientMatcher;
@@ -100,6 +101,7 @@ public class TunnelHelpers {
      * @param ingredientPredicate Only ingredientstack matching this predicate will be moved.
      * @param movementPosition The position at which the movement is happening.
      * @param craftIfFailed If the exact ingredient from ingredientPredicate should be crafted if transfer failed.
+     *                      Crafting is only requested once the root transaction is committed.
      * @param transaction The transaction context.
      * @param <T> The instance type.
      * @param <M> The matching condition parameter.
@@ -167,23 +169,26 @@ public class TunnelHelpers {
                 }
 
                 // Only craft if the target accepts the crafting output completely
+                // (simulated in a nested transaction, which is aborted on close)
                 boolean targetAcceptsCraftingResult;
                 T finalCraftInstance = craftInstance;
                 if (destinationSlot >= 0) {
-                    try (Transaction checkTx = Transaction.openRoot()) {
+                    try (Transaction checkTx = Transaction.open(transaction)) {
                         targetAcceptsCraftingResult = destination instanceof IIngredientComponentStorageSlotted
                                 && matcher.isEmpty(((IIngredientComponentStorageSlotted<T, M>) destination)
                                 .insert(destinationSlot, finalCraftInstance, checkTx));
                     }
                 } else {
-                    try (Transaction checkTx = Transaction.openRoot()) {
+                    try (Transaction checkTx = Transaction.open(transaction)) {
                         targetAcceptsCraftingResult = matcher.isEmpty(destination.insert(finalCraftInstance, checkTx));
                     }
                 }
 
                 if (targetAcceptsCraftingResult) {
-                    requestCrafting(network, ingredientsNetwork, channel,
-                            craftInstance, ingredientPredicate.getMatchFlags());
+                    // Crafting handlers may open their own root transactions,
+                    // so only request crafting once the root transaction has been committed.
+                    new RootCommitJournal(() -> requestCrafting(network, ingredientsNetwork, channel,
+                            finalCraftInstance, ingredientPredicate.getMatchFlags())).updateSnapshots(transaction);
                     break;
                 }
             }

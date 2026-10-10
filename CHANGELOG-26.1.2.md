@@ -1,8 +1,24 @@
 # Changelog for Minecraft 26.1.2
 All notable changes to this project will be documented in this file.
 
+<a name="26.1.2-1.13.1"></a>
+## [26.1.2-1.13.1](https://github.com/CyclopsMC/IntegratedTunnels/compare/26.1.2-1.13.0...26.1.2-1.13.1) - 2026-10-10 08:48:29
+
+
+### Fixed
+* Fix crash when exporting with crafting enabled and item is missing (#394)
+  When an exporter with the craft option could not move anything, it
+  simulated inserting the crafting result into the target using a new
+  root transaction, while the outer transaction was still open. NeoForge
+  rejects this with "A root transaction ... is already active on this
+  thread", crashing the server tick loop on every world load.
+  
+  Simulate the insertion in a nested transaction instead, which is
+  aborted on close.
+  Signed-off-by: Kirill Ilin <stitch14@yandex.ru>
+
 <a name="26.1.2-1.13.0"></a>
-## [26.1.2-1.13.0](https://github.com/CyclopsMC/IntegratedTunnels/compare/26.1.2-1.12.0...26.1.2-1.13.0) - 2026-10-03 14:11:53
+## [26.1.2-1.13.0](https://github.com/CyclopsMC/IntegratedTunnels/compare/26.1.2-1.12.0...26.1.2-1.13.0) - 2026-10-03 14:11:53 +0200
 
 
 ### Added

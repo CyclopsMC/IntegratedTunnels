@@ -27,4 +27,4 @@ All stable releases (including deobfuscated builds) can be found on [CurseForge]
 For every major Minecraft version, a `master-{mc_version}` branch exists.
 
 ### License
-All code and images are licenced under the [MIT License](https://github.com/CyclopsMC/IntegratedTunnels/blob/master-1.8/LICENSE.txt)
+All code and images are licenced under the [MIT License](LICENSE.txt)
