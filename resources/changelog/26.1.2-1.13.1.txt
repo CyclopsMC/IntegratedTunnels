@@ -1,0 +1,14 @@
+As always, don't forget to backup your world before updating!
+Requires CyclopsCore version 1.31.0 or higher.
+
+Fixes:
+* Fix crash when exporting with crafting enabled and item is missing (#394)
+  When an exporter with the craft option could not move anything, it
+  simulated inserting the crafting result into the target using a new
+  root transaction, while the outer transaction was still open. NeoForge
+  rejects this with "A root transaction ... is already active on this
+  thread", crashing the server tick loop on every world load.
+  
+  Simulate the insertion in a nested transaction instead, which is
+  aborted on close.
+  Signed-off-by: Kirill Ilin <stitch14@yandex.ru>
