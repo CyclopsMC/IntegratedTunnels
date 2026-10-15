@@ -114,7 +114,6 @@ public class FakeNetHandlerPlayServer extends ServerGamePacketListenerImpl {
 
     @Override
     public boolean hasChannel(Identifier payloadId) {
-        // The fake connection has no Netty channel, so nothing can be sent over it.
         return false;
     }
 
