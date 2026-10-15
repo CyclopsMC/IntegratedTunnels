@@ -5,6 +5,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.Container;
 import net.minecraft.world.item.Item;
@@ -26,6 +27,7 @@ import org.cyclops.integrateddynamics.core.evaluate.variable.ValueTypeBoolean;
 import org.cyclops.integrateddynamics.core.evaluate.variable.ValueTypes;
 import org.cyclops.integrateddynamics.core.helper.PartHelpers;
 import org.cyclops.integratedtunnels.Reference;
+import org.cyclops.integratedtunnels.core.ExtendedFakePlayer;
 import org.cyclops.integratedtunnels.part.PartTypes;
 import org.cyclops.integratedtunnels.part.aspect.TunnelAspectWriteBuilders;
 import org.cyclops.integratedtunnels.part.aspect.TunnelAspects;
@@ -544,6 +546,15 @@ public class GameTestsPlayerSimulator {
             helper.assertTrue(arrowsTaken == arrowsShot || arrowsTaken == arrowsShot + 1,
                     "Took " + arrowsTaken + " arrows out of the network for " + arrowsShot + " shot arrows");
         });
+    }
+
+    @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
+    public void testPlayerSimulatorFakePlayerHasNoChannel(GameTestHelper helper) {
+        // Synced attachments query this when they change, which crashed on the channel-less fake connection (#395)
+        ExtendedFakePlayer player = new ExtendedFakePlayer(helper.getLevel());
+        helper.assertFalse(player.connection.hasChannel(Identifier.fromNamespaceAndPath(Reference.MOD_ID, "test")),
+                Component.literal("Fake player connection must not report any channels"));
+        helper.succeed();
     }
 
 }
