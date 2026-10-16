@@ -13,6 +13,7 @@ import net.minecraft.network.protocol.common.ServerboundCustomPayloadPacket;
 import net.minecraft.network.protocol.common.ServerboundKeepAlivePacket;
 import net.minecraft.network.protocol.common.ServerboundResourcePackPacket;
 import net.minecraft.network.protocol.game.*;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.CommonListenerCookie;
@@ -109,6 +110,11 @@ public class FakeNetHandlerPlayServer extends ServerGamePacketListenerImpl {
     @Override
     public void tick() {
 
+    }
+
+    @Override
+    public boolean hasChannel(Identifier payloadId) {
+        return false;
     }
 
     @Override
