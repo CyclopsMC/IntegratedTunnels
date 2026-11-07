@@ -17,10 +17,12 @@ import net.minecraft.world.level.block.entity.HopperBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import org.cyclops.commoncapabilities.api.capability.itemhandler.ItemMatch;
 import org.cyclops.cyclopscore.datastructure.DimPos;
 import org.cyclops.integrateddynamics.RegistryEntries;
 import org.cyclops.integrateddynamics.api.network.INetwork;
 import org.cyclops.integrateddynamics.api.network.IPartNetwork;
+import org.cyclops.integrateddynamics.api.network.IPositionedAddonsNetworkIngredients;
 import org.cyclops.integrateddynamics.api.part.PartPos;
 import org.cyclops.integrateddynamics.api.part.PartTarget;
 import org.cyclops.integrateddynamics.api.part.aspect.property.IAspectProperties;
@@ -32,7 +34,10 @@ import org.cyclops.integrateddynamics.core.evaluate.variable.*;
 import org.cyclops.integrateddynamics.core.helper.NetworkHelpers;
 import org.cyclops.integrateddynamics.core.helper.PartHelpers;
 import org.cyclops.integrateddynamics.part.aspect.Aspects;
+import org.cyclops.integratedtunnels.Capabilities;
+import org.cyclops.integratedtunnels.GeneralConfig;
 import org.cyclops.integratedtunnels.Reference;
+import org.cyclops.integratedtunnels.api.network.IItemNetwork;
 import org.cyclops.integratedtunnels.core.part.IPartTypeInterfacePositionedAddon;
 import org.cyclops.integratedtunnels.part.PartTypeInterfaceFilteringItem;
 import org.cyclops.integratedtunnels.part.PartTypes;
@@ -1261,6 +1266,103 @@ public class GameTestsItems {
                     helper.assertContainerEmpty(POS.east().east().above());
                 })
                 .thenSucceed();
+    }
+
+    private static PartPos placeInterfaceWithCobblestone(GameTestHelper helper, int stacks) {
+        helper.setBlock(POS, RegistryEntries.BLOCK_CABLE.value());
+        PartHelpers.addPart(helper.getLevel(), helper.absolutePos(POS), Direction.WEST, PartTypes.INTERFACE_ITEM, new ItemStack(PartTypes.INTERFACE_ITEM.getItem()));
+        helper.setBlock(POS.west(), Blocks.CHEST);
+        ChestBlockEntity chestIn = helper.getBlockEntity(POS.west());
+        for (int i = 0; i < stacks; i++) {
+            chestIn.setItem(i, new ItemStack(Items.COBBLESTONE, 64));
+        }
+        return PartPos.of(helper.getLevel(), helper.absolutePos(POS), Direction.WEST);
+    }
+
+    private static int simulateNetworkExtraction(PartPos partPos, int amount) {
+        IItemNetwork itemNetwork = NetworkHelpers.getNetworkChecked(partPos).getCapability(Capabilities.ItemNetwork.NETWORK).orElseThrow();
+        return itemNetwork.getChannel(IPositionedAddonsNetworkIngredients.DEFAULT_CHANNEL)
+                .extract(new ItemStack(Items.COBBLESTONE, amount), ItemMatch.ITEM, true)
+                .getCount();
+    }
+
+    private static void placeExporterWithRate(GameTestHelper helper, int rate) {
+        helper.setBlock(POS.east(), RegistryEntries.BLOCK_CABLE.value());
+        PartPos posExporter = PartPos.of(helper.getLevel(), helper.absolutePos(POS.east()), Direction.EAST);
+        PartHelpers.addPart(helper.getLevel(), helper.absolutePos(POS.east()), Direction.EAST, PartTypes.EXPORTER_ITEM, new ItemStack(PartTypes.EXPORTER_ITEM.getItem()));
+        helper.setBlock(POS.east().east(), Blocks.CHEST);
+        placeVariableInWriter(helper.getLevel(), posExporter, TunnelAspects.Write.Item.BOOLEAN_EXPORT, new ItemStack(RegistryEntries.ITEM_VARIABLE));
+
+        PartHelpers.PartStateHolder partStateHolder = PartHelpers.getPart(posExporter);
+        IAspectProperties properties = TunnelAspects.Write.Item.BOOLEAN_EXPORT.getProperties(partStateHolder.getPart(), PartTarget.fromCenter(posExporter), partStateHolder.getState());
+        properties.setValue(TunnelAspectWriteBuilders.Item.PROP_RATE, ValueTypeInteger.ValueInteger.of(rate));
+        partStateHolder.getState().setAspectProperties(TunnelAspects.Write.Item.BOOLEAN_EXPORT, properties);
+    }
+
+    /**
+     * Succeed if the first observed export moved the expected amount.
+     * Exporters move at most once per tick, so the first non-empty observation is a single transfer.
+     */
+    private static void succeedWhenFirstExportEquals(GameTestHelper helper, int expected, Runnable onFirstExport) {
+        int[] firstExported = { -1 };
+        helper.succeedWhen(() -> {
+            if (firstExported[0] < 0) {
+                ChestBlockEntity chestOut = helper.getBlockEntity(POS.east().east());
+                int exported = chestOut.countItem(Items.COBBLESTONE);
+                if (exported > 0) {
+                    firstExported[0] = exported;
+                    onFirstExport.run();
+                }
+            }
+            helper.assertTrue(firstExported[0] >= 0, "Nothing was exported");
+            helper.assertValueEqual(firstExported[0], expected, "Amount exported in a single transfer");
+        });
+    }
+
+    @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
+    public void testItemsNetworkRateLimitDefault(GameTestHelper helper) {
+        PartPos posInterface = placeInterfaceWithCobblestone(helper, 4);
+
+        helper.succeedWhen(() -> helper.assertValueEqual(simulateNetworkExtraction(posInterface, 256), 64, "Extracted amount"));
+    }
+
+    @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
+    public void testItemsNetworkRateLimitConfigured(GameTestHelper helper) {
+        PartPos posInterface = placeInterfaceWithCobblestone(helper, 4);
+
+        helper.succeedWhen(() -> {
+            // Restore the config within the same tick, so concurrent tests are not affected
+            int originalRateLimit = GeneralConfig.itemRateLimit;
+            GeneralConfig.itemRateLimit = 128;
+            int extracted;
+            try {
+                extracted = simulateNetworkExtraction(posInterface, 256);
+            } finally {
+                GeneralConfig.itemRateLimit = originalRateLimit;
+            }
+            helper.assertValueEqual(extracted, 128, "Extracted amount");
+        });
+    }
+
+    @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
+    public void testItemsInterfaceToExporterRateLimitDefault(GameTestHelper helper) {
+        placeInterfaceWithCobblestone(helper, 4);
+        placeExporterWithRate(helper, 256);
+
+        succeedWhenFirstExportEquals(helper, 64, () -> {});
+    }
+
+    @GameTest(template = TEMPLATE_EMPTY, batch = "item_rate_limit_configured", timeoutTicks = TIMEOUT)
+    public void testItemsInterfaceToExporterRateLimitConfigured(GameTestHelper helper) {
+        // Temporarily modify config for this test
+        int originalRateLimit = GeneralConfig.itemRateLimit;
+        GeneralConfig.itemRateLimit = 256;
+
+        placeInterfaceWithCobblestone(helper, 4);
+        placeExporterWithRate(helper, 256);
+
+        // Restore original config once the first transfer happened
+        succeedWhenFirstExportEquals(helper, 256, () -> GeneralConfig.itemRateLimit = originalRateLimit);
     }
 
 }
