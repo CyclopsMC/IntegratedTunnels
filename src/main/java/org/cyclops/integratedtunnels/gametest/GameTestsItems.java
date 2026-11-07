@@ -4,6 +4,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -46,7 +47,10 @@ import org.cyclops.integratedtunnels.part.aspect.TunnelAspects;
 
 import static org.cyclops.integrateddynamics.gametest.GameTestHelpersIntegratedDynamics.createVariableForValue;
 import static org.cyclops.integrateddynamics.gametest.GameTestHelpersIntegratedDynamics.createVariableFromReader;
+import static org.cyclops.integrateddynamics.gametest.GameTestHelpersIntegratedDynamics.getAspectPropertyVariableError;
+import static org.cyclops.integrateddynamics.gametest.GameTestHelpersIntegratedDynamics.getEffectiveAspectProperty;
 import static org.cyclops.integrateddynamics.gametest.GameTestHelpersIntegratedDynamics.placeVariableInWriter;
+import static org.cyclops.integrateddynamics.gametest.GameTestHelpersIntegratedDynamics.setAspectPropertyVariable;
 import static org.cyclops.integratedtunnels.gametest.GameTestHelpersIntegratedTunnels.setPassiveInteraction;
 import static org.cyclops.integratedtunnels.gametest.GameTestHelpersIntegratedTunnels.setTargetSide;
 import static org.cyclops.integratedtunnels.gametest.GameTestHelpersIntegratedTunnels.setTargetSideViaSettings;
@@ -1363,6 +1367,69 @@ public class GameTestsItems {
 
         // Restore original config once the first transfer happened
         succeedWhenFirstExportEquals(helper, 256, () -> GeneralConfig.itemRateLimit = originalRateLimit);
+    }
+
+    private static PartPos placeExporterWithRateVariable(GameTestHelper helper, int rate) {
+        helper.setBlock(POS, RegistryEntries.BLOCK_CABLE.value());
+        PartPos posExporter = PartPos.of(helper.getLevel(), helper.absolutePos(POS), Direction.EAST);
+        PartHelpers.addPart(helper.getLevel(), helper.absolutePos(POS), Direction.EAST, PartTypes.EXPORTER_ITEM, new ItemStack(PartTypes.EXPORTER_ITEM.getItem()));
+        placeVariableInWriter(helper.getLevel(), posExporter, TunnelAspects.Write.Item.BOOLEAN_EXPORT, new ItemStack(RegistryEntries.ITEM_VARIABLE));
+        setAspectPropertyVariable(posExporter, TunnelAspects.Write.Item.BOOLEAN_EXPORT, TunnelAspectWriteBuilders.Item.PROP_RATE,
+                createVariableForValue(helper.getLevel(), ValueTypes.INTEGER, ValueTypeInteger.ValueInteger.of(rate)));
+        return posExporter;
+    }
+
+    @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
+    public void testItemsExporterRateVariableAboveRateLimit(GameTestHelper helper) {
+        PartPos posExporter = placeExporterWithRateVariable(helper, 65);
+
+        helper.succeedWhen(() -> {
+            Component error = getAspectPropertyVariableError(posExporter, TunnelAspects.Write.Item.BOOLEAN_EXPORT, TunnelAspectWriteBuilders.Item.PROP_RATE);
+            helper.assertTrue(error != null, "Rate variable has no error");
+            helper.assertValueEqual(error, Component.translatable("gui.integrateddynamics.aspectsettings.slot.message.invalidvalue"), "Rate variable error");
+            // The default rate is used instead
+            helper.assertValueEqual(
+                    getEffectiveAspectProperty(posExporter, TunnelAspects.Write.Item.BOOLEAN_EXPORT, TunnelAspectWriteBuilders.Item.PROP_RATE).getRawValue(),
+                    64,
+                    "Effective rate");
+        });
+    }
+
+    @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
+    public void testItemsExporterRateVariableWithinRateLimit(GameTestHelper helper) {
+        PartPos posExporter = placeExporterWithRateVariable(helper, 32);
+
+        helper.succeedWhen(() -> {
+            helper.assertValueEqual(
+                    getEffectiveAspectProperty(posExporter, TunnelAspects.Write.Item.BOOLEAN_EXPORT, TunnelAspectWriteBuilders.Item.PROP_RATE).getRawValue(),
+                    32,
+                    "Effective rate");
+            helper.assertTrue(
+                    getAspectPropertyVariableError(posExporter, TunnelAspects.Write.Item.BOOLEAN_EXPORT, TunnelAspectWriteBuilders.Item.PROP_RATE) == null,
+                    "Rate variable has an error");
+        });
+    }
+
+    @GameTest(template = TEMPLATE_EMPTY, batch = "item_rate_limit_configured_validator", timeoutTicks = TIMEOUT)
+    public void testItemsExporterRateVariableConfiguredRateLimit(GameTestHelper helper) {
+        // Temporarily modify config for this test
+        int originalRateLimit = GeneralConfig.itemRateLimit;
+        GeneralConfig.itemRateLimit = 128;
+
+        PartPos posExporter = placeExporterWithRateVariable(helper, 128);
+
+        helper.succeedWhen(() -> {
+            helper.assertValueEqual(
+                    getEffectiveAspectProperty(posExporter, TunnelAspects.Write.Item.BOOLEAN_EXPORT, TunnelAspectWriteBuilders.Item.PROP_RATE).getRawValue(),
+                    128,
+                    "Effective rate");
+            helper.assertTrue(
+                    getAspectPropertyVariableError(posExporter, TunnelAspects.Write.Item.BOOLEAN_EXPORT, TunnelAspectWriteBuilders.Item.PROP_RATE) == null,
+                    "Rate variable has an error");
+
+            // Restore original config
+            GeneralConfig.itemRateLimit = originalRateLimit;
+        });
     }
 
 }
