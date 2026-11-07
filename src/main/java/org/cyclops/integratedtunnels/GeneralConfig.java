@@ -23,6 +23,10 @@ public class GeneralConfig extends DummyConfigCommon<IModBase> {
     @ConfigurablePropertyCommon(category = "core", comment = "The maximum network fluid transfer rate.", isCommandable = true, minimalValue = 0, configLocation = ModConfigLocation.SERVER)
     public static int fluidRateLimit = Integer.MAX_VALUE;
 
+    // TODO: increase default value in next major version
+    @ConfigurablePropertyCommon(category = "core", comment = "The maximum network item transfer rate.", isCommandable = true, minimalValue = 0, configLocation = ModConfigLocation.SERVER)
+    public static int itemRateLimit = 64;
+
     @ConfigurablePropertyCommon(category = "core", comment = "If particles should be shown and sounds should be played when tunnels are interacting with the world.", isCommandable = true)
     public static boolean worldInteractionEvents = true;
 

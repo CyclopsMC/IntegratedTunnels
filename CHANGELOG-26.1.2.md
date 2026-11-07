@@ -1,8 +1,22 @@
 # Changelog for Minecraft 26.1.2
 All notable changes to this project will be documented in this file.
 
+<a name="26.1.2-1.13.3"></a>
+## [26.1.2-1.13.3](https://github.com/CyclopsMC/IntegratedTunnels/compare/26.1.2-1.13.2...26.1.2-1.13.3) - 2026-11-07 16:37:25
+
+
+### Added
+* Add config option to modify item rate limit (#399), Closes #398
+
+<a name="26.1.2-1.13.2"></a>
+## [26.1.2-1.13.2](https://github.com/CyclopsMC/IntegratedTunnels/compare/26.1.2-1.13.1...26.1.2-1.13.2) - 2026-10-16 05:10:02 +0200
+
+
+### Fixed
+* Fix Player Simulator crash on synced attachments (#396), Closes #395
+
 <a name="26.1.2-1.13.1"></a>
-## [26.1.2-1.13.1](https://github.com/CyclopsMC/IntegratedTunnels/compare/26.1.2-1.13.0...26.1.2-1.13.1) - 2026-10-10 08:48:29
+## [26.1.2-1.13.1](https://github.com/CyclopsMC/IntegratedTunnels/compare/26.1.2-1.13.0...26.1.2-1.13.1) - 2026-10-10 08:48:29 +0200
 
 
 ### Fixed

@@ -3,6 +3,7 @@ package org.cyclops.integratedtunnels.core.network;
 import net.minecraft.world.item.ItemStack;
 import org.cyclops.commoncapabilities.api.ingredient.IngredientComponent;
 import org.cyclops.integrateddynamics.core.network.PositionedAddonsNetworkIngredients;
+import org.cyclops.integratedtunnels.GeneralConfig;
 import org.cyclops.integratedtunnels.api.network.IItemNetwork;
 
 /**
@@ -17,6 +18,6 @@ public class ItemNetwork extends PositionedAddonsNetworkIngredients<ItemStack, I
 
     @Override
     public long getRateLimit() {
-        return 64;
+        return GeneralConfig.itemRateLimit;
     }
 }

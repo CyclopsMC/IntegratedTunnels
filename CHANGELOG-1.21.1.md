@@ -1,8 +1,15 @@
 # Changelog for Minecraft 1.21.1
 All notable changes to this project will be documented in this file.
 
+<a name="1.21.1-1.13.1"></a>
+## [1.21.1-1.13.1](https://github.com/CyclopsMC/IntegratedTunnels/compare/1.21.1-1.13.0...1.21.1-1.13.1) - 2026-11-07 16:28:30
+
+
+### Added
+* Add config option to modify item rate limit (#399), Closes #398
+
 <a name="1.21.1-1.13.0"></a>
-## [1.21.1-1.13.0](https://github.com/CyclopsMC/IntegratedTunnels/compare/1.21.1-1.12.0...1.21.1-1.13.0) - 2026-10-03 14:03:07
+## [1.21.1-1.13.0](https://github.com/CyclopsMC/IntegratedTunnels/compare/1.21.1-1.12.0...1.21.1-1.13.0) - 2026-10-03 14:03:07 +0200
 
 
 ### Added
