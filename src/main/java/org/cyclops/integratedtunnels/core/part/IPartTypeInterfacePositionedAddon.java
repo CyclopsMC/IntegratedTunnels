@@ -206,6 +206,8 @@ public interface IPartTypeInterfacePositionedAddon<N extends IPositionedAddonsNe
         if (posTarget.getPos().getLevel(true) instanceof ServerLevel serverLevel) {
             ICapabilityInvalidationListener listener = () -> {
                 state.setTargetCapabilityInvalidated(true);
+                // No neighbour change may follow, so re-check the target by ourselves.
+                InterfaceTargetRecheckScheduler.schedule(this, state);
                 return true;
             };
             // The part state must hold on to the listener, as NeoForge only references it weakly.

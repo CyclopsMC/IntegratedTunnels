@@ -10,6 +10,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.GameType;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.HopperBlock;
 import net.minecraft.world.level.block.entity.ChestBlockEntity;
@@ -1148,6 +1149,47 @@ public class GameTestsItems {
                 // The exporter can still run before the network observed the container that just
                 // joined it, after which it sleeps. That sleep expires on wall-clock time rather
                 // than on ticks, so wait for the transfer instead of asserting after fixed ticks.
+                .thenWaitUntil(() -> {
+                    helper.assertContainerContains(POS.east().east(), Items.WHITE_WOOL);
+                    helper.assertContainerEmpty(POS.west());
+                })
+                .thenSucceed();
+    }
+
+    /**
+     * An interface must pick up a container that appears later without causing a neighbour or shape update,
+     * which happens for blocks that only signal this through a capability invalidation.
+     */
+    @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = TIMEOUT)
+    public void testItemsInterfaceTargetPlacedLaterWithoutNeighbourUpdate(GameTestHelper helper) {
+        // Place cable
+        helper.setBlock(POS, RegistryEntries.BLOCK_CABLE.value());
+        helper.setBlock(POS.east(), RegistryEntries.BLOCK_CABLE.value());
+
+        // Place item interface, without a container to expose yet
+        PartHelpers.addPart(helper.getLevel(), helper.absolutePos(POS), Direction.WEST, PartTypes.INTERFACE_ITEM, new ItemStack(PartTypes.INTERFACE_ITEM.getItem()));
+        PartPos posInterface = PartPos.of(helper.getLevel(), helper.absolutePos(POS), Direction.WEST);
+
+        // Place item exporter with an output chest, but don't activate it yet
+        PartHelpers.addPart(helper.getLevel(), helper.absolutePos(POS.east()), Direction.EAST, PartTypes.EXPORTER_ITEM, new ItemStack(PartTypes.EXPORTER_ITEM.getItem()));
+        helper.setBlock(POS.east().east(), Blocks.CHEST);
+
+        helper.startSequence()
+                // Let the interface join the network without a container
+                .thenIdle(TICKS_NETWORK_INIT)
+                .thenExecute(() -> helper.assertFalse(isInterfaceTargetValid(posInterface), "Interface exposed a container before one was placed"))
+                // Place an empty container without notifying neighbours or updating shapes,
+                // so only its capability invalidation reaches the interface.
+                .thenExecute(() -> helper.getLevel().setBlock(helper.absolutePos(POS.west()), Blocks.CHEST.defaultBlockState(), Block.UPDATE_CLIENTS | Block.UPDATE_KNOWN_SHAPE))
+                .thenIdle(TICKS_NETWORK_INIT)
+                .thenExecute(() -> helper.assertTrue(isInterfaceTargetValid(posInterface), "Interface did not expose the container that was placed later"))
+                // Filling the container does notify its neighbours, so only do this after the check above
+                .thenExecute(() -> {
+                    ChestBlockEntity chestIn = helper.getBlockEntity(POS.west());
+                    chestIn.setItem(0, new ItemStack(Items.WHITE_WOOL));
+                })
+                .thenExecute(() -> placeVariableInWriter(helper.getLevel(), PartPos.of(helper.getLevel(), helper.absolutePos(POS.east()), Direction.EAST),
+                        TunnelAspects.Write.Item.BOOLEAN_EXPORT, new ItemStack(RegistryEntries.ITEM_VARIABLE)))
                 .thenWaitUntil(() -> {
                     helper.assertContainerContains(POS.east().east(), Items.WHITE_WOOL);
                     helper.assertContainerEmpty(POS.west());

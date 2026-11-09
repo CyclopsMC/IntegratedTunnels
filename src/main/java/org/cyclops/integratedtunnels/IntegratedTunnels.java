@@ -31,6 +31,7 @@ import org.cyclops.integratedtunnels.capability.network.TunnelNetworkCapabilityC
 import org.cyclops.integratedtunnels.command.CommandGenerateTunnels;
 import org.cyclops.integratedtunnels.core.ItemStoragePlayerWrapper;
 import org.cyclops.integratedtunnels.core.part.ContainerInterfaceSettingsConfig;
+import org.cyclops.integratedtunnels.core.part.InterfaceTargetRecheckScheduler;
 import org.cyclops.integratedtunnels.core.world.BlockBreakHandlerRegistry;
 import org.cyclops.integratedtunnels.core.world.BlockBreakHandlers;
 import org.cyclops.integratedtunnels.core.world.BlockBreakPlaceRegistry;
@@ -67,6 +68,8 @@ public class IntegratedTunnels extends ModBaseVersionable<IntegratedTunnels> {
         modEventBus.addListener(Capabilities::registerPartCapabilities);
         modEventBus.register(new TunnelNetworkCapabilityConstructors());
         NeoForge.EVENT_BUS.addListener(ItemStoragePlayerWrapper::onTameAnimal);
+        NeoForge.EVENT_BUS.addListener(InterfaceTargetRecheckScheduler::onServerTick);
+        NeoForge.EVENT_BUS.addListener(InterfaceTargetRecheckScheduler::onServerStopped);
     }
 
     public void onRegistriesCreate(NewRegistryEvent event) {
